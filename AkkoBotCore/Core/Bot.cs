@@ -70,6 +70,10 @@ namespace AkkoBot.Core
 
         private void CreateCredentials(string filePath)
         {
+            // Ensure the folder exists
+            if (!Directory.Exists(AkkoEnvironment.CredsDirectory))
+                Directory.CreateDirectory(AkkoEnvironment.CredsDirectory);
+
             // Serialize the default credentials into a new file.
             using (var writer = File.CreateText(filePath))
                 new Serializer().Serialize(writer, _creds);
