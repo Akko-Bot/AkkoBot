@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
 {
     [Comment("Stores settings related to individual Discord servers.")]
-    public partial class GuildConfigEntity
+    public partial class GuildConfigEntity : DbEntity
     {
         [Key]
         public ulong GuildId { get; set; }

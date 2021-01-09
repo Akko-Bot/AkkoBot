@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
 {
     [Comment("Stores settings related to the bot.")]
-    public partial class BotConfigEntity
+    public partial class BotConfigEntity : DbEntity
     {
         [Required]
         [MaxLength(15)]

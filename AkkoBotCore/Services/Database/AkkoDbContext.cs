@@ -1,7 +1,5 @@
 ﻿using AkkoBot.Services.Database.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-
 
 
 namespace AkkoBot.Services.Database
@@ -11,7 +9,7 @@ namespace AkkoBot.Services.Database
         public DbSet<DiscordUserEntity> DiscordUsers { get; set; }
         public DbSet<BotConfigEntity> BotConfig { get; set; }
         public DbSet<GuildConfigEntity> GuildConfigs { get; set; }
-        public DbSet<BlacklistEntity> GlobalBlacklist { get; set; }
+        public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt) { }

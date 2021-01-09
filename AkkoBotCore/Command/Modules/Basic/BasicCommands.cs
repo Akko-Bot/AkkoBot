@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Repository;
+using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -15,14 +17,20 @@ namespace AkkoBot.Command.Modules.Basic
     public class BasicCommands : AkkoCommandModule
     {
         private readonly DateTimeOffset _startup;
-        private readonly AkkoDbContext _db;
+        private readonly AkkoUnitOfWork _db;
         //private readonly Credentials _creds;
 
-        public BasicCommands(AkkoDbContext db)
+        public BasicCommands(AkkoUnitOfWork db)
         {
             _startup = DateTimeOffset.Now;
             _db = db;
             //_creds = creds;
+
+            /*
+            Receive Repository object
+            Repository looks up cache
+            Repository returns result from request
+             */
         }
 
         [Command("ping")]
@@ -68,30 +76,20 @@ namespace AkkoBot.Command.Modules.Basic
         [Description("Reads an entry of myself in the db.")]
         public async Task DbRead(CommandContext context)
         {
-            var result = _db.DiscordUsers
-                .Where(u => u.UserId == context.User.Id)
-                .Select(u => u.Username)
-                .FirstOrDefault();
+            var result = await _db.DiscordUsers.GetAsync(x => x.UserId == context.User.Id);
 
             if (result is null)
                 await context.RespondAsync("Nothing");
             else
-                await context.RespondAsync(result);
+                await context.RespondAsync(result.FirstOrDefault()?.Username);
         }
 
         [Command("dbwrite")]
         [Description("Writes an entry of myself in the db.")]
         public async Task DbWrite(CommandContext context)
         {
-            var me = new DiscordUserEntity()
-            {
-                UserId = context.User.Id,
-                Username = context.User.Username,
-                Discriminator = context.User.Discriminator
-            };
-
-            _db.DiscordUsers.Add(me);
-            _db.SaveChanges();
+            await _db.DiscordUsers.CreateOrUpdate(context.User);
+            await _db.SaveChangesAsync();
 
             await context.RespondAsync("Done. Inserted db entry.");
         }
@@ -106,7 +104,7 @@ namespace AkkoBot.Command.Modules.Basic
                 TypeId = context.User.Id
             };
 
-            _db.GlobalBlacklist.Add(me);
+            await _db.Blacklist.CreateAsync(me);
             _db.SaveChanges();
 
             await context.RespondAsync("Done. Inserted db entry.");
@@ -116,13 +114,13 @@ namespace AkkoBot.Command.Modules.Basic
         [Description("Add blacklist.")]
         public async Task RemBl(CommandContext context)
         {
-            _db.GlobalBlacklist.Remove(new BlacklistEntity()
+            _db.Blacklist.Delete(new BlacklistEntity()
             {
                 Type = BlacklistType.User,
                 TypeId = context.User.Id
             });
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             await context.RespondAsync("Done. Removed db entry.");
         }

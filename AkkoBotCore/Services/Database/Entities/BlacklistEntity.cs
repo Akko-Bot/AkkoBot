@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
@@ -6,7 +7,7 @@ namespace AkkoBot.Services.Database.Entities
     public enum BlacklistType { User, Channel, Guild }
 
     [Comment("Stores users, channels, and servers blacklisted from the bot.")]
-    public class BlacklistEntity
+    public class BlacklistEntity : DbEntity
     {
         [Key]
         public ulong TypeId { get; set; }

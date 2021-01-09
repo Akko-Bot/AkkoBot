@@ -17,7 +17,7 @@ namespace AkkoBot.Command.Attributes
         {
             var db = context.CommandsNext.Services.GetService(typeof(AkkoDbContext)) as AkkoDbContext;
 
-            if (context.Member.IsBot || db.GlobalBlacklist.Find(context.Member.Id) is not null)
+            if (context.Member.IsBot || db.Blacklist.Find(context.Member.Id) is not null)
                 return Task.FromResult(false);
             else
                 return Task.FromResult(true);
