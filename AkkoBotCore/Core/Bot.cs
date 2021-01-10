@@ -8,6 +8,7 @@ using YamlDotNet.Serialization;
 using AkkoBot.Credential;
 using AkkoBot.Core.Common;
 using AkkoBot.Services;
+using AkkoBot.Services.Database;
 
 namespace AkkoBot.Core
 {
@@ -27,15 +28,9 @@ namespace AkkoBot.Core
                 .WithDefaultDbContext()
                 .BuildAsync();
 
-            // Debug
-            foreach (var handler in botCore.CommandExt.Values)
-                handler.CommandErrored += (a, b) =>
-                {
-                    botCore.BotClient.Logger.LogError(
-                        new EventId(LoggerEvents.WebSocketReceiveFailure.Id, "Command"),
-                        b?.Exception.ToString());
-                    return Task.CompletedTask;
-                };
+            // Events
+            var startup = new Startup(botCore.GetServices().GetService(typeof(AkkoUnitOfWork)) as AkkoUnitOfWork);
+            startup.RegisterEvents(botCore);
 
             // Connect to Discord
             try

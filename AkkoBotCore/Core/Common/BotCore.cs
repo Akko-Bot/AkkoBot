@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services;
+using AkkoBot.Services.Database;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -30,6 +31,13 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
+        /// Returns the service container for this bot instance.
+        /// </summary>
+        /// <returns>The IoC container servicing this bot or <see langword="null"/> if there is none.</returns>
+        public IServiceProvider GetServices()
+            => CommandExt.Values.FirstOrDefault()?.Services;
+
+        /// <summary>
         /// Registers all commands in the project into the command handler.
         /// </summary>
         private void RegisterCommandModules()
@@ -49,9 +57,5 @@ namespace AkkoBot.Core.Common
                 $"{modules.Length} command modules were successfully loaded on {CommandExt.Count} shards"
             );
         }
-
-        // Change this to pull from the database
-        public static Task<int> ResolvePrefix(DiscordMessage msg)
-            => Task.FromResult(msg.GetStringPrefixLength(">>>", StringComparison.OrdinalIgnoreCase));
     }
 }

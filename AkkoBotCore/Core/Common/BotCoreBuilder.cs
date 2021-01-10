@@ -109,6 +109,9 @@ namespace AkkoBot.Core.Common
             if (_creds is null)
                 throw new InvalidOperationException("No 'Credentials' object was provided.");
 
+            var services = _cmdServices.BuildServiceProvider();
+            var pResolver = services.GetService<PrefixResolver>();
+
             // Setup client configuration
             var botConfig = new DiscordConfiguration()
             {
@@ -127,9 +130,9 @@ namespace AkkoBot.Core.Common
                 EnableDms = _creds.EnableDms,                           // Sets whether the bot responds in dm or not
                 EnableMentionPrefix = _creds.EnableMentionPrefix,       // Sets whether the bot accepts its own mention as a prefix for commands
                 IgnoreExtraArguments = true,                            // Sets whether the bot ignores extra arguments on commands or not
-                Services = _cmdServices.BuildServiceProvider(),         // Sets the dependencies used by the command modules
+                Services = services,                                    // Sets the dependencies used by the command modules
                 EnableDefaultHelp = _creds.EnableHelpCommand,           // Sets whether the bot should use the default help command from the library
-                PrefixResolver = (msg) => BotCore.ResolvePrefix(msg)    // Sets the prefix, defined by the users
+                PrefixResolver = (msg) => pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
             };
 
             var botClient = new DiscordShardedClient(botConfig);

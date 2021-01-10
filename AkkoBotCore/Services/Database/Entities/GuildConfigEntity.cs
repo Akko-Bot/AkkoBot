@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Services.Database.Abstractions;
+using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities

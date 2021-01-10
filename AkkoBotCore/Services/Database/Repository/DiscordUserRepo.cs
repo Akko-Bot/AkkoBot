@@ -15,7 +15,7 @@ namespace AkkoBot.Services.Database.Repository
         public async Task CreateOrUpdate(DiscordUser user)
         {
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO discord_users(user_id, username, discriminator) " + 
+                @"INSERT INTO discord_users(user_id, username, discriminator) " +
                 $"VALUES({user.Id}, '{user.Username}', '{user.Discriminator}') " +
                 @"ON CONFLICT (user_id) " +
                 @"DO " +
