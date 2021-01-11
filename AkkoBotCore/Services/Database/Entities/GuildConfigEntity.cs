@@ -37,5 +37,10 @@ namespace AkkoBot.Services.Database.Entities
         // Warnings, warn expire and warn punishments
         // Xp notification
         // .rero messages and reactions
+
+        public GuildConfigEntity() { }
+        
+        public GuildConfigEntity(DiscordGuild guild = null)
+            => GuildId = guild?.Id ?? default;
     }
 }

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database
 {
-    public class AkkoUnitOfWork : IUnitOfWork, ICommandService
+    public class AkkoUnitOfWork : /*IUnitOfWork,*/ ICommandService
     {
         private readonly AkkoDbContext _db;
 
         public DiscordUserRepo DiscordUsers { get; }
-        public DbRepository<BlacklistEntity> Blacklist { get; }
-        public DbRepository<BotConfigEntity> BotConfig { get; }
+        public BlacklistRepo Blacklist { get; }
+        public BotConfigRepo BotConfig { get; }
         public GuildConfigRepo GuildConfigs { get; }
         public DbRepository<PlayingStatusEntity> PlayingStatuses { get; }
 
@@ -21,8 +21,8 @@ namespace AkkoBot.Services.Database
             _db = db;
 
             DiscordUsers = new(db);
-            Blacklist = new(db);
-            BotConfig = new(db);
+            Blacklist = new(db, dbCache);
+            BotConfig = new(db, dbCache);
             GuildConfigs = new(db, dbCache);
             PlayingStatuses = new(db);
         }

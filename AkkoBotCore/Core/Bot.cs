@@ -28,8 +28,8 @@ namespace AkkoBot.Core
                 .WithDefaultDbContext()
                 .BuildAsync();
 
-            // Events
-            var startup = new Startup(botCore.GetServices().GetService(typeof(AkkoUnitOfWork)) as AkkoUnitOfWork);
+            // Events - TODO: put this in a BotCoreBuilder method?
+            var startup = new Startup(botCore.GetService<AkkoUnitOfWork>());
             startup.RegisterEvents(botCore);
 
             // Connect to Discord
@@ -41,8 +41,8 @@ namespace AkkoBot.Core
             {
                 botCore.BotClient.Logger.LogCritical(
                     new EventId(LoggerEvents.ConnectionFailure.Id, "AkkoBot"),
-                    "An error has occurred while attempting to connect to Discord. " +
-                    "Make sure your credentials are correct and that you don't have " +
+                    @"An error has occurred while attempting to connect to Discord. " +
+                    @"Make sure your credentials are correct and that you don't have " +
                     $"a firewall or any external software blocking the connection. [{ex.Message}]"
                 );
 

@@ -132,7 +132,7 @@ namespace AkkoBot.Core.Common
                 IgnoreExtraArguments = true,                            // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                    // Sets the dependencies used by the command modules
                 EnableDefaultHelp = _creds.EnableHelpCommand,           // Sets whether the bot should use the default help command from the library
-                PrefixResolver = (msg) => pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
+                PrefixResolver = async (msg) => await pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
             };
 
             var botClient = new DiscordShardedClient(botConfig);

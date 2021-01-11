@@ -9,15 +9,15 @@ namespace AkkoBot.Services.Database
 {
     public class AkkoDbCacher : ICommandService
     {
-        public HashSet<ulong> BlackList { get; init; }
-        public string DefaultPrefix { get; set; }
-        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; init; }
-        public List<PlayingStatusEntity> PlayingStatuses { get; init; }
+        public HashSet<ulong> Blacklist { get; }
+        public BotConfigEntity BotConfig { get; }
+        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
+        public List<PlayingStatusEntity> PlayingStatuses { get; }
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {
-            BlackList = dbContext.Blacklist.Select(x => x.TypeId).ToHashSet() ?? new();
-            DefaultPrefix = dbContext.BotConfig.Select(x => x.DefaultPrefix).FirstOrDefault() ?? "!";
+            Blacklist = dbContext.Blacklist.Select(x => x.TypeId).ToHashSet() ?? new();
+            BotConfig = dbContext.BotConfig.FirstOrDefault() ?? new();
             Guilds = dbContext.GuildConfigs.ToConcurrentDictionary(x => x.GuildId) ?? new();
             PlayingStatuses = dbContext.PlayingStatuses.ToList() ?? new();
         }

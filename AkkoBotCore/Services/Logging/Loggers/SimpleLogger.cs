@@ -57,7 +57,7 @@ namespace AkkoBot.Services.Logging.Loggers
                 {
                     var logBody =
                         $"[{_cmdContext.Client.ShardId}] " +
-                        $"g:{_cmdContext.Guild.Id} " +
+                        $"g:{((_cmdContext.Guild is null) ? "Private" : "[" + _cmdContext.Guild.Id + "]")} " +
                         $"| c:{_cmdContext.Channel.Id} " +
                         $"| u:{_cmdContext.User.Id} " +
                         $"| msg: {message} ";

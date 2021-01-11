@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Repository
@@ -8,37 +9,48 @@ namespace AkkoBot.Services.Database.Repository
     public class GuildConfigRepo : DbRepository<GuildConfigEntity>
     {
         private readonly AkkoDbContext _db;
-        private readonly AkkoDbCacher _dbCacher;
+        private readonly BotConfigEntity _botConfig;
+        public ConcurrentDictionary<ulong, GuildConfigEntity> Cache { get; }
 
         public GuildConfigRepo(AkkoDbContext db, AkkoDbCacher dbCacher) : base(db)
         {
             _db = db;
-            _dbCacher = dbCacher;
+            _botConfig = dbCacher.BotConfig;
+            Cache = dbCacher.Guilds;
+        }
+
+        public async Task<string> GetPrefixAsync(ulong sid)
+        {
+            return (await GetGuildAsync(sid)).Prefix;
         }
 
         public async Task<GuildConfigEntity> GetGuildAsync(ulong sid)
         {
-            if (_dbCacher.Guilds.ContainsKey(sid))
-                return _dbCacher.Guilds[sid];
+            if (Cache.ContainsKey(sid))
+                return Cache[sid];
             else
             {
                 var guild = await base.GetAsync(sid);
-                _dbCacher.Guilds.TryAdd(guild.GuildId, guild);
+                Cache.TryAdd(guild.GuildId, guild);
 
                 return guild;
             }
         }
 
-        public async Task TryAddAsync(DiscordGuild guild)
+        public async Task TryCreateAsync(DiscordGuild guild)
         {
-            var dGuild = new GuildConfigEntity();
+            var dGuild = new GuildConfigEntity(guild);
 
+            // Add to the database
             await _db.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color) " +
-                $"VALUES({guild.Id}, '{_dbCacher.DefaultPrefix}', {true}, '{dGuild.OkColor}', '{dGuild.ErrorColor}') " +
+                $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO NOTHING;"
             );
+
+            // Add to the cache
+            Cache.TryAdd(dGuild.GuildId, dGuild);
         }
 
         public async Task CreateOrUpdateAsync(GuildConfigEntity guild)
@@ -54,8 +66,8 @@ namespace AkkoBot.Services.Database.Repository
             );
 
             // Update the cache
-            if (!_dbCacher.Guilds.TryAdd(guild.GuildId, guild))
-                _dbCacher.Guilds.TryUpdate(guild.GuildId, guild, _dbCacher.Guilds[guild.GuildId]);
+            if (!Cache.TryAdd(guild.GuildId, guild))
+                Cache.TryUpdate(guild.GuildId, guild, Cache[guild.GuildId]);
         }
     }
 }

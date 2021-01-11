@@ -9,16 +9,17 @@ namespace AkkoBot.Core.Common
 {
     public class PrefixResolver : ICommandService
     {
-        private readonly AkkoDbCacher _dbCache;
+        private readonly AkkoUnitOfWork _db;
 
-        public PrefixResolver(AkkoDbCacher dbCache)
-            => _dbCache = dbCache;
+        public PrefixResolver(AkkoUnitOfWork db)
+            => _db = db;
 
-        public Task<int> ResolvePrefix(DiscordMessage msg)
+        public async Task<int> ResolvePrefix(DiscordMessage msg)
         {
+            // Server prefix needs to be changed
             return (msg.Channel.IsPrivate)
-                ? Task.FromResult(msg.GetStringPrefixLength(_dbCache.DefaultPrefix, StringComparison.OrdinalIgnoreCase))
-                : Task.FromResult(msg.GetStringPrefixLength(_dbCache.Guilds[msg.Channel.GuildId].Prefix, StringComparison.OrdinalIgnoreCase));
+                ? msg.GetStringPrefixLength(_db.BotConfig.Cache.DefaultPrefix, StringComparison.OrdinalIgnoreCase)
+                : msg.GetStringPrefixLength(await _db.GuildConfigs.GetPrefixAsync(msg.Channel.GuildId), StringComparison.OrdinalIgnoreCase);
         }
     }
 }

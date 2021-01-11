@@ -38,6 +38,14 @@ namespace AkkoBot.Core.Common
             => CommandExt.Values.FirstOrDefault()?.Services;
 
         /// <summary>
+        /// Returns a specific service registered in this bot instance.
+        /// </summary>
+        /// <typeparam name="T">Class of the registered service.</typeparam>
+        /// <returns>The registered service or <see langword="null"/> if it hasn't been registered.</returns>
+        public T GetService<T>()
+            => (T)CommandExt.Values.FirstOrDefault()?.Services.GetService(typeof(T));
+
+        /// <summary>
         /// Registers all commands in the project into the command handler.
         /// </summary>
         private void RegisterCommandModules()
