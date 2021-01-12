@@ -31,10 +31,11 @@ namespace AkkoBot.Services.Database.Repository
         /// Removes a playing status from the database and the cache.
         /// </summary>
         /// <param name="pStatus"></param>
-        public void Remove(PlayingStatusEntity pStatus)
+        /// <returns><see langword="true"/> if the entry got removed from the database, <see langword="false"/> otherwise.</returns>
+        public bool Remove(PlayingStatusEntity pStatus)
         {
             base.Delete(pStatus);
-            Cache.Remove(pStatus);
+            return Cache.Remove(pStatus);
         }
 
         /// <summary>

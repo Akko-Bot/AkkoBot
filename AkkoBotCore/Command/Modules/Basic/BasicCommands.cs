@@ -105,7 +105,7 @@ namespace AkkoBot.Command.Modules.Basic
                 Name = context.User.Username
             };
 
-            await _db.Blacklist.AddAsync(me);
+            await _db.Blacklist.TryCreateAsync(me);
             await _db.SaveChangesAsync();
 
             await context.RespondAsync("Done. Inserted db entry.");

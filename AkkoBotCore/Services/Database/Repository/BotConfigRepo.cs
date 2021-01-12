@@ -20,8 +20,8 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="botConfig">The new bot settings.</param>
         /// <remarks>If an entry already exists, it does nothing.</remarks>
-        /// <returns></returns>
-        public async Task TryCreateAsync(BotConfigEntity botConfig)
+        /// <returns><see langword="true"/> if the entry got added to the database, <see langword="false"/> otherwise.</returns>
+        public async Task<bool> TryCreateAsync(BotConfigEntity botConfig)
         {
             // Add to the database
             var result = await _db.Database.ExecuteSqlRawAsync(
@@ -35,7 +35,12 @@ namespace AkkoBot.Services.Database.Repository
 
             // Change the cache if the query inserted a row
             if (result > 0)
+            {
                 Cache = botConfig;
+                return true;
+            }
+
+            return false;
         }
     }
 }

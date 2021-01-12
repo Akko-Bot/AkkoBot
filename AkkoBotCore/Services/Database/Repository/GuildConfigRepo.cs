@@ -50,8 +50,8 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="guild">The ID of the Discord guild.</param>
         /// <remarks>If an entry for the guild already exists, it does nothing.</remarks>
-        /// <returns></returns>
-        public async Task TryCreateAsync(DiscordGuild guild)
+        /// <returns><see langword="true"/> if the user got added to the database, <see langword="false"/> otherwise.</returns>
+        public async Task<bool> TryCreateAsync(DiscordGuild guild)
         {
             var dGuild = new GuildConfigEntity(guild);
 
@@ -64,15 +64,15 @@ namespace AkkoBot.Services.Database.Repository
             );
 
             // Add to the cache
-            Cache.TryAdd(dGuild.GuildId, dGuild);
+            return Cache.TryAdd(dGuild.GuildId, dGuild);
         }
 
         /// <summary>
         /// Upserts an entry for the specified guild into the database.
         /// </summary>
         /// <param name="guild">The ID of the Discord guild.</param>
-        /// <returns></returns>
-        public async Task CreateOrUpdateAsync(GuildConfigEntity guild)
+        /// <returns><see langword="true"/> if the user got added to the database, <see langword="false"/> if it got updated.</returns>
+        public async Task<bool> CreateOrUpdateAsync(GuildConfigEntity guild)
         {
             await _db.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color) " +
@@ -86,7 +86,12 @@ namespace AkkoBot.Services.Database.Repository
 
             // Update the cache
             if (!Cache.TryAdd(guild.GuildId, guild))
+            {
                 Cache.TryUpdate(guild.GuildId, guild, Cache[guild.GuildId]);
+                return false;
+            }
+
+            return true;
         }
     }
 }

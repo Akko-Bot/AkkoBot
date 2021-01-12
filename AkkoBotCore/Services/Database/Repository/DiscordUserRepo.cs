@@ -27,20 +27,5 @@ namespace AkkoBot.Services.Database.Repository
                 $"SET username = '{user.Username}', discriminator = '{user.Discriminator}';"
             );
         }
-
-        /// <summary>
-        /// Upserts a user into the database.
-        /// </summary>
-        /// <param name="user">User to be added or updated.</param>
-        public void CreateOrUpdate(DiscordUser user)
-        {
-            _db.Database.ExecuteSqlRaw(
-                @"INSERT INTO discord_users(user_id, username, discriminator) " +
-                $"VALUES({user.Id}, '{user.Username}', '{user.Discriminator}') " +
-                @"ON CONFLICT (user_id) " +
-                @"DO UPDATE " +
-                $"SET username = '{user.Username}', discriminator = '{user.Discriminator}';"
-            );
-        }
     }
 }

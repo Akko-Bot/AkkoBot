@@ -39,8 +39,8 @@ namespace AkkoBot.Core
             }
             catch (Exception ex)
             {
-                botCore.BotClient.Logger.LogCritical(
-                    new EventId(LoggerEvents.ConnectionFailure.Id, "AkkoBot"),
+                botCore.BotClient.Logger.LogError(
+                    new EventId(LoggerEvents.ConnectionFailure.Id, "Startup"),
                     @"An error has occurred while attempting to connect to Discord. " +
                     @"Make sure your credentials are correct and that you don't have " +
                     $"a firewall or any external software blocking the connection. [{ex.Message}]"
