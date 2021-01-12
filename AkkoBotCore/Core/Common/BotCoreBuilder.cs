@@ -18,13 +18,13 @@ namespace AkkoBot.Core.Common
     {
         private Credentials _creds;
         private ILoggerFactory _loggerFactory;
-        private IServiceCollection _cmdServices;
+        private readonly IServiceCollection _cmdServices;
 
         public BotCoreBuilder(Credentials creds = null, ILoggerFactory loggerFactory = null, IServiceCollection cmdServices = null)
         {
             _creds = creds;
             _loggerFactory = loggerFactory;
-            _cmdServices = cmdServices;
+            _cmdServices = cmdServices ?? new ServiceCollection();
         }
 
         public BotCoreBuilder WithCredentials(Credentials creds)
@@ -47,33 +47,26 @@ namespace AkkoBot.Core.Common
 
         public BotCoreBuilder WithDefaultCmdServices()
         {
-            _cmdServices = _cmdServices?.AddSingletonServices(typeof(ICommandService))
-                ?? new ServiceCollection().AddSingletonServices(typeof(ICommandService));
-
+            _cmdServices.AddSingletonServices(typeof(ICommandService));
             return this;
         }
 
         public BotCoreBuilder WithCmdServices(Type serviceType)
         {
-            _cmdServices = _cmdServices?.AddSingletonServices(serviceType)
-                ?? new ServiceCollection().AddSingletonServices(serviceType);
-
+            _cmdServices.AddSingletonServices(serviceType);
             return this;
         }
 
         public BotCoreBuilder WithCmdServices(params object[] implementations)
         {
-            _cmdServices = _cmdServices?.AddSingletonServices(implementations)
-                ?? new ServiceCollection().AddSingletonServices(implementations);
-
+            _cmdServices.AddSingletonServices(implementations);
             return this;
         }
 
         public BotCoreBuilder WithDefaultDbContext()
         {
-            Action<DbContextOptionsBuilder> options = (DbContextOptionsBuilder o) =>
-            {
-                o.UseSnakeCaseNamingConvention()
+            _cmdServices.AddDbContext<AkkoDbContext>(options =>
+                options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(
                         @"Server=127.0.0.1;" +
                         @"Port=5432;" +
@@ -81,25 +74,18 @@ namespace AkkoBot.Core.Common
                         $"User Id={_creds.Database["Role"]};" +
                         $"Password={_creds.Database["Password"]};" +
                         @"CommandTimeout=20;"
-                    );
-            };
-
-            _cmdServices = _cmdServices?.AddDbContext<AkkoDbContext>(options)
-                ?? new ServiceCollection().AddDbContext<AkkoDbContext>(options);
+                )
+            );
 
             return this;
         }
 
         public BotCoreBuilder WithDbContext<T>(string connectionString) where T : DbContext
         {
-            Action<DbContextOptionsBuilder> options = (DbContextOptionsBuilder o) =>
-            {
-                o.UseSnakeCaseNamingConvention()
-                    .UseNpgsql(connectionString);
-            };
-
-            _cmdServices = _cmdServices?.AddDbContext<T>(options)
-                ?? new ServiceCollection().AddDbContext<T>(options);
+            _cmdServices.AddDbContext<T>(options =>
+                options.UseSnakeCaseNamingConvention()
+                    .UseNpgsql(connectionString)
+            );
 
             return this;
         }
@@ -120,7 +106,7 @@ namespace AkkoBot.Core.Common
                 AutoReconnect = true,           // Sets whether the bot should automatically reconnect in case it disconnects
                 ReconnectIndefinitely = false,  // Sets whether the bot should attempt to reconnect indefinitely
                 MessageCacheSize = 200,         // Defines how many messages should be cached by the library, per channel
-                LoggerFactory = _loggerFactory  // Overrides D#+ default logger with our own
+                LoggerFactory = _loggerFactory  // Overrides D#+ default logger with your own
             };
 
             // Setup command handler configuration

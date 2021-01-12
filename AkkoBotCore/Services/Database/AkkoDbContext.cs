@@ -12,7 +12,11 @@ namespace AkkoBot.Services.Database
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
 
-        public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt) { }
+        public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
+        {
+            // Ensure that the database exists
+            base.Database.Migrate();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

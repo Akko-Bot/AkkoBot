@@ -16,10 +16,10 @@ namespace AkkoBot.Services.Database
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {
-            Blacklist = dbContext.Blacklist.Select(x => x.TypeId).ToHashSet() ?? new();
+            Blacklist = dbContext.Blacklist.Select(x => x.TypeId).ToHashSet();
             BotConfig = dbContext.BotConfig.FirstOrDefault() ?? new();
-            Guilds = dbContext.GuildConfigs.ToConcurrentDictionary(x => x.GuildId) ?? new();
-            PlayingStatuses = dbContext.PlayingStatuses.ToList() ?? new();
+            Guilds = dbContext.GuildConfigs.ToConcurrentDictionary(x => x.GuildId);
+            PlayingStatuses = dbContext.PlayingStatuses.ToList();
         }
 
         /// <summary>

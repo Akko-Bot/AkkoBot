@@ -28,20 +28,6 @@ namespace AkkoBot.Services.Database
             PlayingStatuses = new(db, dbCache);
         }
 
-        public async Task Dispose()
-        {
-            await _db.DisposeAsync();
-        }
-
-        //public void ResetDatabase()
-        //{
-            //_db.Database.GetAppliedMigrationsAsync();
-            //_db.Database.MigrateAsync();
-            //_db.Database.ExecuteSqlRawAsync(
-            //    "//aaa"
-            //);
-        //}
-
         /// <summary>
         /// Saves all changes made in this context to the database.
         /// </summary>

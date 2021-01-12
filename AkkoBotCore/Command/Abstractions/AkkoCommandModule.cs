@@ -15,14 +15,13 @@ namespace AkkoBot.Command.Abstractions
         // ReplyLocalizedAsync
         // ErrorLocalizedAsync
 
-        // public override Task BeforeExecutionAsync(CommandContext context)
-        // {
-        //     // Save or update the user who ran the command
-        //     var db = context.CommandsNext.Services.GetService<AkkoUnitOfWork>();
-        //     db.DiscordUsers.CreateOrUpdate(context.User);
-
-        //     return Task.CompletedTask;
-        // }
+        public async override Task BeforeExecutionAsync(CommandContext context)
+        {
+            // Save or update the user who ran the command
+            // This might be a scale bottleneck in the future
+            var db = context.CommandsNext.Services.GetService<AkkoUnitOfWork>();
+            await db.DiscordUsers.CreateOrUpdateAsync(context.User);
+        }
 
         public override Task AfterExecutionAsync(CommandContext context)
         {
