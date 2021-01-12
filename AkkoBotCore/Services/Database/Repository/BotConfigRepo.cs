@@ -15,6 +15,12 @@ namespace AkkoBot.Services.Database.Repository
             Cache = dbCacher.BotConfig;
         }
 
+        /// <summary>
+        /// Adds an entry for the bot's settings into the database.
+        /// </summary>
+        /// <param name="botConfig">The new bot settings.</param>
+        /// <remarks>If an entry already exists, it does nothing.</remarks>
+        /// <returns></returns>
         public async Task TryCreateAsync(BotConfigEntity botConfig)
         {
             // Add to the database

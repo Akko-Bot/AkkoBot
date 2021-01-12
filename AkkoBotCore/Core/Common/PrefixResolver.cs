@@ -7,7 +7,7 @@ using DSharpPlus.Entities;
 
 namespace AkkoBot.Core.Common
 {
-    public class PrefixResolver : ICommandService
+    public class PrefixResolver
     {
         private readonly AkkoUnitOfWork _db;
 

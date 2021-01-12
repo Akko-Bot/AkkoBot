@@ -10,7 +10,7 @@ namespace AkkoBot.Services.Database
     public class AkkoDbCacher : ICommandService
     {
         public HashSet<ulong> Blacklist { get; }
-        public BotConfigEntity BotConfig { get; }
+        public BotConfigEntity BotConfig { get; private set; }
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
         public List<PlayingStatusEntity> PlayingStatuses { get; }
 
@@ -20,6 +20,17 @@ namespace AkkoBot.Services.Database
             BotConfig = dbContext.BotConfig.FirstOrDefault() ?? new();
             Guilds = dbContext.GuildConfigs.ToConcurrentDictionary(x => x.GuildId) ?? new();
             PlayingStatuses = dbContext.PlayingStatuses.ToList() ?? new();
+        }
+
+        /// <summary>
+        /// Completely resets the database cache.
+        /// </summary>
+        public void Clear()
+        {
+            Blacklist.Clear();
+            BotConfig = new();
+            Guilds.Clear();
+            PlayingStatuses.Clear();
         }
     }
 }

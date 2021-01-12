@@ -19,11 +19,19 @@ namespace AkkoBot.Services.Database.Repository
             Cache = dbCacher.Guilds;
         }
 
+        /// <summary>
+        /// Gets the prefix of the specified Discord guild.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns>The prefix for the Discord guild.</returns>
         public async Task<string> GetPrefixAsync(ulong sid)
-        {
-            return (await GetGuildAsync(sid)).Prefix;
-        }
+            => (await GetGuildAsync(sid)).Prefix;
 
+        /// <summary>
+        /// Gets the settings of the specified Discord guild.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns></returns>
         public async Task<GuildConfigEntity> GetGuildAsync(ulong sid)
         {
             if (Cache.ContainsKey(sid))
@@ -37,13 +45,19 @@ namespace AkkoBot.Services.Database.Repository
             }
         }
 
+        /// <summary>
+        /// Adds an entry for the specified guild into the database.
+        /// </summary>
+        /// <param name="guild">The ID of the Discord guild.</param>
+        /// <remarks>If an entry for the guild already exists, it does nothing.</remarks>
+        /// <returns></returns>
         public async Task TryCreateAsync(DiscordGuild guild)
         {
             var dGuild = new GuildConfigEntity(guild);
 
             // Add to the database
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color) " +
+                @"INSERT INTO guild_configs(guild_id, prefix, use_embed, ok_color, error_color) " +
                 $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO NOTHING;"
@@ -53,14 +67,19 @@ namespace AkkoBot.Services.Database.Repository
             Cache.TryAdd(dGuild.GuildId, dGuild);
         }
 
+        /// <summary>
+        /// Upserts an entry for the specified guild into the database.
+        /// </summary>
+        /// <param name="guild">The ID of the Discord guild.</param>
+        /// <returns></returns>
         public async Task CreateOrUpdateAsync(GuildConfigEntity guild)
         {
             await _db.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color) " +
                 $"VALUES({guild.GuildId}, '{guild.Prefix}', {guild.UseEmbed}, '{guild.OkColor}', '{guild.ErrorColor}') " +
                 @"ON CONFLICT (guild_id) " +
-                @"DO " +
-                @"UPDATE SET " +
+                @"DO UPDATE " +
+                @"SET " +
                 $"prefix = '{guild.Prefix}', use_embed = '{guild.UseEmbed}', " +
                 $"ok_color = '{guild.OkColor}', error_color = '{guild.ErrorColor}';"
             );

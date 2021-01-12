@@ -88,7 +88,7 @@ namespace AkkoBot.Command.Modules.Basic
         [Description("Writes an entry of myself in the db.")]
         public async Task DbWrite(CommandContext context)
         {
-            await _db.DiscordUsers.CreateOrUpdate(context.User);
+            await _db.DiscordUsers.CreateOrUpdateAsync(context.User);
             await _db.SaveChangesAsync();
 
             await context.RespondAsync("Done. Inserted db entry.");
@@ -101,11 +101,12 @@ namespace AkkoBot.Command.Modules.Basic
             var me = new BlacklistEntity()
             {
                 Type = BlacklistType.User,
-                TypeId = context.User.Id
+                TypeId = context.User.Id,
+                Name = context.User.Username
             };
 
-            await _db.Blacklist.CreateAsync(me);
-            _db.SaveChanges();
+            await _db.Blacklist.AddAsync(me);
+            await _db.SaveChangesAsync();
 
             await context.RespondAsync("Done. Inserted db entry.");
         }

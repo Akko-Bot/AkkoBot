@@ -3,6 +3,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Repository;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database
 {
@@ -14,7 +15,7 @@ namespace AkkoBot.Services.Database
         public BlacklistRepo Blacklist { get; }
         public BotConfigRepo BotConfig { get; }
         public GuildConfigRepo GuildConfigs { get; }
-        public DbRepository<PlayingStatusEntity> PlayingStatuses { get; }
+        public PlayingStatusRepo PlayingStatuses { get; }
 
         public AkkoUnitOfWork(AkkoDbContext db, AkkoDbCacher dbCache)
         {
@@ -24,8 +25,22 @@ namespace AkkoBot.Services.Database
             Blacklist = new(db, dbCache);
             BotConfig = new(db, dbCache);
             GuildConfigs = new(db, dbCache);
-            PlayingStatuses = new(db);
+            PlayingStatuses = new(db, dbCache);
         }
+
+        public async Task Dispose()
+        {
+            await _db.DisposeAsync();
+        }
+
+        //public void ResetDatabase()
+        //{
+            //_db.Database.GetAppliedMigrationsAsync();
+            //_db.Database.MigrateAsync();
+            //_db.Database.ExecuteSqlRawAsync(
+            //    "//aaa"
+            //);
+        //}
 
         /// <summary>
         /// Saves all changes made in this context to the database.

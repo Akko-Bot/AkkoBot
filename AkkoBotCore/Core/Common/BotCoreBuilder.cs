@@ -110,7 +110,7 @@ namespace AkkoBot.Core.Common
                 throw new InvalidOperationException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
-            var pResolver = services.GetService<PrefixResolver>();
+            var pResolver = new PrefixResolver(services.GetService<AkkoUnitOfWork>());
 
             // Setup client configuration
             var botConfig = new DiscordConfiguration()

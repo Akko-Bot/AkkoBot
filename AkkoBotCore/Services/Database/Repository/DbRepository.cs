@@ -52,6 +52,9 @@ namespace AkkoBot.Services.Database.Repository
         public virtual async Task CreateAsync(T newEntity)
             => await _table.AddAsync(newEntity);
 
+        public virtual void Create(T newEntity)
+            => _table.Add(newEntity);
+
         /// <summary>
         /// Adds the entries specified in the <paramref name="newEntities"/> in bulk to the database.
         /// </summary>
