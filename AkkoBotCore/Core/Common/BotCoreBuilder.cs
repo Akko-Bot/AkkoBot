@@ -4,6 +4,7 @@ using AkkoBot.Command.Abstractions;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Logging;
 using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus;
@@ -51,6 +52,30 @@ namespace AkkoBot.Core.Common
             return this;
         }
 
+        public BotCoreBuilder WithSingletonCmdService<T1, T2>() where T1 : Type where T2 : T1
+        {
+            _cmdServices.AddSingleton<T1, T2>();
+            return this;
+        }
+
+        public BotCoreBuilder WithScopedCmdService<T1, T2>() where T1 : Type where T2 : T1
+        {
+            _cmdServices.AddScoped<T1, T2>();
+            return this;
+        }
+
+        public BotCoreBuilder WithTransientCmdService<T1, T2>() where T1 : Type where T2 : T1
+        {
+            _cmdServices.AddTransient<T1, T2>();
+            return this;
+        }
+
+        public BotCoreBuilder WithCmdServices<T>()
+        {
+            _cmdServices.AddSingletonServices(typeof(T));
+            return this;
+        }
+
         public BotCoreBuilder WithCmdServices(Type serviceType)
         {
             _cmdServices.AddSingletonServices(serviceType);
@@ -75,7 +100,8 @@ namespace AkkoBot.Core.Common
                         $"Password={_creds.Database["Password"]};" +
                         @"CommandTimeout=20;"
                 )
-            );
+            ).AddSingleton<IDbCacher, AkkoDbCacher>()
+            .AddScoped<IUnitOfWork, AkkoUnitOfWork>();
 
             return this;
         }
@@ -96,7 +122,7 @@ namespace AkkoBot.Core.Common
                 throw new InvalidOperationException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
-            var pResolver = new PrefixResolver(services.GetService<AkkoUnitOfWork>());
+            var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
 
             // Setup client configuration
             var botConfig = new DiscordConfiguration()

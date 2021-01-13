@@ -1,16 +1,16 @@
-﻿using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Database.Repository;
+﻿using AkkoBot.Services.Database.Repository;
+using System;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Abstractions
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
-        DiscordUserRepo DiscordUsers { get; }
-        DbRepository<BlacklistEntity> Blacklist { get; }
-        DbRepository<BotConfigEntity> BotConfig { get; }
-        GuildConfigRepo GuildConfigs { get; }
-        DbRepository<PlayingStatusEntity> PlayingStatuses { get; }
+        public DiscordUserRepo DiscordUsers { get; }
+        public BlacklistRepo Blacklist { get; }
+        public BotConfigRepo BotConfig { get; }
+        public GuildConfigRepo GuildConfigs { get; }
+        public PlayingStatusRepo PlayingStatuses { get; }
 
         int SaveChanges();
         Task<int> SaveChangesAsync();

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace AkkoBot.Services.Database.Repository
         private readonly AkkoDbContext _db;
         private readonly HashSet<ulong> _blacklist;
 
-        public BlacklistRepo(AkkoDbContext db, AkkoDbCacher dbCacher) : base(db)
+        public BlacklistRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
         {
             _db = db;
             _blacklist = dbCacher.Blacklist;
@@ -41,12 +42,12 @@ namespace AkkoBot.Services.Database.Repository
         /// Adds a blacklist entry to the database.
         /// </summary>
         /// <param name="value">The specified blacklist entry.</param>
-        /// <returns><see langword="true"/> if the entry got added to the dtabase, <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if the entry got added to the database or to the cache, <see langword="false"/> otherwise.</returns>
         public async Task<bool> TryCreateAsync(BlacklistEntity value)
         {
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO blacklist(type_id, type, name) " +
-                $"VALUES({value.TypeId}, {(int)value.Type}, '{value.Name}') " +
+                @"INSERT INTO blacklist(type_id, type, name, date_added) " +
+                $"VALUES({value.TypeId}, {(int)value.Type}, '{value.Name}', '{value.DateAdded:O}') " +
                 @"ON CONFLICT (type_id) " +
                 @"DO NOTHING;"
             );
@@ -58,7 +59,7 @@ namespace AkkoBot.Services.Database.Repository
         /// Removes a blacklist entry from the database.
         /// </summary>
         /// <param name="id">The specified blacklist ID.</param>
-        /// <returns><see langword="true"/> if the entry got removed from the database, <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if the entry got removed from the database or from the cache, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveAsync(ulong id)
         {
             if (!_blacklist.Contains(id))

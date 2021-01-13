@@ -9,6 +9,7 @@ using AkkoBot.Credential;
 using AkkoBot.Core.Common;
 using AkkoBot.Services;
 using AkkoBot.Services.Database;
+using AkkoBot.Services.Database.Abstractions;
 
 namespace AkkoBot.Core
 {
@@ -29,7 +30,7 @@ namespace AkkoBot.Core
                 .BuildAsync();
 
             // Events - TODO: put this in a BotCoreBuilder method?
-            var startup = new Startup(botCore.GetService<AkkoUnitOfWork>());
+            var startup = new Startup(botCore.GetService<IUnitOfWork>());
             startup.RegisterEvents(botCore);
 
             // Connect to Discord

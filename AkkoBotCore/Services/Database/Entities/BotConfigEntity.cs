@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AkkoBot.Services.Database.Entities
 {
     [Comment("Stores settings related to the bot.")]
-    public partial class BotConfigEntity : DbEntity
+    public class BotConfigEntity : DbEntity
     {
         [Required]
         [MaxLength(15)]

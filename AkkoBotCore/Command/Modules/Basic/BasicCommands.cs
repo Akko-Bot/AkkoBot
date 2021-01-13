@@ -17,10 +17,10 @@ namespace AkkoBot.Command.Modules.Basic
     public class BasicCommands : AkkoCommandModule
     {
         private readonly DateTimeOffset _startup;
-        private readonly AkkoUnitOfWork _db;
+        private readonly IUnitOfWork _db;
         //private readonly Credentials _creds;
 
-        public BasicCommands(AkkoUnitOfWork db)
+        public BasicCommands(IUnitOfWork db)
         {
             _startup = DateTimeOffset.Now;
             _db = db;

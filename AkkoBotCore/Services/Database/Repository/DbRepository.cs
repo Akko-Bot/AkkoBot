@@ -13,10 +13,10 @@ namespace AkkoBot.Services.Database.Repository
     /// </summary>
     public class DbRepository<T> : IRepository<T> where T : DbEntity
     {
-        private readonly DbSet<T> _table;
+        protected DbSet<T> Table { get; }
 
         public DbRepository(AkkoDbContext db)
-            => _table = db.Set<T>();
+            => Table = db.Set<T>();
 
         /// <summary>
         /// Returns a database entry that contains the specified parameter as a primary key.
@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <remarks>This method does not use the database cache. It throws a <see cref="NullReferenceException"/> if the table doesn't contain a primary key of the same type as <typeparamref name="TValue"/>.</remarks>
         /// <returns>A database entry.</returns>
         public virtual async Task<T> GetAsync<TValue>(TValue value)
-            => await _table.FindAsync(value);
+            => await Table.FindAsync(value);
 
         /// <summary>
         /// Returns multiple database entries which primary keys meet the conditions specified in the <paramref name="expression"/>.
@@ -35,7 +35,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <remarks>This method does not use the database cache.</remarks>
         /// <returns>A collection of database entries.</returns>
         public virtual async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> expression)
-            => await _table.Where(expression).ToListAsync();
+            => await Table.Where(expression).ToListAsync();
 
         /// <summary>
         /// Returns all database entries in this table.
@@ -43,48 +43,48 @@ namespace AkkoBot.Services.Database.Repository
         /// <remarks>This method does not use the database cache.</remarks>
         /// <returns>A collection of database entries.</returns>
         public virtual async Task<IEnumerable<T>> GetAllAsync()
-            => await _table.ToListAsync();
+            => await Table.ToListAsync();
 
         /// <summary>
         /// Adds the entry specified in <paramref name="newEntity"/> to the database.
         /// </summary>
         /// <param name="newEntity">Entry to be added to the database.</param>
         public virtual async Task CreateAsync(T newEntity)
-            => await _table.AddAsync(newEntity);
+            => await Table.AddAsync(newEntity);
 
         /// <summary>
         /// Adds the entries specified in the <paramref name="newEntities"/> in bulk to the database.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         public virtual async Task CreateRangeAsync(params T[] newEntities)
-            => await _table.AddRangeAsync(newEntities);
+            => await Table.AddRangeAsync(newEntities);
 
         /// <summary>
         /// Updates a database entry with the entity specified in <paramref name="newEntity"/>.
         /// </summary>
         /// <param name="newEntity">A database entry.</param>
         public virtual void Update(T newEntity)
-            => _table.Update(newEntity);
+            => Table.Update(newEntity);
 
         /// <summary>
         /// Updates multiple database entries in bulk with the entities specified in <paramref name="newEntities"/>.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         public virtual void UpdateRange(params T[] newEntities)
-            => _table.UpdateRange(newEntities);
+            => Table.UpdateRange(newEntities);
 
         /// <summary>
         /// Removes the entry specified in <paramref name="oldEntity"/> from the database.
         /// </summary>
         /// <param name="newEntities">A database entry.</param>
         public virtual void Delete(T oldEntity)
-            => _table.Remove(oldEntity);
+            => Table.Remove(oldEntity);
 
         /// <summary>
         /// Removes multiple entries specified in <paramref name="oldEntity"/> from the database.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         public virtual void DeleteRange(params T[] oldEntities)
-            => _table.RemoveRange(oldEntities);
+            => Table.RemoveRange(oldEntities);
     }
 }

@@ -1,8 +1,9 @@
-﻿using AkkoBot.Services.Database;
+﻿using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Command.Attributes
 {
@@ -14,7 +15,7 @@ namespace AkkoBot.Command.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var db = context.CommandsNext.Services.GetService(typeof(AkkoUnitOfWork)) as AkkoUnitOfWork;
+            var db = context.CommandsNext.Services.GetService<IUnitOfWork>();
             return Task.FromResult(!db.Blacklist.IsBlacklisted(context));
         }
     }

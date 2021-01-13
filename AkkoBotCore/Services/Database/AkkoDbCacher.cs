@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 
 namespace AkkoBot.Services.Database
 {
-    public class AkkoDbCacher : ICommandService
+    public class AkkoDbCacher : IDbCacher
     {
         public HashSet<ulong> Blacklist { get; }
         public BotConfigEntity BotConfig { get; private set; }

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database;
+using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 
@@ -9,9 +10,9 @@ namespace AkkoBot.Core.Common
 {
     public class PrefixResolver
     {
-        private readonly AkkoUnitOfWork _db;
+        private readonly IUnitOfWork _db;
 
-        public PrefixResolver(AkkoUnitOfWork db)
+        public PrefixResolver(IUnitOfWork db)
             => _db = db;
 
         public async Task<int> ResolvePrefix(DiscordMessage msg)

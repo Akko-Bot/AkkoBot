@@ -1,4 +1,5 @@
-﻿using AkkoBot.Services.Database.Entities;
+﻿using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -12,7 +13,7 @@ namespace AkkoBot.Services.Database.Repository
         private readonly BotConfigEntity _botConfig;
         public ConcurrentDictionary<ulong, GuildConfigEntity> Cache { get; }
 
-        public GuildConfigRepo(AkkoDbContext db, AkkoDbCacher dbCacher) : base(db)
+        public GuildConfigRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
         {
             _db = db;
             _botConfig = dbCacher.BotConfig;
@@ -50,15 +51,15 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="guild">The ID of the Discord guild.</param>
         /// <remarks>If an entry for the guild already exists, it does nothing.</remarks>
-        /// <returns><see langword="true"/> if the user got added to the database, <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if the user got added to the database or to the cache, <see langword="false"/> otherwise.</returns>
         public async Task<bool> TryCreateAsync(DiscordGuild guild)
         {
             var dGuild = new GuildConfigEntity(guild);
 
             // Add to the database
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO guild_configs(guild_id, prefix, use_embed, ok_color, error_color) " +
-                $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}') " +
+                @"INSERT INTO guild_configs(guild_id, prefix, use_embed, ok_color, error_color, date_added) " +
+                $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}', '{dGuild.DateAdded:O}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO NOTHING;"
             );
@@ -71,12 +72,12 @@ namespace AkkoBot.Services.Database.Repository
         /// Upserts an entry for the specified guild into the database.
         /// </summary>
         /// <param name="guild">The ID of the Discord guild.</param>
-        /// <returns><see langword="true"/> if the user got added to the database, <see langword="false"/> if it got updated.</returns>
+        /// <returns><see langword="true"/> if the user got added to the database or to the cache, <see langword="false"/> if it got updated.</returns>
         public async Task<bool> CreateOrUpdateAsync(GuildConfigEntity guild)
         {
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color) " +
-                $"VALUES({guild.GuildId}, '{guild.Prefix}', {guild.UseEmbed}, '{guild.OkColor}', '{guild.ErrorColor}') " +
+                @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color, date_added) " +
+                $"VALUES({guild.GuildId}, '{guild.Prefix}', {guild.UseEmbed}, '{guild.OkColor}', '{guild.ErrorColor}', '{guild.DateAdded:O}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO UPDATE " +
                 @"SET " +

@@ -1,6 +1,8 @@
-﻿using AkkoBot.Services.Database.Entities;
+﻿using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Repository
@@ -19,9 +21,11 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns></returns>
         public async Task CreateOrUpdateAsync(DiscordUser user)
         {
+            var eUser = new DiscordUserEntity(user);
+
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO discord_users(user_id, username, discriminator) " +
-                $"VALUES({user.Id}, '{user.Username}', '{user.Discriminator}') " +
+                @"INSERT INTO discord_users(user_id, username, discriminator, date_added) " +
+                $"VALUES({eUser.UserId}, '{eUser.Username}', '{eUser.Discriminator}', '{eUser.DateAdded:O}') " +
                 @"ON CONFLICT (user_id) " +
                 @"DO UPDATE " +
                 $"SET username = '{user.Username}', discriminator = '{user.Discriminator}';"

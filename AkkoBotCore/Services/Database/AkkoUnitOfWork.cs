@@ -1,13 +1,12 @@
 ﻿using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Repository;
+using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database
 {
-    public class AkkoUnitOfWork : /*IUnitOfWork,*/ ICommandService
+    public class AkkoUnitOfWork : IUnitOfWork
     {
         private readonly AkkoDbContext _db;
 
@@ -17,7 +16,7 @@ namespace AkkoBot.Services.Database
         public GuildConfigRepo GuildConfigs { get; }
         public PlayingStatusRepo PlayingStatuses { get; }
 
-        public AkkoUnitOfWork(AkkoDbContext db, AkkoDbCacher dbCache)
+        public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCache)
         {
             _db = db;
 
@@ -44,5 +43,14 @@ namespace AkkoBot.Services.Database
         /// </returns>
         public Task<int> SaveChangesAsync()
             => _db.SaveChangesAsync();
+
+        /// <summary>
+        /// Releases the allocated resources for this unit of work.
+        /// </summary>
+        public void Dispose()
+        {
+            _db.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
 }

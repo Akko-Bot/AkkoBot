@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AkkoBot.Services.Database.Entities
 {
     [Comment("Stores settings related to individual Discord servers.")]
-    public partial class GuildConfigEntity : DbEntity
+    public class GuildConfigEntity : DbEntity
     {
         [Key]
         public ulong GuildId { get; set; }

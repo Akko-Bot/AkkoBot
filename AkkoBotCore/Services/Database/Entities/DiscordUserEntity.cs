@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Services.Database.Abstractions;
+using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
@@ -20,6 +21,14 @@ namespace AkkoBot.Services.Database.Entities
         [Column(TypeName = "varchar(4)")]
         public string Discriminator { get; set; }
 
+        public DiscordUserEntity() { }
+
+        public DiscordUserEntity(DiscordUser user)
+        {
+            UserId = user.Id;
+            Username = user.Username;
+            Discriminator = user.Discriminator;
+        }
 
 
         // Global xp, maybe?

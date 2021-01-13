@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -13,9 +14,9 @@ namespace AkkoBot.Core.Common
 {
     public class Startup
     {
-        private readonly AkkoUnitOfWork _db;
+        private readonly IUnitOfWork _db;
 
-        public Startup(AkkoUnitOfWork db)
+        public Startup(IUnitOfWork db)
             => _db = db;
 
         public void RegisterEvents(BotCore botCore)
