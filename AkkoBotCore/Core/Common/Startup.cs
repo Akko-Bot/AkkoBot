@@ -43,9 +43,12 @@ namespace AkkoBot.Core.Common
             // Decache guild on leave
             botCore.BotClient.GuildDeleted += DecacheGuildOnLeave;
 
-            // Command error logging
+            // Command logging
             foreach (var handler in botCore.CommandExt.Values)
-                handler.CommandErrored += LogCmdErrors;
+            {
+                handler.CommandExecuted += LogCmdExecution;
+                handler.CommandErrored += LogCmdError;
+            }
         }
 
 
@@ -90,8 +93,21 @@ namespace AkkoBot.Core.Common
             return Task.CompletedTask;
         }
 
+        // Log basic information about command execution.
+        private Task LogCmdExecution(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
+        {
+            cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
+
+            cmdHandler.Client.Logger.LogInformation(
+                new EventId(LoggerEvents.Misc.Id, "Command"),
+                eventArgs.Context.Message.Content
+            );
+
+            return Task.CompletedTask;
+        }
+
         // Log exceptions thrown on command execution.
-        private Task LogCmdErrors(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
+        private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
             if (eventArgs.Exception is not ChecksFailedException and not CommandNotFoundException)
             {

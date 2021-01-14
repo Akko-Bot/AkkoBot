@@ -22,7 +22,7 @@ namespace AkkoBot.Command.Abstractions
             await db.DiscordUsers.CreateOrUpdateAsync(context.User);
         }
 
-        public override Task AfterExecutionAsync(CommandContext context)
+        /*public override Task AfterExecutionAsync(CommandContext context)
         {
             context.Client.Logger.BeginScope(context);
 
@@ -32,6 +32,6 @@ namespace AkkoBot.Command.Abstractions
             );
 
             return Task.CompletedTask;
-        }
+        }*/
     }
 }
