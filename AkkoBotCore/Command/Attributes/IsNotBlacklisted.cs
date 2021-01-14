@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Command.Attributes
 {
+    /// <summary>
+    /// Checks if the command was issued in a blacklisted context and cancels execution if it was.
+    /// </summary>
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,

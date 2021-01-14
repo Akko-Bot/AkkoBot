@@ -15,6 +15,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Core.Common
 {
+    /// <summary>
+    /// Wrapper class for building a <see cref="BotCore"/>.
+    /// </summary>
     public class BotCoreBuilder
     {
         private Credentials _creds;
@@ -28,66 +31,132 @@ namespace AkkoBot.Core.Common
             _cmdServices = cmdServices ?? new ServiceCollection();
         }
 
+        /// <summary>
+        /// Adds the credentials to be used for authentication with Discord.
+        /// </summary>
+        /// <param name="creds">The credentials.</param>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithCredentials(Credentials creds)
         {
             _creds = creds;
             return WithCmdServices(creds);
         }
 
+        /// <summary>
+        /// Overrides DSharpPlus' default logger with an <see cref="AkkoLoggerFactory"/>.
+        /// </summary>
+        /// <param name="logLevel">Minimum log severity to be logged. Default is "Information".</param>
+        /// <param name="fileLogger">An object responsible for writing the logs to a text file. Default is <see langword="null"/> (no file logging).</param>
+        /// <param name="logFormat">The type of logging to be output. Default is "Default".</param>
+        /// <param name="timeFormat">The format of the time stamp to be used in the logs. Default depends on <paramref name="logFormat"/>.</param>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultLogging(LogLevel? logLevel = null, IAkkoFileLogger fileLogger = null, string logFormat = null, string timeFormat = null)
         {
             _loggerFactory = new AkkoLoggerFactory(logLevel, fileLogger, logFormat, timeFormat);
             return this;
         }
 
+        /// <summary>
+        /// Overrides DSharpPlus' default logger factory with your own implementation.
+        /// </summary>
+        /// <param name="loggerFactory">A concrete <see cref="ILoggerFactory"/>.</param>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithLogging(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
             return this;
         }
 
+        /// <summary>
+        /// Adds all objects that implement <see cref="ICommandService"/> as a singleton service for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultCmdServices()
         {
             _cmdServices.AddSingletonServices(typeof(ICommandService));
             return this;
         }
 
+        /// <summary>
+        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a singleton service for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T1">An abstract Type.</typeparam>
+        /// <typeparam name="T2">A concrete Type.</typeparam>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithSingletonCmdService<T1, T2>() where T1 : Type where T2 : T1
         {
             _cmdServices.AddSingleton<T1, T2>();
             return this;
         }
 
+        /// <summary>
+        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a scoped service for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T1">An abstract Type.</typeparam>
+        /// <typeparam name="T2">A concrete Type.</typeparam>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithScopedCmdService<T1, T2>() where T1 : Type where T2 : T1
         {
             _cmdServices.AddScoped<T1, T2>();
             return this;
         }
 
+        /// <summary>
+        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a transient service for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T1">An abstract Type.</typeparam>
+        /// <typeparam name="T2">A concrete Type.</typeparam>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithTransientCmdService<T1, T2>() where T1 : Type where T2 : T1
         {
             _cmdServices.AddTransient<T1, T2>();
             return this;
         }
 
+        /// <summary>
+        /// Adds all concrete classes that implement <typeparamref name="T"/> as singleton services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T">An abstract Type.</typeparam>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithCmdServices<T>()
         {
             _cmdServices.AddSingletonServices(typeof(T));
             return this;
         }
 
+        /// <summary>
+        /// Adds all concrete classes that implement <paramref name="serviceType"/> as singleton services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <param name="serviceType">An abstract Type.</param>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithCmdServices(Type serviceType)
         {
             _cmdServices.AddSingletonServices(serviceType);
             return this;
         }
 
+        /// <summary>
+        /// Adds the specified concrete objects as singleton services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <param name="implementations">Collection of service objects.</param>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithCmdServices(params object[] implementations)
         {
             _cmdServices.AddSingletonServices(implementations);
             return this;
         }
 
+        /// <summary>
+        /// Adds the default <see cref="AkkoDbContext"/> as a service to this <see cref="BotCore"/>. 
+        /// </summary>
+        /// <remarks>This database context depends directly on EF Core and Npgsql.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultDbContext()
         {
             _cmdServices.AddDbContext<AkkoDbContext>(options =>
@@ -106,6 +175,12 @@ namespace AkkoBot.Core.Common
             return this;
         }
 
+        /// <summary>
+        /// Adds an EF Core <see cref="DbContext"/> as a service to this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="DbContext"/>.</typeparam>
+        /// <param name="connectionString">The connection string for the database.</param>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDbContext<T>(string connectionString) where T : DbContext
         {
             _cmdServices.AddDbContext<T>(options =>
@@ -116,10 +191,15 @@ namespace AkkoBot.Core.Common
             return this;
         }
 
+        /// <summary>
+        /// Builds a <see cref="BotCore"/> from the provided settings passed to this builder.
+        /// </summary>
+        /// <returns>A <see cref="BotCore"/>.</returns>
+        /// <exception cref="NullReferenceException"/>
         public async Task<BotCore> BuildAsync()
         {
             if (_creds is null)
-                throw new InvalidOperationException("No 'Credentials' object was provided.");
+                throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
             var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
@@ -149,8 +229,13 @@ namespace AkkoBot.Core.Common
 
             var botClient = new DiscordShardedClient(botConfig);
             var cmdHandlers = await botClient.UseCommandsNextAsync(cmdExtConfig);
+            var bot = new BotCore(botClient, cmdHandlers);
 
-            return new BotCore(botClient, cmdHandlers);
+            // Register core events
+            var startup = new Startup(bot.GetService<IUnitOfWork>());
+            startup.RegisterEvents(bot);
+
+            return bot;
         }
     }
 }

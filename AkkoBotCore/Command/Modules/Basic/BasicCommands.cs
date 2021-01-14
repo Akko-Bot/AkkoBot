@@ -101,7 +101,7 @@ namespace AkkoBot.Command.Modules.Basic
             var me = new BlacklistEntity()
             {
                 Type = BlacklistType.User,
-                TypeId = context.User.Id,
+                ContextId = context.User.Id,
                 Name = context.User.Username
             };
 
@@ -118,7 +118,7 @@ namespace AkkoBot.Command.Modules.Basic
             _db.Blacklist.Delete(new BlacklistEntity()
             {
                 Type = BlacklistType.User,
-                TypeId = context.User.Id
+                ContextId = context.User.Id
             });
 
             await _db.SaveChangesAsync();

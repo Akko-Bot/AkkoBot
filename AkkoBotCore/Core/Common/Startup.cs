@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
@@ -12,6 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Core.Common
 {
+    /// <summary>
+    /// Registers events the bot should listen to once it connects to Discord.
+    /// </summary>
     public class Startup
     {
         private readonly IUnitOfWork _db;
@@ -19,6 +21,11 @@ namespace AkkoBot.Core.Common
         public Startup(IUnitOfWork db)
             => _db = db;
 
+        /// <summary>
+        /// Defines the core behavior the bot should have for specific Discord events.
+        /// </summary>
+        /// <param name="botCore">The bot to register the events to.</param>
+        /// <exception cref="NullReferenceException"/>
         public void RegisterEvents(BotCore botCore)
         {
             if (_db is null)
@@ -76,12 +83,14 @@ namespace AkkoBot.Core.Common
             await _db.GuildConfigs.TryCreateAsync(eventArgs.Guild);
         }
 
+        // Remove a guild from the cache when the bot is removed from it.
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
         {
             _db.GuildConfigs.Cache.TryRemove(eventArgs.Guild.Id, out _);
             return Task.CompletedTask;
         }
 
+        // Log exceptions thrown on command execution.
         private Task LogCmdErrors(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
             if (eventArgs.Exception is not ChecksFailedException and not CommandNotFoundException)

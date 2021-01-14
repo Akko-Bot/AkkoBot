@@ -43,6 +43,7 @@ namespace AkkoBot.Services.Logging
 
             _loggerRegister.Clear();
             _loggerRegister.TrimExcess();
+            GC.SuppressFinalize(this);
         }
     }
 }

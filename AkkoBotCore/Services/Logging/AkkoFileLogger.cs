@@ -55,6 +55,7 @@ namespace AkkoBot.Services.Logging
 
             _logStream.Dispose();
             IsDisposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }

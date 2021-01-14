@@ -47,12 +47,12 @@ namespace AkkoBot.Services.Database.Repository
         {
             await _db.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO blacklist(type_id, type, name, date_added) " +
-                $"VALUES({value.TypeId}, {(int)value.Type}, '{value.Name}', '{value.DateAdded:O}') " +
+                $"VALUES({value.ContextId}, {(int)value.Type}, '{value.Name}', '{value.DateAdded:O}') " +
                 @"ON CONFLICT (type_id) " +
                 @"DO NOTHING;"
             );
 
-            return _blacklist.Add(value.TypeId);
+            return _blacklist.Add(value.ContextId);
         }
 
         /// <summary>

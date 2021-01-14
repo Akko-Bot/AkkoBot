@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services;
-using AkkoBot.Services.Database;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Core.Common
 {
+    /// <summary>
+    /// Class that contains the Discord client and the command handlers.
+    /// </summary>
     public class BotCore
     {
-        //private readonly Credentials _creds; // TODO: get prefix from database
         public DiscordShardedClient BotClient { get; }
         public IReadOnlyDictionary<int, CommandsNextExtension> CommandExt { get; }
 
@@ -53,7 +52,7 @@ namespace AkkoBot.Core.Common
             var modules = GeneralService.GetImplementables(typeof(AkkoCommandModule)).ToArray();
 
             // Loop through the list of selected assemblies and register
-            // each one of them on the command handler of each shard.
+            // each one of them to the command handler of each shard.
             foreach (var cmdHandler in CommandExt.Values)
             {
                 foreach (var cmdModule in modules)
@@ -61,8 +60,8 @@ namespace AkkoBot.Core.Common
             }
 
             BotClient.Logger.LogInformation(
-                new EventId(LoggerEvents.Startup.Id, "AkkoBot"),
-                $"{modules.Length} command modules were successfully loaded on {CommandExt.Count} shards"
+                new EventId(LoggerEvents.Startup.Id, "Startup"),
+                $"{modules.Length} command modules were successfully loaded."
             );
         }
     }

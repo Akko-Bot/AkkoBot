@@ -1,5 +1,4 @@
-﻿using AkkoBot.Command.Abstractions;
-using AkkoBot.Extensions;
+﻿using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using System.Collections.Concurrent;
@@ -17,18 +16,18 @@ namespace AkkoBot.Services.Database
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {
-            Blacklist = dbContext.Blacklist.Select(x => x.TypeId).ToHashSet();
+            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToHashSet();
             BotConfig = dbContext.BotConfig.FirstOrDefault() ?? new();
             Guilds = dbContext.GuildConfigs.ToConcurrentDictionary(x => x.GuildId);
             PlayingStatuses = dbContext.PlayingStatuses.ToList();
         }
 
         /// <summary>
-        /// Completely resets the database cache.
+        /// Clears the database cache.
         /// </summary>
         public void Clear()
         {
-            Blacklist.Clear();
+            //Blacklist.Clear();
             BotConfig = new();
             Guilds.Clear();
             PlayingStatuses.Clear();

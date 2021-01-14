@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace AkkoBot.Credential
 {
+    /// <summary>
+    /// A class that represents a credentials file.
+    /// </summary>
     public class Credentials
     {
         public HashSet<ulong> OwnerIds { get; init; } = new() { 0 };
@@ -10,7 +13,7 @@ namespace AkkoBot.Credential
         public bool EnableDms { get; set; } = true;
         public bool EnableMentionPrefix { get; set; } = false;
         public bool EnableHelpCommand { get; set; } = true;
-        public Dictionary<string, string> Database { get; init; } = new()
+        public Dictionary<string, string> Database { get; init; } = new(2)
         {
             { "Role", Environment.UserName },
             { "Password", "postgres_password_here" }

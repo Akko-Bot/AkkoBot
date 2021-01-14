@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Abstractions
 {
+    /// <summary>
+    /// Represents the interface for an <see cref="AkkoUnitOfWork"/>.
+    /// </summary>
     public interface IUnitOfWork : IDisposable
     {
         public DiscordUserRepo DiscordUsers { get; }

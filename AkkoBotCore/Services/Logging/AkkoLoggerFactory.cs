@@ -64,6 +64,7 @@ namespace AkkoBot.Services.Logging
             _fileLogger?.Dispose();
             _providers.Clear();
             _providers.TrimExcess();
+            GC.SuppressFinalize(this);
         }
     }
 }

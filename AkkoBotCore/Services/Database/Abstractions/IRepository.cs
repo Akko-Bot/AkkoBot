@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Abstractions
 {
+    /// <summary>
+    /// Represents the base interface of a Repository object.
+    /// </summary>
+    /// <typeparam name="T">A <see cref="DbEntity"/> Type.</typeparam>
     public interface IRepository<T>
     {
         Task<T> GetAsync<TValue>(TValue value);

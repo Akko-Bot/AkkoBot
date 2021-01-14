@@ -23,17 +23,18 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="value"></param>
         /// <typeparam name="TValue"></typeparam>
-        /// <remarks>This method does not use the database cache. It throws a <see cref="NullReferenceException"/> if the table doesn't contain a primary key of the same type as <typeparamref name="TValue"/>.</remarks>
-        /// <returns>A database entry.</returns>
+        /// <remarks>This method does not use the database cache. It throws an exception if the table doesn't contain a primary key of the same type as <typeparamref name="TValue"/>.</remarks>
+        /// <returns>A database entry or <see langword="null"/> if not found.</returns>
+        /// <exception cref="NullReferenceException"/>
         public virtual async Task<T> GetAsync<TValue>(TValue value)
             => await Table.FindAsync(value);
 
         /// <summary>
-        /// Returns multiple database entries which primary keys meet the conditions specified in the <paramref name="expression"/>.
+        /// Returns multiple database entries whose primary keys meet the criteria specified in the <paramref name="expression"/>.
         /// </summary>
         /// <param name="expression">Expression tree to filter the result.</param>
         /// <remarks>This method does not use the database cache.</remarks>
-        /// <returns>A collection of database entries.</returns>
+        /// <returns>A collection of database entries. The collection will be empty if no entity matches the criterias from <paramref name="expression"/>.</returns>
         public virtual async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> expression)
             => await Table.Where(expression).ToListAsync();
 
@@ -41,7 +42,7 @@ namespace AkkoBot.Services.Database.Repository
         /// Returns all database entries in this table.
         /// </summary>
         /// <remarks>This method does not use the database cache.</remarks>
-        /// <returns>A collection of database entries.</returns>
+        /// <returns>A collection of database entries. The collection will be empty if no entries are present.</returns>
         public virtual async Task<IEnumerable<T>> GetAllAsync()
             => await Table.ToListAsync();
 

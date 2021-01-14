@@ -28,13 +28,9 @@ namespace AkkoBot.Services.Database
 
             modelBuilder.Entity<GuildConfigEntity>()
                 .HasIndex(g => g.GuildId);
-                //.IncludeProperties(p => p.Prefix)
-                //.IncludeProperties(p => p.UseEmbed)
-                //.IncludeProperties(p => p.OkColor)
-                //.IncludeProperties(p => p.ErrorColor);
 
             modelBuilder.Entity<BlacklistEntity>()
-                .HasIndex(g => g.TypeId);
+                .HasIndex(g => g.ContextId);
 
             modelBuilder.Entity<PlayingStatusEntity>()
                 .HasNoKey();
