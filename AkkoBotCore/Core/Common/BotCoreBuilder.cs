@@ -71,7 +71,7 @@ namespace AkkoBot.Core.Common
         /// Adds all objects that implement <see cref="ICommandService"/> as a singleton service to this <see cref="BotCore"/>.
         /// </summary>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithDefaultCmdServices()
+        public BotCoreBuilder WithDefaultServices()
         {
             _cmdServices.AddSingletonServices(typeof(ICommandService));
             return this;
@@ -84,7 +84,7 @@ namespace AkkoBot.Core.Common
         /// <typeparam name="T2">A concrete Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithSingletonCmdService<T1, T2>() where T1 : Type where T2 : T1
+        public BotCoreBuilder WithSingletonService<T1, T2>() where T1 : Type where T2 : T1
         {
             _cmdServices.AddSingleton<T1, T2>();
             return this;
@@ -97,7 +97,7 @@ namespace AkkoBot.Core.Common
         /// <typeparam name="T2">A concrete Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithScopedCmdService<T1, T2>() where T1 : Type where T2 : T1
+        public BotCoreBuilder WithScopedService<T1, T2>() where T1 : Type where T2 : T1
         {
             _cmdServices.AddScoped<T1, T2>();
             return this;
@@ -110,7 +110,7 @@ namespace AkkoBot.Core.Common
         /// <typeparam name="T2">A concrete Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithTransientCmdService<T1, T2>() where T1 : Type where T2 : T1
+        public BotCoreBuilder WithTransientService<T1, T2>() where T1 : Type where T2 : T1
         {
             _cmdServices.AddTransient<T1, T2>();
             return this;

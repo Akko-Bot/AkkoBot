@@ -13,7 +13,7 @@ namespace AkkoBot.Services
         /// <summary>
         /// Gets the fully qualified path for the current directory of the application.
         /// </summary>
-        public static string CurrentDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory + OsSlash;
+        public static string CurrentDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
 
         /// <summary>
         /// Gets the fully qualified path for the directory where the credentials file is stored.
@@ -28,16 +28,24 @@ namespace AkkoBot.Services
         /// <summary>
         /// Gets the fully qualified path for the credentials file.
         /// </summary>
-        public static string CredentialsPath { get; } = CredsDirectory + "credentials.yaml";
+        public static string CredsPath { get; } = CredsDirectory + "credentials.yaml";
 
+        /// <summary>
+        /// Gets either the absolute or relative path for <paramref name="filePath"/>.
+        /// </summary>
+        /// <param name="filePath">Relative or absolute directory path to the file.</param>
+        /// <remarks><paramref name="filePath"/> must contain at least one <see cref="Path.DirectorySeparatorChar"/>.</remarks>
+        /// <returns>The directory path of the specified file.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"/>
         public static string GetFileDirectoryPath(string filePath)
-        {
-            return filePath.Substring(0, filePath.LastIndexOf(OsSlash));
-        }
+            => filePath.Substring(0, filePath.LastIndexOf(OsSlash) + 1);
 
+        /// <summary>
+        /// Gets the relative path from <see cref="CurrentDirectory"/> to <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">The specified path.</param>
+        /// <returns>The relative path to <paramref name="path"/>.</returns>
         public static string GetRelativeAkkoPath(string path)
-        {
-            return "." + OsSlash + Path.GetRelativePath(CurrentDirectory, path);
-        }
+            => Path.GetRelativePath(CurrentDirectory, path);
     }
 }

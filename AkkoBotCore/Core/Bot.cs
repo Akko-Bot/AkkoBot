@@ -13,17 +13,16 @@ namespace AkkoBot.Core
 {
     public class Bot
     {
-        private Credentials _creds;
-
         public async Task MainAsync(string[] args)
         {
-            _creds = PrepareCredentials();
+            // Load up credentials
+            var creds = PrepareCredentials(AkkoEnvironment.CredsPath);
 
             // Initialize bot configuration
             var botCore = await new BotCoreBuilder()
-                .WithCredentials(_creds)
+                .WithCredentials(creds)
                 .WithDefaultLogging()
-                .WithDefaultCmdServices()
+                .WithDefaultServices()
                 .WithDefaultDbContext()
                 .BuildAsync();
 
@@ -51,12 +50,13 @@ namespace AkkoBot.Core
         /// <summary>
         /// Prepare the credentials for bot startup.
         /// </summary>
+        /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
         /// <returns>A valid <see cref="Credentials"/> object.</returns>
-        private Credentials PrepareCredentials()
+        private Credentials PrepareCredentials(string filePath)
         {
-            while (!IsValidCredential(AkkoEnvironment.CredentialsPath));
+            while (!IsValidCredential(filePath));
 
-            return LoadCredentials(AkkoEnvironment.CredentialsPath);
+            return LoadCredentials(filePath);
         }
 
         /// <summary>
@@ -87,8 +87,9 @@ namespace AkkoBot.Core
                 CreateCredentials(filePath);
 
                 PauseProgram(
-                    @"A credentials file has been generated for you in " +
-                    $"{AkkoEnvironment.GetRelativeAkkoPath(AkkoEnvironment.CredentialsPath)}\n" +
+                    @"A credentials file has been generated for you at " +
+                    $".{AkkoEnvironment.OsSlash}" +
+                    $"{AkkoEnvironment.GetRelativeAkkoPath(AkkoEnvironment.CredsPath)}\n" +
                     @"Please, add your data to it and"
                 );
             }

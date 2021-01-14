@@ -13,7 +13,7 @@ namespace AkkoBot.Services.Database.Design
     {
         public AkkoDbContext CreateDbContext(string[] args)
         {
-            var creds = LoadCredentials(AkkoEnvironment.CredentialsPath);
+            var creds = LoadCredentials(AkkoEnvironment.CredsPath);
 
             var options = new DbContextOptionsBuilder<AkkoDbContext>()
                 .UseSnakeCaseNamingConvention()
