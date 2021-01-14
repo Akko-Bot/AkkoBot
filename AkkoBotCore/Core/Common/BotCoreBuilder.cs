@@ -39,7 +39,7 @@ namespace AkkoBot.Core.Common
         public BotCoreBuilder WithCredentials(Credentials creds)
         {
             _creds = creds;
-            return WithCmdServices(creds);
+            return WithSingletonServices(creds);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace AkkoBot.Core.Common
         /// <typeparam name="T">An abstract Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithCmdServices<T>()
+        public BotCoreBuilder WithSingletonServices<T>()
         {
             _cmdServices.AddSingletonServices(typeof(T));
             return this;
@@ -134,7 +134,7 @@ namespace AkkoBot.Core.Common
         /// <param name="serviceType">An abstract Type.</param>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithCmdServices(Type serviceType)
+        public BotCoreBuilder WithSingletonServices(Type serviceType)
         {
             _cmdServices.AddSingletonServices(serviceType);
             return this;
@@ -146,10 +146,59 @@ namespace AkkoBot.Core.Common
         /// <param name="implementations">Collection of service objects.</param>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithCmdServices(params object[] implementations)
+        public BotCoreBuilder WithSingletonServices(params object[] implementations)
         {
             _cmdServices.AddSingletonServices(implementations);
             return this;
+        }
+
+        /// <summary>
+        /// Adds all concrete classes that implement <typeparamref name="T"/> as scoped services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T">An abstract Type.</typeparam>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        public BotCoreBuilder WithScopedServices<T>()
+        {
+            _cmdServices.AddScopedServices(typeof(T));
+            return this;
+        }
+
+        /// <summary>
+        /// Adds all concrete classes that implement <paramref name="serviceType"/> as scoped services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <param name="serviceType">An abstract Type.</param>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        public BotCoreBuilder WithScopedServices(Type serviceType)
+        {
+            _cmdServices.AddScopedServices(serviceType);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds all concrete classes that implement <typeparamref name="T"/> as transient services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <typeparam name="T">An abstract Type.</typeparam>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        public BotCoreBuilder WithTransientServices<T>()
+        {
+            _cmdServices.AddTransientServices(typeof(T));
+            return this;
+        }
+
+        /// <summary>
+        /// Adds all concrete classes that implement <paramref name="serviceType"/> as transient services for this <see cref="BotCore"/>.
+        /// </summary>
+        /// <param name="serviceType">An abstract Type.</param>
+        /// <remarks>Use this to inject the command modules with your own services.</remarks>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        public BotCoreBuilder WithTransientServices(Type serviceType)
+        {
+            _cmdServices.AddTransientServices(serviceType);
+            return this;
+
         }
 
         /// <summary>

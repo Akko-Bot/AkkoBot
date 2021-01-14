@@ -7,14 +7,14 @@ namespace AkkoBot.Extensions
     public static class ServiceCollectionExt
     {
         /// <summary>
-        /// Adds several singleton services of the type specified in serviceType to this IoC container.
+        /// Adds several singleton services of the type specified in <paramref name="abstraction"/> to this <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <param name="dependencies">This collection of injectables.</param>
-        /// <param name="cmdModule">The type implemented by all classes.</param>
-        /// <returns>A collection of default singletons to be injected into a service.</returns>
-        public static IServiceCollection AddSingletonServices(this IServiceCollection dependencies, Type cmdModule)
+        /// <param name="dependencies">This collection of services.</param>
+        /// <param name="abstraction">The type implemented by all services.</param>
+        /// <returns>This <see cref="IServiceCollection"/>.</returns>
+        public static IServiceCollection AddSingletonServices(this IServiceCollection dependencies, Type abstraction)
         {
-            var modules = GeneralService.GetImplementables(cmdModule);
+            var modules = GeneralService.GetImplementables(abstraction);
 
             foreach (var module in modules)
                 dependencies.AddSingleton(module);
@@ -23,15 +23,47 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Adds several singleton services provided in implementations to this IoC container.
+        /// Adds several singleton services provided in <paramref name="implementations"/> to this <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <param name="dependencies">This collection of injectables.</param>
+        /// <param name="dependencies">This collection of services.</param>
         /// <param name="implementations">Objects to be injected as singletons.</param>
-        /// <returns>A collection of singletons to be injected into a service.</returns>
+        /// <returns>This <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddSingletonServices(this IServiceCollection dependencies, params object[] implementations)
         {
             foreach (var module in implementations)
                 dependencies.AddSingleton(module.GetType(), module);
+
+            return dependencies;
+        }
+
+        /// <summary>
+        /// Adds several scoped services of the type specified in <paramref name="abstraction"/> to this <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="dependencies">This collection of services.</param>
+        /// <param name="abstraction">The type implemented by all services</param>
+        /// <returns>This <see cref="IServiceCollection"/></returns>
+        public static IServiceCollection AddScopedServices(this IServiceCollection dependencies, Type abstraction)
+        {
+            var modules = GeneralService.GetImplementables(abstraction);
+
+            foreach (var module in modules)
+                dependencies.AddScoped(abstraction, module.GetType());
+
+            return dependencies;
+        }
+
+        /// <summary>
+        /// Adds several transient services of the type specified in <paramref name="abstraction"/> to this <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="dependencies">This collection of services.</param>
+        /// <param name="abstraction">The type implemented by all services</param>
+        /// <returns>This <see cref="IServiceCollection"/></returns>
+        public static IServiceCollection AddTransientServices(this IServiceCollection dependencies, Type abstraction)
+        {
+            var modules = GeneralService.GetImplementables(abstraction);
+
+            foreach (var module in modules)
+                dependencies.AddTransient(abstraction, module.GetType());
 
             return dependencies;
         }
