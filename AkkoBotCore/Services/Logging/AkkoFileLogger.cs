@@ -50,12 +50,21 @@ namespace AkkoBot.Services.Logging
 
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            _logStream.Dispose();
-            IsDisposed = true;
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!IsDisposed)
+            {
+                if (isDisposing)
+                {
+                    _logStream.Dispose();
+                }
+
+                IsDisposed = true;
+            }
         }
     }
 }

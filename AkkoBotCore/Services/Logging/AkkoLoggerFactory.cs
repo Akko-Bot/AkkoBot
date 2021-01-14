@@ -53,18 +53,26 @@ namespace AkkoBot.Services.Logging
 
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            IsDisposed = true;
-
-            foreach (var provider in _providers)
-                provider.Dispose();
-
-            _fileLogger?.Dispose();
-            _providers.Clear();
-            _providers.TrimExcess();
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                if (disposing)
+                {
+                    foreach (var provider in _providers)
+                        provider.Dispose();
+
+                    _fileLogger?.Dispose();
+                    _providers.Clear();
+                    _providers.TrimExcess();
+                }
+
+                IsDisposed = true;
+            }
         }
     }
 }

@@ -169,7 +169,7 @@ namespace AkkoBot.Core.Common
                         $"Password={_creds.Database["Password"]};" +
                         @"CommandTimeout=20;"
                 )
-            ).AddSingleton<IDbCacher, AkkoDbCacher>()
+            ).AddScoped<IDbCacher, AkkoDbCacher>()
             .AddScoped<IUnitOfWork, AkkoUnitOfWork>();
 
             return this;

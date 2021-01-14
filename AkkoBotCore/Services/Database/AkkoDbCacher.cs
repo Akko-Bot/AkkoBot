@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,12 @@ namespace AkkoBot.Services.Database
 {
     public class AkkoDbCacher : IDbCacher
     {
-        public HashSet<ulong> Blacklist { get; }
+        private bool _isDisposed = false;
+
+        public HashSet<ulong> Blacklist { get; private set; }
         public BotConfigEntity BotConfig { get; private set; }
-        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
-        public List<PlayingStatusEntity> PlayingStatuses { get; }
+        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
+        public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {
@@ -23,14 +26,45 @@ namespace AkkoBot.Services.Database
         }
 
         /// <summary>
-        /// Clears the database cache.
+        /// Resets the database cache.
         /// </summary>
-        public void Clear()
+        public void Reset()
         {
-            //Blacklist.Clear();
+            Blacklist.Clear();
             BotConfig = new();
             Guilds.Clear();
             PlayingStatuses.Clear();
+        }
+
+        /// <summary>
+        /// Releases the allocated resources for this database cacher.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!_isDisposed)
+            {
+                if (isDisposing)
+                {
+                    Blacklist.Clear();
+                    Blacklist.TrimExcess();
+                    Guilds.Clear();
+                    PlayingStatuses.Clear();
+                    PlayingStatuses.TrimExcess();
+                }
+
+                Blacklist = null;
+                BotConfig = null;
+                Guilds = null;
+                PlayingStatuses = null;
+
+                _isDisposed = true;
+            }
         }
     }
 }

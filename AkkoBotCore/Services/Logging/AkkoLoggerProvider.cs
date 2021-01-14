@@ -8,9 +8,9 @@ namespace AkkoBot.Services.Logging
 {
     public class AkkoLoggerProvider : ILoggerProvider
     {
+        private bool _isDisposed = false;
         private readonly LogLevel _minLogLevel;
         private readonly string _timeFormat;
-        private bool _isDisposed;
         private readonly List<Type> _loggerRegister;
         private readonly IAkkoFileLogger _fileLogger;
 
@@ -18,7 +18,6 @@ namespace AkkoBot.Services.Logging
         {
             _minLogLevel = minLogLevel;
             _timeFormat = timeFormat;
-            _isDisposed = false;
             _loggerRegister = GeneralService.GetImplementables(typeof(ILogger)).ToList();
             _fileLogger = fileLogger;
         }
@@ -36,14 +35,23 @@ namespace AkkoBot.Services.Logging
 
         public void Dispose()
         {
-            if (_isDisposed)
-                return;
-
-            _isDisposed = true;
-
-            _loggerRegister.Clear();
-            _loggerRegister.TrimExcess();
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _fileLogger?.Dispose();
+                    _loggerRegister.Clear();
+                    _loggerRegister.TrimExcess();
+                }
+
+                _isDisposed = true;
+            }
         }
     }
 }

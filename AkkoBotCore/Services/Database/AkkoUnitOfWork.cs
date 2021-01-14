@@ -8,13 +8,14 @@ namespace AkkoBot.Services.Database
 {
     public class AkkoUnitOfWork : IUnitOfWork
     {
+        private bool _isDisposed = false;
         private readonly AkkoDbContext _db;
 
-        public DiscordUserRepo DiscordUsers { get; }
-        public BlacklistRepo Blacklist { get; }
-        public BotConfigRepo BotConfig { get; }
-        public GuildConfigRepo GuildConfigs { get; }
-        public PlayingStatusRepo PlayingStatuses { get; }
+        public DiscordUserRepo DiscordUsers { get; private set; }
+        public BlacklistRepo Blacklist { get; private set; }
+        public BotConfigRepo BotConfig { get; private set; }
+        public GuildConfigRepo GuildConfigs { get; private set; }
+        public PlayingStatusRepo PlayingStatuses { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCache)
         {
@@ -49,8 +50,27 @@ namespace AkkoBot.Services.Database
         /// </summary>
         public void Dispose()
         {
-            _db.Dispose();
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!_isDisposed)
+            {
+                if (isDisposing)
+                {
+                    _db.Dispose();
+                }
+
+                DiscordUsers = null;
+                Blacklist = null;
+                BotConfig = null;
+                GuildConfigs = null;
+                PlayingStatuses = null;
+
+                _isDisposed = true;
+            }
         }
     }
 }
