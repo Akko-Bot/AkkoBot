@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace AkkoBot.Services
 {
@@ -7,7 +8,7 @@ namespace AkkoBot.Services
         /// <summary>
         /// Gets the platform specific character for separating directories in the local path.
         /// </summary>
-        public static char OsSlash { get; } = (Environment.OSVersion.Platform < PlatformID.Unix) ? '\\' : '/';
+        public static char OsSlash { get; } = Path.DirectorySeparatorChar;
 
         /// <summary>
         /// Gets the fully qualified path for the current directory of the application.
@@ -28,5 +29,15 @@ namespace AkkoBot.Services
         /// Gets the fully qualified path for the credentials file.
         /// </summary>
         public static string CredentialsPath { get; } = CredsDirectory + "credentials.yaml";
+
+        public static string GetFileDirectoryPath(string filePath)
+        {
+            return filePath.Substring(0, filePath.LastIndexOf(OsSlash));
+        }
+
+        public static string GetRelativeAkkoPath(string path)
+        {
+            return "." + OsSlash + Path.GetRelativePath(CurrentDirectory, path);
+        }
     }
 }

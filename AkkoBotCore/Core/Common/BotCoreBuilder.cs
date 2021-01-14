@@ -68,7 +68,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all objects that implement <see cref="ICommandService"/> as a singleton service for this <see cref="BotCore"/>.
+        /// Adds all objects that implement <see cref="ICommandService"/> as a singleton service to this <see cref="BotCore"/>.
         /// </summary>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultCmdServices()
@@ -78,7 +78,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a singleton service for this <see cref="BotCore"/>.
+        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a singleton service to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T1">An abstract Type.</typeparam>
         /// <typeparam name="T2">A concrete Type.</typeparam>
@@ -91,7 +91,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a scoped service for this <see cref="BotCore"/>.
+        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a scoped service to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T1">An abstract Type.</typeparam>
         /// <typeparam name="T2">A concrete Type.</typeparam>
@@ -104,7 +104,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a transient service for this <see cref="BotCore"/>.
+        /// Adds a <typeparamref name="T2"/> object with a <typeparamref name="T1"/> interface as a transient service to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T1">An abstract Type.</typeparam>
         /// <typeparam name="T2">A concrete Type.</typeparam>
@@ -117,7 +117,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all concrete classes that implement <typeparamref name="T"/> as singleton services for this <see cref="BotCore"/>.
+        /// Adds all concrete classes that implement <typeparamref name="T"/> as singleton services to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T">An abstract Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
@@ -129,7 +129,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all concrete classes that implement <paramref name="serviceType"/> as singleton services for this <see cref="BotCore"/>.
+        /// Adds all concrete classes that implement <paramref name="serviceType"/> as singleton services to this <see cref="BotCore"/>.
         /// </summary>
         /// <param name="serviceType">An abstract Type.</param>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
@@ -141,7 +141,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds the specified concrete objects as singleton services for this <see cref="BotCore"/>.
+        /// Adds the specified concrete objects as singleton services to this <see cref="BotCore"/>.
         /// </summary>
         /// <param name="implementations">Collection of service objects.</param>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
@@ -153,7 +153,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all concrete classes that implement <typeparamref name="T"/> as scoped services for this <see cref="BotCore"/>.
+        /// Adds all concrete classes that implement <typeparamref name="T"/> as scoped services to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T">An abstract Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
@@ -165,7 +165,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all concrete classes that implement <paramref name="serviceType"/> as scoped services for this <see cref="BotCore"/>.
+        /// Adds all concrete classes that implement <paramref name="serviceType"/> as scoped services to this <see cref="BotCore"/>.
         /// </summary>
         /// <param name="serviceType">An abstract Type.</param>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
@@ -177,7 +177,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all concrete classes that implement <typeparamref name="T"/> as transient services for this <see cref="BotCore"/>.
+        /// Adds all concrete classes that implement <typeparamref name="T"/> as transient services to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T">An abstract Type.</typeparam>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>
@@ -189,7 +189,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds all concrete classes that implement <paramref name="serviceType"/> as transient services for this <see cref="BotCore"/>.
+        /// Adds all concrete classes that implement <paramref name="serviceType"/> as transient services to this <see cref="BotCore"/>.
         /// </summary>
         /// <param name="serviceType">An abstract Type.</param>
         /// <remarks>Use this to inject the command modules with your own services.</remarks>

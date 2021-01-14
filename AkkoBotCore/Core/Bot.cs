@@ -13,11 +13,11 @@ namespace AkkoBot.Core
 {
     public class Bot
     {
-        private Credentials _creds = new();
+        private Credentials _creds;
 
         public async Task MainAsync(string[] args)
         {
-            PrepareCredentials();
+            _creds = PrepareCredentials();
 
             // Initialize bot configuration
             var botCore = await new BotCoreBuilder()
@@ -48,44 +48,103 @@ namespace AkkoBot.Core
             await Task.Delay(Timeout.Infinite);
         }
 
-        private void PrepareCredentials()
+        /// <summary>
+        /// Prepare the credentials for bot startup.
+        /// </summary>
+        /// <returns>A valid <see cref="Credentials"/> object.</returns>
+        private Credentials PrepareCredentials()
         {
-            // Define the name of the credentials file and
-            // check if token in the credentials is valid
-            if (File.Exists(AkkoEnvironment.CredentialsPath))
-                LoadCredentials(AkkoEnvironment.CredentialsPath);
-            else
-                CreateCredentials(AkkoEnvironment.CredentialsPath);
+            while (!IsValidCredential(AkkoEnvironment.CredentialsPath));
+
+            return LoadCredentials(AkkoEnvironment.CredentialsPath);
         }
 
+        /// <summary>
+        /// Creates the credentials file and the directory(ies) it is stored at.
+        /// </summary>
+        /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
         private void CreateCredentials(string filePath)
         {
             // Ensure the folder exists
-            if (!Directory.Exists(AkkoEnvironment.CredsDirectory))
-                Directory.CreateDirectory(AkkoEnvironment.CredsDirectory);
+            if (!Directory.Exists(AkkoEnvironment.GetFileDirectoryPath(filePath)))
+                Directory.CreateDirectory(AkkoEnvironment.GetFileDirectoryPath(filePath));
 
             // Serialize the default credentials into a new file.
-            using (var writer = File.CreateText(filePath))
-                new Serializer().Serialize(writer, _creds);
-
-            // Print instructions to the user and gracefully terminate the program
-            TerminateProgram(
-                "A credentials file has been generated for you in \"./Creds/credentials.yaml\"\n" +
-                "Please, add your data to it and restart the program."
-            );
+            using var writer = File.CreateText(filePath);
+            new Serializer().Serialize(writer, new Credentials());
         }
 
-        private void LoadCredentials(string filePath)
+        /// <summary>
+        /// Ensures the credentials file exists and deserializes it into a <see cref="Credentials"/> object.
+        /// </summary>
+        /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
+        /// <returns>A <see cref="Credentials"/> object.</returns>
+        private Credentials LoadCredentials(string filePath)
+        {
+            // If directory or file don't exist, return false
+            if (!Directory.Exists(AkkoEnvironment.GetFileDirectoryPath(filePath)) || !File.Exists(filePath))
+            {
+                CreateCredentials(filePath);
+
+                PauseProgram(
+                    @"A credentials file has been generated for you in " +
+                    $"{AkkoEnvironment.GetRelativeAkkoPath(AkkoEnvironment.CredentialsPath)}\n" +
+                    @"Please, add your data to it and"
+                );
+            }
+
+            // Open the file and deserialize it.
+            using var reader = new StreamReader(File.OpenRead(filePath));
+            return new Deserializer().Deserialize<Credentials>(reader);
+        }
+
+        /// <summary>
+        /// Checks if the credentials file is remotely valid.
+        /// </summary>
+        /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
+        /// <returns><see langword="true"/> if it seems to be valid, <see langword="false"/> otherwise.</returns>
+        private bool IsValidCredential(string filePath)
         {
             // Open the file and deserialize it.
-            using (var reader = new StreamReader(File.OpenRead(filePath)))
-                _creds = new Deserializer().Deserialize<Credentials>(reader);
+            var creds = LoadCredentials(filePath);
 
-            // Check if token is remotely valid.
-            if (_creds.Token.Length < 50)
-                TerminateProgram("Your token is probably invalid. Please, add a valid token.");
+            // Check if token and database password are remotely valid.
+            if (creds.Token.Length < 50)
+            {
+                PauseProgram(
+                    "Your token is probably invalid.\n" +
+                    "Please, add a valid token and"
+                );
+
+                return false;
+            }
+            else if (creds.Database["Password"] == "postgres_password_here")
+            {
+                PauseProgram(
+                    "You forgot to set your database password.\n" +
+                    "Please, add it and"
+                );
+
+                return false;
+            }
+
+            return true;
         }
 
+        /// <summary>
+        /// Pauses the program for the user to read the <paramref name="message"/>.
+        /// </summary>
+        /// <param name="message">A message to be displayed to the user.</param>
+        private void PauseProgram(string message)
+        {
+            Console.WriteLine(message + " press Enter when you are ready.");
+            Console.Read();
+        }
+
+        /// <summary>
+        /// Terminates the program with a <paramref name="message"/> for the user to read.
+        /// </summary>
+        /// <param name="message">A message to be displayed to the user.</param>
         private void TerminateProgram(string message)
         {
             Console.WriteLine(message + "\nPress Enter to exit...");
