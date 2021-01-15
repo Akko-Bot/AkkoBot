@@ -24,15 +24,23 @@ namespace AkkoBot.Services.Database.Repository
         /// Gets the prefix of the specified Discord guild.
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>
-        /// <returns>The prefix for the Discord guild.</returns>
+        /// <returns>The prefix for the specified Discord guild.</returns>
         public async Task<string> GetPrefixAsync(ulong sid)
             => (await GetGuildAsync(sid)).Prefix;
+
+        /// <summary>
+        /// Gets the locale of the specified Discord guild.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns>The locale for the specified Discord guild.</returns>
+        public async Task<string> GetLocaleAsync(ulong sid)
+            => (await GetGuildAsync(sid)).Locale;
 
         /// <summary>
         /// Gets the settings of the specified Discord guild.
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>
-        /// <returns></returns>
+        /// <returns>The guild settings.</returns>
         public async Task<GuildConfigEntity> GetGuildAsync(ulong sid)
         {
             if (Cache.ContainsKey(sid))
@@ -58,8 +66,8 @@ namespace AkkoBot.Services.Database.Repository
 
             // Add to the database
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO guild_configs(guild_id, prefix, use_embed, ok_color, error_color, date_added) " +
-                $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}', '{dGuild.DateAdded:O}') " +
+                @"INSERT INTO guild_configs(guild_id, prefix, locale, use_embed, ok_color, error_color, date_added) " +
+                $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', '{dGuild.Locale}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}', '{dGuild.DateAdded:O}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO NOTHING;"
             );
@@ -76,8 +84,8 @@ namespace AkkoBot.Services.Database.Repository
         public async Task<bool> CreateOrUpdateAsync(GuildConfigEntity guild)
         {
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO discord_users(guild_id, prefix, use_embed, ok_color, error_color, date_added) " +
-                $"VALUES({guild.GuildId}, '{guild.Prefix}', {guild.UseEmbed}, '{guild.OkColor}', '{guild.ErrorColor}', '{guild.DateAdded:O}') " +
+                @"INSERT INTO discord_users(guild_id, prefix, locale, use_embed, ok_color, error_color, date_added) " +
+                $"VALUES({guild.GuildId}, '{guild.Prefix}', '{guild.Locale}' {guild.UseEmbed}, '{guild.OkColor}', '{guild.ErrorColor}', '{guild.DateAdded:O}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO UPDATE " +
                 @"SET " +

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Localization;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,12 @@ namespace AkkoBot.Services.Database.Entities
         [MaxLength(15)]
         public string Prefix { get; set; } = "!";
 
+        [Required]
+        [MaxLength(6)]
+        [Column(TypeName = "varchar(6)")]
+        public string Locale { get; set; } = AkkoLocalizer.DefaultLanguage;
+
+        [Required]
         public bool UseEmbed { get; set; } = true;
 
         [Required]

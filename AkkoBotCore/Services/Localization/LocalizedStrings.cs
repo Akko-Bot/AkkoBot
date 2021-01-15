@@ -3,10 +3,13 @@ using AkkoBot.Extensions;
 
 namespace AkkoBot.Services.Localization
 {
+    /// <summary>
+    /// A model class for all possible response strings.
+    /// </summary>
     public class LocalizedStrings
     {
         public string ErrorNotFound { get; set; } = "Error: the requested response string was not found.";
-        public string ShutDown { get; set; } = "Shutting down.";
+        public string Shutdown { get; set; } = "Shutting down.";
         public string Uptime { get; set; } = "Uptime";
         public string Days { get; set; } = "Days";
         public string Hours { get; set; } = "Hours";
@@ -26,7 +29,12 @@ namespace AkkoBot.Services.Localization
             var result = new Dictionary<string, string>(props.Length);
 
             foreach (var prop in props)
-                result.TryAdd(prop.Name.ToSnakeCase(), prop.GetValue(prop) as string);
+            {
+                result.TryAdd(
+                    prop.Name.ToSnakeCase(),
+                    prop.GetValue(this).ToString()
+                );
+            }
 
             return result;
         }

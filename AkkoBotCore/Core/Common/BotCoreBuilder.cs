@@ -5,6 +5,8 @@ using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Localization;
+using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging;
 using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus;
@@ -73,7 +75,9 @@ namespace AkkoBot.Core.Common
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultServices()
         {
-            _cmdServices.AddSingletonServices(typeof(ICommandService));
+            _cmdServices.AddSingletonServices(typeof(ICommandService))
+                .AddSingleton<ILocalizer, AkkoLocalizer>();
+
             return this;
         }
 

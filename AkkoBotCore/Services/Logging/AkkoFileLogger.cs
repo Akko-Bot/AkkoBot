@@ -24,7 +24,7 @@ namespace AkkoBot.Services.Logging
 
         public void CacheLogging(string logEntry)
         {
-            var encodedEntry = Encoding.Unicode.GetBytes(logEntry);
+            var encodedEntry = Encoding.UTF8.GetBytes(logEntry);
             _logStream.Write(encodedEntry);
 
             if (_logStream.Length / MB > _fileSizeLimitMB || DateTimeOffset.Now.Subtract(_time) > TimeSpan.FromDays(1))

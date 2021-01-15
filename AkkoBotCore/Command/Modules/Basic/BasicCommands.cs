@@ -10,6 +10,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.Logging;
+using AkkoBot.Services.Localization.Abstractions;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -17,11 +18,13 @@ namespace AkkoBot.Command.Modules.Basic
     public class BasicCommands : AkkoCommandModule
     {
         private readonly IUnitOfWork _db;
+        private readonly ILocalizer _localizer;
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
 
-        public BasicCommands(IUnitOfWork db)
+        public BasicCommands(IUnitOfWork db, ILocalizer localizer) : base(db, localizer)
         {
             _db = db;
+            _localizer = localizer;
         }
 
         [Command("ping")]
@@ -33,14 +36,19 @@ namespace AkkoBot.Command.Modules.Basic
         [Description("Shuts the bot down.")]
         public async Task Die(CommandContext context)
         {
+            var locale = await _db.GuildConfigs.GetLocaleAsync(context.Guild.Id);
+            var responseString = _localizer.GetResponseString(locale, "shutdown");
+
             // There is probably a better way to do this
-            await context.Message.RespondAsync("Shutting down.");
-            
+            await context.Message.RespondAsync(responseString);
+
+            /*
             context.Client.Logger.BeginScope(context);
             context.Client.Logger.LogInformation(
                 new EventId(LoggerEvents.WebSocketReceive.Id, "Command"),
                 context.Message.Content
             );
+            */
 
             await context.Client.DisconnectAsync();
             context.Client.Dispose();
@@ -53,13 +61,17 @@ namespace AkkoBot.Command.Modules.Basic
         {
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 
+            /* Test */
+            var locale = await _db.GuildConfigs.GetLocaleAsync(context.Guild.Id);
+            var responseStrings = _localizer.GetResponseStrings(locale, "uptime", "days", "hours", "minutes", "seconds");
+
             await context.Message.RespondAsync(
-                $"Uptime {Formatter.InlineCode($"[{_startup.LocalDateTime}]")}\n" +
+                responseStrings[0] + $" {Formatter.InlineCode($"[{_startup.LocalDateTime}]")}\n" +
                 Formatter.BlockCode(
-                    $"Days: {elapsed.Days}\n" +
-                    $"Hours: {elapsed.Hours}\n" +
-                    $"Minutes: {elapsed.Minutes}\n" +
-                    $"Seconds: {elapsed.Seconds}"
+                    responseStrings[1] + $": {elapsed.Days}\n" +
+                    responseStrings[2] + $": {elapsed.Hours}\n" +
+                    responseStrings[3] + $": {elapsed.Minutes}\n" +
+                    responseStrings[4] + $": {elapsed.Seconds}"
                 )
             );
         }
