@@ -26,6 +26,11 @@ namespace AkkoBot.Services
         public static string LogsDirectory { get; } = CurrentDirectory + "Logs" + OsSlash;
 
         /// <summary>
+        /// Gets the fully qualified path for the directory where the translated response strings are stored.
+        /// </summary>
+        public static string LocalesDirectory { get; } = CurrentDirectory + "Localization" + OsSlash;
+
+        /// <summary>
         /// Gets the fully qualified path for the credentials file.
         /// </summary>
         public static string CredsPath { get; } = CredsDirectory + "credentials.yaml";

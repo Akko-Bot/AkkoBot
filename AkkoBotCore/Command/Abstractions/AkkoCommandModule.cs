@@ -21,17 +21,5 @@ namespace AkkoBot.Command.Abstractions
             var db = context.CommandsNext.Services.GetService<IUnitOfWork>();
             await db.DiscordUsers.CreateOrUpdateAsync(context.User);
         }
-
-        /*public override Task AfterExecutionAsync(CommandContext context)
-        {
-            context.Client.Logger.BeginScope(context);
-
-            context.Client.Logger.LogInformation(
-                new EventId(LoggerEvents.WebSocketReceive.Id, "Command"),
-                context.Message.Content
-            );
-
-            return Task.CompletedTask;
-        }*/
     }
 }

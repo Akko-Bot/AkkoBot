@@ -16,21 +16,12 @@ namespace AkkoBot.Command.Modules.Basic
     [RequireBotPermissions(Permissions.SendMessages)]
     public class BasicCommands : AkkoCommandModule
     {
-        private readonly DateTimeOffset _startup;
         private readonly IUnitOfWork _db;
-        //private readonly Credentials _creds;
+        private readonly DateTimeOffset _startup = DateTimeOffset.Now;
 
         public BasicCommands(IUnitOfWork db)
         {
-            _startup = DateTimeOffset.Now;
             _db = db;
-            //_creds = creds;
-
-            /*
-            Receive Repository object
-            Repository looks up cache
-            Repository returns result from request
-             */
         }
 
         [Command("ping")]
@@ -44,6 +35,7 @@ namespace AkkoBot.Command.Modules.Basic
         {
             // There is probably a better way to do this
             await context.Message.RespondAsync("Shutting down.");
+            
             context.Client.Logger.BeginScope(context);
             context.Client.Logger.LogInformation(
                 new EventId(LoggerEvents.WebSocketReceive.Id, "Command"),
