@@ -49,6 +49,29 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
+        /// Localizes a response string that contains string formatters.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="key">The key for the response string.</param>
+        /// <param name="args">Variables to be included into the formatted response string.</param>
+        /// <returns>A formatted and localized response string.</returns>
+        public static async Task<string> FormatLocalizedAsync(this CommandContext context, string key, params object[] args)
+        {
+            using var scope = context.Services.CreateScope();
+            var (localizer, guild) = await GetServicesAsync(scope, context);
+
+            for (int index = 0; index < args.Length; index++)
+            {
+                if (args[index] is string)
+                    args[index] = GetLocalizedResponse(localizer, guild.Locale, args[index] as string);
+            }
+
+            key = GetLocalizedResponse(localizer, guild.Locale, key);
+
+            return string.Format(key, args);
+        }
+
+        /// <summary>
         /// Gets the scoped services needed to localize a Discord message.
         /// </summary>
         /// <param name="scope">The scoped service resolver.</param>
@@ -56,7 +79,6 @@ namespace AkkoBot.Extensions
         /// <returns>The response strings cache and the guild settings.</returns>
         private static async Task<(ILocalizer, GuildConfigEntity)> GetServicesAsync(IServiceScope scope, CommandContext context)
         {
-            // TODO: Use create scope for IUnitOfWork
             var guild = await scope.ServiceProvider.GetService<IUnitOfWork>().GuildConfigs.GetGuildAsync(context.Guild.Id);
             var localizer = scope.ServiceProvider.GetService<ILocalizer>();
 

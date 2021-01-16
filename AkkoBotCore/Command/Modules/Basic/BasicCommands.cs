@@ -66,28 +66,17 @@ namespace AkkoBot.Command.Modules.Basic
         {
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 
-            /* Test */
-            /*
-            await ReplyLocalizedAsync(
-                context,
-                "{0}" + $" {Formatter.InlineCode($"[{_startup.LocalDateTime}]")}\n" +
-                Formatter.BlockCode(
-                    "{1}" + $": {elapsed.Days}\n" +
-                    "{2}" + $": {elapsed.Hours}\n" +
-                    "{3}" + $": {elapsed.Minutes}\n" +
-                    "{4}" + $": {elapsed.Seconds}"
-                ),
-                "uptime", "days", "hours", "minutes", "seconds"
-            );
-            */
-
             var embed = new DiscordEmbedBuilder()
-                .WithTitle("uptime")
+                .WithTitle("online_since")
                 .WithDescription(Formatter.InlineCode($"[{_startup.LocalDateTime}]"))
-                .AddField("days", elapsed.Days.ToString(), true)
-                .AddField("hours", elapsed.Hours.ToString(), true)
-                .AddField("minutes", elapsed.Minutes.ToString(), true)
-                .AddField("seconds", elapsed.Seconds.ToString(), true);
+                .AddField(
+                    "uptime",
+                    await context.FormatLocalizedAsync("{0}: {1}\n", "days", elapsed.Days) +
+                    await context.FormatLocalizedAsync("{0}: {1}\n", "hours", elapsed.Hours) +
+                    await context.FormatLocalizedAsync("{0}: {1}\n", "minutes", elapsed.Minutes) +
+                    await context.FormatLocalizedAsync("{0}: {1}\n", "seconds", elapsed.Seconds),
+                    true
+                );
 
             await context.RespondLocalizedAsync(embed, false);
         }

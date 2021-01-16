@@ -9,6 +9,7 @@ namespace AkkoBot.Services.Localization
     public class LocalizedStrings
     {
         public string ErrorNotFound { get; set; } = "Error: the requested response string was not found.";
+        public string OnlineSince { get; set; } = "Online since";
         public string Shutdown { get; set; } = "Shutting down.";
         public string Uptime { get; set; } = "Uptime";
         public string Days { get; set; } = "Days";
