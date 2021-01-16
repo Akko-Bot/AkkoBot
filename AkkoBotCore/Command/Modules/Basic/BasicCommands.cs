@@ -11,6 +11,8 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.Logging;
 using AkkoBot.Services.Localization.Abstractions;
+using DSharpPlus.Entities;
+using AkkoBot.Extensions;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -21,7 +23,7 @@ namespace AkkoBot.Command.Modules.Basic
         private readonly ILocalizer _localizer;
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
 
-        public BasicCommands(IUnitOfWork db, ILocalizer localizer) : base(db, localizer)
+        public BasicCommands(IUnitOfWork db, ILocalizer localizer)
         {
             _db = db;
             _localizer = localizer;
@@ -36,11 +38,8 @@ namespace AkkoBot.Command.Modules.Basic
         [Description("Shuts the bot down.")]
         public async Task Die(CommandContext context)
         {
-            var locale = await _db.GuildConfigs.GetLocaleAsync(context.Guild.Id);
-            var responseString = _localizer.GetResponseString(locale, "shutdown");
-
             // There is probably a better way to do this
-            await context.Message.RespondAsync(responseString);
+            await context.ReplyLocalizedAsync("shutdown");
 
             /*
             context.Client.Logger.BeginScope(context);
@@ -62,18 +61,29 @@ namespace AkkoBot.Command.Modules.Basic
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 
             /* Test */
-            var locale = await _db.GuildConfigs.GetLocaleAsync(context.Guild.Id);
-            var responseStrings = _localizer.GetResponseStrings(locale, "uptime", "days", "hours", "minutes", "seconds");
-
-            await context.Message.RespondAsync(
-                responseStrings[0] + $" {Formatter.InlineCode($"[{_startup.LocalDateTime}]")}\n" +
+            /*
+            await ReplyLocalizedAsync(
+                context,
+                "{0}" + $" {Formatter.InlineCode($"[{_startup.LocalDateTime}]")}\n" +
                 Formatter.BlockCode(
-                    responseStrings[1] + $": {elapsed.Days}\n" +
-                    responseStrings[2] + $": {elapsed.Hours}\n" +
-                    responseStrings[3] + $": {elapsed.Minutes}\n" +
-                    responseStrings[4] + $": {elapsed.Seconds}"
-                )
+                    "{1}" + $": {elapsed.Days}\n" +
+                    "{2}" + $": {elapsed.Hours}\n" +
+                    "{3}" + $": {elapsed.Minutes}\n" +
+                    "{4}" + $": {elapsed.Seconds}"
+                ),
+                "uptime", "days", "hours", "minutes", "seconds"
             );
+            */
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("uptime")
+                .WithDescription(Formatter.InlineCode($"[{_startup.LocalDateTime}]"))
+                .AddField("days", elapsed.Days.ToString(), true)
+                .AddField("hours", elapsed.Hours.ToString(), true)
+                .AddField("minutes", elapsed.Minutes.ToString(), true)
+                .AddField("seconds", elapsed.Seconds.ToString(), true);
+
+            await context.ReplyLocalizedEmbedAsync(null, embed);
         }
 
         [Command("dbread")]

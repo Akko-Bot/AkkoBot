@@ -27,6 +27,14 @@ namespace AkkoBot.Services.Localization
             => LoadLocalizedStrings();
 
         /// <summary>
+        /// Checks if the bot contains a valid default response for a given response key.
+        /// </summary>
+        /// <param name="response">Response string key to be checked.</param>
+        /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
+        public bool ContainsResponse(string response)
+            => _localizedStrings[DefaultLanguage].ContainsKey(response);
+
+        /// <summary>
         /// Gets all cached locales.
         /// </summary>
         /// <returns>A collection of the registered locale keys.</returns>
@@ -107,9 +115,15 @@ namespace AkkoBot.Services.Localization
         /// </summary>
         /// <param name="locale">The desired locale.</param>
         /// <param name="response">Key of the response string to be fetched.</param>
-        /// <returns>The localized response string, if it exists.</returns>
+        /// <returns>
+        /// The localized response string, if it exists.
+        /// An empty string, if <paramref name="response"/> is <see langword="null"/>.
+        /// </returns>
         public string GetResponseString(string locale, string response)
         {
+            if (string.IsNullOrWhiteSpace(response))
+                return string.Empty;
+
             if (!_localizedStrings.ContainsKey(locale))
                 locale = DefaultLanguage;
 
