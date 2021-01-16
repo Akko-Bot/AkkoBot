@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Services.Database.Abstractions
 {
     /// <summary>
-    /// Represents the interface for an <see cref="AkkoUnitOfWork"/>.
+    /// Represents an object that centralizes all database operations.
     /// </summary>
     public interface IUnitOfWork : IDisposable
     {
@@ -15,7 +15,19 @@ namespace AkkoBot.Services.Database.Abstractions
         public GuildConfigRepo GuildConfigs { get; }
         public PlayingStatusRepo PlayingStatuses { get; }
 
+        /// <summary>
+        /// Saves all changes made in this context to the database.
+        /// </summary>
+        /// <returns>The number of state entries written to the database.</returns>
         int SaveChanges();
+
+        /// <summary>
+        /// Saves all changes made in this context to the database.
+        /// </summary>
+        /// <returns>
+        /// A task that represents the asynchronous save operation.
+        /// The task result contains the number of state entries written to the database.
+        /// </returns>
         Task<int> SaveChangesAsync();
     }
 }

@@ -23,7 +23,7 @@ namespace AkkoBot.Services.Localization
         /// A <see cref="Dictionary{string, string}"/> where the key is the property name in 
         /// snake_case format and the value is the response string.
         /// </returns>
-        public Dictionary<string, string> GetStringCollection()
+        public IDictionary<string, string> GetStringCollection()
         {
             var props = this.GetType().GetProperties();
             var result = new Dictionary<string, string>(props.Length);

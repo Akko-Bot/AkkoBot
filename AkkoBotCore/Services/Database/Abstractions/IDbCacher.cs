@@ -15,6 +15,9 @@ namespace AkkoBot.Services.Database.Abstractions
         ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
         List<PlayingStatusEntity> PlayingStatuses { get; }
 
+        /// <summary>
+        /// Resets the database cache.
+        /// </summary>
         void Reset();
     }
 }

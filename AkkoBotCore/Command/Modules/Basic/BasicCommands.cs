@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
-using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Database.Repository;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -12,6 +10,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using AkkoBot.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -35,26 +34,27 @@ namespace AkkoBot.Command.Modules.Basic
             var embed = new DiscordEmbedBuilder()
                 .WithDescription($"{context.Client.Ping} ms");
 
-            await context.ReplyLocalizedAsync(embed);
+            await context.RespondLocalizedAsync(embed);
         }
 
         [Command("die"), Aliases("shutdown")]
         [Description("Shuts the bot down.")]
         public async Task Die(CommandContext context)
         {
+            // There is probably a better way to do this
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("shutdown");
-            // There is probably a better way to do this
-            await context.ReplyLocalizedAsync(embed);
 
-            /*
+            await context.RespondLocalizedAsync(embed);
+
+            // Log to the console
             context.Client.Logger.BeginScope(context);
             context.Client.Logger.LogInformation(
-                new EventId(LoggerEvents.WebSocketReceive.Id, "Command"),
+                new EventId(LoggerEvents.ConnectionClose.Id, "Command"),
                 context.Message.Content
             );
-            */
 
+            // Clean-up
             await context.Client.DisconnectAsync();
             context.Client.Dispose();
             Environment.Exit(Environment.ExitCode);
@@ -89,7 +89,7 @@ namespace AkkoBot.Command.Modules.Basic
                 .AddField("minutes", elapsed.Minutes.ToString(), true)
                 .AddField("seconds", elapsed.Seconds.ToString(), true);
 
-            await context.ReplyLocalizedAsync(embed, false);
+            await context.RespondLocalizedAsync(embed, false);
         }
 
         [Command("dbread")]

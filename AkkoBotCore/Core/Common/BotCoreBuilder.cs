@@ -202,7 +202,6 @@ namespace AkkoBot.Core.Common
         {
             _cmdServices.AddTransientServices(serviceType);
             return this;
-
         }
 
         /// <summary>
@@ -255,7 +254,6 @@ namespace AkkoBot.Core.Common
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
-            using var scope = services.CreateScope();
             var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
 
             // Setup client configuration
@@ -286,7 +284,7 @@ namespace AkkoBot.Core.Common
             var bot = new BotCore(botClient, cmdHandlers);
 
             // Register core events
-            var startup = new Startup(scope.ServiceProvider.GetService<IUnitOfWork>());
+            var startup = new Startup(services.GetService<IUnitOfWork>());
             startup.RegisterEvents(bot);
 
             return bot;

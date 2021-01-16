@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AkkoBot.Services.Localization.Abstractions;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace AkkoBot.Services.Localization
 {
@@ -21,18 +22,10 @@ namespace AkkoBot.Services.Localization
         /// The cache of response strings. First key is the locale. Second key is the response 
         /// string's key. The value is the response string itself.
         /// </summary>
-        private readonly Dictionary<string, Dictionary<string, string>> _localizedStrings = new();
+        private readonly Dictionary<string, IDictionary<string, string>> _localizedStrings = new();
 
         public AkkoLocalizer()
             => LoadLocalizedStrings();
-
-        /// <summary>
-        /// Checks if the bot contains a valid default response for a given response key.
-        /// </summary>
-        /// <param name="response">Response string key to be checked.</param>
-        /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
-        public bool ContainsResponse(string response)
-            => _localizedStrings[DefaultLanguage].ContainsKey(response);
 
         /// <summary>
         /// Gets all cached locales.
@@ -60,28 +53,16 @@ namespace AkkoBot.Services.Localization
             => GetResponseStrings(locale.Name, responses);
 
         /// <summary>
-        /// Loads all response strings into the cache.
+        /// Checks if the bot contains a valid response for a given response key.
         /// </summary>
-        public void LoadLocalizedStrings()
+        /// <param name="locale">Locale of the response string.</param>
+        /// <param name="response">Response string key to be checked.</param>
+        /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
+        public bool ContainsResponse(string locale, string response)
         {
-            // If Localization directory doesn't exist create one with en-US strings
-            if (!Directory.Exists(AkkoEnvironment.LocalesDirectory))
-                CreateDefaultLocaleFile(AkkoEnvironment.LocalesDirectory);
-
-            var fileNames = Directory
-                .GetFiles(AkkoEnvironment.LocalesDirectory)
-                .Where(x => x.Contains(".yaml") && x.Contains('_'));
-
-            // If directory doesn't contain response strings files create the default one
-            if (!fileNames.Any())
-                fileNames = fileNames.Append(CreateDefaultLocaleFile(AkkoEnvironment.LocalesDirectory));
-
-            foreach (var file in fileNames)
-            {
-                using var reader = new StreamReader(File.OpenRead(file));
-                var lStrings = new Deserializer().Deserialize<LocalizedStrings>(reader);
-                _localizedStrings.TryAdd(GetFileLocale(file), lStrings.GetStringCollection());
-            }
+            return (_localizedStrings.ContainsKey(locale))
+                ? _localizedStrings[locale].ContainsKey(response)
+                : _localizedStrings[DefaultLanguage].ContainsKey(response);
         }
 
         /// <summary>
@@ -147,7 +128,38 @@ namespace AkkoBot.Services.Localization
         /// <param name="filePath">Path to the file with the response strings.</param>
         /// <returns>The locale of the response string's file.</returns>
         private string GetFileLocale(string filePath)
-            => filePath[(filePath.LastIndexOf('_') + 1).. filePath.LastIndexOf('.')];
+            => filePath[(filePath.LastIndexOf('_') + 1)..filePath.LastIndexOf('.')];
+ 
+        /// <summary>
+        /// Loads all response strings into the cache.
+        /// </summary>
+        private void LoadLocalizedStrings()
+        {
+            // If Localization directory doesn't exist create one with en-US strings
+            if (!Directory.Exists(AkkoEnvironment.LocalesDirectory))
+                CreateDefaultLocaleFile(AkkoEnvironment.LocalesDirectory);
+
+            var fileNames = Directory
+                .GetFiles(AkkoEnvironment.LocalesDirectory)
+                .Where(x => x.Contains(".yaml") && x.Contains('_'));
+
+            // If directory doesn't contain response strings files create the default one
+            if (!fileNames.Any())
+                fileNames = fileNames.Append(CreateDefaultLocaleFile(AkkoEnvironment.LocalesDirectory));
+
+            // Start deserialization
+            var yaml = new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build();
+
+            foreach (var file in fileNames)
+            {
+                using var reader = new StreamReader(File.OpenRead(file));
+                var lStrings = yaml.Deserialize<LocalizedStrings>(reader);
+
+                _localizedStrings.TryAdd(GetFileLocale(file), lStrings.GetStringCollection());
+            }
+        }
 
         /// <summary>
         /// Creates the directory where the response strings will be stored and a default 
@@ -161,7 +173,10 @@ namespace AkkoBot.Services.Localization
             var fileName = filePath + $"ResponseStrings_{DefaultLanguage}.yaml";
 
             using var writer = File.CreateText(fileName);
-            new Serializer().Serialize(writer, new LocalizedStrings());
+            new SerializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Serialize(writer, new LocalizedStrings());
 
             return fileName;
         }
