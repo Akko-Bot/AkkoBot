@@ -30,19 +30,13 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Returns the service container for this bot instance.
+        /// Returns the service container for the specified bot shard.
         /// </summary>
-        /// <returns>The IoC container servicing this bot or <see langword="null"/> if there is none.</returns>
-        public IServiceProvider GetServices()
-            => CommandExt.Values.FirstOrDefault()?.Services;
-
-        /// <summary>
-        /// Returns a specific service registered in this bot instance.
-        /// </summary>
-        /// <typeparam name="T">Class of the registered service.</typeparam>
-        /// <returns>The registered service or <see langword="null"/> if it hasn't been registered.</returns>
-        public T GetService<T>()
-            => (T)CommandExt.Values.FirstOrDefault()?.Services.GetService(typeof(T));
+        /// <param name="shard">The bot shard to get the IoC container from.</param>
+        /// <returns>The IoC container servicing this bot shard or <see langword="null"/> if there is none.</returns>
+        /// <exception cref="IndexOutOfRangeException"/>
+        public IServiceProvider GetServices(int shard)
+            => CommandExt[shard].Services;
 
         /// <summary>
         /// Registers all commands in the project into the command handler.

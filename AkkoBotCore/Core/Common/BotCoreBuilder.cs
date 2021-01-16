@@ -222,7 +222,7 @@ namespace AkkoBot.Core.Common
                         $"Password={_creds.Database["Password"]};" +
                         @"CommandTimeout=20;"
                 )
-            ).AddScoped<IDbCacher, AkkoDbCacher>()
+            ).AddSingleton<IDbCacher, AkkoDbCacher>()
             .AddScoped<IUnitOfWork, AkkoUnitOfWork>();
 
             return this;
@@ -255,6 +255,7 @@ namespace AkkoBot.Core.Common
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
+            using var scope = services.CreateScope();
             var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
 
             // Setup client configuration
@@ -285,7 +286,7 @@ namespace AkkoBot.Core.Common
             var bot = new BotCore(botClient, cmdHandlers);
 
             // Register core events
-            var startup = new Startup(bot.GetService<IUnitOfWork>());
+            var startup = new Startup(scope.ServiceProvider.GetService<IUnitOfWork>());
             startup.RegisterEvents(bot);
 
             return bot;

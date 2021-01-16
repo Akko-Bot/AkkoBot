@@ -21,7 +21,8 @@ namespace AkkoBot.Command.Abstractions
         {
             // Save or update the user who ran the command
             // This might be a scale bottleneck in the future
-            var db = context.CommandsNext.Services.GetService<IUnitOfWork>();
+            using var scope = context.CommandsNext.Services.CreateScope();
+            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
             await db.DiscordUsers.CreateOrUpdateAsync(context.User);
         }
     }

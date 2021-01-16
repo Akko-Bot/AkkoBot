@@ -9,7 +9,6 @@ using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using Microsoft.Extensions.Logging;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using AkkoBot.Extensions;
@@ -31,15 +30,22 @@ namespace AkkoBot.Command.Modules.Basic
 
         [Command("ping")]
         [Description("Ping Discord's servers and return the bot's latency.")]
-        public async Task Ping(CommandContext context) =>
-            await context.Message.RespondAsync(Formatter.BlockCode($"{context.Client.Ping} ms"));
+        public async Task Ping(CommandContext context)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription($"{context.Client.Ping} ms");
+
+            await context.ReplyLocalizedAsync(embed);
+        }
 
         [Command("die"), Aliases("shutdown")]
         [Description("Shuts the bot down.")]
         public async Task Die(CommandContext context)
         {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription("shutdown");
             // There is probably a better way to do this
-            await context.ReplyLocalizedAsync("shutdown");
+            await context.ReplyLocalizedAsync(embed);
 
             /*
             context.Client.Logger.BeginScope(context);
@@ -83,7 +89,7 @@ namespace AkkoBot.Command.Modules.Basic
                 .AddField("minutes", elapsed.Minutes.ToString(), true)
                 .AddField("seconds", elapsed.Seconds.ToString(), true);
 
-            await context.ReplyLocalizedEmbedAsync(null, embed);
+            await context.ReplyLocalizedAsync(embed, false);
         }
 
         [Command("dbread")]

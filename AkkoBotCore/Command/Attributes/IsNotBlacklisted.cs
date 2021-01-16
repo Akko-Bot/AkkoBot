@@ -18,7 +18,8 @@ namespace AkkoBot.Command.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var db = context.CommandsNext.Services.GetService<IUnitOfWork>();
+            using var scope = context.CommandsNext.Services.CreateScope();
+            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
             return Task.FromResult(!db.Blacklist.IsBlacklisted(context));
         }
     }
