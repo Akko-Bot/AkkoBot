@@ -12,10 +12,10 @@ namespace AkkoBot.Services.Logging.Loggers
 
         private readonly LogLevel _minimumLevel;
         private readonly string _timeFormat;
-        private readonly IAkkoFileLogger _fileLogger;
+        private readonly IFileLogger _fileLogger;
         private CommandContext _cmdContext;
 
-        public MinimalistLogger(LogLevel minLevel, string timestampFormat, IAkkoFileLogger fileLogger = null)
+        public MinimalistLogger(LogLevel minLevel, string timestampFormat, IFileLogger fileLogger = null)
         {
             _minimumLevel = minLevel;
             _timeFormat = timestampFormat ?? "HH:mm";

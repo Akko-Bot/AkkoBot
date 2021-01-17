@@ -52,7 +52,7 @@ namespace AkkoBot.Core.Common
         /// <param name="logFormat">The type of logging to be output. Default is "Default".</param>
         /// <param name="timeFormat">The format of the time stamp to be used in the logs. Default depends on <paramref name="logFormat"/>.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithDefaultLogging(LogLevel? logLevel = null, IAkkoFileLogger fileLogger = null, string logFormat = null, string timeFormat = null)
+        public BotCoreBuilder WithDefaultLogging(LogLevel? logLevel = null, IFileLogger fileLogger = null, string logFormat = null, string timeFormat = null)
         {
             _loggerFactory = new AkkoLoggerFactory(logLevel, fileLogger, logFormat, timeFormat);
             return this;
