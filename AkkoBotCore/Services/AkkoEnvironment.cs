@@ -13,7 +13,10 @@ namespace AkkoBot.Services
         /// <summary>
         /// Gets the fully qualified path for the current directory of the application.
         /// </summary>
-        public static string CurrentDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
+        public static string CurrentDirectory { get; }
+            = (AppDomain.CurrentDomain.BaseDirectory.Contains("bin" + OsSlash + "Debug"))
+                ? Directory.GetParent(Environment.CurrentDirectory).FullName + OsSlash
+                : AppDomain.CurrentDomain.BaseDirectory + OsSlash;
 
         /// <summary>
         /// Gets the fully qualified path for the directory where the credentials file is stored.

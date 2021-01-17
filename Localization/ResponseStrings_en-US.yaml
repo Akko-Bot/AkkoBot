@@ -1,0 +1,8 @@
+error_not_found: 'Error: the requested response string was not found.'
+online_since: Online since
+shutdown: Shutting down.
+uptime: Uptime
+days: Days
+hours: Hours
+minutes: Minutes
+seconds: Seconds
