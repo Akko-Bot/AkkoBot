@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
@@ -65,7 +66,7 @@ namespace AkkoBot.Services.Database.Repository
             if (!_blacklist.Contains(id))
                 return false;
 
-            await _db.Database.ExecuteSqlRawAsync($"DELETE FROM blacklist WHERE type_id = {id};");
+            await _db.Database.ExecuteSqlRawAsync($"DELETE FROM blacklist WHERE context_id = {id};");
             return _blacklist.Remove(id);
         }
 

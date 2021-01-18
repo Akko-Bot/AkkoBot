@@ -8,14 +8,29 @@ namespace AkkoBot.Services.Localization
     /// </summary>
     public class LocalizedStrings
     {
-        public string ErrorNotFound { get; set; } = "Error: the requested response string was not found.";
-        public string OnlineSince { get; set; } = "Online since";
-        public string Shutdown { get; set; } = "Shutting down.";
-        public string Uptime { get; set; } = "Uptime";
-        public string Days { get; set; } = "Days";
-        public string Hours { get; set; } = "Hours";
-        public string Minutes { get; set; } = "Minutes";
-        public string Seconds { get; set; } = "Seconds";
+        public string BlAdded { get; init; } = "Successfully added {0} {1} {2} to the blacklist.";
+        public string BlClear { get; init; } = "{0} entries were removed from the blacklist successfully.";
+        public string BlEmpty { get; init; } = "There are no entries in the blacklist.";
+        public string BlExist { get; init; } = "{0} {1} {2} is blacklisted already.";
+        public string BlNotExist { get; init; } = "{0} {1} {2} is not blacklisted.";
+        public string BlRemoved { get; init; } = "Successfully removed {0} {1} {2} from the blacklist.";
+        public string BlTitle { get; init; } = "Blacklist";
+        public string Channel { get; init; } = "Channel";
+        public string Days { get; init; } = "Days";
+        public string Hours { get; init; } = "Hours";
+        public string Id { get; init; } = "Id";
+        public string Minutes { get; init; } = "Minutes";
+        public string Name { get; init; } = "Name";
+        public string OnlineSince { get; init; } = "Online since";
+        public string Seconds { get; init; } = "Seconds";
+        public string Server { get; init; } = "Server";
+        public string Shutdown { get; init; } = "Shutting down.";
+        public string Type { get; init; } = "Type";
+        public string Unknown { get; init; } = "Unknown";
+        public string Unspecified { get; init; } = "Unspecified";
+        public string Uptime { get; init; } = "Uptime";
+        public string User { get; init; } = "User";
+        public string ErrorNotFound { get; init; } = "Error: the requested response string was not found.";
 
         /// <summary>
         /// Gets the collection of response strings stored in this object.

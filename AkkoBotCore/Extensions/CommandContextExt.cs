@@ -39,7 +39,7 @@ namespace AkkoBot.Extensions
             var responseString = localizer.GetResponseString(guild.Locale, message); // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, guild, embed, isError);    // Localize the embed message
 
-            if (isMarked)   // Marks the message with the full name of the user who ran the command
+            if (isMarked && embed.Description is not null)   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.Username}#{context.User.Discriminator} "));
 
             if (guild.UseEmbed) // Send the message

@@ -150,6 +150,7 @@ namespace AkkoBot.Services.Localization
             // Start deserialization
             var yaml = new DeserializerBuilder()
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .IgnoreUnmatchedProperties()
                 .Build();
 
             foreach (var file in fileNames)

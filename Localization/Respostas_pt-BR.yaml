@@ -1,8 +1,23 @@
-error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
-online_since: Online desde
-shutdown: Desligando.
-uptime: Tempo Online
+bl_added: '{0} {1} {2} foi adicionado à lista negra.'
+bl_clear: '{0} registros foram removidos da lista negra.'
+bl_empty: Não há registros na lista negra.
+bl_exist: '{0} {1} {2} já se encontra na lista negra.'
+bl_not_exist: '{0} {1} {2} não se encontra na lista negra.'
+bl_removed: '{0} {1} {2} foi removido da lista negra.'
+bl_title: Lista Negra
+channel: Canal
 days: Dias
+error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 hours: Horas
+id: Id
 minutes: Minutos
+name: Nome
+online_since: Online desde
 seconds: Segundos
+server: Servidor
+shutdown: Desligando.
+type: Tipo
+unknown: Desconhecido
+unspecified: Não especificado
+uptime: Tempo Online
+user: Usuário

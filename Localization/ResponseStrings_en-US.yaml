@@ -1,8 +1,23 @@
-error_not_found: 'Error: the requested response string was not found.'
-online_since: Online since
-shutdown: Shutting down.
-uptime: Uptime
+bl_added: Successfully added {0} {1} {2} to the blacklist.
+bl_clear: '{0} entries were removed from the blacklist successfully.'
+bl_empty: There are no entries in the blacklist.
+bl_exist: '{0} {1} {2} is blacklisted already.'
+bl_not_exist: '{0} {1} {2} is not blacklisted.'
+bl_removed: Successfully removed {0} {1} {2} from the blacklist.
+bl_title: Blacklist
+channel: Channel
 days: Days
+error_not_found: 'Error: the requested response string was not found.'
 hours: Hours
+id: Id
 minutes: Minutes
+name: Name
+online_since: Online since
 seconds: Seconds
+server: Server
+shutdown: Shutting down.
+type: Type
+unknown: Unknown
+unspecified: Unspecified
+uptime: Uptime
+user: User

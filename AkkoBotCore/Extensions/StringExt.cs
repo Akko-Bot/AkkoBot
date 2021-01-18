@@ -6,6 +6,15 @@ namespace AkkoBot.Extensions
     public static class StringExt
     {
         /// <summary>
+        /// Truncates the string to the maximum specified length.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="maxLength">The maximum length the string should have.</param>
+        /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
+        public static string MaxLength(this string text, int maxLength)
+            => text.Substring(0, Math.Min(text.Length, maxLength));
+
+        /// <summary>
         /// Converts a string to the snake_case format.
         /// </summary>
         /// <param name="text">This <see cref="string"/> to be converted.</param>

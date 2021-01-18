@@ -109,7 +109,11 @@ namespace AkkoBot.Core.Common
         // Log exceptions thrown on command execution.
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
-            if (eventArgs.Exception is not ChecksFailedException and not CommandNotFoundException)
+            if (eventArgs.Exception
+            is not ArgumentException
+            and not ChecksFailedException
+            and not CommandNotFoundException
+            and not InvalidOperationException)
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
 

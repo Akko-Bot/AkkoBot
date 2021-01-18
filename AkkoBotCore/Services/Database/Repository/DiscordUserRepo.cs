@@ -1,8 +1,6 @@
-﻿using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
+﻿using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Repository
