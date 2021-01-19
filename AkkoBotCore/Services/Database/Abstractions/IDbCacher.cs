@@ -18,6 +18,7 @@ namespace AkkoBot.Services.Database.Abstractions
         /// <summary>
         /// Resets the database cache.
         /// </summary>
-        void Reset();
+        /// <param name="botId">Discord ID of the bot.</param>
+        void Reset(ulong botId);
     }
 }

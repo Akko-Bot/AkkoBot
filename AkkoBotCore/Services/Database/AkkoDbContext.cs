@@ -24,7 +24,7 @@ namespace AkkoBot.Services.Database
                 .HasIndex(u => u.UserId);
 
             modelBuilder.Entity<BotConfigEntity>()
-                .HasNoKey();
+                .HasIndex(c => c.BotId);
 
             modelBuilder.Entity<GuildConfigEntity>()
                 .HasIndex(g => g.GuildId);

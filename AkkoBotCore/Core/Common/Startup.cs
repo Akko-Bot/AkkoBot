@@ -58,7 +58,7 @@ namespace AkkoBot.Core.Common
         private async Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
             // If there is no BotConfig entry in the database, create one.
-            await _db.BotConfig.TryCreateAsync(new BotConfigEntity());
+            await _db.BotConfig.TryCreateAsync(new BotConfigEntity(client.CurrentUser.Id));
         }
 
         // Saves guilds to the db on startup
@@ -112,8 +112,7 @@ namespace AkkoBot.Core.Common
             if (eventArgs.Exception
             is not ArgumentException
             and not ChecksFailedException
-            and not CommandNotFoundException
-            and not InvalidOperationException)
+            and not CommandNotFoundException)
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
 

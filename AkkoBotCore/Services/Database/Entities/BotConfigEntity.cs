@@ -16,6 +16,9 @@ namespace AkkoBot.Services.Database.Entities
         private string _errorColor = "FB3D28";
         private string _logFormat = "Default";
 
+        [Key]
+        public ulong BotId { get; init; }
+
         [Required]
         [MaxLength(6)]
         [Column(TypeName = "varchar(6)")]
@@ -74,6 +77,11 @@ namespace AkkoBot.Services.Database.Entities
 
         [Required]
         public int MessageSizeCache { get; set; } = 200;
+
+        public BotConfigEntity() { }
+
+        public BotConfigEntity(ulong id)
+            => BotId = id;
 
         //public HashSet<BlacklistItem> Blacklist { get; set; }
 

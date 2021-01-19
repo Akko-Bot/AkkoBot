@@ -107,7 +107,7 @@ namespace AkkoBot.Command.Modules.Self
             {
                 responseIds.AppendLine(entity.ContextId.ToString());
                 responseTypes.AppendLine(await context.FormatLocalizedAsync(entity.Type.ToString().ToSnakeCase()));
-                responseNames.AppendLine((entity.Name is null) ? await context.FormatLocalizedAsync("unknown") : entity.Name);
+                responseNames.AppendLine((string.IsNullOrEmpty(entity.Name)) ? await context.FormatLocalizedAsync("unknown") : entity.Name);
             }
 
             // Send response
