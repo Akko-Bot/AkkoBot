@@ -13,9 +13,9 @@ namespace AkkoBot.Command.ArgumentConverters
             // Determine the appropriate type specified by the user
             return blType?.ToLowerInvariant() switch
             {
-                "u" or "user" => Task.FromResult(Optional.FromValue(BlacklistType.User)),
-                "c" or "channel" => Task.FromResult(Optional.FromValue(BlacklistType.Channel)),
-                "s" or "server" => Task.FromResult(Optional.FromValue(BlacklistType.Server)),
+                "u" or "user" or "users" => Task.FromResult(Optional.FromValue(BlacklistType.User)),
+                "c" or "channel" or "channels" => Task.FromResult(Optional.FromValue(BlacklistType.Channel)),
+                "s" or "server" or "servers" => Task.FromResult(Optional.FromValue(BlacklistType.Server)),
                 _ => Task.FromResult(Optional.FromValue(BlacklistType.Unspecified))
             };
         }

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using AkkoBot.Command.Abstractions;
-using AkkoBot.Command.ArgumentConverters;
+using AkkoBot.Extensions;
 using AkkoBot.Services;
-using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
@@ -47,7 +46,7 @@ namespace AkkoBot.Core.Common
         private void RegisterCommandModules()
         {
             var modules = GeneralService.GetImplementables(typeof(AkkoCommandModule)).ToArray();
-            //var converters = GeneralService.GetImplementables(typeof(IArgumentConverter)).ToArray();
+            var converters = GeneralService.GetImplementables(typeof(IArgumentConverter)).ToArray();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.
@@ -56,9 +55,8 @@ namespace AkkoBot.Core.Common
                 foreach (var cmdModule in modules)
                     cmdHandler.RegisterCommands(cmdModule);
 
-                // Apparently D#+ can't register argument converters
-                // through reflection. Bummer.
-                cmdHandler.RegisterConverter(new BlacklistTypeConverter());
+                foreach (var converter in converters)
+                    cmdHandler.RegisterConverter(converter);
             }
 
             BotClient.Logger.LogInformation(
