@@ -28,8 +28,8 @@ namespace AkkoBot.Services.Database.Repository
             var result = await _db.Database.ExecuteSqlRawAsync(
                 @"DO $$ BEGIN " +
                 @"   IF (SELECT COUNT(*) FROM bot_config) = 0 THEN " +
-                @"       INSERT INTO bot_config(default_prefix, log_format, log_time_format, respond_to_dms, case_sensitive_commands, message_size_cache, date_added) " +
-                $"       VALUES('{botConfig.DefaultPrefix}', '{botConfig.LogFormat}', '{botConfig.LogTimeFormat}', {botConfig.RespondToDms}, {botConfig.CaseSensitiveCommands}, {botConfig.MessageSizeCache}, '{botConfig.DateAdded:O}'); " +
+                @"       INSERT INTO bot_config(locale, bot_prefix, ok_color, error_color, use_embed, log_format, log_time_format, respond_to_dms, case_sensitive_commands, message_size_cache, date_added) " +
+                $"       VALUES('{botConfig.Locale}', '{botConfig.BotPrefix}', '{botConfig.OkColor}', '{botConfig.ErrorColor}', {botConfig.UseEmbed}, '{botConfig.LogFormat}', '{botConfig.LogTimeFormat}', {botConfig.RespondToDms}, {botConfig.CaseSensitiveCommands}, {botConfig.MessageSizeCache}, '{botConfig.DateAdded:O}'); " +
                 @"   END IF; " +
                 @"END $$;"
             );

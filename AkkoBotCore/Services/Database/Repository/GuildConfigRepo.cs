@@ -67,7 +67,7 @@ namespace AkkoBot.Services.Database.Repository
             // Add to the database
             await _db.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO guild_configs(guild_id, prefix, locale, use_embed, ok_color, error_color, date_added) " +
-                $"VALUES({dGuild.GuildId}, '{_botConfig.DefaultPrefix}', '{dGuild.Locale}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}', '{dGuild.DateAdded:O}') " +
+                $"VALUES({dGuild.GuildId}, '{_botConfig.BotPrefix}', '{dGuild.Locale}', {dGuild.UseEmbed}, '{dGuild.OkColor}', '{dGuild.ErrorColor}', '{dGuild.DateAdded:O}') " +
                 @"ON CONFLICT (guild_id) " +
                 @"DO NOTHING;"
             );

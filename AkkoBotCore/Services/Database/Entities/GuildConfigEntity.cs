@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AkkoBot.Services.Database.Entities
 {
     [Comment("Stores settings related to individual Discord servers.")]
-    public class GuildConfigEntity : DbEntity
+    public class GuildConfigEntity : DbEntity, IMessageSettings
     {
         private string _prefix = "!";
         private string _locale = AkkoLocalizer.DefaultLanguage;
@@ -24,7 +24,7 @@ namespace AkkoBot.Services.Database.Entities
         public string Prefix
         {
             get => _prefix;
-            set => _prefix = value.MaxLength(15);
+            set => _prefix = value?.MaxLength(15);
         }
 
         [Required]
@@ -33,7 +33,7 @@ namespace AkkoBot.Services.Database.Entities
         public string Locale
         {
             get => _locale;
-            set => _locale = value.MaxLength(6);
+            set => _locale = value?.MaxLength(6);
         }
 
         [Required]
@@ -45,7 +45,7 @@ namespace AkkoBot.Services.Database.Entities
         public string OkColor
         {
             get => _okColor;
-            set => _okColor = value.MaxLength(6);
+            set => _okColor = value?.MaxLength(6);
         }
 
         [Required]
@@ -54,7 +54,7 @@ namespace AkkoBot.Services.Database.Entities
         public string ErrorColor
         {
             get => _errorColor;
-            set => _errorColor = value.MaxLength(6);
+            set => _errorColor = value?.MaxLength(6);
         }
 
         // Greet and Bye channels and messages

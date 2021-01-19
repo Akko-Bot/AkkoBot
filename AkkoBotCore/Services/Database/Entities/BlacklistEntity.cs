@@ -25,7 +25,7 @@ namespace AkkoBot.Services.Database.Entities
         public string Name
         {
             get => _name;
-            set => _name = value.MaxLength(37);
+            set => _name = value?.MaxLength(37);
         }
     }
 }

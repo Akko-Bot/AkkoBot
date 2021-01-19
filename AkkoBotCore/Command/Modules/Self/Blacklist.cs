@@ -4,6 +4,7 @@ using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Self.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -23,11 +24,11 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("add")]
         public async Task BlacklistAdd(CommandContext context, DiscordChannel channel)
-            => await BlacklistAdd(context, "channel", channel.Id);
+            => await BlacklistAdd(context, BlacklistType.Channel, channel.Id);
 
         [Command("add")]
         public async Task BlacklistAdd(CommandContext context, DiscordUser user)
-            => await BlacklistAdd(context, "user", user.Id);
+            => await BlacklistAdd(context, BlacklistType.User, user.Id);
 
         [Command("remove")]
         public async Task BlacklistRemove(CommandContext context, DiscordChannel channel)
@@ -39,7 +40,7 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("add")]
         [Description("Adds an entry to the blacklist.")]
-        public async Task BlacklistAdd(CommandContext context, string type, ulong id)
+        public async Task BlacklistAdd(CommandContext context, BlacklistType type, ulong id)
         {
             var (entry, success) = await _service.TryAddAsync(context, type, id);
 
@@ -68,7 +69,7 @@ namespace AkkoBot.Command.Modules.Self
         {
             var (entry, success) = await _service.TryRemoveAsync(context, id);
 
-            var entryName = (string.IsNullOrEmpty(entry.Name))
+            var entryName = (string.IsNullOrEmpty(entry?.Name))
                 ? await context.FormatLocalizedAsync("unknown")
                 : entry.Name;
 
@@ -78,9 +79,9 @@ namespace AkkoBot.Command.Modules.Self
                 .WithDescription(
                     await context.FormatLocalizedAsync(
                         (success) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓ 
-                        entry.Type.ToString().ToSnakeCase(),        // User, Channel, Server or Unspecified
+                        entry?.Type.ToString().ToSnakeCase(),        // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),                  // Name or Unknown
-                        Formatter.InlineCode(entry.ContextId.ToString())    // ID
+                        Formatter.InlineCode(id.ToString())    // ID
                     )
                 );
 
@@ -89,15 +90,15 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("list"), Aliases("show")]
         [Description("Lists the blacklist.")]
-        public async Task BlacklistList(CommandContext context, string type = null)
+        public async Task BlacklistList(CommandContext context, BlacklistType? type = null)
         {
             // Convert user input to the appropriate enum
-            var blType = _service.GetBlacklistType(type);
+            //var blType = _service.GetBlacklistType(type);
 
             // Get the blacklist. Returns an empty collection if there is nothing there.
             var blacklist = (type is null)
                 ? await _service.GetAllAsync(context)
-                : await _service.GetAsync(context, b => b.Type == blType);
+                : await _service.GetAsync(context, b => b.Type == type.Value);
 
             // Prepare localized response
             StringBuilder responseIds = new(), responseTypes = new(), responseNames = new();

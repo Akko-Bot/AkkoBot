@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
@@ -34,15 +35,21 @@ namespace AkkoBot.Extensions
         /// <returns></returns>
         public static async Task RespondLocalizedAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();           // Create service scope
-            var (localizer, guild) = await GetServicesAsync(scope, context);         // Get scoped services
-            var responseString = localizer.GetResponseString(guild.Locale, message); // Localize the content message, if there is one
-            var localizedEmbed = LocalizeEmbed(localizer, guild, embed, isError);    // Localize the embed message
+            using var scope = context.CommandsNext.Services.CreateScope();  // Create service scope
+            var (localizer, db) = GetContextServices(scope, context);       // Get scoped services
+
+            // Get the message settings (guild or dm)
+            IMessageSettings settings = (context.Guild is null)
+                ? (await db.BotConfig.GetAllAsync()).FirstOrDefault()
+                : await db.GuildConfigs.GetGuildAsync(context.Guild.Id);
+
+            var responseString = localizer.GetResponseString(settings.Locale, message); // Localize the content message, if there is one
+            var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
 
             if (isMarked && embed.Description is not null)   // Marks the message with the full name of the user who ran the command
-                localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.Username}#{context.User.Discriminator} "));
+                localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
-            if (guild.UseEmbed) // Send the message
+            if (settings.UseEmbed) // Send the message
                 await context.RespondAsync(responseString, false, localizedEmbed);
             else
                 await context.RespondAsync(responseString + "\n\n" + DeconstructEmbed(embed));
@@ -58,15 +65,19 @@ namespace AkkoBot.Extensions
         public static async Task<string> FormatLocalizedAsync(this CommandContext context, string key, params object[] args)
         {
             using var scope = context.Services.CreateScope();
-            var (localizer, guild) = await GetServicesAsync(scope, context);
+            var (localizer, db) = GetContextServices(scope, context);
+
+            var locale = (context.Guild is null)
+                ? (await db.BotConfig.GetAllAsync()).FirstOrDefault().Locale
+                : (await db.GuildConfigs.GetGuildAsync(context.Guild.Id)).Locale;
 
             for (int index = 0; index < args.Length; index++)
             {
                 if (args[index] is string)
-                    args[index] = GetLocalizedResponse(localizer, guild.Locale, args[index] as string);
+                    args[index] = GetLocalizedResponse(localizer, locale, args[index] as string);
             }
 
-            key = GetLocalizedResponse(localizer, guild.Locale, key);
+            key = GetLocalizedResponse(localizer, locale, key);
 
             return string.Format(key, args);
         }
@@ -77,47 +88,49 @@ namespace AkkoBot.Extensions
         /// <param name="scope">The scoped service resolver.</param>
         /// <param name="context">The context of the message.</param>
         /// <returns>The response strings cache and the guild settings.</returns>
-        private static async Task<(ILocalizer, GuildConfigEntity)> GetServicesAsync(IServiceScope scope, CommandContext context)
+        private static (ILocalizer, IUnitOfWork) GetContextServices(IServiceScope scope, CommandContext context)
         {
-            var guild = await scope.ServiceProvider.GetService<IUnitOfWork>().GuildConfigs.GetGuildAsync(context.Guild.Id);
+            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
             var localizer = scope.ServiceProvider.GetService<ILocalizer>();
 
-            return (localizer, guild);
+            return (localizer, db);
         }
 
         /// <summary>
         /// Localizes the content of an embed to its corresponding response string(s).
         /// </summary>
         /// <param name="localizer">The response strings cache.</param>
-        /// <param name="guild">The guild settings for the context guild.</param>
-        /// <param name="embed">The embed to be localized.</param>
+        /// <param name="embed">Embed to be localized.</param>
+        /// <param name="locale">Locale to localize to.</param>
+        /// <param name="okColor">OkColor to set the embed to, if it doesn't have one already.</param>
+        /// <param name="errorColor">ErrorColor to set the embed to, if it doesn't have one already.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <remarks>It ignores strings that don't match any key for a response string.</remarks>
         /// <returns>The localized embed.</returns>
-        private static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, GuildConfigEntity guild, DiscordEmbedBuilder embed, bool isError = false)
+        private static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, IMessageSettings settings, DiscordEmbedBuilder embed, bool isError = false)
         {
             if (embed.Title is not null)
-                embed.Title = GetLocalizedResponse(localizer, guild.Locale, embed.Title);
+                embed.Title = GetLocalizedResponse(localizer, settings.Locale, embed.Title);
 
             if (embed.Description is not null)
-                embed.Description = GetLocalizedResponse(localizer, guild.Locale, embed.Description);
+                embed.Description = GetLocalizedResponse(localizer, settings.Locale, embed.Description);
 
             if (embed.Url is not null)
-                embed.Url = GetLocalizedResponse(localizer, guild.Locale, embed.Url);
+                embed.Url = GetLocalizedResponse(localizer, settings.Locale, embed.Url);
 
             if (!embed.Color.HasValue)
-                embed.Color = new DiscordColor((isError) ? guild.ErrorColor : guild.OkColor);
+                embed.Color = new DiscordColor((isError) ? settings.ErrorColor : settings.OkColor);
 
             if (embed.Author is not null)
-                embed.Author.Name = GetLocalizedResponse(localizer, guild.Locale, embed.Author.Name);
+                embed.Author.Name = GetLocalizedResponse(localizer, settings.Locale, embed.Author.Name);
 
             if (embed.Footer is not null)
-                embed.Footer.Text = GetLocalizedResponse(localizer, guild.Locale, embed.Footer.Text);
+                embed.Footer.Text = GetLocalizedResponse(localizer, settings.Locale, embed.Footer.Text);
 
             foreach (var field in embed.Fields)
             {
-                field.Name = GetLocalizedResponse(localizer, guild.Locale, field.Name);
-                field.Value = GetLocalizedResponse(localizer, guild.Locale, field.Value);
+                field.Name = GetLocalizedResponse(localizer, settings.Locale, field.Name);
+                field.Value = GetLocalizedResponse(localizer, settings.Locale, field.Value);
             }
 
             return embed;

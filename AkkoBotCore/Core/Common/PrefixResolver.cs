@@ -25,7 +25,7 @@ namespace AkkoBot.Core.Common
         {
             // Server prefix needs to be changed
             return (msg.Channel.IsPrivate)
-                ? msg.GetStringPrefixLength(_db.BotConfig.Cache.DefaultPrefix, StringComparison.OrdinalIgnoreCase)
+                ? msg.GetStringPrefixLength(_db.BotConfig.Cache.BotPrefix, StringComparison.OrdinalIgnoreCase)
                 : msg.GetStringPrefixLength(await _db.GuildConfigs.GetPrefixAsync(msg.Channel.GuildId), StringComparison.OrdinalIgnoreCase);
         }
     }

@@ -17,7 +17,7 @@ namespace AkkoBot.Services.Database.Entities
         public string Message
         {
             get => _message;
-            set => _message = value.MaxLength(128);
+            set => _message = value?.MaxLength(128);
         }
         public ActivityType Type { get; set; }
         public TimeSpan RotationTime { get; set; } // Move this to BotConfigs?

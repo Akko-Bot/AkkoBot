@@ -273,7 +273,7 @@ namespace AkkoBot.Core.Common
                 CaseSensitive = true,                                   // Sets whether commands are case-sensitive
                 EnableDms = _creds.EnableDms,                           // Sets whether the bot responds in dm or not
                 EnableMentionPrefix = _creds.EnableMentionPrefix,       // Sets whether the bot accepts its own mention as a prefix for commands
-                IgnoreExtraArguments = true,                            // Sets whether the bot ignores extra arguments on commands or not
+                IgnoreExtraArguments = false,                            // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                    // Sets the dependencies used by the command modules
                 EnableDefaultHelp = _creds.EnableHelpCommand,           // Sets whether the bot should use the default help command from the library
                 PrefixResolver = async (msg) => await pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users

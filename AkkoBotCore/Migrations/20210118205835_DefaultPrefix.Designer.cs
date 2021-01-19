@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210118205835_DefaultPrefix")]
+    partial class DefaultPrefix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,12 +55,6 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.BotConfigEntity", b =>
                 {
-                    b.Property<string>("BotPrefix")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)")
-                        .HasColumnName("bot_prefix");
-
                     b.Property<bool>("CaseSensitiveCommands")
                         .HasColumnType("boolean")
                         .HasColumnName("case_sensitive_commands");
@@ -67,17 +63,17 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
 
-                    b.Property<string>("ErrorColor")
+                    b.Property<string>("DefaultLanguage")
                         .IsRequired()
                         .HasMaxLength(6)
                         .HasColumnType("varchar(6)")
-                        .HasColumnName("error_color");
+                        .HasColumnName("default_language");
 
-                    b.Property<string>("Locale")
+                    b.Property<string>("DefaultPrefix")
                         .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)")
-                        .HasColumnName("locale");
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("default_prefix");
 
                     b.Property<string>("LogFormat")
                         .IsRequired()
@@ -93,19 +89,9 @@ namespace AkkoBot.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("message_size_cache");
 
-                    b.Property<string>("OkColor")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)")
-                        .HasColumnName("ok_color");
-
                     b.Property<bool>("RespondToDms")
                         .HasColumnType("boolean")
                         .HasColumnName("respond_to_dms");
-
-                    b.Property<bool>("UseEmbed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("use_embed");
 
                     b.ToTable("bot_config");
 
