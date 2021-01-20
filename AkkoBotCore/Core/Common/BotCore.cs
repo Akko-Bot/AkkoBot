@@ -46,7 +46,7 @@ namespace AkkoBot.Core.Common
         private void RegisterCommandModules()
         {
             var modules = GeneralService.GetImplementables(typeof(AkkoCommandModule)).ToArray();
-            var converters = GeneralService.GetImplementables(typeof(IArgumentConverter)).ToArray();
+            var converters = GeneralService.GetImplementables(typeof(IArgumentConverter));
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.

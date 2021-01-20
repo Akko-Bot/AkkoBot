@@ -64,15 +64,16 @@ namespace AkkoBot.Core.Common
         // Saves guilds to the db on startup
         private async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
+            var botConfig = _db.BotConfig.Cache;
+
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
-                .Except((await _db.GuildConfigs.GetAllAsync())
-                    .Select(dbGuild => dbGuild.GuildId))
-                .Select(key => new GuildConfigEntity() { GuildId = key })
+                .Except((await _db.GuildConfigs.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
+                .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
                 .ToArray();
 
             // Save the new guilds to the database
-            await _db.GuildConfigs.CreateRangeAsync(newGuilds);
+            _db.GuildConfigs.CreateRange(newGuilds);
             await _db.SaveChangesAsync();
 
             // Cache the new guilds
@@ -110,9 +111,10 @@ namespace AkkoBot.Core.Common
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
             if (eventArgs.Exception
-            is not ArgumentException
-            and not ChecksFailedException
-            and not CommandNotFoundException)
+            is not ArgumentException            // Ignore commands with invalid arguments
+            and not ChecksFailedException       // Ignore command check fails
+            and not CommandNotFoundException    // Ignore commands that do not exist
+            and not InvalidOperationException)  // Ignore subcommands that do not exist
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
 

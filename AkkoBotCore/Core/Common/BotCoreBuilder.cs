@@ -254,6 +254,7 @@ namespace AkkoBot.Core.Common
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
+            var botSettings = services.GetService<IUnitOfWork>().BotConfig.Cache;
             var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
 
             // Setup client configuration
@@ -271,11 +272,11 @@ namespace AkkoBot.Core.Common
             var cmdExtConfig = new CommandsNextConfiguration()
             {
                 CaseSensitive = true,                                   // Sets whether commands are case-sensitive
-                EnableDms = _creds.EnableDms,                           // Sets whether the bot responds in dm or not
-                EnableMentionPrefix = _creds.EnableMentionPrefix,       // Sets whether the bot accepts its own mention as a prefix for commands
+                EnableDms = botSettings.RespondToDms,                           // Sets whether the bot responds in dm or not
+                EnableMentionPrefix = botSettings.MentionPrefix,       // Sets whether the bot accepts its own mention as a prefix for commands
                 IgnoreExtraArguments = false,                            // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                    // Sets the dependencies used by the command modules
-                EnableDefaultHelp = _creds.EnableHelpCommand,           // Sets whether the bot should use the default help command from the library
+                EnableDefaultHelp = botSettings.EnableHelp,           // Sets whether the bot should use the default help command from the library
                 PrefixResolver = async (msg) => await pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
             };
 

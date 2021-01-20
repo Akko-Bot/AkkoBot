@@ -22,7 +22,7 @@ namespace AkkoBot.Services.Localization
         /// The cache of response strings. First key is the locale. Second key is the response 
         /// string's key. The value is the response string itself.
         /// </summary>
-        private readonly Dictionary<string, IDictionary<string, string>> _localizedStrings = new();
+        private readonly Dictionary<string, IReadOnlyDictionary<string, string>> _localizedStrings = new();
 
         public AkkoLocalizer()
             => LoadLocalizedStrings();

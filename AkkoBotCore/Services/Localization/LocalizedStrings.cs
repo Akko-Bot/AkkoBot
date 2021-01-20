@@ -30,16 +30,18 @@ namespace AkkoBot.Services.Localization
         public string Unspecified { get; init; } = "Unspecified";
         public string Uptime { get; init; } = "Uptime";
         public string User { get; init; } = "User";
+        public string Settings { get; init; } = "Setting";
+        public string Value { get; init; } = "Value";
         public string ErrorNotFound { get; init; } = "Error: the requested response string was not found.";
 
         /// <summary>
         /// Gets the collection of response strings stored in this object.
         /// </summary>
         /// <returns>
-        /// A <see cref="Dictionary{string, string}"/> where the key is the property name in 
+        /// An <see cref="IReadOnlyDictionary{string, string}"/> where the key is the property name in 
         /// snake_case format and the value is the response string.
         /// </returns>
-        public IDictionary<string, string> GetStringCollection()
+        public IReadOnlyDictionary<string, string> GetStringCollection()
         {
             var props = this.GetType().GetProperties();
             var result = new Dictionary<string, string>(props.Length);

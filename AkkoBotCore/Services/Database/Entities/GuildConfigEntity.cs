@@ -68,8 +68,17 @@ namespace AkkoBot.Services.Database.Entities
         // .rero messages and reactions
 
         public GuildConfigEntity() { }
-        
+
         public GuildConfigEntity(DiscordGuild guild = null)
             => GuildId = guild?.Id ?? default;
+
+        public GuildConfigEntity(BotConfigEntity config)
+        {
+            Prefix = config.BotPrefix;
+            Locale = config.Locale;
+            UseEmbed = config.UseEmbed;
+            OkColor = config.OkColor;
+            ErrorColor = config.ErrorColor;
+        }
     }
 }

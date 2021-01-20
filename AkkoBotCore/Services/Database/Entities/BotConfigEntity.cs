@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
@@ -73,6 +74,12 @@ namespace AkkoBot.Services.Database.Entities
         public bool RespondToDms { get; set; } = true;
 
         [Required]
+        public bool MentionPrefix { get; set; } = false;
+
+        [Required]
+        public bool EnableHelp { get; set; } = true;
+
+        [Required]
         public bool CaseSensitiveCommands { get; set; } = true;
 
         [Required]
@@ -90,5 +97,23 @@ namespace AkkoBot.Services.Database.Entities
         // Implement .gcmd and .gmod?
         // Implement forward dms to owners?
         // Might be an issue with "message staff" type of features
+        public IReadOnlyDictionary<string, string> GetSettings()
+        {
+            var props = this.GetType().GetProperties();
+            var result = new Dictionary<string, string>(props.Length);
+
+            // Skip bot ID
+            props.GetEnumerator().MoveNext();
+
+            foreach (var prop in props)
+            {
+                result.TryAdd(
+                    prop.Name.ToSnakeCase(),
+                    prop.GetValue(this).ToString()
+                );
+            }
+
+            return result;
+        }
     }
 }

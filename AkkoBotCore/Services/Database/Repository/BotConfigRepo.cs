@@ -27,9 +27,9 @@ namespace AkkoBot.Services.Database.Repository
         {
             var result = await base.GetAsync(x => x.BotId == botConfig.BotId);
 
-            if (result is null)
+            if (!result.Any())
             {
-                await base.CreateAsync(botConfig);
+                base.Create(botConfig);
                 await _db.SaveChangesAsync();
                 Cache = botConfig;
                 return true;

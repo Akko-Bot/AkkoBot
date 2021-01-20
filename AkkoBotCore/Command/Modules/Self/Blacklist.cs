@@ -64,7 +64,7 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [Command("remove"), Aliases("rem")]
-        [Description("Remove from blacklist.")]
+        [Description("Removes an entry from blacklist.")]
         public async Task BlacklistRemove(CommandContext context, ulong id)
         {
             var (entry, success) = await _service.TryRemoveAsync(context, id);
@@ -89,7 +89,7 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [Command("list"), Aliases("show")]
-        [Description("Lists the blacklist.")]
+        [Description("Shows the blacklist.")]
         public async Task BlacklistList(CommandContext context, BlacklistType? type = null)
         {
             // Convert user input to the appropriate enum

@@ -62,9 +62,9 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="pStatus">Playing status to be added.</param>
         /// <returns></returns>
-        public async Task AddAsync(PlayingStatusEntity pStatus)
+        public void Add(PlayingStatusEntity pStatus)
         {
-            await base.CreateAsync(pStatus);
+            base.Create(pStatus);
             Cache.Add(pStatus);
         }
 

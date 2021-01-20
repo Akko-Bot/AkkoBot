@@ -50,6 +50,24 @@ namespace AkkoBot.Services.Database.Repository
         /// Adds the entry specified in <paramref name="newEntity"/> to the database.
         /// </summary>
         /// <param name="newEntity">Entry to be added to the database.</param>
+        public virtual void Create(T newEntity)
+            => Table.Add(newEntity);
+
+        /// <summary>
+        /// Adds the entries specified in the <paramref name="newEntities"/> in bulk to the database.
+        /// </summary>
+        /// <param name="newEntities">A collection of database entries.</param>
+        public virtual void CreateRange(params T[] newEntities)
+            => Table.AddRange(newEntities);
+
+        /// <summary>
+        /// Adds the entry specified in <paramref name="newEntity"/> to the database.
+        /// </summary>
+        /// <param name="newEntity">Entry to be added to the database.</param>
+        /// <remarks>
+        /// This should only be used for value generators.
+        /// Use the synchronous version otherwise.
+        /// </remarks>
         public virtual async Task CreateAsync(T newEntity)
             => await Table.AddAsync(newEntity);
 
@@ -57,6 +75,10 @@ namespace AkkoBot.Services.Database.Repository
         /// Adds the entries specified in the <paramref name="newEntities"/> in bulk to the database.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
+        /// <remarks>
+        /// This should only be used for value generators.
+        /// Use the synchronous version otherwise.
+        /// </remarks>
         public virtual async Task CreateRangeAsync(params T[] newEntities)
             => await Table.AddRangeAsync(newEntities);
 

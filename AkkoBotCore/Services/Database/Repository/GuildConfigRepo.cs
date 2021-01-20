@@ -62,7 +62,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns><see langword="true"/> if the user got added to the database or to the cache, <see langword="false"/> otherwise.</returns>
         public async Task<bool> TryCreateAsync(DiscordGuild guild)
         {
-            var dGuild = new GuildConfigEntity(guild);
+            var dGuild = new GuildConfigEntity(_botConfig) { GuildId = guild.Id };
 
             // Add to the database
             await _db.Database.ExecuteSqlRawAsync(
