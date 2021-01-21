@@ -24,7 +24,10 @@ namespace AkkoBot.Services.Database
                 .HasIndex(u => u.UserId);
 
             modelBuilder.Entity<BotConfigEntity>()
-                .HasIndex(c => c.BotId);
+                .HasOne(x => x.LogConfigRel)
+                .WithOne(x => x.BotConfigRel)
+                .HasForeignKey<LogConfigEntity>(x => x.BotIdRef)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GuildConfigEntity>()
                 .HasIndex(g => g.GuildId);
@@ -33,7 +36,7 @@ namespace AkkoBot.Services.Database
                 .HasIndex(g => g.ContextId);
 
             modelBuilder.Entity<PlayingStatusEntity>()
-                .HasNoKey();
+                .HasNoKey(); // Make this dependent on BotConfigEntity?
         }
     }
 }

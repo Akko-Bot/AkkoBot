@@ -6,17 +6,18 @@ using AkkoBot.Services.Database.Entities;
 namespace AkkoBot.Services.Database.Abstractions
 {
     /// <summary>
-    /// Represents a default database cacher for an <see cref="AkkoDbContext"/>.
+    /// Represents a default database cacher for an <see cref="IUnitOfWork"/>.
     /// </summary>
     public interface IDbCacher : IDisposable
     {
         HashSet<ulong> Blacklist { get; }
-        BotConfigEntity BotConfig { get; }
+        BotConfigEntity BotConfig { get; set; }
+        LogConfigEntity LogConfig { get; set; }
         ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
         List<PlayingStatusEntity> PlayingStatuses { get; }
 
         /// <summary>
-        /// Resets the database cache.
+        /// Reinitializes the database cache.
         /// </summary>
         /// <param name="botId">Discord ID of the bot.</param>
         void Reset(ulong botId);

@@ -28,12 +28,20 @@ namespace AkkoBot.Command.Modules.Self.Services
             db.SaveChanges();
         }
 
-        public IReadOnlyDictionary<string, string> GetConfigs(CommandContext context)
+        public IDictionary<string, string> GetConfigs(CommandContext context)
         {
             using var scope = context.CommandsNext.Services.CreateScope();
-            var botConfig = scope.ServiceProvider.GetService<IUnitOfWork>().BotConfig.Cache;
+            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            return botConfig.GetSettings();
+            var botConfig = db.BotConfig.Cache;
+            var logConfig = db.LogConfig.Cache;
+
+            var settings = botConfig.GetSettings();
+
+            foreach (var propPair in logConfig.GetSettings())
+                settings.TryAdd(propPair.Key, propPair.Value);
+
+            return settings;
         }
     }
 }

@@ -5,6 +5,7 @@ using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging;
@@ -254,7 +255,7 @@ namespace AkkoBot.Core.Common
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var services = _cmdServices.BuildServiceProvider();
-            var botSettings = services.GetService<IUnitOfWork>().BotConfig.Cache;
+            var botSettings = services.GetService<IUnitOfWork>().BotConfig.Cache ?? new BotConfigEntity();
             var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
 
             // Setup client configuration

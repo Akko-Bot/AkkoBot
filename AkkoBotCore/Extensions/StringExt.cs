@@ -23,9 +23,9 @@ namespace AkkoBot.Extensions
         {
             var buffer = new StringBuilder(text);
 
-            for (int index = 0; index < buffer.Length; index++)
+            for (int index = 1; index < buffer.Length; index++)
             {
-                if (char.IsUpper(buffer[index]))
+                if (char.IsUpper(buffer[index]) && !char.IsUpper(buffer[index - 1]))
                     buffer.Insert(index++, '_');
             }
 

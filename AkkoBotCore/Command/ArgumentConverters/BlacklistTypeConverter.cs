@@ -8,10 +8,10 @@ namespace AkkoBot.Command.ArgumentConverters
 {
     public class BlacklistTypeConverter : IArgumentConverter<BlacklistType>
     {
-        public Task<Optional<BlacklistType>> ConvertAsync(string blType, CommandContext ctx)
+        public Task<Optional<BlacklistType>> ConvertAsync(string input, CommandContext ctx)
         {
             // Determine the appropriate type specified by the user
-            return blType?.ToLowerInvariant() switch
+            return input?.ToLowerInvariant() switch
             {
                 "u" or "user" or "users" => Task.FromResult(Optional.FromValue(BlacklistType.User)),
                 "c" or "channel" or "channels" => Task.FromResult(Optional.FromValue(BlacklistType.Channel)),

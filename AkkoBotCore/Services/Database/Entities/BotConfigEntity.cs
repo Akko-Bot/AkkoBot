@@ -15,7 +15,8 @@ namespace AkkoBot.Services.Database.Entities
         private string _botPrefix = "!";
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
-        private string _logFormat = "Default";
+
+        public LogConfigEntity LogConfigRel { get; set; }
 
         [Key]
         public ulong BotId { get; init; }
@@ -59,18 +60,6 @@ namespace AkkoBot.Services.Database.Entities
         public bool UseEmbed { get; set; } = true;
 
         [Required]
-        [MaxLength(20)]
-        [Column(TypeName = "varchar(20)")]
-        public string LogFormat
-        {
-            get => _logFormat;
-            set => _logFormat = value?.MaxLength(20);
-        }
-
-        [Column(TypeName = "varchar")]
-        public string LogTimeFormat { get; set; }
-
-        [Required]
         public bool RespondToDms { get; set; } = true;
 
         [Required]
@@ -88,28 +77,25 @@ namespace AkkoBot.Services.Database.Entities
         public BotConfigEntity() { }
 
         public BotConfigEntity(ulong id)
-            => BotId = id;
-
-        //public HashSet<BlacklistItem> Blacklist { get; set; }
-
-        //public HashSet<PlayingStatusItem> PlayingStatuses { get; set; }
+        {
+            BotId = id;
+            LogConfigRel = new(id);
+        }
 
         // Implement .gcmd and .gmod?
         // Implement forward dms to owners?
         // Might be an issue with "message staff" type of features
-        public IReadOnlyDictionary<string, string> GetSettings()
+        public IDictionary<string, string> GetSettings()
         {
             var props = this.GetType().GetProperties();
             var result = new Dictionary<string, string>(props.Length);
 
-            // Skip bot ID
-            props.GetEnumerator().MoveNext();
-
-            foreach (var prop in props)
+            // Index should skip undesirable props at the start
+            for (int index = 2; index < props.Length - 1; index++)
             {
                 result.TryAdd(
-                    prop.Name.ToSnakeCase(),
-                    prop.GetValue(this).ToString()
+                    props[index].Name.ToSnakeCase(),
+                    props[index].GetValue(this)?.ToString()
                 );
             }
 

@@ -10,6 +10,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Command.Modules.Self
 {
@@ -44,15 +45,20 @@ namespace AkkoBot.Command.Modules.Self
         public async Task SetBotErrorColor(CommandContext context, string errorColor)
             => await ChangeProperty(context, x => x.ErrorColor = errorColor);
 
+        [Command("loglevel")]
+        [Description("Sets the level of the logs that are going to be registered on the console.")]
+        public async Task SetBotLogLevel(CommandContext context, LogLevel logLevel)
+            => await ChangeProperty(context, x => x.LogConfigRel.LogLevel = logLevel);
+
         [Command("logformat")]
         [Description("Sets the log format used for logging on the console.")]
         public async Task SetBotLogFormat(CommandContext context, string logFormat)
-            => await ChangeProperty(context, x => x.LogFormat = logFormat);
+            => await ChangeProperty(context, x => x.LogConfigRel.LogFormat = logFormat);
 
         [Command("logtimeformat")]
         [Description("Sets the time format used for logging on the console.")]
         public async Task SetBotLogTimeFormat(CommandContext context, string logTimeFormat)
-            => await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
+            => await ChangeProperty(context, x => x.LogConfigRel.LogTimeFormat = logTimeFormat);
 
         [Command("embed"), Aliases("useembed")]
         [Description("Sets whether the bot should use embeds for responses or not.")]
@@ -83,6 +89,17 @@ namespace AkkoBot.Command.Modules.Self
         [Description("Sets how many messages should be cached per channel.")]
         public async Task SetBotCacheSize(CommandContext context, int cacheSize)
             => await ChangeProperty(context, x => x.MessageSizeCache = cacheSize);
+
+        [Command("log")]
+        [Description("Sets whether logs should be written to a text file.")]
+        public async Task SetFileLogging(CommandContext context, bool isEnabled, double mbSize = 1.0)
+        {
+            await ChangeProperty(context, x =>
+            {
+                x.LogConfigRel.IsLoggedToFile = isEnabled;
+                x.LogConfigRel.LogSizeMB = mbSize;
+            });
+        }
 
         [Command("list"), Aliases("show")]
         [Description("Shows the bot's current settings.")]

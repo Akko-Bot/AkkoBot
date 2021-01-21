@@ -58,7 +58,8 @@ namespace AkkoBot.Core.Common
         private async Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
             // If there is no BotConfig entry in the database, create one.
-            await _db.BotConfig.TryCreateAsync(new BotConfigEntity(client.CurrentUser.Id));
+            await _db.LogConfig.LoadLogConfigAsync(client.CurrentUser.Id);
+            await _db.BotConfig.TryCreateAsync(client.CurrentUser.Id);
         }
 
         // Saves guilds to the db on startup

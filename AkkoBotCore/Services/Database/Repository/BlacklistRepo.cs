@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
@@ -11,12 +12,12 @@ namespace AkkoBot.Services.Database.Repository
     public class BlacklistRepo : DbRepository<BlacklistEntity>
     {
         private readonly AkkoDbContext _db;
-        private readonly HashSet<ulong> _blacklist;
+        private readonly HashSet<ulong> _cache;
 
         public BlacklistRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
         {
             _db = db;
-            _blacklist = dbCacher.Blacklist;
+            _cache = dbCacher.Blacklist;
         }
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <param name="id">ID of a user, channel or guild.</param>
         /// <returns><see langword="true"/> if the ID is blacklisted, <see langword="false"/> otherwise.</returns>
         public bool IsBlacklisted(ulong id)
-            => _blacklist.Contains(id);
+            => _cache.Contains(id);
 
         /// <summary>
         /// Checks if the command comes from a backlisted context.
@@ -34,9 +35,9 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns><see langword="true"/> if it's blacklisted, <see langword="false"/> otherwise.</returns>
         public bool IsBlacklisted(CommandContext context)
         {
-            return _blacklist.Contains(context.User.Id)
-                || _blacklist.Contains(context.Channel.Id)
-                || _blacklist.Contains(context.Guild?.Id ?? default); // This will cause dms to always fail if 0 is in the blacklist.
+            return _cache.Contains(context.User.Id)
+                || _cache.Contains(context.Channel.Id)
+                || _cache.Contains(context.Guild?.Id ?? default); // This will cause dms to always fail if 0 is in the blacklist.
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace AkkoBot.Services.Database.Repository
                 @"DO NOTHING;"
             );
 
-            return _blacklist.Add(value.ContextId);
+            return _cache.Add(value.ContextId);
         }
 
         /// <summary>
@@ -63,11 +64,11 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns><see langword="true"/> if the entry got removed from the database or from the cache, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveAsync(ulong id)
         {
-            if (!_blacklist.Contains(id))
+            if (!_cache.Contains(id))
                 return false;
 
             await _db.Database.ExecuteSqlRawAsync($"DELETE FROM blacklist WHERE context_id = {id};");
-            return _blacklist.Remove(id);
+            return _cache.Remove(id);
         }
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace AkkoBot.Services.Database.Repository
         public async Task<int> ClearAsync()
         {
             var rows = await _db.Database.ExecuteSqlRawAsync("DELETE FROM blacklist;");
-            _blacklist.Clear();
+            _cache.Clear();
 
             return rows;
         }

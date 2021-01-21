@@ -1,5 +1,4 @@
-﻿using AkkoBot.Command.Abstractions;
-using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Repository;
 using System;
 using System.Threading.Tasks;
@@ -14,18 +13,20 @@ namespace AkkoBot.Services.Database
         public DiscordUserRepo DiscordUsers { get; private set; }
         public BlacklistRepo Blacklist { get; private set; }
         public BotConfigRepo BotConfig { get; private set; }
+        public LogConfigRepo LogConfig { get; private set; }
         public GuildConfigRepo GuildConfigs { get; private set; }
         public PlayingStatusRepo PlayingStatuses { get; private set; }
 
-        public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCache)
+        public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)
         {
             _db = db;
 
             DiscordUsers = new(db);
-            Blacklist = new(db, dbCache);
-            BotConfig = new(db, dbCache);
-            GuildConfigs = new(db, dbCache);
-            PlayingStatuses = new(db, dbCache);
+            Blacklist = new(db, dbCacher);
+            BotConfig = new(db, dbCacher);
+            LogConfig = new(db, dbCacher);
+            GuildConfigs = new(db, dbCacher);
+            PlayingStatuses = new(db, dbCacher);
         }
 
         /// <summary>

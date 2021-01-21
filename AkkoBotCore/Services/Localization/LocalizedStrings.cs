@@ -30,6 +30,7 @@ namespace AkkoBot.Services.Localization
         public string Unspecified { get; init; } = "Unspecified";
         public string Uptime { get; init; } = "Uptime";
         public string User { get; init; } = "User";
+        public string BotSettingsTitle { get; init; } = "Global Settings";
         public string Settings { get; init; } = "Setting";
         public string Value { get; init; } = "Value";
         public string ErrorNotFound { get; init; } = "Error: the requested response string was not found.";
