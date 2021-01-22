@@ -9,6 +9,7 @@ namespace AkkoBot.Services.Database
         public DbSet<DiscordUserEntity> DiscordUsers { get; set; }
         public DbSet<BotConfigEntity> BotConfig { get; set; }
         public DbSet<GuildConfigEntity> GuildConfigs { get; set; }
+        public DbSet<LogConfigEntity> LogConfigs { get; set; }
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
 
@@ -23,11 +24,11 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<DiscordUserEntity>()
                 .HasIndex(u => u.UserId);
 
+            modelBuilder.Entity<LogConfigEntity>()
+                .HasKey(x => x.Id);
+
             modelBuilder.Entity<BotConfigEntity>()
-                .HasOne(x => x.LogConfigRel)
-                .WithOne(x => x.BotConfigRel)
-                .HasForeignKey<LogConfigEntity>(x => x.BotIdRef)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasKey(x => x.Id);
 
             modelBuilder.Entity<GuildConfigEntity>()
                 .HasIndex(g => g.GuildId);

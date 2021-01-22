@@ -16,7 +16,7 @@ namespace AkkoBot.Command.Modules.Self
 {
     [BotOwner]
     [RequireBotPermissions(Permissions.AddReactions)]
-    [Group("config"), Aliases("self", "bot")]
+    [Group("config"), Aliases("self")]
     [Description("This module manages the settings that define how the bot should behave globally.")]
     public class BotConfig : AkkoCommandModule
     {
@@ -44,21 +44,6 @@ namespace AkkoBot.Command.Modules.Self
         [Description("Sets the default okcolor for the bot.")]
         public async Task SetBotErrorColor(CommandContext context, string errorColor)
             => await ChangeProperty(context, x => x.ErrorColor = errorColor);
-
-        [Command("loglevel")]
-        [Description("Sets the level of the logs that are going to be registered on the console.")]
-        public async Task SetBotLogLevel(CommandContext context, LogLevel logLevel)
-            => await ChangeProperty(context, x => x.LogConfigRel.LogLevel = logLevel);
-
-        [Command("logformat")]
-        [Description("Sets the log format used for logging on the console.")]
-        public async Task SetBotLogFormat(CommandContext context, string logFormat)
-            => await ChangeProperty(context, x => x.LogConfigRel.LogFormat = logFormat);
-
-        [Command("logtimeformat")]
-        [Description("Sets the time format used for logging on the console.")]
-        public async Task SetBotLogTimeFormat(CommandContext context, string logTimeFormat)
-            => await ChangeProperty(context, x => x.LogConfigRel.LogTimeFormat = logTimeFormat);
 
         [Command("embed"), Aliases("useembed")]
         [Description("Sets whether the bot should use embeds for responses or not.")]
@@ -90,17 +75,6 @@ namespace AkkoBot.Command.Modules.Self
         public async Task SetBotCacheSize(CommandContext context, int cacheSize)
             => await ChangeProperty(context, x => x.MessageSizeCache = cacheSize);
 
-        [Command("log")]
-        [Description("Sets whether logs should be written to a text file.")]
-        public async Task SetFileLogging(CommandContext context, bool isEnabled, double mbSize = 1.0)
-        {
-            await ChangeProperty(context, x =>
-            {
-                x.LogConfigRel.IsLoggedToFile = isEnabled;
-                x.LogConfigRel.LogSizeMB = mbSize;
-            });
-        }
-
         [Command("list"), Aliases("show")]
         [Description("Shows the bot's current settings.")]
         public async Task GetBotSettings(CommandContext context)
@@ -129,6 +103,50 @@ namespace AkkoBot.Command.Modules.Self
             await context.Message.CreateReactionAsync(
                 DiscordEmoji.FromName(context.Client, ":white_check_mark:")
             );
+        }
+
+        [Group("log"), Aliases("logs", "logging")]
+        [Description("Logs")]
+        public class LogConfig : AkkoCommandModule
+        {
+            private readonly BotConfigService _service;
+
+            public LogConfig(BotConfigService service)
+                => _service = service;
+
+            [Command("level")]
+            [Description("Sets the level of the logs that are going to be registered on the console.")]
+            public async Task SetBotLogLevel(CommandContext context, LogLevel logLevel)
+                => await ChangeProperty(context, x => x.LogLevel = logLevel);
+
+            [Command("format")]
+            [Description("Sets the log format used for logging on the console.")]
+            public async Task SetBotLogFormat(CommandContext context, string logFormat)
+                => await ChangeProperty(context, x => x.LogFormat = logFormat);
+
+            [Command("timeformat")]
+            [Description("Sets the time format used for logging on the console.")]
+            public async Task SetBotLogTimeFormat(CommandContext context, string logTimeFormat)
+                => await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
+
+            [Command("save")]
+            [Description("Sets whether logs should be written to a text file.")]
+            public async Task SetFileLogging(CommandContext context, bool isEnabled)
+                => await ChangeProperty(context, x => x.IsLoggedToFile = isEnabled);
+
+            [Command("size"), Aliases("setsize")]
+            [Description("Sets the size a log file should have.")]
+            public async Task SetFileMaxSize(CommandContext context, double size)
+                => await ChangeProperty(context, x => x.LogSizeMB = size);
+
+            private async Task ChangeProperty(CommandContext context, Action<LogConfigEntity> selector)
+            {
+                _service.SetProperty(context, selector);
+
+                await context.Message.CreateReactionAsync(
+                    DiscordEmoji.FromName(context.Client, ":white_check_mark:")
+                );
+            }
         }
     }
 }

@@ -37,8 +37,8 @@ namespace AkkoBot.Services.Database
         public void Reset(ulong botId)
         {
             Blacklist.Clear();
-            BotConfig = new(botId);
-            LogConfig = new(botId);
+            BotConfig = new();
+            LogConfig = new();
             Guilds.Clear();
             PlayingStatuses.Clear();
         }

@@ -18,6 +18,12 @@ namespace AkkoBot.Services.Database.Repository
         public DbRepository(AkkoDbContext db)
             => Table = db.Set<T>();
 
+        public virtual T GetSync<TValue>(TValue value)
+            => Table.Find(value);
+
+        public virtual IEnumerable<T> GetAllSync()
+            => Table.ToList();
+
         /// <summary>
         /// Returns a database entry that contains the specified parameter as a primary key.
         /// </summary>

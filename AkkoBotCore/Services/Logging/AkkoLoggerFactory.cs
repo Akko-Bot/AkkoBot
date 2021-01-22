@@ -47,15 +47,26 @@ namespace AkkoBot.Services.Logging
             if (_providers.Count == 0)
                 RegisterProviders();
 
+            int index = 0;
+
             foreach (var provider in _providers)
             {
                 var logger = provider.CreateLogger(LogFormat);
 
                 if (logger is not null)
                     return logger;
+
+                if (++index == _providers.Count)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"No logger of name \"{LogFormat}\" was found. Falling back to \"Default\".");
+                    Console.ResetColor();
+
+                    return provider.CreateLogger("Default");
+                }
             }
 
-            throw new InvalidOperationException($"There is no logger named \"{LogFormat}\".");
+            throw new InvalidOperationException("An issue occurred while initializing a logger object.");
         }
 
         /// <summary>

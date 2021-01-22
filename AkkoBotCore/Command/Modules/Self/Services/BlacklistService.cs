@@ -106,23 +106,6 @@ namespace AkkoBot.Command.Modules.Self.Services
         }
 
         /// <summary>
-        /// Parses the user input into the appropriate blacklist type.
-        /// </summary>
-        /// <param name="type">The type provided by the user.</param>
-        /// <returns>The appropriate <see cref="BlacklistType"/>.</returns>
-        public BlacklistType GetBlacklistType(string type)
-        {
-            // Determine the appropriate type specified by the user
-            return type?.ToLowerInvariant() switch
-            {
-                "u" or "user" => BlacklistType.User,
-                "c" or "channel" => BlacklistType.Channel,
-                "s" or "server" => BlacklistType.Server,
-                _ => BlacklistType.Unspecified
-            };
-        }
-
-        /// <summary>
         /// Gets the name of the blacklist entity.
         /// </summary>
         /// <param name="context">The command context.</param>

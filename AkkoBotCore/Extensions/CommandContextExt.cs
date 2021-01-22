@@ -36,7 +36,7 @@ namespace AkkoBot.Extensions
         public static async Task RespondLocalizedAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
             using var scope = context.CommandsNext.Services.CreateScope();  // Create service scope
-            var (localizer, db) = GetContextServices(scope, context);       // Get scoped services
+            var (localizer, db) = GetContextServices(scope);                // Get scoped services
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (context.Guild is null)
@@ -65,7 +65,7 @@ namespace AkkoBot.Extensions
         public static async Task<string> FormatLocalizedAsync(this CommandContext context, string key, params object[] args)
         {
             using var scope = context.Services.CreateScope();
-            var (localizer, db) = GetContextServices(scope, context);
+            var (localizer, db) = GetContextServices(scope);
 
             var locale = (context.Guild is null)
                 ? (await db.BotConfig.GetAllAsync()).FirstOrDefault().Locale
@@ -86,9 +86,8 @@ namespace AkkoBot.Extensions
         /// Gets the scoped services needed to localize a Discord message.
         /// </summary>
         /// <param name="scope">The scoped service resolver.</param>
-        /// <param name="context">The context of the message.</param>
         /// <returns>The response strings cache and the guild settings.</returns>
-        private static (ILocalizer, IUnitOfWork) GetContextServices(IServiceScope scope, CommandContext context)
+        private static (ILocalizer, IUnitOfWork) GetContextServices(IServiceScope scope)
         {
             var db = scope.ServiceProvider.GetService<IUnitOfWork>();
             var localizer = scope.ServiceProvider.GetService<ILocalizer>();

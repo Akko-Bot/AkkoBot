@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Repository
 {
@@ -24,20 +25,19 @@ namespace AkkoBot.Services.Database.Repository
         /// <param name="uid">ID of the bot.</param>
         /// <remarks>If an entry already exists for a given ID, it does nothing.</remarks>
         /// <returns><see langword="true"/> if the entry got added to the database, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> TryCreateAsync(ulong uid)
+        public async Task<bool> TryCreateAsync()
         {
-            Cache = await base.GetAsync(uid);
+            Cache = (await base.GetAllAsync()).FirstOrDefault();
 
-            if (Cache is null)
+            if (Cache is null) // If it is empty
             {
-                Cache = _dbCacher.BotConfig = new BotConfigEntity(uid);
+                Cache = _dbCacher.BotConfig = new BotConfigEntity();
                 base.Create(Cache);
                 await _db.SaveChangesAsync();
 
                 return true;
             }
 
-            Cache.LogConfigRel = _dbCacher.LogConfig;
             _dbCacher.BotConfig = Cache;
 
             return false;

@@ -11,10 +11,8 @@ namespace AkkoBot.Services.Database.Entities
     {
         private string _logFormat = "Default";
 
-        public BotConfigEntity BotConfigRel { get; set; }
-
         [Key]
-        public ulong BotIdRef { get; set; }
+        public int Id { get; init; }
 
         [Required]
         [MaxLength(20)]
@@ -37,18 +35,13 @@ namespace AkkoBot.Services.Database.Entities
         [Required]
         public double LogSizeMB { get; set; } = 1.0;
 
-        public LogConfigEntity() { }
-
-        public LogConfigEntity(ulong id)
-            => BotIdRef = id;
-
         public IDictionary<string, string> GetSettings()
         {
             var props = this.GetType().GetProperties();
             var result = new Dictionary<string, string>(props.Length);
 
             // Index should skip undesirable props at the start
-            for (int index = 2; index < props.Length - 1; index++)
+            for (int index = 1; index < props.Length - 1; index++)
             {
                 result.TryAdd(
                     props[index].Name.ToSnakeCase(),

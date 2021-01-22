@@ -28,6 +28,19 @@ namespace AkkoBot.Command.Modules.Self.Services
             db.SaveChanges();
         }
 
+        public void SetProperty(CommandContext context, Action<LogConfigEntity> selector)
+        {
+            using var scope = context.CommandsNext.Services.CreateScope();
+            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
+
+            // Change the cached settings
+            selector(db.LogConfig.Cache);
+
+            // Set the database entry to the modified cached settings
+            db.LogConfig.Update(db.LogConfig.Cache);
+            db.SaveChanges();
+        }
+
         public IDictionary<string, string> GetConfigs(CommandContext context)
         {
             using var scope = context.CommandsNext.Services.CreateScope();

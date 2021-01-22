@@ -16,10 +16,8 @@ namespace AkkoBot.Services.Database.Entities
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
-        public LogConfigEntity LogConfigRel { get; set; }
-
         [Key]
-        public ulong BotId { get; init; }
+        public int Id { get; init; }
 
         [Required]
         [MaxLength(6)]
@@ -76,10 +74,18 @@ namespace AkkoBot.Services.Database.Entities
 
         public BotConfigEntity() { }
 
-        public BotConfigEntity(ulong id)
+        public BotConfigEntity(BotConfigEntity model)
         {
-            BotId = id;
-            LogConfigRel = new(id);
+            Locale = model.Locale;
+            BotPrefix = model.BotPrefix;
+            OkColor = model.OkColor;
+            ErrorColor = model.ErrorColor;
+            UseEmbed = model.UseEmbed;
+            RespondToDms = model.RespondToDms;
+            MentionPrefix = model.MentionPrefix;
+            EnableHelp = model.EnableHelp;
+            CaseSensitiveCommands = model.CaseSensitiveCommands;
+            MessageSizeCache = model.MessageSizeCache;
         }
 
         // Implement .gcmd and .gmod?

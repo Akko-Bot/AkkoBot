@@ -24,7 +24,7 @@ namespace AkkoBot.Core
                 .WithDefaultLogging()
                 .WithDefaultServices()
                 .WithDefaultDbContext()
-                .BuildAsync();
+                .BuildDefaultAsync();
 
             // Connect to Discord
             try

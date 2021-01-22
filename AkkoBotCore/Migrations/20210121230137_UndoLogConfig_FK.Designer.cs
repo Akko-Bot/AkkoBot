@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210121230137_UndoLogConfig_FK")]
+    partial class UndoLogConfig_FK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,12 +55,6 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.BotConfigEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
                     b.Property<string>("BotPrefix")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -110,9 +106,6 @@ namespace AkkoBot.Migrations
                     b.Property<bool>("UseEmbed")
                         .HasColumnType("boolean")
                         .HasColumnName("use_embed");
-
-                    b.HasKey("Id")
-                        .HasName("pk_bot_config");
 
                     b.ToTable("bot_config");
 
@@ -208,12 +201,6 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.LogConfigEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
@@ -239,9 +226,6 @@ namespace AkkoBot.Migrations
                     b.Property<string>("LogTimeFormat")
                         .HasColumnType("varchar")
                         .HasColumnName("log_time_format");
-
-                    b.HasKey("Id")
-                        .HasName("pk_log_configs");
 
                     b.ToTable("log_configs");
                 });

@@ -18,14 +18,10 @@ namespace AkkoBot.Command.Modules.Basic
     [RequireBotPermissions(Permissions.SendMessages)]
     public class BasicCommands : AkkoCommandModule
     {
-        private readonly IUnitOfWork _db;
-        private readonly ILocalizer _localizer;
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
 
-        public BasicCommands(IUnitOfWork db, ILocalizer localizer)
+        public BasicCommands()
         {
-            _db = db;
-            _localizer = localizer;
         }
 
         [Command("ping")]

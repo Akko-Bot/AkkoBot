@@ -17,13 +17,14 @@ namespace AkkoBot.Services.Database.Repository
             Cache = _dbCacher.LogConfig;
         }
 
-        public async Task<bool> LoadLogConfigAsync(ulong uid)
+        public async Task<bool> TryCreateAsync()
         {
-            Cache = await base.GetAsync(uid);
+            Cache = (await base.GetAllAsync()).FirstOrDefault();
 
             if (Cache is null)
             {
-                Cache = _dbCacher.LogConfig = new LogConfigEntity(uid);
+                Cache = _dbCacher.LogConfig = new LogConfigEntity();
+                base.Create(Cache);
                 return false;
             }
 
