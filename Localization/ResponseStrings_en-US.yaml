@@ -24,3 +24,6 @@ user: User
 bot_settings_title: Global Settings
 settings: Settings
 value: Value
+requires: Requires
+subcommands: Subcommands
+usage: Usage

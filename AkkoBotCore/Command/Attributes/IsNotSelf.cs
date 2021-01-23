@@ -11,8 +11,9 @@ namespace AkkoBot.Command.Attributes
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
-    AllowMultiple = true)]
-    public class IsNotSelf : CheckBaseAttribute
+    AllowMultiple = true,
+    Inherited = false)]
+    public sealed class IsNotSelf : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
             => Task.FromResult(context.User.Id != context.Client.CurrentUser.Id);

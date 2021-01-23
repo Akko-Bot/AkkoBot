@@ -45,14 +45,14 @@ namespace AkkoBot.Command.Modules.Self
             var (entry, success) = await _service.TryAddAsync(context, type, id);
 
             var entryName = (string.IsNullOrEmpty(entry.Name))
-                ? await context.FormatLocalizedAsync("unknown")
+                ? context.FormatLocalized("unknown")
                 : entry.Name;
 
             // bl_added: Successfully added {0} {1} {2} to the blacklist
             // bl_exists: '{0} {1} {2} is blacklisted already.'
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(
-                    await context.FormatLocalizedAsync(
+                    context.FormatLocalized(
                         (success) ? "bl_added" : "bl_exist",    // <- Key | Args ↓ 
                         entry.Type.ToString().ToSnakeCase(),    // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),              // Name or Unknown
@@ -64,20 +64,20 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [Command("remove"), Aliases("rem")]
-        [Description("Removes an entry from blacklist.")]
+        [Description("Removes an entry from the blacklist.")]
         public async Task BlacklistRemove(CommandContext context, ulong id)
         {
             var (entry, success) = await _service.TryRemoveAsync(context, id);
 
             var entryName = (string.IsNullOrEmpty(entry?.Name))
-                ? await context.FormatLocalizedAsync("unknown")
+                ? context.FormatLocalized("unknown")
                 : entry.Name;
 
             // bl_removed: Successfully removed {0} {1} {2} from the blacklist.
             // bl_not_exist: '{0} {1} {2} is not blacklisted.'
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(
-                    await context.FormatLocalizedAsync(
+                    context.FormatLocalized(
                         (success) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓ 
                         entry?.Type.ToString().ToSnakeCase(),        // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),                  // Name or Unknown
@@ -88,13 +88,10 @@ namespace AkkoBot.Command.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
-        [Command("list"), Aliases("show")]
+        [GroupCommand, Command("list"), Aliases("show")]
         [Description("Shows the blacklist.")]
         public async Task BlacklistList(CommandContext context, BlacklistType? type = null)
         {
-            // Convert user input to the appropriate enum
-            //var blType = _service.GetBlacklistType(type);
-
             // Get the blacklist. Returns an empty collection if there is nothing there.
             var blacklist = (type is null)
                 ? await _service.GetAllAsync(context)
@@ -106,8 +103,8 @@ namespace AkkoBot.Command.Modules.Self
             foreach (var entity in blacklist)
             {
                 responseIds.AppendLine(entity.ContextId.ToString());
-                responseTypes.AppendLine(await context.FormatLocalizedAsync(entity.Type.ToString().ToSnakeCase()));
-                responseNames.AppendLine((string.IsNullOrEmpty(entity.Name)) ? await context.FormatLocalizedAsync("unknown") : entity.Name);
+                responseTypes.AppendLine(context.FormatLocalized(entity.Type.ToString().ToSnakeCase()));
+                responseNames.AppendLine((string.IsNullOrEmpty(entity.Name)) ? context.FormatLocalized("unknown") : entity.Name);
             }
 
             // Send response
@@ -133,7 +130,7 @@ namespace AkkoBot.Command.Modules.Self
             var rows = await _service.ClearAsync(context);
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(await context.FormatLocalizedAsync("bl_clear", rows));
+                .WithDescription(context.FormatLocalized("bl_clear", rows));
 
             await context.RespondLocalizedAsync(embed);
         }

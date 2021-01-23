@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
-using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
-using AkkoBot.Command.Attributes;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -22,6 +17,7 @@ namespace AkkoBot.Command.Modules.Basic
 
         public BasicCommands()
         {
+            //
         }
 
         [Command("ping")]
@@ -68,10 +64,10 @@ namespace AkkoBot.Command.Modules.Basic
                 .WithDescription(Formatter.InlineCode($"[{_startup.LocalDateTime}]"))
                 .AddField(
                     "uptime",
-                    await context.FormatLocalizedAsync("{0}: {1}\n", "days", elapsed.Days) +
-                    await context.FormatLocalizedAsync("{0}: {1}\n", "hours", elapsed.Hours) +
-                    await context.FormatLocalizedAsync("{0}: {1}\n", "minutes", elapsed.Minutes) +
-                    await context.FormatLocalizedAsync("{0}: {1}\n", "seconds", elapsed.Seconds),
+                    context.FormatLocalized("{0}: {1}\n", "days", elapsed.Days) +
+                    context.FormatLocalized("{0}: {1}\n", "hours", elapsed.Hours) +
+                    context.FormatLocalized("{0}: {1}\n", "minutes", elapsed.Minutes) +
+                    context.FormatLocalized("{0}: {1}\n", "seconds", elapsed.Seconds),
                     inline: true
                 );
 

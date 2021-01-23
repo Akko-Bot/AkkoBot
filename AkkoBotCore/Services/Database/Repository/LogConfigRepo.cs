@@ -7,7 +7,6 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class LogConfigRepo : DbRepository<LogConfigEntity>
     {
-        //private readonly AkkoDbContext _db;
         private readonly IDbCacher _dbCacher;
         public LogConfigEntity Cache { get; private set; }
 
@@ -17,6 +16,10 @@ namespace AkkoBot.Services.Database.Repository
             Cache = _dbCacher.LogConfig;
         }
 
+        /// <summary>
+        /// Creates an entry for log settings, if there isn't one already.
+        /// </summary>
+        /// <returns><see langword="true"/> if the entry got created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> TryCreateAsync()
         {
             Cache = (await base.GetAllAsync()).FirstOrDefault();
@@ -25,12 +28,12 @@ namespace AkkoBot.Services.Database.Repository
             {
                 Cache = _dbCacher.LogConfig = new LogConfigEntity();
                 base.Create(Cache);
-                return false;
+                return true;
             }
 
             _dbCacher.LogConfig = Cache;
 
-            return true;
+            return false;
         }
     }
 }

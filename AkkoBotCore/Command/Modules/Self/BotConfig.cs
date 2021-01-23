@@ -52,7 +52,7 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("dm"), Aliases("dms", "respondtodms")]
         [Description("Sets whether the bot should execute commands in direct messages or not.")]
-        public async Task SetBotRespondDms(CommandContext context, bool respondToDms)
+        public async Task SetBotRespondDms(CommandContext context, [Description("`true` to enable responses in dm, `false` to disable it.")]bool respondToDms)
             => await ChangeProperty(context, x => x.RespondToDms = respondToDms);
 
         [Command("help"), Aliases("withhelp")]
@@ -75,7 +75,7 @@ namespace AkkoBot.Command.Modules.Self
         public async Task SetBotCacheSize(CommandContext context, int cacheSize)
             => await ChangeProperty(context, x => x.MessageSizeCache = cacheSize);
 
-        [Command("list"), Aliases("show")]
+        [GroupCommand, Command("list"), Aliases("show")]
         [Description("Shows the bot's current settings.")]
         public async Task GetBotSettings(CommandContext context)
         {
@@ -105,6 +105,7 @@ namespace AkkoBot.Command.Modules.Self
             );
         }
 
+        [BotOwner]
         [Group("log"), Aliases("logs", "logging")]
         [Description("Logs")]
         public class LogConfig : AkkoCommandModule

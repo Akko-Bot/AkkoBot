@@ -40,8 +40,8 @@ namespace AkkoBot.Extensions
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (context.Guild is null)
-                ? (await db.BotConfig.GetAllAsync()).FirstOrDefault()
-                : await db.GuildConfigs.GetGuildAsync(context.Guild.Id);
+                ? db.BotConfig.GetAllSync().FirstOrDefault()
+                : db.GuildConfigs.GetGuild(context.Guild.Id);
 
             var responseString = localizer.GetResponseString(settings.Locale, message); // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
@@ -62,14 +62,14 @@ namespace AkkoBot.Extensions
         /// <param name="key">The key for the response string.</param>
         /// <param name="args">Variables to be included into the formatted response string.</param>
         /// <returns>A formatted and localized response string.</returns>
-        public static async Task<string> FormatLocalizedAsync(this CommandContext context, string key, params object[] args)
+        public static string FormatLocalized(this CommandContext context, string key, params object[] args)
         {
             using var scope = context.Services.CreateScope();
             var (localizer, db) = GetContextServices(scope);
 
             var locale = (context.Guild is null)
-                ? (await db.BotConfig.GetAllAsync()).FirstOrDefault().Locale
-                : (await db.GuildConfigs.GetGuildAsync(context.Guild.Id)).Locale;
+                ? db.BotConfig.GetAllSync().FirstOrDefault().Locale
+                : db.GuildConfigs.GetSync(context.Guild.Id).Locale;
 
             for (int index = 0; index < args.Length; index++)
             {

@@ -22,33 +22,17 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Gets the prefix of the specified Discord guild.
-        /// </summary>
-        /// <param name="sid">The ID of the Discord guild.</param>
-        /// <returns>The prefix for the specified Discord guild.</returns>
-        public async Task<string> GetPrefixAsync(ulong sid)
-            => (await GetGuildAsync(sid)).Prefix;
-
-        /// <summary>
-        /// Gets the locale of the specified Discord guild.
-        /// </summary>
-        /// <param name="sid">The ID of the Discord guild.</param>
-        /// <returns>The locale for the specified Discord guild.</returns>
-        public async Task<string> GetLocaleAsync(ulong sid)
-            => (await GetGuildAsync(sid)).Locale;
-
-        /// <summary>
         /// Gets the settings of the specified Discord guild.
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>
         /// <returns>The guild settings.</returns>
-        public async Task<GuildConfigEntity> GetGuildAsync(ulong sid)
+        public GuildConfigEntity GetGuild(ulong sid)
         {
             if (Cache.ContainsKey(sid))
                 return Cache[sid];
             else
             {
-                var guild = await base.GetAsync(sid);
+                var guild = base.GetSync(sid);
                 Cache.TryAdd(guild.GuildId, guild);
 
                 return guild;

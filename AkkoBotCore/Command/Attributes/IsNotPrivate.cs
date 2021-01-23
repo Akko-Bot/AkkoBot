@@ -11,8 +11,9 @@ namespace AkkoBot.Command.Attributes
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
-    AllowMultiple = true)]
-    public class IsNotPrivate : CheckBaseAttribute
+    AllowMultiple = true,
+    Inherited = false)]
+    public sealed class IsNotPrivate : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
             => Task.FromResult(!context.Channel.IsPrivate);

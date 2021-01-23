@@ -24,3 +24,6 @@ user: Usuário
 bot_settings_title: Configurações Globais
 settings: Configuração
 value: Valor
+requires: Requer
+subcommands: Subcomandos
+usage: Uso

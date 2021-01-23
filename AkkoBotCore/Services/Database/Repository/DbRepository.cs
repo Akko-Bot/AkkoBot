@@ -18,9 +18,31 @@ namespace AkkoBot.Services.Database.Repository
         public DbRepository(AkkoDbContext db)
             => Table = db.Set<T>();
 
+        /// <summary>
+        /// Returns a database entry that contains the specified parameter as a primary key.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <typeparam name="TValue"></typeparam>
+        /// <remarks>This method does not use the database cache. It throws an exception if the table doesn't contain a primary key of the same type as <typeparamref name="TValue"/>.</remarks>
+        /// <returns>A database entry or <see langword="null"/> if not found.</returns>
+        /// <exception cref="NullReferenceException"/>
         public virtual T GetSync<TValue>(TValue value)
             => Table.Find(value);
 
+        /// <summary>
+        /// Returns multiple database entries whose primary keys meet the criteria specified in the <paramref name="expression"/>.
+        /// </summary>
+        /// <param name="expression">Expression tree to filter the result.</param>
+        /// <remarks>This method does not use the database cache.</remarks>
+        /// <returns>A collection of database entries. The collection will be empty if no entity matches the criterias from <paramref name="expression"/>.</returns>
+        public virtual IEnumerable<T> GetSync(Expression<Func<T, bool>> expression)
+            => Table.Where(expression).ToList();
+
+        /// <summary>
+        /// Returns all database entries in this table.
+        /// </summary>
+        /// <remarks>This method does not use the database cache.</remarks>
+        /// <returns>A collection of database entries. The collection will be empty if no entries are present.</returns>
         public virtual IEnumerable<T> GetAllSync()
             => Table.ToList();
 

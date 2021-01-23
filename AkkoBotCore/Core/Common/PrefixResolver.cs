@@ -21,12 +21,12 @@ namespace AkkoBot.Core.Common
         /// </summary>
         /// <param name="msg">Message to be processed.</param>
         /// <returns>Positive integer if the prefix is present, -1 otherwise.</returns>
-        public async Task<int> ResolvePrefix(DiscordMessage msg)
+        public Task<int> ResolvePrefix(DiscordMessage msg)
         {
             // Server prefix needs to be changed
             return (msg.Channel.IsPrivate)
-                ? msg.GetStringPrefixLength(_db.BotConfig.Cache.BotPrefix, StringComparison.OrdinalIgnoreCase)
-                : msg.GetStringPrefixLength(await _db.GuildConfigs.GetPrefixAsync(msg.Channel.GuildId), StringComparison.OrdinalIgnoreCase);
+                ? Task.FromResult(msg.GetStringPrefixLength(_db.BotConfig.Cache.BotPrefix, StringComparison.OrdinalIgnoreCase))
+                : Task.FromResult(msg.GetStringPrefixLength(_db.GuildConfigs.GetGuild(msg.Channel.GuildId).Prefix, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
