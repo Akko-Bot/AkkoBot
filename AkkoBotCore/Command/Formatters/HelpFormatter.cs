@@ -18,10 +18,10 @@ namespace AkkoBot.Command.Formatters
     public class HelpFormatter : BaseHelpFormatter
     {
         private string _helpTitle;
-        private readonly StringBuilder _helpDescription = new();
+        private string _helpDescription;
         private readonly StringBuilder _helpRequiresField = new();
-        private readonly StringBuilder _helpExamplesField = new();
-        private readonly StringBuilder _helpSubcommandsField = new();
+        private StringBuilder _helpExamplesField;
+        private StringBuilder _helpSubcommandsField;
         private readonly CommandContext _cmdContext;
 
         public HelpFormatter(CommandContext context) : base(context)
@@ -41,25 +41,27 @@ namespace AkkoBot.Command.Formatters
             _helpTitle = GetHelpHeader(cmd);
 
             // Add description
-            _helpDescription.AppendLine(_cmdContext.FormatLocalized(cmd.Description));
+            _helpDescription = _cmdContext.FormatLocalized(cmd.Description);
 
             // Add requirements
             foreach (var att in cmd.Module.ModuleType.CustomAttributes)
             {
                 if (att.AttributeType == typeof(BotOwner))
                 {
-                    _helpRequiresField.AppendLine("BotOwner");
+                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_bot_owner"));
                 }
                 else if (att.AttributeType == typeof(RequireBotPermissionsAttribute))
                 {
                     Enum.TryParse(typeof(Permissions), att.ConstructorArguments.FirstOrDefault().Value.ToString(), true, out var result);
-                    _helpRequiresField.AppendLine(result.ToString());
+                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_" + result.ToString().ToSnakeCase()));
                 }
             }
 
-            // Format arguments
+            // If this is a group, there are no arguments to be shown
             if (cmd is CommandGroup)
                 return this;
+
+            _helpExamplesField = new();
 
             // Format usage
             foreach (var overload in cmd.Overloads)
@@ -85,8 +87,9 @@ namespace AkkoBot.Command.Formatters
                 foreach (var argument in overload.Arguments)
                 {
                     _helpExamplesField.AppendLine(
-                        $"{Formatter.InlineCode($"{argument.Name} ({argument.Type.Name})")}: " +
-                        _cmdContext.FormatLocalized(argument.Description)
+                        $"{Formatter.InlineCode($"{argument.Name}")}: " +
+                        _cmdContext.FormatLocalized(argument.Description ?? string.Empty) +
+                        "\n"
                     );
                 }
             }
@@ -98,6 +101,8 @@ namespace AkkoBot.Command.Formatters
         // processed or current command is not a group, it won't be called
         public override BaseHelpFormatter WithSubcommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
         {
+            _helpSubcommandsField = new();
+
             foreach (var command in subcommands)
             {
                 _helpSubcommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
@@ -121,16 +126,16 @@ namespace AkkoBot.Command.Formatters
             {
                 var msg = new DiscordEmbedBuilder()
                     .WithTitle(_helpTitle)
-                    .WithDescription(_helpDescription.ToString())
+                    .WithDescription(_helpDescription)
                     .WithColor(new DiscordColor(guildSettings.OkColor));
 
                 if (_helpRequiresField.Length != 0)
                     msg.AddField(_cmdContext.FormatLocalized("requires"), _helpRequiresField.ToString());
 
-                if (_helpSubcommandsField.Length != 0)
+                if (_helpSubcommandsField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("subcommands"), _helpSubcommandsField.ToString());
 
-                if (_helpExamplesField.Length != 0)
+                if (_helpExamplesField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
 
                 return new CommandHelpMessage(null, msg);

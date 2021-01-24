@@ -14,7 +14,7 @@ namespace AkkoBot.Command.Modules.Self
 {
     [BotOwner]
     [Group("blacklist"), Aliases("bl")]
-    [Description("Groups commands related to the bot's blacklist.")]
+    [Description("cmd_blacklist")]
     public sealed class Blacklist : AkkoCommandModule
     {
         private readonly BlacklistService _service;
@@ -23,24 +23,24 @@ namespace AkkoBot.Command.Modules.Self
             => _service = service;
 
         [Command("add")]
-        public async Task BlacklistAdd(CommandContext context, DiscordChannel channel)
+        public async Task BlacklistAdd(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
             => await BlacklistAdd(context, BlacklistType.Channel, channel.Id);
 
         [Command("add")]
-        public async Task BlacklistAdd(CommandContext context, DiscordUser user)
+        public async Task BlacklistAdd(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
             => await BlacklistAdd(context, BlacklistType.User, user.Id);
 
         [Command("remove")]
-        public async Task BlacklistRemove(CommandContext context, DiscordChannel channel)
+        public async Task BlacklistRemove(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
             => await BlacklistRemove(context, channel.Id);
 
         [Command("remove")]
-        public async Task BlacklistRemove(CommandContext context, DiscordUser user)
+        public async Task BlacklistRemove(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
             => await BlacklistRemove(context, user.Id);
 
         [Command("add")]
-        [Description("Adds an entry to the blacklist.")]
-        public async Task BlacklistAdd(CommandContext context, BlacklistType type, ulong id)
+        [Description("cmd_blacklist_add")]
+        public async Task BlacklistAdd(CommandContext context, [Description("arg_bl_type")] BlacklistType type, [Description("arg_ulong_id")] ulong id)
         {
             var (entry, success) = await _service.TryAddAsync(context, type, id);
 
@@ -64,8 +64,8 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [Command("remove"), Aliases("rem")]
-        [Description("Removes an entry from the blacklist.")]
-        public async Task BlacklistRemove(CommandContext context, ulong id)
+        [Description("cmd_blacklist_rem")]
+        public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
             var (entry, success) = await _service.TryRemoveAsync(context, id);
 
@@ -89,8 +89,8 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [GroupCommand, Command("list"), Aliases("show")]
-        [Description("Shows the blacklist.")]
-        public async Task BlacklistList(CommandContext context, BlacklistType? type = null)
+        [Description("cmd_blacklist_list")]
+        public async Task BlacklistList(CommandContext context, [Description("arg_bl_type")] BlacklistType? type = null)
         {
             // Get the blacklist. Returns an empty collection if there is nothing there.
             var blacklist = (type is null)
@@ -124,7 +124,7 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [Command("clear")] // TODO: make this interactive
-        [Description("Clears the blacklist.")]
+        [Description("cmd_blacklist_clear")]
         public async Task BlacklistClear(CommandContext context)
         {
             var rows = await _service.ClearAsync(context);

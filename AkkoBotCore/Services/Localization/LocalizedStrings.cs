@@ -36,6 +36,42 @@ namespace AkkoBot.Services.Localization
         public string Requires { get; init; } = "Requires";
         public string Subcommands { get; init; } = "Subcommands";
         public string Usage { get; init; } = "Usage";
+        public string HelpBotOwner { get; init; } = "Bot Ownership";
+        public string HelpAddReactions { get; init; } = "Add Reactions";
+        public string HelpAdministrator { get; init; } = "Administrator";
+        public string HelpAttachFiles { get; init; } = "Attach Files";
+        public string HelpBanMembers { get; init; } = "Ban Members";
+        public string HelpChangeNickname { get; init; } = "Change Nickname";
+        public string HelpCreateInstantInvite { get; init; } = "Create Invite";
+        public string HelpDeafenMembers { get; init; } = "Deafen Members";
+        public string HelpKickMembers { get; init; } = "Kick Members";
+        public string HelpManageChannels { get; init; } = "Manage Channels";
+        public string HelpManageEmojis { get; init; } = "Manage Emojis";
+        public string HelpManageGuild { get; init; } = "Manage Server";
+        public string HelpManageMessages { get; init; } = "Manage Messages";
+        public string HelpManageNicknames { get; init; } = "Manage Nicknames";
+        public string HelpManageRoles { get; init; } = "Manage Roles";
+        public string HelpManageWebhooks { get; init; } = "Manage Webhooks";
+        public string HelpMentionEveryone { get; init; } = "Mention Everyone";
+        public string HelpMoveMembers { get; init; } = "Move Members";
+        public string HelpMuteMembers { get; init; } = "Mute Members";
+        public string HelpPrioritySpeaker { get; init; } = "Priority Speaker";
+        public string HelpSendMessages { get; init; } = "Send Messages";
+        public string HelpSpeak { get; init; } = "Speak";
+        public string HelpStream { get; init; } = "Stream";
+        public string HelpUseExternalEmojis { get; init; } = "Use External Emojis";
+        public string HelpUseVoice { get; init; } = "Connect";
+        public string HelpViewAuditLog { get; init; } = "View Audit Log";
+        // start here
+        public string CmdBlacklist { get; init; } = "Groups commands related to the bot's blacklist.";
+        public string CmdBlacklistAdd { get; init; } = "Adds an entry to the blacklist.";
+        public string CmdBlacklistRem { get; init; } = "Removes an entry from the blacklist.";
+        public string CmdBlacklistList { get; init; } = "Shows the blacklist. Provide no parameter to show all entry types.";
+        public string CmdBlacklistClear { get; init; } = "Clears the blacklist.";
+        public string ArgDiscordChannel { get; init; } = "ID or mention to a Discord channel.";
+        public string ArgDiscordUser { get; init; } = "ID or mention to a Discord user.";
+        public string ArgUlongId { get; init; } = "A valid Discord ID.";
+        public string ArgBlType { get; init; } = "The type of the blacklist entry - `user`, `channel` or `server`.";
         public string ErrorNotFound { get; init; } = "Error: the requested response string was not found.";
 
         /// <summary>

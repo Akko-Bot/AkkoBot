@@ -106,6 +106,7 @@ namespace AkkoBot.Command.Modules.Self
         }
 
         [BotOwner]
+        [RequireBotPermissions(Permissions.AddReactions)]
         [Group("log"), Aliases("logs", "logging")]
         [Description("Logs")]
         public class LogConfig : AkkoCommandModule

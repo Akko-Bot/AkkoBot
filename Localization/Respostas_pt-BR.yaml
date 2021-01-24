@@ -27,3 +27,38 @@ value: Valor
 requires: Requer
 subcommands: Subcomandos
 usage: Uso
+help_bot_owner: Autoria do Bot
+help_add_reactions: Adicionar Reações
+help_administrator: Administrador
+help_attach_files: Anexar Arquivos
+help_ban_members: Banir Membros
+help_change_nickname: Alterar Apelido
+help_create_invite: Criar Convite
+help_deafen_members: Ensurdecer Membros
+help_kick_members: Expulsar Membros
+help_manage_channels: Gerenciar Canais
+help_manage_emojis: Gerenciar Emojis
+help_manage_guild: Gerenciar Servidor
+help_manage_messages: Gerenciar Mensagens
+help_manage_nicknames: Gerenciar Apelidos
+help_manage_roles: Gerenciar Cargos
+help_manage_webhooks: Gerenciar Webhooks
+help_mention_everyone: Mencionar Everyone
+help_move_members: Mover Membros
+help_mute_members: Silenciar Membros
+help_priority_speaker: Voz Prioritária
+help_send_messages: Enviar Mensagens
+help_speak: Falar
+help_stream: Vídeo
+help_use_external_emojis: Usar Emojis Externos
+help_use_voice: Conectar
+help_view_audit_log: Ver o Registro de Auditoria
+cmd_blacklist: Agrupa comandos relacionados à lista negra.
+cmd_blacklist_add: Adiciona um registro à lista negra.
+cmd_blacklist_rem: Remove um registro da lista negra.
+cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâmetro for fornecido.
+cmd_blacklist_clear: Limpa a lista negra.
+arg_discord_channel: ID ou menção a um canal de texto do Discord.
+arg_discord_user: ID ou menção a um usuário do Discord.
+arg_ulong_id: Um ID do Discord válido.
+arg_bl_type: O tipo de registro na lista negra - `user`, `channel` ou `server`.

@@ -27,3 +27,38 @@ value: Value
 requires: Requires
 subcommands: Subcommands
 usage: Usage
+help_bot_owner: Bot Ownership
+help_add_reactions: Add Reactions
+help_administrator: Administrator
+help_attach_files: Attach Files
+help_ban_members: Ban Members
+help_change_nickname: Change Nickname
+help_create_invite: Create Invite
+help_deafen_members: Deafen Members
+help_kick_members: Kick Members
+help_manage_channels: Manage Channels
+help_manage_emojis: Manage Emojis
+help_manage_guild: Manage Server
+help_manage_messages: Manage Messages
+help_manage_nicknames: Manage Nicknames
+help_manage_roles: Manage Roles
+help_manage_webhooks: Manage Webhooks
+help_mention_everyone: Mention Everyone
+help_move_members: Move Members
+help_mute_members: Mute Members
+help_priority_speaker: Priority Speaker
+help_send_messages: Send Messages
+help_speak: Speak
+help_stream: Stream
+help_use_external_emojis: Use External Emojis
+help_use_voice: Connect
+help_view_audit_log: View Audit Log
+cmd_blacklist: Groups commands related to the bot's blacklist.
+cmd_blacklist_add: Adds an entry to the blacklist.
+cmd_blacklist_rem: Removes an entry from the blacklist.
+cmd_blacklist_list: Shows the blacklist. Provide no parameter to show all entry types.
+cmd_blacklist_clear: Clears the blacklist.
+arg_discord_channel: ID or mention to a Discord channel.
+arg_discord_user: ID or mention to a Discord user.
+arg_ulong_id: A valid Discord ID.
+arg_bl_type: The type of the blacklist entry - `user`, `channel` or `server`.

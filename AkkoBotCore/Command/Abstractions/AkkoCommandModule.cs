@@ -2,12 +2,11 @@
 using AkkoBot.Command.Attributes;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Command.Abstractions
 {
-    [IsNotBot, IsNotBlacklisted/*, Hidden*/]
+    [IsNotBot, IsNotBlacklisted]
     public abstract class AkkoCommandModule : BaseCommandModule
     {
         public async override Task BeforeExecutionAsync(CommandContext context)
