@@ -89,3 +89,8 @@ uptime: Tempo Online
 usage: Uso
 user: Usuário
 value: Valor
+
+q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
+q_blclear: remover todos os registros da lista negra
+q_yes: 'sim'
+q_no: 'não'

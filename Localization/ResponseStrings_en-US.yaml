@@ -10,7 +10,7 @@ arg_prefix: The new prefix.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
 bl_added: Successfully added {0} {1} {2} to the blacklist.
-bl_clear: '{0} entries were removed from the blacklist successfully.'
+bl_clear: '{0} entries were successfully removed from the blacklist.'
 bl_empty: There are no entries in the blacklist.
 bl_exist: '{0} {1} {2} is blacklisted already.'
 bl_not_exist: '{0} {1} {2} is not blacklisted.'
@@ -89,3 +89,8 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
+
+q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
+q_blclear: remove all blacklist entries
+q_yes: 'yes'
+q_no: 'no'

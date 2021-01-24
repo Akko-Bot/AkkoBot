@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
@@ -9,6 +10,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity.Extensions;
 
 namespace AkkoBot.Command.Modules.Self
 {
@@ -123,16 +125,42 @@ namespace AkkoBot.Command.Modules.Self
             await context.RespondLocalizedAsync(embed, false);
         }
 
-        [Command("clear")] // TODO: make this interactive
+        [Command("clear")]
         [Description("cmd_blacklist_clear")]
         public async Task BlacklistClear(CommandContext context)
         {
-            var rows = await _service.ClearAsync(context);
+            // If blacklist is empty, return error
+            if (!(await _service.GetAllAsync(context)).Any())
+            {
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription("bl_empty");
 
-            var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("bl_clear", rows));
+                await context.RespondLocalizedAsync(embed, isError: true);
+                return;
+            }
 
-            await context.RespondLocalizedAsync(embed);
+            // Send confirmation message
+            var question = new DiscordEmbedBuilder()
+                .WithDescription(
+                    context.FormatLocalized(
+                        "q_are_you_sure",               // Key
+                        "q_blclear", "q_yes", "q_no"    // Values
+                    )
+                );
+
+            var interaction = await context.RespondInteractiveAsync(question);
+
+            // If interaction didn't timeout and the user confirmed the action,
+            // perform the operation.
+            if (!interaction.TimedOut && interaction.Result.UserConfirmedAction(context))
+            {
+                var rows = await _service.ClearAsync(context);
+
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription(context.FormatLocalized("bl_clear", rows));
+
+                await context.RespondLocalizedAsync(embed);
+            }
         }
     }
 }

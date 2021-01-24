@@ -13,6 +13,9 @@ using AkkoBot.Services.Logging;
 using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -306,17 +309,33 @@ namespace AkkoBot.Core.Common
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()
             {
-                CaseSensitive = isCaseSensitive,                                   // Sets whether commands are case-sensitive
-                EnableDms = withDms,                           // Sets whether the bot responds in dm or not
-                EnableMentionPrefix = withMentionPrefix,       // Sets whether the bot accepts its own mention as a prefix for commands
-                IgnoreExtraArguments = false,                            // Sets whether the bot ignores extra arguments on commands or not
+                CaseSensitive = isCaseSensitive,                        // Sets whether commands are case-sensitive
+                EnableDms = withDms,                                    // Sets whether the bot responds in dm or not
+                EnableMentionPrefix = withMentionPrefix,                // Sets whether the bot accepts its own mention as a prefix for commands
+                IgnoreExtraArguments = false,                           // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                    // Sets the dependencies used by the command modules
-                EnableDefaultHelp = withHelp,           // Sets whether the bot should use the default help command from the library
+                EnableDefaultHelp = withHelp,                           // Sets whether the bot should use the default help command from the library
                 PrefixResolver = (msg) => pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
             };
 
-            var botClient = new DiscordShardedClient(botConfig);
-            var cmdHandlers = await botClient.UseCommandsNextAsync(cmdExtConfig);
+            // Setup client interactivity
+            var interactivityOptions = new InteractivityConfiguration()
+            {
+                PaginationBehaviour = PaginationBehaviour.WrapAround,   // Sets whether paginated responses should wrap from first page to last page and vice-versa
+                PaginationDeletion = PaginationDeletion.DeleteEmojis,   // Sets whether emojis or the paginated message should be deleted after timeout
+                PollBehaviour = PollBehaviour.KeepEmojis,               // Sets whether emojis should be deleted after a poll ends
+                Timeout = TimeSpan.FromSeconds(30),                     // Sets how long it takes for an interactive response to timeout
+                // setup customized paginated emojis
+            };
+
+            var botClient = new DiscordShardedClient(botConfig);                    // Initialize the sharded clients
+            var cmdHandlers = await botClient.UseCommandsNextAsync(cmdExtConfig);   // Initialize the command handlers
+
+            // Add interactivity to the sharded clients
+            foreach (var client in botClient.ShardClients.Values)
+                client.UseInteractivity(interactivityOptions);
+
+            // Build the bot
             var bot = new BotCore(botClient, cmdHandlers);
 
             // Register core events
