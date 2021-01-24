@@ -1,3 +1,14 @@
+arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
+arg_bool: __true__ para ativar, __false__ para desativar.
+arg_color: Um código de cor hexadecimal de seis dígitos.
+arg_discord_channel: ID ou menção a um canal de texto do Discord.
+arg_discord_user: ID ou menção a um usuário do Discord.
+arg_double: Um número real.
+arg_locale: O idioma a ser utilizado nas respostas.
+arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug_, __Info__, __Warning__, __Critical__ e __None__.'
+arg_prefix: O novo prefixo.
+arg_uint: Um número inteiro maior ou igual a zero.
+arg_ulong_id: Um ID válido do Discord.
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
 bl_clear: '{0} registros foram removidos da lista negra.'
 bl_empty: Não há registros na lista negra.
@@ -5,33 +16,40 @@ bl_exist: '{0} {1} {2} já se encontra na lista negra.'
 bl_not_exist: '{0} {1} {2} não se encontra na lista negra.'
 bl_removed: '{0} {1} {2} foi removido da lista negra.'
 bl_title: Lista Negra
+bot_settings_title: Configurações Globais
 channel: Canal
+cmd_blacklist: Agrupa comandos relacionados à lista negra.
+cmd_blacklist_add: Adiciona um registro à lista negra.
+cmd_blacklist_clear: Limpa a lista negra.
+cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâmetro for fornecido.
+cmd_blacklist_rem: Remove um registro da lista negra.
+cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
+cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
+cmd_config_case: Define se o bot deve diferenciar letras maiúsculas de minúsculas nos comandos. Requer reinicialização para tomar efeito.
+cmd_config_dm: Define se o bot deve responder a comandos executados em mensagem privada. Requer reinicialização para tomar efeito.
+cmd_config_embed: Define se o bot deve utilizar embeds em suas respostas.
+cmd_config_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro.
+cmd_config_help: Define se o bot deve responder a comandos de ajuda. Requer reinicialização para tomar efeito.
+cmd_config_list: Mostra as configurações atuais do bot.
+cmd_config_locale: Define o idioma padrão do bot.
+cmd_config_log: Agrupa configuracões que controlam como logs devem ser tratados.
+cmd_config_log_format: Define o formato do log a ser user utilizado. Requer reinicialização para tomar efeito.
+cmd_config_log_format_arg: 'O formato dos logs. Valores possíveis incluem: __Default__, __Simple__ e __Minimalist__.'
+cmd_config_log_level: Define o nível mínimo de severidade dos logs que devem ser registrados. Requer reinicialização para tomar efeito.
+cmd_config_log_save: Define se os logs devem ser salvos em um arquivo de texto. Requer reinicialização para tomar efeito.
+cmd_config_log_size: Defines the size a log file should have, in MB. Requires a restart to take effect.
+cmd_config_log_timeformat: Define o formato de hora a ser utilizado nos logs. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings). Requer reinicialização para tomar efeito.
+cmd_config_log_timeformat_arg: O formato de hora a ser utilizado. Deixe vazio para redefini-lo de volta ao valor padrão.
+cmd_config_mention: Define se o bot deve responder a comandos executados com uma menção a si como prefixo. Requer reinicialização para tomar efeito.
+cmd_config_okcolor: Define a cor padrão a ser utilizada em embeds.
+cmd_config_prefix: Define o prefixo padrão do bot.
 days: Dias
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
-hours: Horas
-id: Id
-minutes: Minutos
-name: Nome
-online_since: Online desde
-seconds: Segundos
-server: Servidor
-shutdown: Desligando.
-type: Tipo
-unknown: Desconhecido
-unspecified: Não especificado
-uptime: Tempo Online
-user: Usuário
-bot_settings_title: Configurações Globais
-settings: Configuração
-value: Valor
-requires: Requer
-subcommands: Subcomandos
-usage: Uso
-help_bot_owner: Autoria do Bot
 help_add_reactions: Adicionar Reações
 help_administrator: Administrador
 help_attach_files: Anexar Arquivos
 help_ban_members: Banir Membros
+help_bot_owner: Autoria do Bot
 help_change_nickname: Alterar Apelido
 help_create_invite: Criar Convite
 help_deafen_members: Ensurdecer Membros
@@ -53,12 +71,21 @@ help_stream: Vídeo
 help_use_external_emojis: Usar Emojis Externos
 help_use_voice: Conectar
 help_view_audit_log: Ver o Registro de Auditoria
-cmd_blacklist: Agrupa comandos relacionados à lista negra.
-cmd_blacklist_add: Adiciona um registro à lista negra.
-cmd_blacklist_rem: Remove um registro da lista negra.
-cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâmetro for fornecido.
-cmd_blacklist_clear: Limpa a lista negra.
-arg_discord_channel: ID ou menção a um canal de texto do Discord.
-arg_discord_user: ID ou menção a um usuário do Discord.
-arg_ulong_id: Um ID do Discord válido.
-arg_bl_type: O tipo de registro na lista negra - `user`, `channel` ou `server`.
+hours: Horas
+id: Id
+minutes: Minutos
+name: Nome
+online_since: Online desde
+requires: Requer
+seconds: Segundos
+server: Servidor
+settings: Configuração
+shutdown: Desligando.
+subcommands: Subcomandos
+type: Tipo
+unknown: Desconhecido
+unspecified: Não especificado
+uptime: Tempo Online
+usage: Uso
+user: Usuário
+value: Valor

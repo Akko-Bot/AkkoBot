@@ -17,7 +17,7 @@ namespace AkkoBot.Command.Modules.Self
     [BotOwner]
     [RequireBotPermissions(Permissions.AddReactions)]
     [Group("config"), Aliases("self")]
-    [Description("This module manages the settings that define how the bot should behave globally.")]
+    [Description("cmd_config")]
     public class BotConfig : AkkoCommandModule
     {
         private readonly BotConfigService _service;
@@ -26,57 +26,57 @@ namespace AkkoBot.Command.Modules.Self
             => _service = service;
 
         [Command("prefix")]
-        [Description("Sets the default prefix for the bot.")]
-        public async Task SetBotPrefix(CommandContext context, string prefix)
+        [Description("cmd_config_prefix")]
+        public async Task SetBotPrefix(CommandContext context, [Description("arg_prefix")] string prefix)
             => await ChangeProperty(context, x => x.BotPrefix = prefix);
 
         [Command("locale")]
-        [Description("Sets the default locale for the bot.")]
-        public async Task SetBotLocale(CommandContext context, string locale)
+        [Description("cmd_config_locale")]
+        public async Task SetBotLocale(CommandContext context, [Description("arg_locale")] string locale)
             => await ChangeProperty(context, x => x.Locale = locale);
 
         [Command("okcolor")]
-        [Description("Sets the default okcolor for the bot.")]
-        public async Task SetBotOkColor(CommandContext context, string okColor)
+        [Description("cmd_config_okcolor")]
+        public async Task SetBotOkColor(CommandContext context, [Description("arg_color")] string okColor)
             => await ChangeProperty(context, x => x.OkColor = okColor);
 
         [Command("errorcolor")]
-        [Description("Sets the default okcolor for the bot.")]
-        public async Task SetBotErrorColor(CommandContext context, string errorColor)
+        [Description("cmd_config_errorcolor")]
+        public async Task SetBotErrorColor(CommandContext context, [Description("arg_color")] string errorColor)
             => await ChangeProperty(context, x => x.ErrorColor = errorColor);
 
         [Command("embed"), Aliases("useembed")]
-        [Description("Sets whether the bot should use embeds for responses or not.")]
-        public async Task SetBotUseEmbed(CommandContext context, bool useEmbed)
+        [Description("cmd_config_embed")]
+        public async Task SetBotUseEmbed(CommandContext context, [Description("arg_bool")] bool useEmbed)
             => await ChangeProperty(context, x => x.UseEmbed = useEmbed);
 
         [Command("dm"), Aliases("dms", "respondtodms")]
-        [Description("Sets whether the bot should execute commands in direct messages or not.")]
-        public async Task SetBotRespondDms(CommandContext context, [Description("`true` to enable responses in dm, `false` to disable it.")]bool respondToDms)
+        [Description("cmd_config_dm")]
+        public async Task SetBotRespondDms(CommandContext context, [Description("arg_bool")] bool respondToDms)
             => await ChangeProperty(context, x => x.RespondToDms = respondToDms);
 
         [Command("help"), Aliases("withhelp")]
-        [Description("Sets whether the bot respond to help commands or not.")]
-        public async Task SetBotEnableHelp(CommandContext context, bool enableHelp)
+        [Description("cmd_config_help")]
+        public async Task SetBotEnableHelp(CommandContext context, [Description("arg_bool")] bool enableHelp)
             => await ChangeProperty(context, x => x.EnableHelp = enableHelp);
 
         [Command("mentionprefix"), Aliases("mention")]
-        [Description("Sets whether the bot should respond to commands executed with a mention to itself as a prefix.")]
-        public async Task SetBotMentionPrefix(CommandContext context, bool mention)
+        [Description("cmd_config_mention")]
+        public async Task SetBotMentionPrefix(CommandContext context, [Description("arg_bool")] bool mention)
             => await ChangeProperty(context, x => x.MentionPrefix = mention);
 
         [Command("casesensitive"), Aliases("case")]
-        [Description("Sets whether commands are case sensitive or not.")]
-        public async Task SetBotCaseSensitive(CommandContext context, bool caseSensitive)
+        [Description("cmd_config_case")]
+        public async Task SetBotCaseSensitive(CommandContext context, [Description("arg_bool")] bool caseSensitive)
             => await ChangeProperty(context, x => x.CaseSensitiveCommands = caseSensitive);
 
         [Command("cachesize"), Aliases("cache")]
-        [Description("Sets how many messages should be cached per channel.")]
-        public async Task SetBotCacheSize(CommandContext context, int cacheSize)
-            => await ChangeProperty(context, x => x.MessageSizeCache = cacheSize);
+        [Description("cmd_config_cache")]
+        public async Task SetBotCacheSize(CommandContext context, [Description("arg_uint")] uint cacheSize)
+            => await ChangeProperty(context, x => x.MessageSizeCache = (int)cacheSize);
 
         [GroupCommand, Command("list"), Aliases("show")]
-        [Description("Shows the bot's current settings.")]
+        [Description("cmd_config_list")]
         public async Task GetBotSettings(CommandContext context)
         {
             var configNames = new StringBuilder();
@@ -108,7 +108,7 @@ namespace AkkoBot.Command.Modules.Self
         [BotOwner]
         [RequireBotPermissions(Permissions.AddReactions)]
         [Group("log"), Aliases("logs", "logging")]
-        [Description("Logs")]
+        [Description("cmd_config_log")]
         public class LogConfig : AkkoCommandModule
         {
             private readonly BotConfigService _service;
@@ -117,28 +117,28 @@ namespace AkkoBot.Command.Modules.Self
                 => _service = service;
 
             [Command("level")]
-            [Description("Sets the level of the logs that are going to be registered on the console.")]
-            public async Task SetBotLogLevel(CommandContext context, LogLevel logLevel)
+            [Description("cmd_config_log_level")]
+            public async Task SetBotLogLevel(CommandContext context, [Description("arg_loglevel")] LogLevel logLevel)
                 => await ChangeProperty(context, x => x.LogLevel = logLevel);
 
             [Command("format")]
-            [Description("Sets the log format used for logging on the console.")]
-            public async Task SetBotLogFormat(CommandContext context, string logFormat)
+            [Description("cmd_config_log_format")]
+            public async Task SetBotLogFormat(CommandContext context, [Description("cmd_config_log_format_arg")] string logFormat)
                 => await ChangeProperty(context, x => x.LogFormat = logFormat);
 
             [Command("timeformat")]
-            [Description("Sets the time format used for logging on the console.")]
-            public async Task SetBotLogTimeFormat(CommandContext context, string logTimeFormat)
+            [Description("cmd_config_log_timeformat")]
+            public async Task SetBotLogTimeFormat(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string logTimeFormat = null)
                 => await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
 
             [Command("save")]
-            [Description("Sets whether logs should be written to a text file.")]
-            public async Task SetFileLogging(CommandContext context, bool isEnabled)
+            [Description("cmd_config_log_save")]
+            public async Task SetFileLogging(CommandContext context, [Description("arg_bool")] bool isEnabled)
                 => await ChangeProperty(context, x => x.IsLoggedToFile = isEnabled);
 
             [Command("size"), Aliases("setsize")]
-            [Description("Sets the size a log file should have.")]
-            public async Task SetFileMaxSize(CommandContext context, double size)
+            [Description("cmd_config_log_size")]
+            public async Task SetFileMaxSize(CommandContext context, [Description("arg_double")] double size)
                 => await ChangeProperty(context, x => x.LogSizeMB = size);
 
             private async Task ChangeProperty(CommandContext context, Action<LogConfigEntity> selector)

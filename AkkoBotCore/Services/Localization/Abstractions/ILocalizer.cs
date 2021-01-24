@@ -9,7 +9,7 @@ namespace AkkoBot.Services.Localization.Abstractions
         /// Gets all cached locales.
         /// </summary>
         /// <returns>A collection of the registered locale keys.</returns>
-        IEnumerable<string> GetAllLocales();
+        IEnumerable<string> GetLocales();
 
         /// <summary>
         /// Checks if the bot contains a valid response for a given response key.

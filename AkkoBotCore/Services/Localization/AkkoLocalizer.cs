@@ -32,7 +32,7 @@ namespace AkkoBot.Services.Localization
         /// Gets all cached locales.
         /// </summary>
         /// <returns>A collection of the registered locale keys.</returns>
-        public IEnumerable<string> GetAllLocales()
+        public IEnumerable<string> GetLocales()
             => _localizedStrings.Keys;
 
         /// <summary>
@@ -60,11 +60,9 @@ namespace AkkoBot.Services.Localization
         /// <param name="response">Response string key to be checked.</param>
         /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
         public bool ContainsResponse(string locale, string response)
-        {
-            return (_localizedStrings.ContainsKey(locale) && _localizedStrings[locale].ContainsKey(response))
-                ? _localizedStrings[locale].ContainsKey(response)
-                : _localizedStrings[DefaultLanguage].ContainsKey(response);
-        }
+            => _localizedStrings.ContainsKey(locale)
+                && (_localizedStrings[locale].ContainsKey(response)
+                || _localizedStrings[DefaultLanguage].ContainsKey(response));
 
         /// <summary>
         /// Clears the cache and loads all response strings again.
@@ -109,20 +107,17 @@ namespace AkkoBot.Services.Localization
             if (!_localizedStrings.ContainsKey(locale))
                 locale = DefaultLanguage;
 
-            if (_localizedStrings[locale].ContainsKey(response))
+            if (_localizedStrings[locale].ContainsKey(response) || _localizedStrings[DefaultLanguage].ContainsKey(response))
             {
-                return string.IsNullOrEmpty(_localizedStrings[locale][response])
-                    ? _localizedStrings[DefaultLanguage][response]
-                    : _localizedStrings[locale][response];
+                return (_localizedStrings[locale].TryGetValue(response, out _))
+                    ? _localizedStrings[locale][response]
+                    : _localizedStrings[DefaultLanguage][response];
             }
             else
             {
-                if (_localizedStrings[DefaultLanguage].ContainsKey(response))
-                    return _localizedStrings[DefaultLanguage][response];
-                else
-                    return string.IsNullOrEmpty(_localizedStrings[locale]["error_not_found"])
-                        ? _localizedStrings[DefaultLanguage]["error_not_found"]
-                        : _localizedStrings[locale]["error_not_found"];
+                return (_localizedStrings[locale].TryGetValue("error_not_found", out _))
+                    ? _localizedStrings[locale]["error_not_found"]
+                    : _localizedStrings[DefaultLanguage]["error_not_found"];
             }
         }
 
@@ -133,7 +128,7 @@ namespace AkkoBot.Services.Localization
         /// <returns>The locale of the response string's file.</returns>
         private string GetFileLocale(string filePath)
             => filePath[(filePath.LastIndexOf('_') + 1)..filePath.LastIndexOf('.')];
- 
+
         /// <summary>
         /// Loads all response strings into the cache.
         /// </summary>

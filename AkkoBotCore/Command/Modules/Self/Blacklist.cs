@@ -40,7 +40,7 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("add")]
         [Description("cmd_blacklist_add")]
-        public async Task BlacklistAdd(CommandContext context, [Description("arg_bl_type")] BlacklistType type, [Description("arg_ulong_id")] ulong id)
+        public async Task BlacklistAdd(CommandContext context, [Description("arg_bltype")] BlacklistType type, [Description("arg_ulong_id")] ulong id)
         {
             var (entry, success) = await _service.TryAddAsync(context, type, id);
 
@@ -90,7 +90,7 @@ namespace AkkoBot.Command.Modules.Self
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_blacklist_list")]
-        public async Task BlacklistList(CommandContext context, [Description("arg_bl_type")] BlacklistType? type = null)
+        public async Task BlacklistList(CommandContext context, [Description("arg_bltype")] BlacklistType? type = null)
         {
             // Get the blacklist. Returns an empty collection if there is nothing there.
             var blacklist = (type is null)

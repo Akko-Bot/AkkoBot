@@ -88,10 +88,11 @@ namespace AkkoBot.Command.Formatters
                 {
                     _helpExamplesField.AppendLine(
                         $"{Formatter.InlineCode($"{argument.Name}")}: " +
-                        _cmdContext.FormatLocalized(argument.Description ?? string.Empty) +
-                        "\n"
+                        _cmdContext.FormatLocalized(argument.Description ?? string.Empty)
                     );
                 }
+
+                _helpExamplesField.AppendLine();
             }
 
             return this;
