@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -60,7 +61,7 @@ namespace AkkoBot.Services.Localization
         /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
         public bool ContainsResponse(string locale, string response)
         {
-            return (_localizedStrings.ContainsKey(locale))
+            return (_localizedStrings.ContainsKey(locale) && _localizedStrings[locale].ContainsKey(response))
                 ? _localizedStrings[locale].ContainsKey(response)
                 : _localizedStrings[DefaultLanguage].ContainsKey(response);
         }
@@ -116,9 +117,12 @@ namespace AkkoBot.Services.Localization
             }
             else
             {
-                return string.IsNullOrEmpty(_localizedStrings[locale]["error_not_found"])
-                    ? _localizedStrings[DefaultLanguage]["error_not_found"]
-                    : _localizedStrings[locale]["error_not_found"];
+                if (_localizedStrings[DefaultLanguage].ContainsKey(response))
+                    return _localizedStrings[DefaultLanguage][response];
+                else
+                    return string.IsNullOrEmpty(_localizedStrings[locale]["error_not_found"])
+                        ? _localizedStrings[DefaultLanguage]["error_not_found"]
+                        : _localizedStrings[locale]["error_not_found"];
             }
         }
 
@@ -133,19 +137,18 @@ namespace AkkoBot.Services.Localization
         /// <summary>
         /// Loads all response strings into the cache.
         /// </summary>
+        /// <exception cref="DirectoryNotFoundException"/>
+        /// <exception cref="FileNotFoundException"/>
+        /// <exception cref="IOException"/>
         private void LoadLocalizedStrings()
         {
-            // If Localization directory doesn't exist create one with en-US strings
-            if (!Directory.Exists(AkkoEnvironment.LocalesDirectory))
-                CreateDefaultLocaleFile(AkkoEnvironment.LocalesDirectory);
-
             var fileNames = Directory
                 .GetFiles(AkkoEnvironment.LocalesDirectory)
                 .Where(x => x.Contains(".yaml") && x.Contains('_'));
 
-            // If directory doesn't contain response strings files create the default one
+            // If directory doesn't contain response strings, stop program execution
             if (!fileNames.Any())
-                fileNames = fileNames.Append(CreateDefaultLocaleFile(AkkoEnvironment.LocalesDirectory));
+                throw new FileNotFoundException("No localization file has been found.");
 
             // Start deserialization
             var yaml = new DeserializerBuilder()
@@ -156,30 +159,10 @@ namespace AkkoBot.Services.Localization
             foreach (var file in fileNames)
             {
                 using var reader = new StreamReader(File.OpenRead(file));
-                var lStrings = yaml.Deserialize<LocalizedStrings>(reader);
+                var lStrings = yaml.Deserialize<Dictionary<string, string>>(reader);
 
-                _localizedStrings.TryAdd(GetFileLocale(file), lStrings.GetStringCollection());
+                _localizedStrings.TryAdd(GetFileLocale(file), lStrings);
             }
-        }
-
-        /// <summary>
-        /// Creates the directory where the response strings will be stored and a default 
-        /// response string file in en-US.
-        /// </summary>
-        /// <param name="filePath">Path to the directory where the response strings should be stored.</param>
-        /// <returns>The path to the default response strings file.</returns>
-        private string CreateDefaultLocaleFile(string filePath)
-        {
-            Directory.CreateDirectory(AkkoEnvironment.LocalesDirectory);
-            var fileName = filePath + $"ResponseStrings_{DefaultLanguage}.yaml";
-
-            using var writer = File.CreateText(fileName);
-            new SerializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build()
-                .Serialize(writer, new LocalizedStrings());
-
-            return fileName;
         }
     }
 }
