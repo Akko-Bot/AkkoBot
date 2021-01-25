@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -179,12 +180,41 @@ namespace AkkoBot.Extensions
 
             var dEmbed = new StringBuilder(
                 ((embed.Author is null) ? string.Empty : embed.Author.Name + "\n\n") +
-                ((embed.Title is null) ? string.Empty : embed.Title + "\n") +
+                ((embed.Title is null) ? string.Empty : Formatter.Bold(embed.Title) + "\n") +
                 ((embed.Description is null) ? string.Empty : embed.Description + "\n\n")
             );
 
+            // var fieldNames = embed.Fields.Select(x => x.Name).ToArray();
+            // var fieldValues = embed.Fields.Select(x => x.Value).ToArray();
+
+            // for (int index = 0; index < embed.Fields.Count; index++)
+            // {
+            //     if (embed.Fields[index].Inline)
+            //     {
+            //         if (index == fieldNames.Length - 1)
+            //             continue;
+
+            //         var valueLines = fieldValues[index].Split("\n"); // 15
+            //         var valueLines2 = fieldValues[index + 1].Split("\n");
+
+            //         dEmbed.AppendLine("```");
+            //         dEmbed.AppendLine($"{fieldNames[index].MaxLength(15), -15} {fieldNames[++index]}");
+
+            //         for (int line = 0; line < valueLines.Length; line++)
+            //         {
+            //             dEmbed.AppendLine($"{valueLines[line].MaxLength(15), -15} {valueLines2[line]}");
+            //         }
+
+            //         dEmbed.Append("```");
+            //     }
+            //     else
+            //     {
+            //         dEmbed.AppendLine(Formatter.BlockCode(fieldNames[index] + "\n" + fieldValues[index] + "\n"));
+            //     }
+            // }
+
             foreach (var field in embed.Fields)
-                dEmbed.AppendLine(field.Name + "\n" + field.Value + "\n");
+                dEmbed.AppendLine(Formatter.BlockCode(field.Name + "\n" + field.Value + "\n"));
 
             dEmbed.Append(
                 ((embed.ImageUrl is null) ? string.Empty : $"{embed.ImageUrl}\n\n") +

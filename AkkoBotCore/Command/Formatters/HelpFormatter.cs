@@ -143,7 +143,13 @@ namespace AkkoBot.Command.Formatters
             }
             else
             {
-                return new CommandHelpMessage(_helpDescription.ToString(), null);
+                return new CommandHelpMessage(
+                    ((_helpTitle is not null) ? Formatter.Bold(_helpTitle) + "\n" : string.Empty) +
+                    ((_helpDescription is not null) ? _helpDescription + "\n\n" : string.Empty) +
+                    ((_helpRequiresField.Length != 0) ? Formatter.Bold(_cmdContext.FormatLocalized("requires")) + "\n" + _helpRequiresField.ToString() + "\n" : string.Empty) +
+                    ((_helpSubcommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("subcommands")) + "\n" + _helpSubcommandsField.ToString() + "\n" : string.Empty) +
+                    ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty)
+                );
             }
         }
 
