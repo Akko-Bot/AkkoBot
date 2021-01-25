@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Extensions;
@@ -20,12 +21,12 @@ namespace AkkoBot.Services.Database.Entities
         public int Id { get; init; }
 
         [Required]
-        [MaxLength(6)]
-        [Column(TypeName = "varchar(6)")]
+        [MaxLength(10)]
+        [Column(TypeName = "varchar(10)")]
         public string Locale
         {
             get => _locale;
-            set => _locale = value?.MaxLength(6);
+            set => _locale = value?.MaxLength(10);
         }
 
         [Required]
@@ -72,21 +73,8 @@ namespace AkkoBot.Services.Database.Entities
         [Required]
         public int MessageSizeCache { get; set; } = 200;
 
-        public BotConfigEntity() { }
-
-        public BotConfigEntity(BotConfigEntity model)
-        {
-            Locale = model.Locale;
-            BotPrefix = model.BotPrefix;
-            OkColor = model.OkColor;
-            ErrorColor = model.ErrorColor;
-            UseEmbed = model.UseEmbed;
-            RespondToDms = model.RespondToDms;
-            MentionPrefix = model.MentionPrefix;
-            EnableHelp = model.EnableHelp;
-            CaseSensitiveCommands = model.CaseSensitiveCommands;
-            MessageSizeCache = model.MessageSizeCache;
-        }
+        [Required]
+        public TimeSpan? InteractiveTimeout { get; set; } = new(0, 0, 30);
 
         // Implement .gcmd and .gmod?
         // Implement forward dms to owners?

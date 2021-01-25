@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
@@ -74,6 +76,27 @@ namespace AkkoBot.Command.Modules.Self
         [Description("cmd_config_cache")]
         public async Task SetBotCacheSize(CommandContext context, [Description("arg_uint")] uint cacheSize)
             => await ChangeProperty(context, x => x.MessageSizeCache = (int)cacheSize);
+
+        [Command("timeout")]
+        [Description("cmd_config_timeout")]
+        public async Task SetBotTimeout(CommandContext context, [Description("arg_uint")] uint time)
+            => await ChangeProperty(context, x => x.InteractiveTimeout = new TimeSpan(0, 0, (time < 10) ? 10 : (int)time));
+
+        [Command("locale")]
+        [Description("cmd_config_locale")]
+        public async Task ListLocales(CommandContext context)
+        {
+            var locales = _service.GetLocales(context)
+                .Select(x => $"{Formatter.InlineCode(x)} - {new CultureInfo(x).NativeName}")
+                .OrderBy(x => x)
+                .ToArray();
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("locales_title")
+                .WithDescription(string.Join("\n", locales));
+
+            await context.RespondLocalizedAsync(embed, false);
+        }
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_config_list")]

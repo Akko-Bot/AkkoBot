@@ -271,6 +271,7 @@ namespace AkkoBot.Core.Common
             var (botSettings, _) = GetBotSettings();
 
             return await BuildAsync(
+                (long)botSettings.InteractiveTimeout.Value.TotalSeconds,
                 botSettings.CaseSensitiveCommands,
                 botSettings.RespondToDms,
                 botSettings.MentionPrefix,
@@ -287,7 +288,7 @@ namespace AkkoBot.Core.Common
         /// <param name="withHelp">Sets whether help commands are enabled or not.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
         /// <exception cref="NullReferenceException"/>
-        public async Task<BotCore> BuildAsync(bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true, bool withHelp = true)
+        public async Task<BotCore> BuildAsync(long? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true, bool withHelp = true)
         {
             if (_creds is null)
                 throw new NullReferenceException("No 'Credentials' object was provided.");
@@ -324,7 +325,7 @@ namespace AkkoBot.Core.Common
                 PaginationBehaviour = PaginationBehaviour.WrapAround,   // Sets whether paginated responses should wrap from first page to last page and vice-versa
                 PaginationDeletion = PaginationDeletion.DeleteEmojis,   // Sets whether emojis or the paginated message should be deleted after timeout
                 PollBehaviour = PollBehaviour.KeepEmojis,               // Sets whether emojis should be deleted after a poll ends
-                Timeout = TimeSpan.FromSeconds(30),                     // Sets how long it takes for an interactive response to timeout
+                Timeout = new TimeSpan(timeout ?? 30),                  // Sets how long it takes for an interactive response to timeout
                 // setup customized paginated emojis
             };
 

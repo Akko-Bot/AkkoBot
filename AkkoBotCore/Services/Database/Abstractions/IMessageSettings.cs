@@ -1,3 +1,5 @@
+using System;
+
 namespace AkkoBot.Services.Database.Abstractions
 {
     /// <summary>
@@ -9,5 +11,6 @@ namespace AkkoBot.Services.Database.Abstractions
         string OkColor { get; }
         string ErrorColor { get; }
         bool UseEmbed { get; }
+        TimeSpan? InteractiveTimeout { get; }
     }
 }

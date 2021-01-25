@@ -43,6 +43,7 @@ cmd_config_log_timeformat_arg: O formato de hora a ser utilizado. Deixe vazio pa
 cmd_config_mention: Define se o bot deve responder a comandos executados com uma menção a si como prefixo. Requer reinicialização para tomar efeito.
 cmd_config_okcolor: Define a cor padrão a ser utilizada em embeds.
 cmd_config_prefix: Define o prefixo padrão do bot.
+cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
 days: Dias
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 help_add_reactions: Adicionar Reações
@@ -73,9 +74,14 @@ help_use_voice: Conectar
 help_view_audit_log: Ver o Registro de Auditoria
 hours: Horas
 id: Id
+locales_title: Idiomas Disponíveis
 minutes: Minutos
 name: Nome
 online_since: Online desde
+q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
+q_blclear: remover todos os registros da lista negra
+q_no: 'não'
+q_yes: 'sim'
 requires: Requer
 seconds: Segundos
 server: Servidor
@@ -89,8 +95,3 @@ uptime: Tempo Online
 usage: Uso
 user: Usuário
 value: Valor
-
-q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
-q_blclear: remover todos os registros da lista negra
-q_yes: 'sim'
-q_no: 'não'

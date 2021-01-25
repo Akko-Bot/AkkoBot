@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
@@ -28,12 +29,12 @@ namespace AkkoBot.Services.Database.Entities
         }
 
         [Required]
-        [MaxLength(6)]
-        [Column(TypeName = "varchar(6)")]
+        [MaxLength(10)]
+        [Column(TypeName = "varchar(10)")]
         public string Locale
         {
             get => _locale;
-            set => _locale = value?.MaxLength(6);
+            set => _locale = value?.MaxLength(10);
         }
 
         [Required]
@@ -57,6 +58,8 @@ namespace AkkoBot.Services.Database.Entities
             set => _errorColor = value?.MaxLength(6);
         }
 
+        public TimeSpan? InteractiveTimeout { get; set; } = null;
+
         // Greet and Bye channels and messages
         // .asar - .iam/.iamnot roles
         // .fi - .sfi/.cfi Server invite filter
@@ -68,9 +71,6 @@ namespace AkkoBot.Services.Database.Entities
         // .rero messages and reactions
 
         public GuildConfigEntity() { }
-
-        public GuildConfigEntity(DiscordGuild guild = null)
-            => GuildId = guild?.Id ?? default;
 
         public GuildConfigEntity(BotConfigEntity config)
         {

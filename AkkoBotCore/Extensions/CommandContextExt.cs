@@ -1,9 +1,7 @@
-using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -27,13 +25,40 @@ namespace AkkoBot.Extensions
         public static async Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
             => await RespondLocalizedAsync(context, null, embed, isMarked, isError);
 
-        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, TimeSpan? timeout = null, bool isMarked = true, bool isError = false)
+        /// <summary>
+        /// Sends a localized interactive message to the context that triggered the command.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The interaction between the user and the message.</returns>
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
+            => await RespondInteractiveAsync(context, null, embed, isMarked, isError);
+
+        /// <summary>
+        /// Sends a localized interactive message to the context that triggered the command.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="message">The message content.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The interaction between the user and the message.</returns>
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
+            using var scope = context.Services.CreateScope();
+            var (_, db) = GetContextServices(scope);
+
+            // Get the timeout
+            var timeout = (await db.GuildConfigs.GetAsync(context.Guild.Id)).InteractiveTimeout;
+            var globalTimeout = (await db.BotConfig.GetAllAsync()).FirstOrDefault().InteractiveTimeout;
+
             // Send the question
-            var question = await context.RespondLocalizedAsync(embed, isMarked, isError);
+            var question = await context.RespondLocalizedAsync(message, embed, isMarked, isError);
 
             // Await interaction, proceed after any message no matter its content
-            var result = await context.Message.GetNextMessageAsync(x => true, timeout);
+            var result = await context.Message.GetNextMessageAsync(x => true, timeout ?? globalTimeout);
 
             // Delete the confirmation message
             await context.Channel.DeleteMessageAsync(question);

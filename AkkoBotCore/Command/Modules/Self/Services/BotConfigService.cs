@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,9 @@ namespace AkkoBot.Command.Modules.Self.Services
 {
     public class BotConfigService : ICommandService
     {
+        public IEnumerable<string> GetLocales(CommandContext context)
+            => context.Services.GetService<ILocalizer>().GetLocales();
+
         /// <summary>
         /// Changes the bot configuration according to the actions defined in <paramref name="selector"/>.
         /// </summary>

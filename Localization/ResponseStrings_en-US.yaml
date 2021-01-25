@@ -43,6 +43,7 @@ cmd_config_log_timeformat_arg: The time format to be used. Leave it empty to res
 cmd_config_mention: Sets whether the bot should respond to commands executed with a mention to itself as a prefix. Requires a restart to take effect.
 cmd_config_okcolor: Sets the default color that should be used for embeds.
 cmd_config_prefix: Sets the default prefix for the bot.
+cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
 days: Days
 error_not_found: 'Error: the requested response string was not found.'
 help_add_reactions: Add Reactions
@@ -73,9 +74,14 @@ help_use_voice: Connect
 help_view_audit_log: View Audit Log
 hours: Hours
 id: Id
+locales_title: Available Languages
 minutes: Minutes
 name: Name
 online_since: Online since
+q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
+q_blclear: remove all blacklist entries
+q_no: 'no'
+q_yes: 'yes'
 requires: Requires
 seconds: Seconds
 server: Server
@@ -89,8 +95,3 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
-
-q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
-q_blclear: remove all blacklist entries
-q_yes: 'yes'
-q_no: 'no'
