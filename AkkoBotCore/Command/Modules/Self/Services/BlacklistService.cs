@@ -8,7 +8,6 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Command.Modules.Self.Services
 {
@@ -26,15 +25,14 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// </returns>
         public async Task<(BlacklistEntity, bool)> TryAddAsync(CommandContext context, BlacklistType type, ulong id)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
             // Generte the database entry
             var entry = new BlacklistEntity()
             {
                 ContextId = id,
                 Type = type,
-                Name = GetBlacklistedNameAsync(context, type, id)
+                Name = GetBlacklistedName(context, type, id)
             };
 
             var success = await db.Blacklist.TryCreateAsync(entry);
@@ -53,14 +51,13 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// </returns>
         public async Task<(BlacklistEntity, bool)> TryRemoveAsync(CommandContext context, ulong id)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
             if (!db.Blacklist.IsBlacklisted(id))
                 return (null, false);
 
             var entry = await db.Blacklist.GetAsync(id);
-            var success = await db.Blacklist.RemoveAsync(id);
+            var success = await db.Blacklist.TryRemoveAsync(id);
 
             return (entry, success);
         }
@@ -73,9 +70,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <returns>A collection of database entries that match the criteria of <paramref name="selector"/>.</returns>
         public async Task<IEnumerable<BlacklistEntity>> GetAsync(CommandContext context, Expression<Func<BlacklistEntity, bool>> selector)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
-
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.GetAsync(selector);
         }
 
@@ -86,9 +81,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <returns>A collection of all blacklist entries.</returns>
         public async Task<IEnumerable<BlacklistEntity>> GetAllAsync(CommandContext context)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
-
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.GetAllAsync();
         }
 
@@ -99,9 +92,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <returns>The amount of entries removed.</returns>
         public async Task<int> ClearAsync(CommandContext context)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
-
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.ClearAsync();
         }
 
@@ -112,7 +103,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <param name="blType">The type of the blacklist.</param>
         /// <param name="id">The ID provided by the user.</param>
         /// <returns>The name of the entity if found, <see langword="null"/> otherwise.</returns>
-        private string GetBlacklistedNameAsync(CommandContext context, BlacklistType blType, ulong id)
+        private string GetBlacklistedName(CommandContext context, BlacklistType blType, ulong id)
         {
             switch (blType)
             {

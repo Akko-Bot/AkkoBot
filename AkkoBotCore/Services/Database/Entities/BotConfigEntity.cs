@@ -79,6 +79,11 @@ namespace AkkoBot.Services.Database.Entities
         // Implement .gcmd and .gmod?
         // Implement forward dms to owners?
         // Might be an issue with "message staff" type of features
+
+        /// <summary>
+        /// Gets all settings from this table.
+        /// </summary>
+        /// <returns>A dictionary of setting name/value pairs.</returns>
         public IDictionary<string, string> GetSettings()
         {
             var props = this.GetType().GetProperties();

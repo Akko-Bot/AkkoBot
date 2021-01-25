@@ -152,7 +152,7 @@ namespace AkkoBot.Command.Modules.Self
 
             // If interaction didn't timeout and the user confirmed the action,
             // perform the operation.
-            if (!interaction.TimedOut && interaction.Result.UserConfirmedAction(context))
+            if (!interaction.TimedOut && interaction.Result.UserConfirmedAction(context, "q_yes"))
             {
                 var rows = await _service.ClearAsync(context);
 

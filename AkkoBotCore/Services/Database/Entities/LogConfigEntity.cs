@@ -35,6 +35,10 @@ namespace AkkoBot.Services.Database.Entities
         [Required]
         public double LogSizeMB { get; set; } = 1.0;
 
+        /// <summary>
+        /// Gets all settings from this table.
+        /// </summary>
+        /// <returns>A dictionary of setting name/value pairs.</returns>
         public IDictionary<string, string> GetSettings()
         {
             var props = this.GetType().GetProperties();

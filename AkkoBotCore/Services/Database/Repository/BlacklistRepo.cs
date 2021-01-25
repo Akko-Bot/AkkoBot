@@ -62,7 +62,7 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="id">The specified blacklist ID.</param>
         /// <returns><see langword="true"/> if the entry got removed from the database or from the cache, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> RemoveAsync(ulong id)
+        public async Task<bool> TryRemoveAsync(ulong id)
         {
             if (!_cache.Contains(id))
                 return false;

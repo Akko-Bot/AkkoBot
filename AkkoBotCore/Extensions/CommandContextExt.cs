@@ -47,8 +47,7 @@ namespace AkkoBot.Extensions
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
-            using var scope = context.Services.CreateScope();
-            var (_, db) = GetContextServices(scope);
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
             // Get the timeout
             var timeout = (await db.GuildConfigs.GetAsync(context.Guild.Id)).InteractiveTimeout;
@@ -77,8 +76,8 @@ namespace AkkoBot.Extensions
         /// <returns>The <see cref="DiscordMessage"/> that has been sent.</returns>
         public static async Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
-            using var scope = context.CommandsNext.Services.CreateScope();  // Create service scope
-            var (localizer, db) = GetContextServices(scope);                // Get scoped services
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (context.Guild is null)
@@ -106,8 +105,8 @@ namespace AkkoBot.Extensions
         /// <returns>A formatted and localized response string.</returns>
         public static string FormatLocalized(this CommandContext context, string key, params object[] args)
         {
-            using var scope = context.Services.CreateScope();
-            var (localizer, db) = GetContextServices(scope);
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
 
             var locale = (context.Guild is null)
                 ? db.BotConfig.GetAllSync().FirstOrDefault().Locale
@@ -125,19 +124,6 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Gets the scoped services needed to localize a Discord message.
-        /// </summary>
-        /// <param name="scope">The scoped service resolver.</param>
-        /// <returns>The response strings cache and the guild settings.</returns>
-        private static (ILocalizer, IUnitOfWork) GetContextServices(IServiceScope scope)
-        {
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
-            var localizer = scope.ServiceProvider.GetService<ILocalizer>();
-
-            return (localizer, db);
-        }
-
-        /// <summary>
         /// Localizes the content of an embed to its corresponding response string(s).
         /// </summary>
         /// <param name="localizer">The response strings cache.</param>
@@ -147,9 +133,12 @@ namespace AkkoBot.Extensions
         /// <param name="errorColor">ErrorColor to set the embed to, if it doesn't have one already.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <remarks>It ignores strings that don't match any key for a response string.</remarks>
-        /// <returns>The localized embed.</returns>
+        /// <returns>The localized embed or <see langword="null"/> if the embed is null.</returns>
         private static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, IMessageSettings settings, DiscordEmbedBuilder embed, bool isError = false)
         {
+            if (embed is null)
+                return null;
+
             if (embed.Title is not null)
                 embed.Title = GetLocalizedResponse(localizer, settings.Locale, embed.Title);
 
@@ -182,9 +171,12 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <param name="embed">Embed to be deconstructed.</param>
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
-        /// <returns>A formatted string with the contents of the embed.</returns>
+        /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
         private static string DeconstructEmbed(DiscordEmbedBuilder embed)
         {
+            if (embed is null)
+                return null;
+
             var dEmbed = new StringBuilder(
                 ((embed.Author is null) ? string.Empty : embed.Author.Name + "\n\n") +
                 ((embed.Title is null) ? string.Empty : embed.Title + "\n") +
