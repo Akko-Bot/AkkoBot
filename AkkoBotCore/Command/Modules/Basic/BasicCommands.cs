@@ -62,6 +62,7 @@ namespace AkkoBot.Command.Modules.Basic
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("online_since")
                 .WithDescription(Formatter.InlineCode($"[{_startup.LocalDateTime}]"))
+                .AddField("Shards", $"#{context.Client.ShardId}/{context.Client.ShardCount}", inline: true)
                 .AddField(
                     "uptime",
                     context.FormatLocalized("{0}: {1}\n", "days", elapsed.Days) +

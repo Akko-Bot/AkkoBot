@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -52,6 +51,14 @@ namespace AkkoBot.Services.Localization
         /// <returns>The localized response strings, if they exist.</returns>
         public string[] GetResponseStrings(CultureInfo locale, params string[] responses)
             => GetResponseStrings(locale.Name, responses);
+
+        /// <summary>
+        /// Checks if a given locale is registered.
+        /// </summary>
+        /// <param name="locale">Locale to be checked.</param>
+        /// <returns><see langword="true"/> if the locale is registered, <see langword="false"/> otherwise.</returns>
+        public bool ContainsLocale(string locale)
+            => _localizedStrings.ContainsKey(locale);
 
         /// <summary>
         /// Checks if the bot contains a valid response for a given response key.

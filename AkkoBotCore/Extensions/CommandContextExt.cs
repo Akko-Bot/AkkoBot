@@ -38,6 +38,17 @@ namespace AkkoBot.Extensions
             => await RespondInteractiveAsync(context, null, embed, isMarked, isError);
 
         /// <summary>
+        /// Gets the guild prefix of the current context.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <returns>The prefix used in the guild.</returns>
+        public static string GetGuildPrefix(this CommandContext context)
+        {
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            return db.GuildConfigs.GetGuild(context.Guild.Id).Prefix;
+        }
+
+        /// <summary>
         /// Sends a localized interactive message to the context that triggered the command.
         /// </summary>
         /// <param name="context">This command context.</param>

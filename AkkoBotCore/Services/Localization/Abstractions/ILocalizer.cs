@@ -12,6 +12,13 @@ namespace AkkoBot.Services.Localization.Abstractions
         IEnumerable<string> GetLocales();
 
         /// <summary>
+        /// Checks if a given locale is registered.
+        /// </summary>
+        /// <param name="locale">Locale to be checked.</param>
+        /// <returns><see langword="true"/> if the locale is registered, <see langword="false"/> otherwise.</returns>
+        bool ContainsLocale(string locale);
+
+        /// <summary>
         /// Checks if the bot contains a valid response for a given response key.
         /// </summary>
         /// <param name="locale">Locale of the response string.</param>

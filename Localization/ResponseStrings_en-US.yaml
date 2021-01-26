@@ -95,3 +95,8 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
+
+guild_locale_unavailable: This language is not available. Use {0} to see the list of available languages.
+guild_locale_changed: The language for this server has been changed to {0}.
+cmd_guild_locale: Changes the language the bot should use in this server. Provide no parameter to see the list of available languages.
+cmd_guild: Groups settings that define how the bot should behave on this Discord server.
