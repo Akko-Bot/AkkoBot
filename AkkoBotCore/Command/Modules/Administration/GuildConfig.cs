@@ -38,12 +38,12 @@ namespace AkkoBot.Command.Modules.Administration
             await context.RespondLocalizedAsync(embed, false);
         }
 
-        [Command("locale"), Aliases("language")]
+        [Command("locale"), Aliases("languages")]
         [Description("cmd_guild_locale")]
         public async Task ChangeGuildLocale(CommandContext context, [Description("arg_locale")] string locale)
         {
             // If locale does not exist, send error message
-            if (!_service.IsLocaleRegistered(locale))
+            if (!_service.IsLocaleRegistered(locale, out var responseKey))
             {
                 var errorEmbed = new DiscordEmbedBuilder()
                     .WithDescription(
@@ -58,11 +58,11 @@ namespace AkkoBot.Command.Modules.Administration
             }
 
             // Change the locale
-            _service.SetProperty(context, x => x.Locale = locale);
+            _service.SetProperty(context, x => x.Locale = responseKey);
 
             // Send the message
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(locale)));
+                .WithDescription(context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey)));
 
             await context.RespondLocalizedAsync(embed);
         }

@@ -69,7 +69,7 @@ namespace AkkoBot.Command.Formatters
                 // If command takes no argument
                 if (overload.Arguments.Count == 0)
                 {
-                    _helpExamplesField.Append(Formatter.InlineCode(prefix + cmd.QualifiedName));
+                    _helpExamplesField.AppendLine(Formatter.InlineCode(prefix + cmd.QualifiedName) + "\n");
                     continue;
                 }
 

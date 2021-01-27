@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace AkkoBot.Services.Localization.Abstractions
 {
+    /// <summary>
+    /// Represents an object responsible for managing the cache of response strings.
+    /// </summary>
     public interface ILocalizer
     {
         /// <summary>

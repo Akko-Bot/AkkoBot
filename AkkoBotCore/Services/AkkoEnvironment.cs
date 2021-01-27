@@ -14,7 +14,7 @@ namespace AkkoBot.Services
         /// Gets the fully qualified path for the current directory of the application.
         /// </summary>
         public static string CurrentDirectory { get; }
-            = (AppDomain.CurrentDomain.BaseDirectory.Contains("bin" + OsSlash + "Debug")
+            = (AppDomain.CurrentDomain.BaseDirectory.Contains("bin", StringComparison.InvariantCultureIgnoreCase)
             && !AppDomain.CurrentDomain.BaseDirectory.Contains("publish"))
                 ? Directory.GetParent(Environment.CurrentDirectory).FullName + OsSlash
                 : AppDomain.CurrentDomain.BaseDirectory + OsSlash;

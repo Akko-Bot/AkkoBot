@@ -139,7 +139,7 @@ namespace AkkoBot.Command.Modules.Self
                 return;
             }
 
-            // Send confirmation message
+            // Build the confirmation message
             var question = new DiscordEmbedBuilder()
                 .WithDescription(
                     context.FormatLocalized(
@@ -148,11 +148,8 @@ namespace AkkoBot.Command.Modules.Self
                     )
                 );
 
-            var interaction = await context.RespondInteractiveAsync(question);
-
-            // If interaction didn't timeout and the user confirmed the action,
-            // perform the operation.
-            if (!interaction.TimedOut && interaction.Result.UserConfirmedAction(context, "q_yes"))
+            // Send the interactive message and perform the action if user comfirms it
+            await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
                 var rows = await _service.ClearAsync(context);
 
@@ -160,7 +157,7 @@ namespace AkkoBot.Command.Modules.Self
                     .WithDescription(context.FormatLocalized("bl_clear", rows));
 
                 await context.RespondLocalizedAsync(embed);
-            }
+            });
         }
     }
 }

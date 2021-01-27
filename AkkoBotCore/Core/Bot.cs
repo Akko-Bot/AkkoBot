@@ -40,7 +40,7 @@ namespace AkkoBot.Core
                     $"a firewall or any external software blocking the connection. [{ex.Message}]"
                 );
 
-                TerminateProgram("\n");
+                TerminateProgram(Environment.NewLine);
             }
 
             // Block the program until it is closed.
@@ -88,8 +88,7 @@ namespace AkkoBot.Core
 
                 PauseProgram(
                     @"A credentials file has been generated for you at " +
-                    $".{AkkoEnvironment.OsSlash}" +
-                    $"{AkkoEnvironment.GetRelativeAkkoPath(AkkoEnvironment.CredsPath)}\n" +
+                    AkkoEnvironment.CredsPath + Environment.NewLine +
                     @"Please, add your data to it and"
                 );
             }
@@ -113,7 +112,7 @@ namespace AkkoBot.Core
             if (creds.Token.Length < 50)
             {
                 PauseProgram(
-                    "Your token is probably invalid.\n" +
+                    "Your token is probably invalid." + Environment.NewLine +
                     "Please, add a valid token and"
                 );
 
@@ -122,7 +121,7 @@ namespace AkkoBot.Core
             else if (creds.Database["Password"] == "postgres_password_here")
             {
                 PauseProgram(
-                    "You forgot to set your database password.\n" +
+                    "You forgot to set your database password." + Environment.NewLine +
                     "Please, add it and"
                 );
 
@@ -148,7 +147,7 @@ namespace AkkoBot.Core
         /// <param name="message">A message to be displayed to the user.</param>
         private void TerminateProgram(string message)
         {
-            Console.WriteLine(message + "\nPress Enter to exit...");
+            Console.WriteLine(message + Environment.NewLine + "Press Enter to exit...");
             Console.Read();
             Environment.Exit(Environment.ExitCode);
         }

@@ -27,15 +27,17 @@ namespace AkkoBot.Extensions
             => await RespondLocalizedAsync(context, null, embed, isMarked, isError);
 
         /// <summary>
-        /// Sends a localized interactive message to the context that triggered the command.
+        /// Sends a localized interactive message to the context that triggered the command and executes a follow-up task.
         /// </summary>
         /// <param name="context">This command context.</param>
         /// <param name="embed">The embed to be sent.</param>
+        /// <param name="expectedResponse">The response that's expected from the user. It gets localized internally.</param>
+        /// <param name="action">The task to be performed if the user comfirms the interaction.</param>
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <returns>The interaction between the user and the message.</returns>
-        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
-            => await RespondInteractiveAsync(context, null, embed, isMarked, isError);
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
+            => await RespondInteractiveAsync(context, null, embed, expectedResponse, action, isMarked, isError);
 
         /// <summary>
         /// Gets the guild prefix of the current context.
@@ -49,15 +51,17 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Sends a localized interactive message to the context that triggered the command.
+        /// Sends a localized interactive message to the context that triggered the command and executes a follow-up task.
         /// </summary>
         /// <param name="context">This command context.</param>
         /// <param name="message">The message content.</param>
         /// <param name="embed">The embed to be sent.</param>
+        /// <param name="expectedResponse">The response that's expected from the user. It gets localized internally.</param>
+        /// <param name="action">The operations to be performed if the user comfirms the interaction.</param>
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <returns>The interaction between the user and the message.</returns>
-        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
         {
             using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
@@ -74,6 +78,13 @@ namespace AkkoBot.Extensions
             // Delete the confirmation message
             await context.Channel.DeleteMessageAsync(question);
 
+            // Localize the response expected from the user
+            var response = context.FormatLocalized(expectedResponse);
+
+            // If user replied with the expected response, execute the action
+            if (!result.TimedOut && result.Result.Content.EqualsOrStartsWith(response))
+                action();
+                
             return result;
         }
 

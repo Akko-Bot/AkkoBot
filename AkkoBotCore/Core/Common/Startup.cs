@@ -112,8 +112,8 @@ namespace AkkoBot.Core.Common
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
             if (eventArgs.Exception
-            //is not ArgumentException            // Ignore commands with invalid arguments
-            is not ChecksFailedException       // Ignore command check fails
+            is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
+            and not ChecksFailedException       // Ignore command check fails
             and not CommandNotFoundException)   // Ignore commands that do not exist
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
