@@ -34,8 +34,8 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("locale")]
         [Description("cmd_config_locale")]
-        public async Task SetBotLocale(CommandContext context, [Description("arg_locale")] string locale)
-            => await ChangeProperty(context, x => x.Locale = locale);
+        public async Task SetBotLocale(CommandContext context, [Description("arg_locale")] string languageCode)
+            => await ChangeProperty(context, x => x.Locale = languageCode);
 
         [Command("okcolor")]
         [Description("cmd_config_okcolor")]

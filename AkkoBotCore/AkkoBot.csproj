@@ -6,8 +6,11 @@
     <StartupObject>AkkoBot.Program</StartupObject>
     <AssemblyName>AkkoBot</AssemblyName>
     <RootNamespace>AkkoBot</RootNamespace>
-    <NoWarn>1822</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DSharpPlus" Version="4.0.0-rc1" />
