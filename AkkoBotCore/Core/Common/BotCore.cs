@@ -45,6 +45,7 @@ namespace AkkoBot.Core.Common
         {
             var modules = GeneralService.GetImplementables(typeof(AkkoCommandModule)).ToArray();
             var converters = GeneralService.GetImplementables(typeof(IArgumentConverter));
+            var cogs = GeneralService.LoadCogs().ToArray();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.
@@ -57,11 +58,14 @@ namespace AkkoBot.Core.Common
 
                 foreach (var converter in converters)
                     cmdHandler.RegisterConverter(converter);
+
+                foreach (var cog in cogs)
+                    cmdHandler.RegisterCommands(cog);
             }
 
             BotClient.Logger.LogInformation(
                 new EventId(LoggerEvents.Startup.Id, "Startup"),
-                $"{modules.Length} command modules were successfully loaded."
+                $"{modules.Length + cogs.Length} command modules were successfully loaded."
             );
         }
     }

@@ -1,6 +1,10 @@
-﻿using System;
+﻿using AkkoBot.Command.Abstractions;
+using DSharpPlus.CommandsNext;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace AkkoBot.Services
 {
@@ -20,6 +24,26 @@ namespace AkkoBot.Services
                 && !types.IsAbstract
                 && types.Namespace.Contains("AkkoBot")
             );
+        }
+
+        /// <summary>
+        /// Gets a collection of assemblies from the cogs directory
+        /// </summary>
+        /// <remarks>
+        /// This method assumes all assemblies have AkkoBot as a dependency reference and
+        /// contain commands that can be registered on CommandsNext.
+        /// </remarks>
+        /// <returns>A collection of assemblies.</returns>
+        public static IEnumerable<Assembly> LoadCogs()
+        {
+            // Create directory if it doesn't exist already.
+            if (!Directory.Exists(AkkoEnvironment.CogsDirectory))
+                Directory.CreateDirectory(AkkoEnvironment.CogsDirectory);
+
+            // Get all cogs from the cogs directory
+            return Directory.EnumerateFiles(AkkoEnvironment.CogsDirectory)
+                .Where(filePath => filePath.EndsWith(".dll"))
+                .Select(filePath => Assembly.LoadFrom(filePath));
         }
     }
 }
