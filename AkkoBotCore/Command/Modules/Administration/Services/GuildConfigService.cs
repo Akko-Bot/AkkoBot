@@ -41,7 +41,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <param name="context">The command context.</param>
         /// <param name="selector">The action to get the property.</param>
         /// <returns>The requested setting.</returns>
-        public T GetProperty<T>(CommandContext context, Func<GuildConfigEntity, T> selector)
+        public T GetOrSetProperty<T>(CommandContext context, Func<GuildConfigEntity, T> selector)
         {
             using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
             var guild = db.GuildConfigs.GetGuild(context.Guild.Id);
@@ -51,6 +51,12 @@ namespace AkkoBot.Command.Modules.Administration.Services
             db.SaveChanges();
 
             return result;
+        }
+
+        public IReadOnlyDictionary<string, string> GetGuildSettings(CommandContext context)
+        {
+            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
+            return db.GuildConfigs.GetGuild(context.Guild.Id).GetSettings();
         }
     }
 }

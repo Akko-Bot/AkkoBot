@@ -46,7 +46,7 @@ namespace AkkoBot.Command.Formatters
             // Add requirements
             foreach (var att in cmd.Module.ModuleType.CustomAttributes)
             {
-                if (att.AttributeType == typeof(BotOwner))
+                if (att.AttributeType == typeof(BotOwnerAttribute))
                 {
                     _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_bot_owner"));
                 }

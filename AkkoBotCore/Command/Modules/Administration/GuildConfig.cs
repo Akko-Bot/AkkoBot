@@ -19,16 +19,14 @@ namespace AkkoBot.Command.Modules.Administration
     {
         private readonly GuildConfigService _service;
 
-        public GuildConfig(GuildConfigService service)
-        {
-            _service = service;
-        }
-        // TODO: make command group for listing the guild settings
+        public GuildConfig(GuildConfigService service) 
+            => _service = service;
+
         [Command("prefix")]
         [Description("cmd_guild_prefix")]
         public async Task CheckPrefix(CommandContext context)
         {
-            var prefix = _service.GetProperty(context, x => x.Prefix);
+            var prefix = _service.GetOrSetProperty(context, x => x.Prefix);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_prefix_check", Formatter.InlineCode(prefix)));
@@ -39,7 +37,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("prefix")]
         public async Task ChangePrefix(CommandContext context, [Description("arg_prefix")] string prefix)
         {
-            _service.GetProperty(context, x => x.Prefix = prefix);
+            _service.GetOrSetProperty(context, x => x.Prefix = prefix);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(prefix)));
@@ -51,7 +49,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_guild_embed")]
         public async Task ChangeEmbed(CommandContext context)
         {
-            var result = _service.GetProperty(context, x => x.UseEmbed = !x.UseEmbed);
+            var result = _service.GetOrSetProperty(context, x => x.UseEmbed = !x.UseEmbed);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_embed_change", (result) ? "enabled" : "disabled"));
@@ -61,9 +59,9 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("okcolor")]
         [Description("cmd_guild_okcolor")]
-        public async Task ChangeOkColor(CommandContext context, string newColor)
+        public async Task ChangeOkColor(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var result = _service.GetProperty(context, x => x.OkColor = newColor);
+            var result = _service.GetOrSetProperty(context, x => x.OkColor = newColor);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_okcolor", Formatter.InlineCode(result)));
@@ -73,9 +71,9 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("errorcolor")]
         [Description("cmd_guild_errorcolor")]
-        public async Task ChangeErrorColor(CommandContext context, string newColor)
+        public async Task ChangeErrorColor(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var result = _service.GetProperty(context, x => x.ErrorColor = newColor);
+            var result = _service.GetOrSetProperty(context, x => x.ErrorColor = newColor);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_errorcolor", Formatter.InlineCode(result)));
@@ -85,9 +83,9 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("timeout")]
         [Description("cmd_guild_timeout")]
-        public async Task ChangeTimeout(CommandContext context, uint? seconds = null)
+        public async Task ChangeTimeout(CommandContext context, [Description("arg_timeout")] uint? seconds = null)
         {
-            var result = _service.GetProperty(context, x => x.InteractiveTimeout = (seconds is null or 0) ? null : new TimeSpan(0, 0, (int)seconds));
+            var result = _service.GetOrSetProperty(context, x => x.InteractiveTimeout = (seconds is null or < 10 or > 120) ? null : new TimeSpan(0, 0, (int)seconds));
 
             var embed = new DiscordEmbedBuilder();
             embed.Description = (result is null)
@@ -132,11 +130,25 @@ namespace AkkoBot.Command.Modules.Administration
             }
 
             // Change the locale
-            _service.GetProperty(context, x => x.Locale = responseKey);
+            _service.GetOrSetProperty(context, x => x.Locale = responseKey);
 
             // Send the message
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey)));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [GroupCommand, Command("list")]
+        [Description("cmd_guild_list")]
+        public async Task ListGuildConfigs(CommandContext context)
+        {
+            var settings = _service.GetGuildSettings(context);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("guild_settings_title")
+                .AddField("settings", string.Join("\n", settings.Keys.ToArray()), true)
+                .AddField("value", string.Join("\n", settings.Values.ToArray()), true);
 
             await context.RespondLocalizedAsync(embed);
         }

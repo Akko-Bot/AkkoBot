@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Command.Modules.Self
 {
-    [BotOwner]
+    [BotOwnerAttribute]
     [RequireBotPermissions(Permissions.AddReactions)]
     [Group("config"), Aliases("self")]
     [Description("cmd_config")]
@@ -34,18 +34,34 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("locale")]
         [Description("cmd_config_locale")]
+        public async Task ListLocales(CommandContext context)
+        {
+            var locales = _service.GetLocales(context)
+                .Select(x => $"{Formatter.InlineCode(x)} - {new CultureInfo(x).NativeName}")
+                .OrderBy(x => x)
+                .ToArray();
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("locales_title")
+                .WithDescription(string.Join("\n", locales));
+
+            await context.RespondLocalizedAsync(embed, false);
+        }
+
+        [Command("locale")]
+        [Description("cmd_config_locale")]
         public async Task SetBotLocale(CommandContext context, [Description("arg_locale")] string languageCode)
             => await ChangeProperty(context, x => x.Locale = languageCode);
 
         [Command("okcolor")]
         [Description("cmd_config_okcolor")]
-        public async Task SetBotOkColor(CommandContext context, [Description("arg_color")] string okColor)
-            => await ChangeProperty(context, x => x.OkColor = okColor);
+        public async Task SetBotOkColor(CommandContext context, [Description("arg_color")] string newColor)
+            => await ChangeProperty(context, x => x.OkColor = newColor);
 
         [Command("errorcolor")]
         [Description("cmd_config_errorcolor")]
-        public async Task SetBotErrorColor(CommandContext context, [Description("arg_color")] string errorColor)
-            => await ChangeProperty(context, x => x.ErrorColor = errorColor);
+        public async Task SetBotErrorColor(CommandContext context, [Description("arg_color")] string newColor)
+            => await ChangeProperty(context, x => x.ErrorColor = newColor);
 
         [Command("embed"), Aliases("useembed")]
         [Description("cmd_config_embed")]
@@ -82,39 +98,16 @@ namespace AkkoBot.Command.Modules.Self
         public async Task SetBotTimeout(CommandContext context, [Description("arg_uint")] uint time)
             => await ChangeProperty(context, x => x.InteractiveTimeout = new TimeSpan(0, 0, (time < 10) ? 10 : (int)time));
 
-        [Command("locale")]
-        [Description("cmd_config_locale")]
-        public async Task ListLocales(CommandContext context)
-        {
-            var locales = _service.GetLocales(context)
-                .Select(x => $"{Formatter.InlineCode(x)} - {new CultureInfo(x).NativeName}")
-                .OrderBy(x => x)
-                .ToArray();
-
-            var embed = new DiscordEmbedBuilder()
-                .WithTitle("locales_title")
-                .WithDescription(string.Join("\n", locales));
-
-            await context.RespondLocalizedAsync(embed, false);
-        }
-
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_config_list")]
-        public async Task GetBotSettings(CommandContext context)
+        public async Task ListBotSettings(CommandContext context)
         {
-            var configNames = new StringBuilder();
-            var configValues = new StringBuilder();
-
-            foreach (var setting in _service.GetConfigs(context))
-            {
-                configNames.AppendLine(setting.Key);
-                configValues.AppendLine(setting.Value);
-            }
+            var settings = _service.GetConfigs(context);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("bot_settings_title")
-                .AddField("settings", configNames.ToString(), true)
-                .AddField("value", configValues.ToString(), true);
+                .AddField("settings", string.Join("\n", settings.Keys.ToArray()), true)
+                .AddField("value", string.Join("\n", settings.Values.ToArray()), true);
 
             await context.RespondLocalizedAsync(embed);
         }

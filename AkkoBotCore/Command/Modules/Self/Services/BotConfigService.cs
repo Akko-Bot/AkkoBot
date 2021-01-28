@@ -59,14 +59,14 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <returns>A collection of setting name/value pairs.</returns>
-        public IDictionary<string, string> GetConfigs(CommandContext context)
+        public IReadOnlyDictionary<string, string> GetConfigs(CommandContext context)
         {
             using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
             var botConfig = db.BotConfig.Cache;
             var logConfig = db.LogConfig.Cache;
 
-            var settings = botConfig.GetSettings();
+            var settings = new Dictionary<string, string>(botConfig.GetSettings());
 
             foreach (var propPair in logConfig.GetSettings())
                 settings.TryAdd(propPair.Key, propPair.Value);

@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
-using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
@@ -41,21 +41,21 @@ namespace AkkoBot.Services.Database.Entities
         public bool UseEmbed { get; set; } = true;
 
         [Required]
-        [MaxLength(6)]
+        [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
         public string OkColor
         {
             get => _okColor;
-            set => _okColor = value?.MaxLength(6);
+            set => _okColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
         [Required]
-        [MaxLength(6)]
+        [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
         public string ErrorColor
         {
             get => _errorColor;
-            set => _errorColor = value?.MaxLength(6);
+            set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
         public TimeSpan? InteractiveTimeout { get; set; } = null;
@@ -79,6 +79,27 @@ namespace AkkoBot.Services.Database.Entities
             UseEmbed = config.UseEmbed;
             OkColor = config.OkColor;
             ErrorColor = config.ErrorColor;
+        }
+
+        /// <summary>
+        /// Gets all settings from this table.
+        /// </summary>
+        /// <returns>A dictionary of setting name/value pairs.</returns>
+        public IReadOnlyDictionary<string, string> GetSettings()
+        {
+            var props = this.GetType().GetProperties();
+            var result = new Dictionary<string, string>(props.Length);
+
+            // Index should skip undesirable props at the start
+            for (int index = 1; index < props.Length - 1; index++)
+            {
+                result.TryAdd(
+                    props[index].Name.ToSnakeCase(),
+                    props[index].GetValue(this)?.ToString()
+                );
+            }
+
+            return result;
         }
     }
 }

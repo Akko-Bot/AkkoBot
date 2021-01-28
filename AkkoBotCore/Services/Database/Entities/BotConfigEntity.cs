@@ -38,21 +38,21 @@ namespace AkkoBot.Services.Database.Entities
         }
 
         [Required]
-        [MaxLength(6)]
+        [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
         public string OkColor
         {
             get => _okColor;
-            set => _okColor = value?.MaxLength(6);
+            set => _okColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
         [Required]
-        [MaxLength(6)]
+        [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
         public string ErrorColor
         {
             get => _errorColor;
-            set => _errorColor = value?.MaxLength(6);
+            set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
         [Required]
@@ -84,7 +84,7 @@ namespace AkkoBot.Services.Database.Entities
         /// Gets all settings from this table.
         /// </summary>
         /// <returns>A dictionary of setting name/value pairs.</returns>
-        public IDictionary<string, string> GetSettings()
+        public IReadOnlyDictionary<string, string> GetSettings()
         {
             var props = this.GetType().GetProperties();
             var result = new Dictionary<string, string>(props.Length);

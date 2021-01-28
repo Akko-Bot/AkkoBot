@@ -10,11 +10,10 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.Interactivity.Extensions;
 
 namespace AkkoBot.Command.Modules.Self
 {
-    [BotOwner]
+    [BotOwnerAttribute]
     [Group("blacklist"), Aliases("bl")]
     [Description("cmd_blacklist")]
     public sealed class Blacklist : AkkoCommandModule
