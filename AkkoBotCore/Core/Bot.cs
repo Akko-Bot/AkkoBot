@@ -13,7 +13,7 @@ namespace AkkoBot.Core
 {
     public class Bot
     {
-        public async Task MainAsync(string[] args)
+        public async Task MainAsync()
         {
             // Load up credentials
             var creds = PrepareCredentials(AkkoEnvironment.CredsPath);

@@ -7,6 +7,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -74,5 +75,12 @@ namespace AkkoBot.Command.Modules.Basic
 
             await context.RespondLocalizedAsync(embed, false);
         }
+
+        //[Command("module"), Aliases("modules")]
+        //[Description("Shows modules.")]
+        //public async Task Modules(CommandContext context)
+        //{
+        //    var test = context.CommandsNext.RegisteredCommands.Values.Where(x => x is CommandGroup && !x.Aliases.Any(y => y.Contains(x.Name))).DistinctBy(x => x.QualifiedName);
+        //}
     }
 }

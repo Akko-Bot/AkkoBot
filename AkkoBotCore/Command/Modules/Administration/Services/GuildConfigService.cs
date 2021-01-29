@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
@@ -13,10 +14,8 @@ namespace AkkoBot.Command.Modules.Administration.Services
     {
         private readonly ILocalizer _localizer;
 
-        public GuildConfigService(ILocalizer localizer)
-        {
-            _localizer = localizer;
-        }
+        public GuildConfigService(ILocalizer localizer) 
+            => _localizer = localizer;
 
         /// <summary>
         /// Checks if the specified locale is available and returns it if so.
@@ -26,6 +25,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <returns><see langword="true"/> if a match is found, <see langword="false"/> otherwise.</returns>
         public bool IsLocaleRegistered(string locale, out string match)
             => _localizer.GetLocales().Contains(locale, StringComparison.InvariantCultureIgnoreCase, out match);
+            //=> _localizer.GetLocales().Any(x => x.Equals(locale, StringComparison.InvariantCultureIgnoreCase));
 
         /// <summary>
         /// Gets all registered localed.

@@ -7,6 +7,7 @@ arg_double: Um número real.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug_, __Info__, __Warning__, __Critical__ e __None__.'
 arg_prefix: O novo prefixo.
+arg_timeout: Um número inteiro maior que 10 e menor que 120.
 arg_uint: Um número inteiro maior ou igual a zero.
 arg_ulong_id: Um ID válido do Discord.
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
@@ -31,7 +32,7 @@ cmd_config_embed: Define se o bot deve utilizar embeds em suas respostas.
 cmd_config_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro.
 cmd_config_help: Define se o bot deve responder a comandos de ajuda. Requer reinicialização para tomar efeito.
 cmd_config_list: Mostra as configurações atuais do bot.
-cmd_config_locale: Define o idioma padrão do bot.
+cmd_config_locale: Define o idioma padrão do bot. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
 cmd_config_log: Agrupa configuracões que controlam como logs devem ser tratados.
 cmd_config_log_format: Define o formato do log a ser user utilizado. Requer reinicialização para tomar efeito.
 cmd_config_log_format_arg: 'O formato dos logs. Valores possíveis incluem: __Default__, __Simple__ e __Minimalist__.'
@@ -44,8 +45,29 @@ cmd_config_mention: Define se o bot deve responder a comandos executados com uma
 cmd_config_okcolor: Define a cor padrão a ser utilizada em embeds.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
+cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
+cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
+cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
+cmd_guild_list: Exibe as configurações de servidor atuais.
+cmd_guild_locale: Define o idioma a ser utilizado pelo bot nesse servidor. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
+cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor.
+cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
+cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela resposta do usuário, em segundos. Forneça nenhum parâmetro para redefini-lo para o valor padrão.
+commands: Comandos
 days: Dias
+disabled: desativado
+enabled: ativado
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
+guild_embed_change: O uso de embeds nesse servidor foi {0}.
+guild_errorcolor: ErrorColor foi alterada para {0}.
+guild_locale_changed: O idioma desse servidor foi alterado para {0}.
+guild_locale_unavailable: Esse idioma não está disponível. Use {0} para ver a lista de idiomas disponíveis.
+guild_okcolor: OkColor foi alterada para {0}.
+guild_prefix_change: O prefixo nesse servidor foi alterado para {0}
+guild_prefix_check: O prefixo nesse servidor é {0}
+guild_settings_title: Configurações de Servidor
+guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
+guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
 help_add_reactions: Adicionar Reações
 help_administrator: Administrador
 help_attach_files: Anexar Arquivos
@@ -87,7 +109,6 @@ seconds: Segundos
 server: Servidor
 settings: Configuração
 shutdown: Desligando.
-subcommands: Subcomandos
 type: Tipo
 unknown: Desconhecido
 unspecified: Não especificado

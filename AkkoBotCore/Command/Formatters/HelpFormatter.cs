@@ -11,7 +11,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.CommandsNext.Entities;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Command.Formatters
 {
@@ -21,7 +20,7 @@ namespace AkkoBot.Command.Formatters
         private string _helpDescription;
         private readonly StringBuilder _helpRequiresField = new();
         private StringBuilder _helpExamplesField;
-        private StringBuilder _helpSubcommandsField;
+        private StringBuilder _helpCommandsField;
         private readonly CommandContext _cmdContext;
 
         public HelpFormatter(CommandContext context) : base(context)
@@ -32,11 +31,6 @@ namespace AkkoBot.Command.Formatters
         // This is called first
         public override BaseHelpFormatter WithCommand(DSharpPlus.CommandsNext.Command cmd)
         {
-            using var scope = _cmdContext.Services.CreateScope();
-            var prefix = scope.ServiceProvider
-                .GetService<IUnitOfWork>().GuildConfigs
-                .GetSync(_cmdContext.Guild.Id).Prefix;
-
             // Set title
             _helpTitle = GetHelpHeader(cmd);
 
@@ -61,6 +55,11 @@ namespace AkkoBot.Command.Formatters
             if (cmd is CommandGroup)
                 return this;
 
+            // Get the prefix
+            using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var prefix = db.GuildConfigs.GetSync(_cmdContext.Guild.Id).Prefix;
+
+            // Initialize string builder
             _helpExamplesField = new();
 
             // Format usage
@@ -102,14 +101,34 @@ namespace AkkoBot.Command.Formatters
         // processed or current command is not a group, it won't be called
         public override BaseHelpFormatter WithSubcommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
         {
-            _helpSubcommandsField = new();
+            var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
+            _helpCommandsField = new();
 
-            foreach (var command in subcommands)
+            if (isHelpCmd)
             {
-                _helpSubcommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
+                // Get all parent command groups
+                var rootCmdGroups = _cmdContext.CommandsNext.RegisteredCommands.Values
+                    .Where(x => x is CommandGroup && !x.Aliases.Any(y => y.Contains(x.Name)))
+                    .DistinctBy(x => x.QualifiedName);
+
+                // Add command groups
+                foreach (var cmdGroup in rootCmdGroups)
+                    _helpCommandsField.Append(Formatter.InlineCode(cmdGroup.Name) + ", ");
+
+                // Add regular commands
+                foreach (var command in subcommands)
+                {
+                    if (command is not CommandGroup)
+                        _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
+                }
+            }
+            else
+            {
+                foreach (var command in subcommands)
+                    _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
             }
 
-            _helpSubcommandsField.Remove(_helpSubcommandsField.Length - 2, 2);
+            _helpCommandsField.Remove(_helpCommandsField.Length - 2, 2);
 
             return this;
         }
@@ -118,10 +137,8 @@ namespace AkkoBot.Command.Formatters
         // It should produce the final message and return it
         public override CommandHelpMessage Build()
         {
-            using var scope = _cmdContext.Services.CreateScope();
-            var guildSettings = scope.ServiceProvider
-                .GetService<IUnitOfWork>().GuildConfigs
-                .GetSync(_cmdContext.Guild.Id);
+            using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var guildSettings = db.GuildConfigs.GetSync(_cmdContext.Guild.Id);
 
             if (guildSettings.UseEmbed)
             {
@@ -133,8 +150,8 @@ namespace AkkoBot.Command.Formatters
                 if (_helpRequiresField.Length != 0)
                     msg.AddField(_cmdContext.FormatLocalized("requires"), _helpRequiresField.ToString());
 
-                if (_helpSubcommandsField is not null)
-                    msg.AddField(_cmdContext.FormatLocalized("subcommands"), _helpSubcommandsField.ToString());
+                if (_helpCommandsField is not null)
+                    msg.AddField(_cmdContext.FormatLocalized("commands"), _helpCommandsField.ToString());
 
                 if (_helpExamplesField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
@@ -147,7 +164,7 @@ namespace AkkoBot.Command.Formatters
                     ((_helpTitle is not null) ? Formatter.Bold(_helpTitle) + "\n" : string.Empty) +
                     ((_helpDescription is not null) ? _helpDescription + "\n\n" : string.Empty) +
                     ((_helpRequiresField.Length != 0) ? Formatter.Bold(_cmdContext.FormatLocalized("requires")) + "\n" + _helpRequiresField.ToString() + "\n" : string.Empty) +
-                    ((_helpSubcommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("subcommands")) + "\n" + _helpSubcommandsField.ToString() + "\n" : string.Empty) +
+                    ((_helpCommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("subcommands")) + "\n" + _helpCommandsField.ToString() + "\n" : string.Empty) +
                     ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty)
                 );
             }

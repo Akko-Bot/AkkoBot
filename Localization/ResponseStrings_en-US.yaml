@@ -7,6 +7,7 @@ arg_double: A real number.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning_, __Critical__ and __None__.'
 arg_prefix: The new prefix.
+arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
 bl_added: Successfully added {0} {1} {2} to the blacklist.
@@ -31,7 +32,7 @@ cmd_config_embed: Sets whether the bot should use embeds for responses or not.
 cmd_config_errorcolor: Sets the default color that should be used on embeds that return an error message.
 cmd_config_help: Sets whether the bot should respond to help commands or not. Requires a restart to take effect.
 cmd_config_list: Shows the bot's current settings.
-cmd_config_locale: Sets the default language for the bot.
+cmd_config_locale: Sets the default language for the bot. Provide no parameter to see the list of available languages.
 cmd_config_log: Groups settings that control how logs should be handled.
 cmd_config_log_format: Sets the log format used for logging. Requires a restart to take effect.
 cmd_config_log_format_arg: 'The format of the logs. Possible values include: __Default__, __Simple__ and __Minimalist__.'
@@ -44,8 +45,29 @@ cmd_config_mention: Sets whether the bot should respond to commands executed wit
 cmd_config_okcolor: Sets the default color that should be used on embeds.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
+cmd_guild: Groups settings that define how the bot should behave on this Discord server.
+cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
+cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
+cmd_guild_list: Shows the server's current settings.
+cmd_guild_locale: Changes the language the bot should use in this server. Provide no parameter to see the list of available languages.
+cmd_guild_okcolor: Sets the color used on embeds for this server.
+cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
+cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
+commands: Commands
 days: Days
+disabled: disabled
+enabled: enabled
 error_not_found: 'Error: the requested response string was not found.'
+guild_embed_change: Embed usage on this server has been {0}.
+guild_errorcolor: ErrorColor has been changed to {0}.
+guild_locale_changed: The language for this server has been changed to {0}.
+guild_locale_unavailable: This language is not available. Use {0} to see the list of available languages.
+guild_okcolor: OkColor has been changed to {0}.
+guild_prefix_change: The prefix on this server has been changed to {0}
+guild_prefix_check: The prefix on this server is {0}
+guild_settings_title: Server Settings
+guild_timeout_changed: Command timeout on this server has been set to {0} seconds.
+guild_timeout_reset: Command timeout on this server has been reset.
 help_add_reactions: Add Reactions
 help_administrator: Administrator
 help_attach_files: Attach Files
@@ -87,7 +109,6 @@ seconds: Seconds
 server: Server
 settings: Settings
 shutdown: Shutting down.
-subcommands: Subcommands
 type: Type
 unknown: Unknown
 unspecified: Unspecified
@@ -95,36 +116,3 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
-
-guild_locale_unavailable: This language is not available. Use {0} to see the list of available languages.
-guild_locale_changed: The language for this server has been changed to {0}.
-cmd_guild_locale: Changes the language the bot should use in this server. Provide no parameter to see the list of available languages.
-cmd_guild: Groups settings that define how the bot should behave on this Discord server.
-guild_prefix_change: The prefix on this server has been changed to {0}
-cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
-guild_prefix_check: The prefix on this server is {0}
-guild_embed_change: Embed usage on this server has been {0}.
-enabled: enabled
-disabled: disabled
-cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
-cmd_guild_okcolor: Sets the color used on embeds for this server.
-guild_okcolor: OkColor has been changed to {0}.
-cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
-guild_errorcolor: ErrorColor has been changed to {0}.
-cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands. Provide no parameter to reset it back to default.
-guild_timeout_reset: Command timeout on this server has been reset.
-guild_timeout_changed: Command timeout on this server has been set to {0} seconds.
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
@@ -16,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Command.Modules.Self
 {
-    [BotOwnerAttribute]
+    [BotOwner]
     [RequireBotPermissions(Permissions.AddReactions)]
     [Group("config"), Aliases("self")]
     [Description("cmd_config")]
