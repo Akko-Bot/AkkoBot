@@ -87,10 +87,12 @@ namespace AkkoBot.Command.Modules.Administration
         {
             var result = _service.GetOrSetProperty(context, x => x.InteractiveTimeout = (seconds is null or < 10 or > 120) ? null : new TimeSpan(0, 0, (int)seconds));
 
-            var embed = new DiscordEmbedBuilder();
-            embed.Description = (result is null)
+            var embed = new DiscordEmbedBuilder()
+            {
+                Description = (result is null)
                 ? context.FormatLocalized("guild_timeout_reset")
-                : context.FormatLocalized("guild_timeout_changed", Formatter.InlineCode(result.Value.TotalSeconds.ToString()));
+                : context.FormatLocalized("guild_timeout_changed", Formatter.InlineCode(result.Value.TotalSeconds.ToString()))
+            };
 
             await context.RespondLocalizedAsync(embed);
         }

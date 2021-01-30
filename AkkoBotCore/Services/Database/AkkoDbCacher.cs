@@ -1,5 +1,4 @@
-﻿using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using System;
 using System.Collections.Concurrent;
@@ -26,7 +25,7 @@ namespace AkkoBot.Services.Database
             Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToHashSet();
             BotConfig = null;   // These will be loaded after
             LogConfig = null;   // the bot connects to Discord
-            Guilds = dbContext.GuildConfigs.ToConcurrentDictionary(x => x.GuildId);
+            Guilds = new();
             PlayingStatuses = dbContext.PlayingStatuses.ToList();
         }
 

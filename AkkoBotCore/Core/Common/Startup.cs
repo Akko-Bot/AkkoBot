@@ -83,10 +83,8 @@ namespace AkkoBot.Core.Common
         }
 
         // Saves default guild settings to the db and caches it
-        private async Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
-        {
-            await _db.GuildConfigs.TryCreateAsync(eventArgs.Guild);
-        }
+        private async Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs) 
+            => await _db.GuildConfigs.TryCreateAsync(eventArgs.Guild);
 
         // Remove a guild from the cache when the bot is removed from it.
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)

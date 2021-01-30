@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Repository
 {
