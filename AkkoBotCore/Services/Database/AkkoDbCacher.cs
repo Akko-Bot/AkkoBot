@@ -1,5 +1,7 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using ConcurrentCollections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ namespace AkkoBot.Services.Database
     {
         private bool _isDisposed = false;
 
-        public HashSet<ulong> Blacklist { get; private set; }
+        public ConcurrentHashSet<ulong> Blacklist { get; private set; }
         public BotConfigEntity BotConfig { get; set; }
         public LogConfigEntity LogConfig { get; set; }
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
@@ -22,10 +24,10 @@ namespace AkkoBot.Services.Database
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {
-            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToHashSet();
-            BotConfig = null;   // These will be loaded after
-            LogConfig = null;   // the bot connects to Discord
-            Guilds = new();
+            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
+            BotConfig = dbContext.BotConfig.FirstOrDefault();
+            LogConfig = dbContext.LogConfigs.FirstOrDefault();
+            Guilds = new(); // Guild configs will be loaded into the cache as needed.
             PlayingStatuses = dbContext.PlayingStatuses.ToList();
         }
 
@@ -58,7 +60,6 @@ namespace AkkoBot.Services.Database
                 if (isDisposing)
                 {
                     Blacklist.Clear();
-                    Blacklist.TrimExcess();
                     Guilds.Clear();
                     PlayingStatuses.Clear();
                     PlayingStatuses.TrimExcess();

@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 
@@ -7,13 +6,11 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class BotConfigRepo : DbRepository<BotConfigEntity>
     {
-        private readonly AkkoDbContext _db;
         private readonly IDbCacher _dbCacher;
         public BotConfigEntity Cache { get; private set; }
 
         public BotConfigRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
         {
-            _db = db;
             _dbCacher = dbCacher;
             Cache = dbCacher.BotConfig;
         }
@@ -23,16 +20,15 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="uid">ID of the bot.</param>
         /// <remarks>If an entry already exists for a given ID, it does nothing.</remarks>
-        /// <returns><see langword="true"/> if the entry got added to the database, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> TryCreateAsync()
+        /// <returns><see langword="true"/> if the entry got added to EF Core's tracker, <see langword="false"/> otherwise.</returns>
+        public bool TryCreate()
         {
-            Cache = (await base.GetAllAsync()).FirstOrDefault();
+            Cache = base.GetAllSync().FirstOrDefault();
 
-            if (Cache is null) // If it is empty
+            if (Cache is null)
             {
                 Cache = _dbCacher.BotConfig = new BotConfigEntity();
                 base.Create(Cache);
-                await _db.SaveChangesAsync();
 
                 return true;
             }

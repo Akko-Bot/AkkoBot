@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using AkkoBot.Command.Attributes;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Command.Abstractions
 {
@@ -13,9 +13,7 @@ namespace AkkoBot.Command.Abstractions
         {
             // Save or update the user who ran the command
             // This might be a scale bottleneck in the future
-            using var scope = context.CommandsNext.Services.CreateScope();
-            var db = scope.ServiceProvider.GetService<IUnitOfWork>();
-
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
             await db.DiscordUsers.CreateOrUpdateAsync(context.User);
         }
     }

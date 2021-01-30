@@ -58,7 +58,7 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Adds a playing status to the database and cache.
+        /// Creates a tracking entry for adding a playing status to the database.
         /// </summary>
         /// <param name="pStatus">Playing status to be added.</param>
         /// <returns></returns>
@@ -69,7 +69,7 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Removes a playing status from the database and the cache.
+        /// Creates a tracking entry for removing a playing status from the database
         /// </summary>
         /// <param name="pStatus"></param>
         /// <returns><see langword="true"/> if the entry got removed from the database, <see langword="false"/> otherwise.</returns>

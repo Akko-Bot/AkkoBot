@@ -53,6 +53,9 @@ cmd_guild_locale: Changes the language the bot should use in this server. Provid
 cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
+cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
+command: Command
+command_modules_footer: Use {0} to see the usage for a specific command.
 commands: Commands
 days: Days
 disabled: disabled
@@ -76,6 +79,7 @@ help_bot_owner: Bot Ownership
 help_change_nickname: Change Nickname
 help_create_invite: Create Invite
 help_deafen_members: Deafen Members
+help_footer: Use {0} to get help for a specific command.
 help_kick_members: Kick Members
 help_manage_channels: Manage Channels
 help_manage_emojis: Manage Emojis
@@ -98,6 +102,9 @@ hours: Hours
 id: Id
 locales_title: Available Languages
 minutes: Minutes
+module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
+modules_footer: Use {0} to see the commands under that module.
+modules_title: Available Modules
 name: Name
 online_since: Online since
 q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})

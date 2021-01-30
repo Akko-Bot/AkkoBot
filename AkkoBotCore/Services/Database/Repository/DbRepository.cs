@@ -75,21 +75,21 @@ namespace AkkoBot.Services.Database.Repository
             => await Table.ToListAsync();
 
         /// <summary>
-        /// Adds the entry specified in <paramref name="newEntity"/> to the database.
+        /// Adds a tracking entry specified in <paramref name="newEntity"/> to be added to the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntity">Entry to be added to the database.</param>
         public virtual void Create(T newEntity)
             => Table.Add(newEntity);
 
         /// <summary>
-        /// Adds the entries specified in the <paramref name="newEntities"/> in bulk to the database.
+        /// Adds the tracking entries specified in <paramref name="newEntities"/> to be added in bulk to the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         public virtual void CreateRange(params T[] newEntities)
             => Table.AddRange(newEntities);
 
         /// <summary>
-        /// Adds the entry specified in <paramref name="newEntity"/> to the database.
+        /// Adds a tracking entry specified in <paramref name="newEntity"/> to be added to the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntity">Entry to be added to the database.</param>
         /// <remarks>
@@ -100,7 +100,7 @@ namespace AkkoBot.Services.Database.Repository
             => await Table.AddAsync(newEntity);
 
         /// <summary>
-        /// Adds the entries specified in the <paramref name="newEntities"/> in bulk to the database.
+        /// Adds the tracking entries specified in <paramref name="newEntities"/> to be added in bulk to the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         /// <remarks>
@@ -111,28 +111,28 @@ namespace AkkoBot.Services.Database.Repository
             => await Table.AddRangeAsync(newEntities);
 
         /// <summary>
-        /// Updates a database entry with the entity specified in <paramref name="newEntity"/>.
+        /// Adds a tracking entry specified in <paramref name="newEntity"/> to be updated in the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntity">A database entry.</param>
         public virtual void Update(T newEntity)
             => Table.Update(newEntity);
 
         /// <summary>
-        /// Updates multiple database entries in bulk with the entities specified in <paramref name="newEntities"/>.
+        /// Adds the tracking entries specified in <paramref name="newEntities"/> to be updated in bulk to the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         public virtual void UpdateRange(params T[] newEntities)
             => Table.UpdateRange(newEntities);
 
         /// <summary>
-        /// Removes the entry specified in <paramref name="oldEntity"/> from the database.
+        /// Adds a tracking entry specified in <paramref name="oldEntity"/> to be removed from the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntities">A database entry.</param>
         public virtual void Delete(T oldEntity)
             => Table.Remove(oldEntity);
 
         /// <summary>
-        /// Removes multiple entries specified in <paramref name="oldEntity"/> from the database.
+        /// Adds the tracking entries specified in <paramref name="oldEntities"/> to be removed in bulk from the database once <see cref="DbContext.SaveChanges()"/> is called.
         /// </summary>
         /// <param name="newEntities">A collection of database entries.</param>
         public virtual void DeleteRange(params T[] oldEntities)

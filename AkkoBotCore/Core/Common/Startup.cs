@@ -44,10 +44,10 @@ namespace AkkoBot.Core.Common
             botCore.BotClient.GuildDeleted += DecacheGuildOnLeave;
 
             // Command logging
-            foreach (var handler in botCore.CommandExt.Values)
+            foreach (var cmdHandler in botCore.CommandExt.Values)
             {
-                handler.CommandExecuted += LogCmdExecution;
-                handler.CommandErrored += LogCmdError;
+                cmdHandler.CommandExecuted += LogCmdExecution;
+                cmdHandler.CommandErrored += LogCmdError;
             }
         }
 
@@ -55,11 +55,14 @@ namespace AkkoBot.Core.Common
         /* Event Methods */
 
         // Creates bot settings on startup, if there isn't one already
-        private async Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
+        private Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
             // If there is no BotConfig entry in the database, create one.
-            await _db.LogConfig.TryCreateAsync();
-            await _db.BotConfig.TryCreateAsync();
+            _db.LogConfig.TryCreate();
+            _db.BotConfig.TryCreate();
+            _db.SaveChanges();
+
+            return Task.CompletedTask;
         }
 
         // Saves guilds to the db on startup
@@ -83,8 +86,13 @@ namespace AkkoBot.Core.Common
         }
 
         // Saves default guild settings to the db and caches it
-        private async Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs) 
-            => await _db.GuildConfigs.TryCreateAsync(eventArgs.Guild);
+        private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
+        {
+            _db.GuildConfigs.TryCreate(eventArgs.Guild);
+            _db.SaveChanges();
+
+            return Task.CompletedTask;
+        }
 
         // Remove a guild from the cache when the bot is removed from it.
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)

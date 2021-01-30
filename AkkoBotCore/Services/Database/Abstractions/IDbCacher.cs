@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AkkoBot.Services.Database.Entities;
+using ConcurrentCollections;
 
 namespace AkkoBot.Services.Database.Abstractions
 {
@@ -10,7 +11,7 @@ namespace AkkoBot.Services.Database.Abstractions
     /// </summary>
     public interface IDbCacher : IDisposable
     {
-        HashSet<ulong> Blacklist { get; }
+        ConcurrentHashSet<ulong> Blacklist { get; }
         BotConfigEntity BotConfig { get; set; }
         LogConfigEntity LogConfig { get; set; }
         ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }

@@ -343,4 +343,5 @@ healthchecksdb
 
 # Akko specific files
 .Creds/
+.Cogs/
 credentials.yaml

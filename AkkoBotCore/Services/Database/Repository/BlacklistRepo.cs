@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ namespace AkkoBot.Services.Database.Repository
     public class BlacklistRepo : DbRepository<BlacklistEntity>
     {
         private readonly AkkoDbContext _db;
-        private readonly HashSet<ulong> _cache;
+        private readonly ConcurrentHashSet<ulong> _cache;
 
         public BlacklistRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
         {
@@ -66,7 +67,7 @@ namespace AkkoBot.Services.Database.Repository
                 return false;
 
             await _db.Database.ExecuteSqlRawAsync($"DELETE FROM blacklist WHERE context_id = {id};");
-            return _cache.Remove(id);
+            return _cache.TryRemove(id);
         }
 
         /// <summary>

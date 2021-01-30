@@ -1,3 +1,4 @@
+using ConcurrentCollections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,6 +22,22 @@ namespace AkkoBot.Extensions
 
             foreach (var value in collection)
                 result.TryAdd(keySelector(value), value);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Saves an <see cref="IEnumerable{T}"/> collection to a concurrent hashset.
+        /// </summary>
+        /// <typeparam name="T">Type of the values.</typeparam>
+        /// <param name="collection">This IEnumerable collection.</param>
+        /// <returns>A <see cref="ConcurrentHashSet{T}"/> collection.</returns>
+        public static ConcurrentHashSet<T> ToConcurrentHashSet<T>(this IEnumerable<T> collection)
+        {
+            var result = new ConcurrentHashSet<T>();
+
+            foreach (var value in collection)
+                result.Add(value);
 
             return result;
         }
