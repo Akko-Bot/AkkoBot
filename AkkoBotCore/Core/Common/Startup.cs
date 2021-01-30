@@ -114,7 +114,8 @@ namespace AkkoBot.Core.Common
             if (eventArgs.Exception
             is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
             and not ChecksFailedException       // Ignore command check fails
-            and not CommandNotFoundException)   // Ignore commands that do not exist
+            and not CommandNotFoundException    // Ignore commands that do not exist
+            and not InvalidOperationException)  // Ignore groups that are not commands themselves
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
 

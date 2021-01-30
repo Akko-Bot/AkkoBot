@@ -43,5 +43,8 @@ namespace AkkoBot.Extensions
 
             return buffer.ToString().ToLowerInvariant();
         }
+
+        public static string Capitalize(this string text) 
+            => char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
     }
 }

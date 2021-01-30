@@ -23,12 +23,10 @@ namespace AkkoBot.Command.Formatters
         private StringBuilder _helpCommandsField;
         private readonly CommandContext _cmdContext;
 
-        public HelpFormatter(CommandContext context) : base(context)
-        {
-            _cmdContext = context;
-        }
+        public HelpFormatter(CommandContext context) : base(context) 
+            => _cmdContext = context;
 
-        // This is called first
+        // This is called first, except if command is !help with no parameters
         public override BaseHelpFormatter WithCommand(DSharpPlus.CommandsNext.Command cmd)
         {
             // Set title
@@ -55,9 +53,6 @@ namespace AkkoBot.Command.Formatters
             if (cmd is CommandGroup)
                 return this;
 
-            // Get the prefix
-            using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var prefix = db.GuildConfigs.GetSync(_cmdContext.Guild.Id).Prefix;
 
             // Initialize string builder
             _helpExamplesField = new();
@@ -68,12 +63,12 @@ namespace AkkoBot.Command.Formatters
                 // If command takes no argument
                 if (overload.Arguments.Count == 0)
                 {
-                    _helpExamplesField.AppendLine(Formatter.InlineCode(prefix + cmd.QualifiedName) + "\n");
+                    _helpExamplesField.AppendLine(Formatter.InlineCode(_cmdContext.Prefix + cmd.QualifiedName) + "\n");
                     continue;
                 }
 
                 // Format full command name + <arguments>
-                _helpExamplesField.Append($"`{prefix}{cmd.QualifiedName}");
+                _helpExamplesField.Append($"`{_cmdContext.Prefix}{cmd.QualifiedName}");
 
                 foreach (var argument in overload.Arguments)
                 {
@@ -108,22 +103,20 @@ namespace AkkoBot.Command.Formatters
             {
                 // Get all parent command groups
                 var rootCmdGroups = _cmdContext.CommandsNext.RegisteredCommands.Values
-                    .Where(x => x is CommandGroup && !x.Aliases.Any(y => y.Contains(x.Name)))
-                    .DistinctBy(x => x.QualifiedName);
+                    .Where(cmd => cmd is CommandGroup && !cmd.Aliases.Any(alias => alias.Contains(cmd.Name)))
+                    .DistinctBy(cmd => cmd.QualifiedName);
 
                 // Add command groups
                 foreach (var cmdGroup in rootCmdGroups)
                     _helpCommandsField.Append(Formatter.InlineCode(cmdGroup.Name) + ", ");
 
                 // Add regular commands
-                foreach (var command in subcommands)
-                {
-                    if (command is not CommandGroup)
-                        _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
-                }
+                foreach (var command in subcommands.Where(cmd => cmd is not CommandGroup))
+                    _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
             }
             else
             {
+                // Add regular commands
                 foreach (var command in subcommands)
                     _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
             }
@@ -151,11 +144,21 @@ namespace AkkoBot.Command.Formatters
                     msg.AddField(_cmdContext.FormatLocalized("requires"), _helpRequiresField.ToString());
 
                 if (_helpCommandsField is not null)
-                    msg.AddField(_cmdContext.FormatLocalized("commands"), _helpCommandsField.ToString());
-
+                {
+                    msg.AddField(_cmdContext.FormatLocalized("commands"), _helpCommandsField.ToString())
+                        .WithFooter(
+                            _cmdContext.FormatLocalized(
+                            "help_footer",
+                            _cmdContext.Prefix + _cmdContext.Command.QualifiedName + " " + _cmdContext.RawArgumentString +
+                           " <" + _cmdContext.FormatLocalized("name").ToLowerInvariant() + ">"
+                            )
+                            .Replace("  ", " ")
+                        );
+                }
+                    
                 if (_helpExamplesField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
-
+                
                 return new CommandHelpMessage(null, msg);
             }
             else

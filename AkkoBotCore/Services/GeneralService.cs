@@ -1,6 +1,4 @@
-﻿using AkkoBot.Command.Abstractions;
-using DSharpPlus.CommandsNext;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +32,7 @@ namespace AkkoBot.Services
         /// contain commands that can be registered on CommandsNext.
         /// </remarks>
         /// <returns>A collection of assemblies.</returns>
-        public static IEnumerable<Assembly> LoadCogs()
+        public static IEnumerable<Assembly> GetCogs()
         {
             // Create directory if it doesn't exist already.
             if (!Directory.Exists(AkkoEnvironment.CogsDirectory))

@@ -83,7 +83,7 @@ namespace AkkoBot.Extensions
         {
             var seenKeys = new HashSet<T2>();
 
-            foreach (T1 element in collection)
+            foreach (var element in collection)
             {
                 if (seenKeys.Add(keySelector(element)))
                     yield return element;

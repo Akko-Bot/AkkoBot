@@ -76,11 +76,64 @@ namespace AkkoBot.Command.Modules.Basic
             await context.RespondLocalizedAsync(embed, false);
         }
 
-        //[Command("module"), Aliases("modules")]
-        //[Description("Shows modules.")]
-        //public async Task Modules(CommandContext context)
-        //{
-        //    var test = context.CommandsNext.RegisteredCommands.Values.Where(x => x is CommandGroup && !x.Aliases.Any(y => y.Contains(x.Name))).DistinctBy(x => x.QualifiedName);
-        //}
+        [Command("module"), Aliases("modules")]
+        [Description("cmd_modules")]
+        public async Task Modules(CommandContext context)
+        {
+            var namespaces = context.CommandsNext.RegisteredCommands.Values
+                .Where(cmd => !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))   // Remove library modules
+                .Select(cmd =>                                                          // Section the namespaces
+                {
+                    var nspaces = cmd.Module.ModuleType.FullName.Split('.');
+                    return nspaces[^Math.Min(2, nspaces.Length - 1)];
+                })               
+                .DistinctBy(nspace => nspace)                                           // Remove the repeated sections
+                .ToArray();
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("modules_title")
+                .WithDescription(string.Join("\n", namespaces))
+                .WithFooter(
+                    context.FormatLocalized(
+                        "modules_footer",
+                        context.Prefix + context.Command.QualifiedName + 
+                        " <" + context.FormatLocalized("name").ToLowerInvariant() + ">"
+                    )
+                );
+
+            await context.RespondLocalizedAsync(embed, false);
+        }
+
+        [Command("module")]
+        public async Task Modules(CommandContext context, string moduleName)
+        {
+            var cmdGroups = context.CommandsNext.RegisteredCommands.Values
+                .Where(cmd => cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase) && !cmd.Aliases.Any(alias => alias.Contains(cmd.Name)))
+                .Select(cmd => context.Prefix + cmd.QualifiedName)
+                .DistinctBy(cmdName => cmdName)
+                .ToArray();
+
+            var embed = new DiscordEmbedBuilder();
+
+            if (cmdGroups.Length == 0)
+            {
+                embed.WithDescription(context.FormatLocalized("module_not_exist", Formatter.InlineCode(context.Prefix + "modules")));
+                await context.RespondLocalizedAsync(embed, isError: true);
+            }
+            else
+            {
+                embed.WithTitle(moduleName.Capitalize())
+                    .WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroups)))
+                    .WithFooter(
+                        context.FormatLocalized(
+                            "command_modules_footer",
+                            context.Prefix + "help" +
+                            " <" + context.FormatLocalized("command").ToLowerInvariant() + ">"
+                        )
+                    );
+                
+                await context.RespondLocalizedAsync(embed, false);
+            }
+        }
     }
 }
