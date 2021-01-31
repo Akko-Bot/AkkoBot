@@ -17,7 +17,7 @@ namespace AkkoBot.Command.Modules.Self
 {
     [BotOwner]
     [RequireBotPermissions(Permissions.AddReactions)]
-    [Group("config"), Aliases("self")]
+    [Group("botconfig"), Aliases("self", "botcfg")]
     [Description("cmd_config")]
     public class BotConfig : AkkoCommandModule
     {

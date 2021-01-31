@@ -12,14 +12,14 @@ using DSharpPlus.Entities;
 
 namespace AkkoBot.Command.Modules.Administration
 {
-    [Group("server"), Aliases("guild")]
+    [Group("serverconfig"), Aliases("guildconfig", "servercfg", "guildcfg")]
     [Description("cmd_guild")]
     [RequireUserPermissions(Permissions.ManageGuild)]
     public class GuildConfig : AkkoCommandModule
     {
         private readonly GuildConfigService _service;
 
-        public GuildConfig(GuildConfigService service) 
+        public GuildConfig(GuildConfigService service)
             => _service = service;
 
         [Command("prefix")]
@@ -85,13 +85,18 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_guild_timeout")]
         public async Task ChangeTimeout(CommandContext context, [Description("arg_timeout")] uint? seconds = null)
         {
-            var result = _service.GetOrSetProperty(context, x => x.InteractiveTimeout = (seconds is null or < 10 or > 120) ? null : new TimeSpan(0, 0, (int)seconds));
+            var result = _service.GetOrSetProperty(
+                context,
+                settings => settings.InteractiveTimeout = (seconds is null or < 10 or > 120)
+                    ? null
+                    : new TimeSpan(0, 0, (int)seconds)
+                );
 
             var embed = new DiscordEmbedBuilder()
             {
                 Description = (result is null)
-                ? context.FormatLocalized("guild_timeout_reset")
-                : context.FormatLocalized("guild_timeout_changed", Formatter.InlineCode(result.Value.TotalSeconds.ToString()))
+                    ? context.FormatLocalized("guild_timeout_reset")
+                    : context.FormatLocalized("guild_timeout_changed", Formatter.InlineCode(result.Value.TotalSeconds.ToString()))
             };
 
             await context.RespondLocalizedAsync(embed);

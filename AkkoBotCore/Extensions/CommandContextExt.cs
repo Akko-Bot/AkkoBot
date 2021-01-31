@@ -110,7 +110,7 @@ namespace AkkoBot.Extensions
             var responseString = localizer.GetResponseString(settings.Locale, message); // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
 
-            if (isMarked && embed.Description is not null)   // Marks the message with the full name of the user who ran the command
+            if (isMarked && !string.IsNullOrWhiteSpace(embed.Description))   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             if (settings.UseEmbed) // Send the message
@@ -256,9 +256,9 @@ namespace AkkoBot.Extensions
         /// <returns>The localized response string. If it does not exist, returns <paramref name="sample"/>.</returns>
         private static string GetLocalizedResponse(ILocalizer localizer, string locale, string sample)
         {
-            return (localizer.ContainsResponse(locale, sample))
+            return (sample is not null && localizer.ContainsResponse(locale, sample))
                 ? localizer.GetResponseString(locale, sample)
-                : sample;
+                : sample ?? string.Empty;
         }
     }
 }
