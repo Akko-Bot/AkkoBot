@@ -8,6 +8,7 @@ using DSharpPlus.Entities;
 using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -86,7 +87,7 @@ namespace AkkoBot.Command.Modules.Basic
                 {
                     var nspaces = cmd.Module.ModuleType.FullName.Split('.');
                     return nspaces[^Math.Min(2, nspaces.Length - 1)];
-                })               
+                })
                 .DistinctBy(nspace => nspace)                                           // Remove the repeated sections
                 .ToArray();
 
@@ -107,15 +108,19 @@ namespace AkkoBot.Command.Modules.Basic
         [Command("module")]
         public async Task Modules(CommandContext context, string moduleName)
         {
-            var cmdGroups = context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase) && !cmd.Aliases.Any(alias => alias.Contains(cmd.Name)))
-                .Select(cmd => context.Prefix + cmd.QualifiedName)
-                .DistinctBy(cmdName => cmdName)
-                .ToArray();
+            var cmdGroup = await context.CommandsNext.RegisteredCommands.Values
+                .Where(cmd => cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
+                .DistinctBy(cmd => cmd.QualifiedName)
+                .Select(async cmd =>
+                {
+                    var emote = (await cmd.RunChecksAsync(context, false)).Any() ? "❌" : "✅";
+                    return $"{emote} {context.Prefix}{cmd.QualifiedName}";
+                })
+                .ToListAsync();
 
             var embed = new DiscordEmbedBuilder();
 
-            if (cmdGroups.Length == 0)
+            if (cmdGroup.Count == 0)
             {
                 embed.WithDescription(context.FormatLocalized("module_not_exist", Formatter.InlineCode(context.Prefix + "modules")));
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -123,7 +128,7 @@ namespace AkkoBot.Command.Modules.Basic
             else
             {
                 embed.WithTitle(moduleName.Capitalize())
-                    .WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroups)))
+                    .WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroup)))
                     .WithFooter(
                         context.FormatLocalized(
                             "command_modules_footer",

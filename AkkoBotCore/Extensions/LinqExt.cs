@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
 {
@@ -105,6 +106,42 @@ namespace AkkoBot.Extensions
                 if (seenKeys.Add(keySelector(element)))
                     yield return element;
             }
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on an asynchronous predicate.
+        /// </summary>
+        /// <param name="collection">This collection.</param>
+        /// <param name="predicate"></param>
+        /// <typeparam name="T">Data type contained in the collection.</typeparam>
+        /// <returns>An awaitable collection of <typeparamref name="T"/>.</returns>
+        public static async Task<IEnumerable<T>> Where<T>(this IEnumerable<T> collection, Func<T, Task<bool>> predicate)
+        {
+            var result = new List<T>();
+
+            foreach (var element in collection)
+            {
+                if (await predicate(element))
+                    result.Add(element);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts a collection of <see cref="Task{T}"/> into a <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="collection">This collection.</param>
+        /// <typeparam name="T">The data that needs to be awaited.</typeparam>
+        /// <returns>A <see cref="List{T}"/>.</returns>
+        public static async Task<List<T>> ToListAsync<T>(this IEnumerable<Task<T>> collection)
+        {
+            var result = new List<T>();
+
+            foreach (var element in collection)
+                result.Add(await element);
+
+            return result;
         }
     }
 }

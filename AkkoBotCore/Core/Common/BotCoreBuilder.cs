@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
+using AkkoBot.Command.Attributes;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;

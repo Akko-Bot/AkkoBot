@@ -23,7 +23,7 @@ namespace AkkoBot.Command.Formatters
         private StringBuilder _helpCommandsField;
         private readonly CommandContext _cmdContext;
 
-        public HelpFormatter(CommandContext context) : base(context) 
+        public HelpFormatter(CommandContext context) : base(context)
             => _cmdContext = context;
 
         // This is called first, except if command is !help with no parameters
@@ -52,7 +52,6 @@ namespace AkkoBot.Command.Formatters
             // If this is a group, there are no arguments to be shown
             if (cmd is CommandGroup)
                 return this;
-
 
             // Initialize string builder
             _helpExamplesField = new();
@@ -96,30 +95,33 @@ namespace AkkoBot.Command.Formatters
         // processed or current command is not a group, it won't be called
         public override BaseHelpFormatter WithSubcommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
         {
-            var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
+            // var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
             _helpCommandsField = new();
 
-            if (isHelpCmd)
-            {
-                // Get all parent command groups
-                var rootCmdGroups = _cmdContext.CommandsNext.RegisteredCommands.Values
-                    .Where(cmd => cmd is CommandGroup && !cmd.Aliases.Any(alias => alias.Contains(cmd.Name)))
-                    .DistinctBy(cmd => cmd.QualifiedName);
+            // if (isHelpCmd)
+            // {
+            //     // Get all parent command groups
+            //     var rootCmdGroups = _cmdContext.CommandsNext.RegisteredCommands.Values
+            //         .Where(cmd => cmd is CommandGroup)
+            //         ;//.DistinctBy(cmd => cmd.QualifiedName);
 
-                // Add command groups
-                foreach (var cmdGroup in rootCmdGroups)
-                    _helpCommandsField.Append(Formatter.InlineCode(cmdGroup.Name) + ", ");
+            //     // Add command groups
+            //     foreach (var cmdGroup in rootCmdGroups)
+            //         _helpCommandsField.Append(Formatter.InlineCode(cmdGroup.Name) + ", ");
 
-                // Add regular commands
-                foreach (var command in subcommands.Where(cmd => cmd is not CommandGroup))
+            //     // Add regular commands
+            //     foreach (var command in subcommands.Where(cmd => cmd is not CommandGroup))
+            //         _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
+            // }
+            // else
+            // {
+            //     // Add regular commands
+            //     foreach (var command in subcommands)
+            //         _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
+            // }
+
+            foreach (var command in subcommands)
                     _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
-            }
-            else
-            {
-                // Add regular commands
-                foreach (var command in subcommands)
-                    _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
-            }
 
             _helpCommandsField.Remove(_helpCommandsField.Length - 2, 2);
 

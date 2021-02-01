@@ -20,6 +20,7 @@ namespace AkkoBot.Services
                 .Where(types => abstraction.IsAssignableFrom(types) // Filter to find any type that can be assigned to the specified abstraction
                 && !types.IsInterface
                 && !types.IsAbstract
+                && !types.IsNested
                 && types.Namespace.Contains("AkkoBot")
             );
         }
