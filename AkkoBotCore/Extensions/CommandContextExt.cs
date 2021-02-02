@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -107,16 +108,60 @@ namespace AkkoBot.Extensions
                 ? db.BotConfig.GetAllSync().FirstOrDefault()
                 : db.GuildConfigs.GetGuild(context.Guild.Id);
 
-            var responseString = localizer.GetResponseString(settings.Locale, message); // Localize the content message, if there is one
+            var responseString = GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
 
-            if (isMarked && !string.IsNullOrWhiteSpace(embed.Description))   // Marks the message with the full name of the user who ran the command
+            if (isMarked && !string.IsNullOrWhiteSpace(embed?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
-            if (settings.UseEmbed) // Send the message
-                return await context.RespondAsync(responseString, false, localizedEmbed);
-            else
-                return await context.RespondAsync(responseString + "\n\n" + DeconstructEmbed(embed));
+            return settings.UseEmbed
+                ? await context.RespondAsync(responseString, false, localizedEmbed)
+                : await context.RespondAsync(responseString + "\n\n" + DeconstructEmbed(embed));
+        }
+
+        /// <summary>
+        /// Sends a localized direct message to the specified user.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="user">The user to receive the direct message.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
+        public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, DiscordEmbedBuilder embed, bool isError = false)
+            => await SendLocalizedDmAsync(context, user, embed, isError);
+
+        /// <summary>
+        /// Sends a localized direct message to the specified user.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="user">The user to receive the direct message.</param>
+        /// <param name="message">The message content.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
+        public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, string message, DiscordEmbedBuilder embed, bool isError = false)
+        {
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
+
+            // Get the message settings (guild or dm)
+            IMessageSettings settings = (context.Guild is null)
+                ? db.BotConfig.GetAllSync().FirstOrDefault()
+                : db.GuildConfigs.GetGuild(context.Guild.Id);
+
+            var responseString = GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
+            var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
+
+            try
+            {
+                return settings.UseEmbed
+                    ? await user.SendMessageAsync(responseString, false, localizedEmbed)
+                    : await user.SendMessageAsync(responseString + "\n\n" + DeconstructEmbed(embed));
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>

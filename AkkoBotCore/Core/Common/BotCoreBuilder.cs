@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
+using AkkoBot.Command.Formatters;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
@@ -316,7 +317,7 @@ namespace AkkoBot.Core.Common
                 EnableMentionPrefix = withMentionPrefix,                // Sets whether the bot accepts its own mention as a prefix for commands
                 IgnoreExtraArguments = false,                           // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                    // Sets the dependencies used by the command modules
-                EnableDefaultHelp = withHelp,                           // Sets whether the bot should use the default help command from the library
+                EnableDefaultHelp = false,                           // Sets whether the bot should use the default help command from the library
                 PrefixResolver = (msg) => pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
             };
 

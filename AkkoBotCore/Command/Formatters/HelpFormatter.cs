@@ -8,13 +8,11 @@ using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.CommandsNext.Converters;
-using DSharpPlus.CommandsNext.Entities;
 using DSharpPlus.Entities;
 
 namespace AkkoBot.Command.Formatters
 {
-    public class HelpFormatter : BaseHelpFormatter
+    public class HelpFormatter
     {
         private string _helpTitle;
         private string _helpDescription;
@@ -23,11 +21,13 @@ namespace AkkoBot.Command.Formatters
         private StringBuilder _helpCommandsField;
         private readonly CommandContext _cmdContext;
 
-        public HelpFormatter(CommandContext context) : base(context)
+        public bool IsErroed { get; private set; }
+
+        public HelpFormatter(CommandContext context)
             => _cmdContext = context;
 
         // This is called first, except if command is !help with no parameters
-        public override BaseHelpFormatter WithCommand(DSharpPlus.CommandsNext.Command cmd)
+        public HelpFormatter WithCommand(DSharpPlus.CommandsNext.Command cmd)
         {
             // Set title
             _helpTitle = GetHelpHeader(cmd);
@@ -80,7 +80,7 @@ namespace AkkoBot.Command.Formatters
                 foreach (var argument in overload.Arguments)
                 {
                     _helpExamplesField.AppendLine(
-                        $"{Formatter.InlineCode($"{argument.Name}")}: " +
+                        $"{Formatter.InlineCode(argument.Name)}: " +
                         _cmdContext.FormatLocalized(argument.Description ?? string.Empty)
                     );
                 }
@@ -93,7 +93,7 @@ namespace AkkoBot.Command.Formatters
 
         // This is called second, it sets the current group's subcommands. If no group is being
         // processed or current command is not a group, it won't be called
-        public override BaseHelpFormatter WithSubcommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
+        public HelpFormatter WithCommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
         {
             // var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
             _helpCommandsField = new();
@@ -130,17 +130,16 @@ namespace AkkoBot.Command.Formatters
 
         // This is called last.
         // It should produce the final message and return it
-        public override CommandHelpMessage Build()
+        public (string, DiscordEmbedBuilder) Build()
         {
             using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var guildSettings = db.GuildConfigs.GetSync(_cmdContext.Guild.Id);
+            var guildSettings = db.GuildConfigs.GetGuild(_cmdContext.Guild.Id);
 
             if (guildSettings.UseEmbed)
             {
                 var msg = new DiscordEmbedBuilder()
                     .WithTitle(_helpTitle)
-                    .WithDescription(_helpDescription)
-                    .WithColor(new DiscordColor(guildSettings.OkColor));
+                    .WithDescription(_helpDescription);
 
                 if (_helpRequiresField.Length != 0)
                     msg.AddField(_cmdContext.FormatLocalized("requires"), _helpRequiresField.ToString());
@@ -161,18 +160,26 @@ namespace AkkoBot.Command.Formatters
                 if (_helpExamplesField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
                 
-                return new CommandHelpMessage(null, msg);
+                return (null, msg);
             }
             else
             {
-                return new CommandHelpMessage(
+                return (
                     ((_helpTitle is not null) ? Formatter.Bold(_helpTitle) + "\n" : string.Empty) +
                     ((_helpDescription is not null) ? _helpDescription + "\n\n" : string.Empty) +
                     ((_helpRequiresField.Length != 0) ? Formatter.Bold(_cmdContext.FormatLocalized("requires")) + "\n" + _helpRequiresField.ToString() + "\n" : string.Empty) +
-                    ((_helpCommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("subcommands")) + "\n" + _helpCommandsField.ToString() + "\n" : string.Empty) +
-                    ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty)
+                    ((_helpCommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("commands")) + "\n" + _helpCommandsField.ToString() + "\n" : string.Empty) +
+                    ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty),
+                    null
                 );
             }
+        }
+
+        public HelpFormatter WithCmdNotFound()
+        {
+            IsErroed = true;
+            _helpDescription = _cmdContext.FormatLocalized("help_cmd_not_found");
+            return this;
         }
 
         private string GetHelpHeader(DSharpPlus.CommandsNext.Command cmd)
@@ -180,7 +187,7 @@ namespace AkkoBot.Command.Formatters
             return string.Join(
                 " / ",
                 cmd.Aliases
-                    .Select(x => Formatter.InlineCode(x))
+                    .Select(alias => Formatter.InlineCode(alias))
                     .Prepend(Formatter.InlineCode(cmd.Name))
                     .ToArray()
             );

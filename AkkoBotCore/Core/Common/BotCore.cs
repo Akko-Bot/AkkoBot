@@ -51,8 +51,6 @@ namespace AkkoBot.Core.Common
             // each one of them to the command handler of each shard.
             foreach (var cmdHandler in CommandExt.Values)
             {
-                cmdHandler.SetHelpFormatter<HelpFormatter>();
-
                 foreach (var cmdModule in modules)
                     cmdHandler.RegisterCommands(cmdModule);
 
