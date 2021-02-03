@@ -1,4 +1,5 @@
 using AkkoBot.Command.Abstractions;
+using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Formatters;
 using AkkoBot.Extensions;
 using DSharpPlus;
@@ -13,6 +14,7 @@ namespace AkkoBot.Command.Modules.Help
 {
     public class Help : AkkoCommandModule
     {
+        [HiddenOverload]
         [Command("help"), Aliases("h")]
         [Description("cmd_help")]
         public async Task HelpCommand(CommandContext context)
@@ -28,7 +30,7 @@ namespace AkkoBot.Command.Modules.Help
 
             // If no parameter, send the default help message
             if (command.Length == 0)
-                helpBuilder.WithCommands(baseCmds);
+                helpBuilder.WithSubcommands(baseCmds);
             else
             {
                 // Remove prefix from the command, if user typed it in
@@ -39,7 +41,7 @@ namespace AkkoBot.Command.Modules.Help
                 if (cmd is null)
                     helpBuilder.WithCmdNotFound();
                 else if (cmd is CommandGroup group)
-                    helpBuilder.WithCommand(cmd).WithCommands(group.Children);
+                    helpBuilder.WithCommand(cmd).WithSubcommands(group.Children);
                 else
                     helpBuilder.WithCommand(cmd);
             }
@@ -66,6 +68,7 @@ namespace AkkoBot.Command.Modules.Help
 
         [Command("module"), Aliases("modules", "cmds")]
         [Description("cmd_modules")]
+        [RequireBotPermissions(Permissions.SendMessages)]
         public async Task Modules(CommandContext context)
         {
             var namespaces = context.CommandsNext.RegisteredCommands.Values

@@ -123,3 +123,16 @@ uptime: Tempo Online
 usage: Uso
 user: Usuário
 value: Valor
+
+
+cmd_help: Exibe ajuda para o comand especificado ou a ajuda padrão se nenhum comando for especificado.
+arg_command: Um comand válido.
+cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
+arg_module: Um módulo válido.
+cmd_kick: Expulsa um usuário.
+arg_punishment_reason: O motivo da punição.
+cmd_sban: Expulsa um usuário e exclui suas mensagens.
+cmd_ban: Bane um usuário.
+cmd_unban: Desbane um usuário.
+arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
+help_optional: Opcional

@@ -51,11 +51,12 @@ namespace AkkoBot.Command.Modules.Administration
             await context.RespondLocalizedAsync(result, false);
         }
 
+        [HiddenOverload]
         [Command("softban"), Aliases("sb")]
         [Description("cmd_sban")]
         [RequireBotPermissions(Permissions.BanMembers)]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task SoftBan(CommandContext context, [HiddenOverload] DiscordMember user, string reason = null)
+        public async Task SoftBan(CommandContext context, DiscordMember user, string reason = null)
             => await SoftBan(context, user, null, reason);
 
         [Command("softban")]
@@ -95,10 +96,11 @@ namespace AkkoBot.Command.Modules.Administration
             await context.RespondLocalizedAsync(result, false);
         }
 
+        [HiddenOverload]
         [Command("ban"), Aliases("b")]
         [Description("cmd_ban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task Ban(CommandContext context, [HiddenOverload] DiscordMember user, string reason = null)
+        public async Task Ban(CommandContext context, DiscordMember user, string reason = null)
             => await Ban(context, user, null, reason);
 
         [Command("ban")]
@@ -135,8 +137,8 @@ namespace AkkoBot.Command.Modules.Administration
             await context.RespondLocalizedAsync(result, false);
         }
 
-        [Command("ban")]
-        public async Task HackBan(CommandContext context, [HiddenOverload] ulong userId, string reason = null)
+        [Command("ban"), HiddenOverload]
+        public async Task HackBan(CommandContext context, ulong userId, string reason = null)
         {
             // Ban the user
             await context.Guild.BanMemberAsync(userId, 1, context.Member.GetFullname() + " | " + reason);
@@ -156,7 +158,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("unban")]
         [Description("cmd_unban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task Unban(CommandContext context, ulong userId, string reason = null)
+        public async Task Unban(CommandContext context, [Description("arg_ulong_id")] ulong userId, [Description("arg_punishment_reason")] string reason = null)
         {
             // Get the user
             var user = (await context.Guild.GetBansAsync()).FirstOrDefault(u => u.User.Id == userId);

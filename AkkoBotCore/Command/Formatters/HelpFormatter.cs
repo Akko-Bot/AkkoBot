@@ -62,15 +62,17 @@ namespace AkkoBot.Command.Formatters
             if (cmd is CommandGroup)
                 return this;
 
-            // Initialize string builder
-            _helpExamplesField = new();
+            // Get the parameters of valid overloads
+            var reflectedParameters = GetOverloads(cmd).ToArray();
 
             // Format usage
             foreach (var overload in cmd.Overloads)
             {
-                // If overload is marked as hidden, ignore it
-                if (overload.Arguments.Any(args => args.CustomAttributes.Any(att => att is HiddenOverloadAttribute)))
+                if (!IsValidOverload(overload, reflectedParameters))
                     continue;
+
+                // Initialize string builder
+                _helpExamplesField ??= new();
 
                 // If command takes no argument
                 if (overload.Arguments.Count == 0)
@@ -114,7 +116,7 @@ namespace AkkoBot.Command.Formatters
         /// <param name="subcommands">The collection of subcommands.</param>
         /// <remarks>Only use this on a command that is a <see cref="CommandGroup"/>.</remarks>
         /// <returns>This HelpFormatter.</returns>
-        public HelpFormatter WithCommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
+        public HelpFormatter WithSubcommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
         {
             // var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
             _helpCommandsField = new();
@@ -235,21 +237,19 @@ namespace AkkoBot.Command.Formatters
         {
             return cmd.Module.ModuleType.GetMethods()
                 .Where(
-                    methods => methods.CustomAttributes.Any(
-                        attribute => attribute.ConstructorArguments.FirstOrDefault().Value as string == cmd.Name
+                    method => method.CustomAttributes.Any(
+                        attribute => (attribute.ConstructorArguments.FirstOrDefault().Value as string)
+                            ?.Equals(cmd.Name, StringComparison.InvariantCultureIgnoreCase) ?? false
                     )
                 )
-                .Select(
-                    method => method.CustomAttributes
-                        .Concat(cmd.Module.ModuleType.CustomAttributes)
-                        .Where(
-                            attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
-                            || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
-                            || attribute.AttributeType == typeof(RequirePermissionsAttribute)
-                        )
-                        .DistinctBy(attribute => attribute.ConstructorArguments.FirstOrDefault().Value)
+                .SelectMany(method => method.CustomAttributes)
+                .Concat(cmd.Module.ModuleType.CustomAttributes)
+                .Where(
+                    attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
+                        || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
+                        || attribute.AttributeType == typeof(RequirePermissionsAttribute)
                 )
-                .FirstOrDefault() ?? Enumerable.Empty<CustomAttributeData>();
+                .DistinctBy(x => x.ConstructorArguments.FirstOrDefault().Value);
         }
 
         /// <summary>
@@ -265,6 +265,66 @@ namespace AkkoBot.Command.Formatters
                     || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
                     || attribute.AttributeType == typeof(RequirePermissionsAttribute)
                 );
+        }
+
+        /// <summary>
+        /// Gets all reflected parameters of a given command.
+        /// </summary>
+        /// <param name="cmd">Command to extract the parameters from.</param>
+        /// <remarks>It filters out overloads marked as <see cref="HiddenAttribute"/> or <see cref="HiddenOverloadAttribute"/>.</remarks>
+        /// <returns>A collection of parameters where each array represents a valid command overload.</returns>
+        private IEnumerable<ParameterInfo[]> GetOverloads(DSharpPlus.CommandsNext.Command cmd)
+        {
+            return cmd.Module.ModuleType.GetMethods()
+                .Where(
+                    method => method.CustomAttributes.Any(
+                        attribute => (attribute.ConstructorArguments.FirstOrDefault().Value as string)
+                            ?.Equals(cmd.Name, StringComparison.InvariantCultureIgnoreCase) ?? false
+                    )
+                    && !method.CustomAttributes.Any(
+                        attribute => attribute.AttributeType == typeof(HiddenOverloadAttribute)
+                            || attribute.AttributeType == typeof(HiddenAttribute)
+                    )
+                )
+                .Select(method =>
+                {
+                    var result = method.GetParameters();
+
+                    return (result.Length == 1 && result.First().ParameterType == typeof(CommandContext))
+                        ? Array.Empty<ParameterInfo>()
+                        : result.Where(param => param.ParameterType != typeof(CommandContext)).ToArray();
+                });
+        }
+
+        /// <summary>
+        /// Checks whether a certain command overload is present in a collection of reflected parameters.
+        /// </summary>
+        /// <param name="overload">Command overload to check for.</param>
+        /// <param name="methodParameters">The collection of reflected parameters.</param>
+        /// <remarks>Each array in the collection represents a method.</remarks>
+        /// <returns><see langword="true"/> if the overload is present in the collection, <see langword="false"/> otherwise.</returns>
+        private bool IsValidOverload(CommandOverload overload, IEnumerable<ParameterInfo[]> methodParameters)
+        {
+            var matches = 0;
+
+            foreach (var parameters in methodParameters)
+            {
+                // If command and reflected method have no parameters, return true
+                if (parameters.Length == 0 && overload.Arguments.Count == 0)
+                    return true;
+
+                foreach (var param in parameters)
+                {
+                    foreach (var ovArg in overload.Arguments)
+                    {
+                        if (ovArg.Name.Equals(param.Name) && ovArg.Type == param.ParameterType && ++matches == parameters.Length)
+                            return true; // Overload is valid
+                    }
+                }
+            }
+
+            // Overload didn't match all reflected parameters
+            return false;
         }
     }
 }

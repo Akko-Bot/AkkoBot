@@ -13,7 +13,7 @@ using DSharpPlus.Entities;
 
 namespace AkkoBot.Command.Modules.Self
 {
-    [BotOwnerAttribute]
+    [BotOwner]
     [Group("blacklist"), Aliases("bl")]
     [Description("cmd_blacklist")]
     public sealed class Blacklist : AkkoCommandModule

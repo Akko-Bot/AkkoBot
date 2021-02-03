@@ -5,7 +5,7 @@ arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_user: ID or mention to a Discord user.
 arg_double: A real number.
 arg_locale: The language to be used in the responses.
-arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning_, __Critical__ and __None__.'
+arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
 arg_prefix: The new prefix.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
@@ -127,12 +127,12 @@ value: Value
 
 
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
-arg_command: A valid command
+arg_command: A valid command.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
 arg_module: A valid module.
 cmd_kick: Kicks a user.
-arg_punishment_reason: The reason for the punishment
-cmd_sban: Kicks and deletes the user's messages in the last 24 hours.
+arg_punishment_reason: The reason for the punishment.
+cmd_sban: Kicks a user and deletes their messages.
 cmd_ban: Bans a user.
 cmd_unban: Unbans a user.
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.

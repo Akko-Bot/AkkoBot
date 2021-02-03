@@ -9,6 +9,7 @@ using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Collections.Generic;
+using AkkoBot.Command.Attributes;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -32,6 +33,28 @@ namespace AkkoBot.Command.Modules.Basic
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("ping"), HiddenOverload]
+        [Description("Gets the websocket latency for this bot.")]
+        public async Task Ping(CommandContext context, string test = null)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription($"{context.Client.Ping} ms");
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("ping")]
+        [Description("Gets the websocket latency for this bot.")]
+        public async Task Ping(CommandContext context, string test = null, string test2 = null)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription($"{context.Client.Ping} ms");
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+
+        [BotOwner]
         [Command("die"), Aliases("shutdown")]
         [Description("Shuts the bot down.")]
         public async Task Die(CommandContext context)
@@ -75,22 +98,6 @@ namespace AkkoBot.Command.Modules.Basic
                 );
 
             await context.RespondLocalizedAsync(embed, false);
-        }
-
-        [Command("time")]
-        public async Task Time(CommandContext context, int num = 1, TimeSpan time = default, string reason = null)
-        {
-            await context.RespondAsync(
-                $"Days: {time.Days}\n" +
-                $"Hours: {time.Hours}\n" +
-                $"Minutes: {time.Minutes}\n" +
-                $"Seconds: {time.Seconds}\n\n" +
-                $"Total Days: {time.TotalDays}\n" +
-                $"Total Hours: {time.TotalHours}\n" +
-                $"Total Minutes: {time.TotalMinutes}\n" +
-                $"Total Seconds: {time.TotalSeconds}\n\n" +
-                $"Reason: {reason} - {num}"
-            );
         }
     }
 }

@@ -3,8 +3,8 @@ using System;
 namespace AkkoBot.Command.Attributes
 {
     /// <summary>
-    /// Marks this command overload as hidden.
+    /// Hides this command overload from the help command.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public sealed class HiddenOverloadAttribute : Attribute { }
 }
