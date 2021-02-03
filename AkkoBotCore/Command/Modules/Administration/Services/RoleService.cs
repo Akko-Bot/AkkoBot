@@ -13,11 +13,11 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// </summary>
         /// <param name="context">This command context.</param>
         /// <param name="user">The targeted user.</param>
-        /// <param name="errorMessage">The error message to be sent.</param>
+        /// <param name="errorMessage">The error message to be sent if the check fails.</param>
         /// <returns><see langword="true"/> if the context user is above in the hierarchy, <see langword="false"/> otherwise.</returns>
         public async Task<bool> CheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
         {
-            if (context.Member.Hierarchy <= user.Hierarchy || context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
+            if (context.Member.Hierarchy <= user.Hierarchy && context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription(errorMessage);

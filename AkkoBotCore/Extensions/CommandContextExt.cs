@@ -128,7 +128,30 @@ namespace AkkoBot.Extensions
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
         public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, DiscordEmbedBuilder embed, bool isError = false)
-            => await SendLocalizedDmAsync(context, user, embed, isError);
+            => await SendLocalizedDmAsync(context, user, null, embed, isError);
+
+        /// <summary>
+        /// Sends a localized direct message to the specified user.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="userId">Discord ID of the user.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
+        public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, ulong userId, DiscordEmbedBuilder embed, bool isError = false)
+            => await SendLocalizedDmAsync(context, await context.Guild.GetMemberAsync(userId), null, embed, isError);
+
+        /// <summary>
+        /// Sends a localized direct message to the specified user.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="userId">Discord ID of the user.</param>
+        /// <param name="message">The message content.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
+        public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, ulong userId, string message, DiscordEmbedBuilder embed, bool isError = false)
+            => await SendLocalizedDmAsync(context, await context.Guild.GetMemberAsync(userId), message, embed, isError);
 
         /// <summary>
         /// Sends a localized direct message to the specified user.

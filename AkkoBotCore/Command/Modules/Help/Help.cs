@@ -15,16 +15,25 @@ namespace AkkoBot.Command.Modules.Help
     {
         [Command("help"), Aliases("h")]
         [Description("cmd_help")]
+        public async Task HelpCommand(CommandContext context)
+            => await HelpCommand(context, Array.Empty<string>());
+
+
+        [Command("help")]
         public async Task HelpCommand(CommandContext context, [Description("arg_command")] params string[] command)
         {
+            // Might consider removing this line if I ever decide to change the default help command
             var baseCmds = context.CommandsNext.RegisteredCommands.Values.Where(cmd => !cmd.IsHidden).Distinct();
             var helpBuilder = new HelpFormatter(context);
 
             // If no parameter, send the default help message
             if (command.Length == 0)
-                helpBuilder.WithCommands(baseCmds).Build();
+                helpBuilder.WithCommands(baseCmds);
             else
             {
+                // Remove prefix from the command, if user typed it in
+                command[0] = command[0].Replace(context.Prefix, string.Empty);
+
                 var cmd = context.CommandsNext.FindCommand(string.Join(" ", command), out _);
 
                 if (cmd is null)
@@ -48,7 +57,8 @@ namespace AkkoBot.Command.Modules.Help
                 // Might consider placing a global ratelimit on !help because of this
                 await context.SendLocalizedDmAsync(
                     context.Member,
-                    new DiscordEmbedBuilder().WithDescription("help_cant_dm"),
+                    "⚠️" + Formatter.Bold(context.FormatLocalized("help_cant_dm")) + "\n\n" + content,
+                    embed,
                     true
                 );
             }
@@ -59,7 +69,7 @@ namespace AkkoBot.Command.Modules.Help
         public async Task Modules(CommandContext context)
         {
             var namespaces = context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))   // Remove library modules
+                .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))   // Remove library modules
                 .Select(cmd =>                                                          // Section the namespaces
                 {
                     var nspaces = cmd.Module.ModuleType.FullName.Split('.');
@@ -86,7 +96,7 @@ namespace AkkoBot.Command.Modules.Help
         public async Task Modules(CommandContext context, [Description("arg_module")] string moduleName)
         {
             var cmdGroup = await context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
                 .Distinct()
                 .Select(async cmd =>
                 {

@@ -76,5 +76,21 @@ namespace AkkoBot.Command.Modules.Basic
 
             await context.RespondLocalizedAsync(embed, false);
         }
+
+        [Command("time")]
+        public async Task Time(CommandContext context, int num = 1, TimeSpan time = default, string reason = null)
+        {
+            await context.RespondAsync(
+                $"Days: {time.Days}\n" +
+                $"Hours: {time.Hours}\n" +
+                $"Minutes: {time.Minutes}\n" +
+                $"Seconds: {time.Seconds}\n\n" +
+                $"Total Days: {time.TotalDays}\n" +
+                $"Total Hours: {time.TotalHours}\n" +
+                $"Total Minutes: {time.TotalMinutes}\n" +
+                $"Total Seconds: {time.TotalSeconds}\n\n" +
+                $"Reason: {reason} - {num}"
+            );
+        }
     }
 }

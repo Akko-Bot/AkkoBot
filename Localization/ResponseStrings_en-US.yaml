@@ -123,3 +123,17 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
+
+
+
+cmd_help: Shows help for the specified command or the default help message if no command is specified.
+arg_command: A valid command
+cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
+arg_module: A valid module.
+cmd_kick: Kicks a user.
+arg_punishment_reason: The reason for the punishment
+cmd_sban: Kicks and deletes the user's messages in the last 24 hours.
+cmd_ban: Bans a user.
+cmd_unban: Unbans a user.
+arg_ban_deletion: How many days to remove messages from. Default is __1d__.
+help_optional: Optional

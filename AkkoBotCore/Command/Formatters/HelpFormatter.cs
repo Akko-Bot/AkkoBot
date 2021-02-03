@@ -1,3 +1,4 @@
+using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,11 @@ namespace AkkoBot.Command.Formatters
         public HelpFormatter(CommandContext context)
             => _cmdContext = context;
 
-        // This is called first, except if command is !help with no parameters
+        /// <summary>
+        /// Adds a command to the help message.
+        /// </summary>
+        /// <param name="cmd">Command to provide help for.</param>
+        /// <returns>This HelpFormatter.</returns>
         public HelpFormatter WithCommand(DSharpPlus.CommandsNext.Command cmd)
         {
             // Set title
@@ -36,13 +41,17 @@ namespace AkkoBot.Command.Formatters
             _helpDescription = _cmdContext.FormatLocalized(cmd.Description);
 
             // Add requirements
-            foreach (var att in cmd.Module.ModuleType.CustomAttributes)
+            var requirements = (cmd is CommandGroup)
+                ? GetCmdGroupRequirements(cmd)
+                : GetCmdRequirements(cmd);
+
+            foreach (var att in requirements.OrderBy(x => x.AttributeType.Name))
             {
                 if (att.AttributeType == typeof(BotOwnerAttribute))
                 {
                     _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_bot_owner"));
                 }
-                else if (att.AttributeType == typeof(RequireBotPermissionsAttribute))
+                else
                 {
                     Enum.TryParse(typeof(Permissions), att.ConstructorArguments.FirstOrDefault().Value.ToString(), true, out var result);
                     _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_" + result.ToString().ToSnakeCase()));
@@ -59,6 +68,10 @@ namespace AkkoBot.Command.Formatters
             // Format usage
             foreach (var overload in cmd.Overloads)
             {
+                // If overload is marked as hidden, ignore it
+                if (overload.Arguments.Any(args => args.CustomAttributes.Any(att => att is HiddenOverloadAttribute)))
+                    continue;
+
                 // If command takes no argument
                 if (overload.Arguments.Count == 0)
                 {
@@ -79,8 +92,12 @@ namespace AkkoBot.Command.Formatters
                 // Format argument descriptions
                 foreach (var argument in overload.Arguments)
                 {
+                    var optional = (argument.IsOptional)
+                        ? $"({_cmdContext.FormatLocalized("help_optional")})"
+                        : string.Empty;
+
                     _helpExamplesField.AppendLine(
-                        $"{Formatter.InlineCode(argument.Name)}: " +
+                        $"{Formatter.InlineCode(argument.Name)}: {optional} " +
                         _cmdContext.FormatLocalized(argument.Description ?? string.Empty)
                     );
                 }
@@ -91,8 +108,12 @@ namespace AkkoBot.Command.Formatters
             return this;
         }
 
-        // This is called second, it sets the current group's subcommands. If no group is being
-        // processed or current command is not a group, it won't be called
+        /// <summary>
+        /// Adds subcommands associated with a specified command
+        /// </summary>
+        /// <param name="subcommands">The collection of subcommands.</param>
+        /// <remarks>Only use this on a command that is a <see cref="CommandGroup"/>.</remarks>
+        /// <returns>This HelpFormatter.</returns>
         public HelpFormatter WithCommands(IEnumerable<DSharpPlus.CommandsNext.Command> subcommands)
         {
             // var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
@@ -128,8 +149,22 @@ namespace AkkoBot.Command.Formatters
             return this;
         }
 
-        // This is called last.
-        // It should produce the final message and return it
+        /// <summary>
+        /// Returns an error message.
+        /// </summary>
+        /// <returns>This HelpFormatter.</returns>
+        public HelpFormatter WithCmdNotFound()
+        {
+            IsErroed = true;
+            _helpDescription = _cmdContext.FormatLocalized("help_cmd_not_found");
+            return this;
+        }
+
+        /// <summary>
+        /// Builds the help message.
+        /// </summary>
+        /// <remarks>The string will be <see langword="null"/> if the embed is not <see langword="null"/> and vice-versa.</remarks>
+        /// <returns>The result help message.</returns>
         public (string, DiscordEmbedBuilder) Build()
         {
             using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
@@ -175,13 +210,11 @@ namespace AkkoBot.Command.Formatters
             }
         }
 
-        public HelpFormatter WithCmdNotFound()
-        {
-            IsErroed = true;
-            _helpDescription = _cmdContext.FormatLocalized("help_cmd_not_found");
-            return this;
-        }
-
+        /// <summary>
+        /// Gets the title of the help message.
+        /// </summary>
+        /// <param name="cmd">A command.</param>
+        /// <returns>A string with command and aliases separated by a slash.</returns>
         private string GetHelpHeader(DSharpPlus.CommandsNext.Command cmd)
         {
             return string.Join(
@@ -191,6 +224,47 @@ namespace AkkoBot.Command.Formatters
                     .Prepend(Formatter.InlineCode(cmd.Name))
                     .ToArray()
             );
+        }
+
+        /// <summary>
+        /// Gets the requirements from a command.
+        /// </summary>
+        /// <param name="cmd">The command to get the requirements from.</param>
+        /// <returns>A list of attributes with the requirements.</returns>
+        private IEnumerable<CustomAttributeData> GetCmdRequirements(DSharpPlus.CommandsNext.Command cmd)
+        {
+            return cmd.Module.ModuleType.GetMethods()
+                .Where(
+                    methods => methods.CustomAttributes.Any(
+                        attribute => attribute.ConstructorArguments.FirstOrDefault().Value as string == cmd.Name
+                    )
+                )
+                .Select(
+                    method => method.CustomAttributes
+                        .Concat(cmd.Module.ModuleType.CustomAttributes)
+                        .Where(
+                            attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
+                            || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
+                            || attribute.AttributeType == typeof(RequirePermissionsAttribute)
+                        )
+                        .DistinctBy(attribute => attribute.ConstructorArguments.FirstOrDefault().Value)
+                )
+                .FirstOrDefault() ?? Enumerable.Empty<CustomAttributeData>();
+        }
+
+        /// <summary>
+        /// Gets the requirements from a command group.
+        /// </summary>
+        /// <param name="cmd">The command to get the requirements from.</param>
+        /// <returns>A list of attributes with the requirements.</returns>
+        private IEnumerable<CustomAttributeData> GetCmdGroupRequirements(DSharpPlus.CommandsNext.Command cmd)
+        {
+            return cmd.Module.ModuleType.CustomAttributes
+                .Where(
+                    attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
+                    || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
+                    || attribute.AttributeType == typeof(RequirePermissionsAttribute)
+                );
         }
     }
 }
