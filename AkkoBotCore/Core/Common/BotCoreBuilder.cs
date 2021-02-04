@@ -276,8 +276,7 @@ namespace AkkoBot.Core.Common
                 (long)botSettings.InteractiveTimeout.Value.TotalSeconds,
                 botSettings.CaseSensitiveCommands,
                 botSettings.RespondToDms,
-                botSettings.MentionPrefix,
-                botSettings.EnableHelp
+                botSettings.MentionPrefix
             );
         }
 
@@ -287,10 +286,9 @@ namespace AkkoBot.Core.Common
         /// <param name="isCaseSensitive">Sets whether the bot ignores case sensitivity on commands or not.</param>
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
-        /// <param name="withHelp">Sets whether help commands are enabled or not.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
         /// <exception cref="NullReferenceException"/>
-        public async Task<BotCore> BuildAsync(long? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true, bool withHelp = true)
+        public async Task<BotCore> BuildAsync(long? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
             if (_creds is null)
                 throw new NullReferenceException("No 'Credentials' object was provided.");

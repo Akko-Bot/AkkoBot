@@ -7,8 +7,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Collections.Generic;
 using AkkoBot.Command.Attributes;
 
 namespace AkkoBot.Command.Modules.Basic
@@ -32,27 +30,6 @@ namespace AkkoBot.Command.Modules.Basic
 
             await context.RespondLocalizedAsync(embed);
         }
-
-        [Command("ping"), HiddenOverload]
-        [Description("Gets the websocket latency for this bot.")]
-        public async Task Ping(CommandContext context, string test = null)
-        {
-            var embed = new DiscordEmbedBuilder()
-                .WithDescription($"{context.Client.Ping} ms");
-
-            await context.RespondLocalizedAsync(embed);
-        }
-
-        [Command("ping")]
-        [Description("Gets the websocket latency for this bot.")]
-        public async Task Ping(CommandContext context, string test = null, string test2 = null)
-        {
-            var embed = new DiscordEmbedBuilder()
-                .WithDescription($"{context.Client.Ping} ms");
-
-            await context.RespondLocalizedAsync(embed);
-        }
-
 
         [BotOwner]
         [Command("die"), Aliases("shutdown")]

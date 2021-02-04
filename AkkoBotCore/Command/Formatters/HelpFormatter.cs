@@ -281,10 +281,7 @@ namespace AkkoBot.Command.Formatters
                         attribute => (attribute.ConstructorArguments.FirstOrDefault().Value as string)
                             ?.Equals(cmd.Name, StringComparison.InvariantCultureIgnoreCase) ?? false
                     )
-                    && !method.CustomAttributes.Any(
-                        attribute => attribute.AttributeType == typeof(HiddenOverloadAttribute)
-                            || attribute.AttributeType == typeof(HiddenAttribute)
-                    )
+                    && !method.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(HiddenOverloadAttribute))
                 )
                 .Select(method =>
                 {
