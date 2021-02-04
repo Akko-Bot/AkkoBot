@@ -151,3 +151,7 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
+
+bl_added_range: '{0} IDs were added to the blacklist.'
+arg_ulong_id_col: Multiple valid Discord IDs.
+bl_removed_range: '{0} IDs were removed from the blacklist.'

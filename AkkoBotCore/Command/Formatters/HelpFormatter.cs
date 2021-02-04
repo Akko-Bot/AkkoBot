@@ -66,7 +66,7 @@ namespace AkkoBot.Command.Formatters
             var reflectedParameters = GetOverloads(cmd).ToArray();
 
             // Format usage
-            foreach (var overload in cmd.Overloads)
+            foreach (var overload in cmd.Overloads.OrderBy(x => x.Arguments.Count))
             {
                 if (!IsValidOverload(overload, reflectedParameters))
                     continue;
@@ -314,7 +314,9 @@ namespace AkkoBot.Command.Formatters
                 {
                     foreach (var ovArg in overload.Arguments)
                     {
-                        if (ovArg.Name.Equals(param.Name) && ovArg.Type == param.ParameterType && ++matches == parameters.Length)
+                        if (ovArg.Name.Equals(param.Name) 
+                            && (param.ParameterType.BaseType == typeof(Array) || ovArg.Type == param.ParameterType) // This is needed for variable arrays
+                            && ++matches == parameters.Length)
                             return true; // Overload is valid
                     }
                 }

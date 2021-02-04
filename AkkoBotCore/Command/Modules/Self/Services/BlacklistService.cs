@@ -41,6 +41,53 @@ namespace AkkoBot.Command.Modules.Self.Services
         }
 
         /// <summary>
+        /// Adds multiple blacklist entries to the database.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="ids">IDs to be added.</param>
+        /// <remarks>The entries will be added as <see cref="BlacklistType.Unspecified"/>.</remarks>
+        /// <returns>The amount of entries that have been added to the database.</returns>
+        public int AddRange(CommandContext context, ulong[] ids)
+        {
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+
+            var entries = ids.Distinct().Select(id => new BlacklistEntity()
+            {
+                ContextId = id,
+                Type = BlacklistType.Unspecified,
+                Name = null
+            });
+
+            var result = db.Blacklist.TryCreateRange(entries);
+            db.SaveChanges();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Removes multiple blacklist entries from the database.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="ids">IDs to be removed.</param>
+        /// <returns>The amount of entries that have been removed to the database.</returns>
+        public int RemoveRange(CommandContext context, ulong[] ids)
+        {
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+
+            var entries = ids.Distinct().Select(id => new BlacklistEntity()
+            {
+                ContextId = id,
+                Type = BlacklistType.Unspecified,
+                Name = null
+            });
+
+            var result = db.Blacklist.TryRemoveRange(entries);
+            db.SaveChanges();
+
+            return result;
+        }
+
+        /// <summary>
         /// Tries to remove a blacklist entry from the database, if it exists.
         /// </summary>
         /// <param name="context">The command context.</param>

@@ -64,6 +64,17 @@ namespace AkkoBot.Command.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("add")]
+        public async Task MassBlacklist(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
+        {
+            var amount = _service.AddRange(context, ids);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("bl_added_range", amount));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [Command("remove"), Aliases("rem")]
         [Description("cmd_blacklist_rem")]
         public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
@@ -85,6 +96,17 @@ namespace AkkoBot.Command.Modules.Self
                         Formatter.InlineCode(id.ToString())    // ID
                     )
                 );
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("remove")]
+        public async Task MassRemove(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
+        {
+            var amount = _service.RemoveRange(context, ids);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("bl_removed_range", amount));
 
             await context.RespondLocalizedAsync(embed);
         }

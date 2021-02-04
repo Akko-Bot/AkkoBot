@@ -143,5 +143,47 @@ namespace AkkoBot.Extensions
 
             return result;
         }
+
+        /// <summary>
+        /// Gets the symmetric difference between two collections based on the key defined by <paramref name="keySelector"/>.
+        /// </summary>
+        /// <param name="collection">This collection.</param>
+        /// <param name="secondCollection">The second collection to compare with.</param>
+        /// <param name="keySelector">A method that defines the property to filter by.</param>
+        /// <typeparam name="T1">Data type contained in the collection.</typeparam>
+        /// <typeparam name="T2">Data type of the property to be selected.</typeparam>
+        /// <returns>A collection of <typeparamref name="T1"/> with the symmetric difference between this <paramref name="collection"/> and <paramref name="secondCollection"/>.</returns>
+        public static IEnumerable<T1> ExceptBy<T1, T2>(this IEnumerable<T1> collection, IEnumerable<T1> secondCollection, Func<T1, T2> keySelector)
+        {
+            var seenKeys = new HashSet<T2>(collection.Select(x => keySelector(x)));
+
+            foreach (var element in secondCollection)
+            {
+                if (!seenKeys.Remove(keySelector(element)))
+                    yield return element;
+            }
+        }
+
+        /// <summary>
+        /// Gets all elements present in this <paramref name="collection"/> and <paramref name="secondCollection"/>
+        /// that share the same property defined by <paramref name="keySelector"/>.
+        /// </summary>
+        /// <param name="collection">This collection.</param>
+        /// <param name="secondCollection">The collection to be intersected with.</param>
+        /// <param name="keySelector">A method that defines the property to filter by.</param>
+        /// <typeparam name="T1">Data type contained in the collection.</typeparam>
+        /// <typeparam name="T2">Data type of the property to be selected.</typeparam>
+        /// <returns>A collection of intersected <typeparamref name="T1"/> objects.</returns>
+        public static IEnumerable<T1> IntersectBy<T1, T2>(this IEnumerable<T1> collection, IEnumerable<T1> secondCollection, Func<T1, T2> keySelector)
+        {
+            var seenKeys = new HashSet<T2>(collection.Select(x => keySelector(x)));
+            seenKeys.IntersectWith(secondCollection.Select(x => keySelector(x)));
+
+            foreach (var element in collection.Concat(secondCollection).DistinctBy(x => keySelector(x)))
+            {
+                if (seenKeys.Contains(keySelector(element)))
+                    yield return element;
+            }
+        }
     }
 }

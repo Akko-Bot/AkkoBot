@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using ConcurrentCollections;
@@ -37,6 +39,44 @@ namespace AkkoBot.Services.Database.Repository
             return _cache.Contains(context.User.Id)
                 || _cache.Contains(context.Channel.Id)
                 || _cache.Contains(context.Guild?.Id ?? default); // This will cause dms to always fail if 0 is in the blacklist.
+        }
+
+        /// <summary>
+        /// Tracks multiple blacklist entries to be added to the database and adds them to the cache.
+        /// </summary>
+        /// <param name="entries">A collection of blacklist entries.</param>
+        /// <returns>The amount of entries that have been added.</returns>
+        public int TryCreateRange(IEnumerable<BlacklistEntity> entries)
+        {
+            foreach (var entry in entries)
+                _cache.Add(entry.ContextId);
+
+            var uniqueEntries = base.GetAllSync()
+                .ExceptBy(entries, x => x.ContextId)
+                .ToArray();
+
+            base.CreateRange(uniqueEntries);
+
+            return uniqueEntries.Length;
+        }
+
+        /// <summary>
+        /// Tracks multiple blacklist entries to be removed from the database and removes them from the cache.
+        /// </summary>
+        /// <param name="entries">A collection of blacklist entries.</param>
+        /// <returns>The amount of entries that have been removed.</returns>
+        public int TryRemoveRange(IEnumerable<BlacklistEntity> entries)
+        {
+            foreach (var entry in entries)
+                _cache.TryRemove(entry.ContextId);
+
+            var presentEntries = base.GetAllSync()
+                .IntersectBy(entries, x => x.ContextId)
+                .ToArray();
+
+            base.DeleteRange(presentEntries);
+
+            return presentEntries.Length;
         }
 
         /// <summary>
