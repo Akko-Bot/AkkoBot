@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,17 +38,6 @@ namespace AkkoBot.Extensions
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
             => await RespondInteractiveAsync(context, null, embed, expectedResponse, action, isMarked, isError);
-
-        /// <summary>
-        /// Gets the guild prefix of the current context.
-        /// </summary>
-        /// <param name="context">This command context.</param>
-        /// <returns>The prefix used in the guild.</returns>
-        public static string GetGuildPrefix(this CommandContext context)
-        {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
-            return db.GuildConfigs.GetGuild(context.Guild.Id).Prefix;
-        }
 
         /// <summary>
         /// Sends a localized interactive message to the context that triggered the command and executes a follow-up task.
@@ -225,7 +213,7 @@ namespace AkkoBot.Extensions
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <remarks>It ignores strings that don't match any key for a response string.</remarks>
         /// <returns>The localized embed or <see langword="null"/> if the embed is null.</returns>
-        private static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, IMessageSettings settings, DiscordEmbedBuilder embed, bool isError = false)
+        internal static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, IMessageSettings settings, DiscordEmbedBuilder embed, bool isError = false)
         {
             if (embed is null)
                 return null;
@@ -263,7 +251,7 @@ namespace AkkoBot.Extensions
         /// <param name="embed">Embed to be deconstructed.</param>
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
-        private static string DeconstructEmbed(DiscordEmbedBuilder embed)
+        internal static string DeconstructEmbed(DiscordEmbedBuilder embed)
         {
             if (embed is null)
                 return null;
@@ -322,7 +310,7 @@ namespace AkkoBot.Extensions
         /// <param name="locale">The locale of the response string.</param>
         /// <param name="sample">The key of the response string.</param>
         /// <returns>The localized response string. If it does not exist, returns <paramref name="sample"/>.</returns>
-        private static string GetLocalizedResponse(ILocalizer localizer, string locale, string sample)
+        internal static string GetLocalizedResponse(ILocalizer localizer, string locale, string sample)
         {
             return (sample is not null && localizer.ContainsResponse(locale, sample))
                 ? localizer.GetResponseString(locale, sample)

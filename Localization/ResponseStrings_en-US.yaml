@@ -8,20 +8,26 @@ arg_discord_user: ID or mention to a Discord user.
 arg_double: A real number.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
+arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_prefix: The new prefix.
 arg_punishment_reason: The reason for the punishment.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
+arg_ulong_id_col: Multiple valid Discord IDs.
+arg_ulong_user_col: Multiple valid user IDs.
+arg_unpunishment_reason: The reason for lifting the punishment.
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
 bl_added: Successfully added {0} {1} {2} to the blacklist.
+bl_added_range: '{0} IDs were added to the blacklist.'
 bl_clear: '{0} entries were successfully removed from the blacklist.'
 bl_empty: There are no entries in the blacklist.
 bl_exist: '{0} {1} {2} is blacklisted already.'
 bl_not_exist: '{0} {1} {2} is not blacklisted.'
 bl_removed: Successfully removed {0} {1} {2} from the blacklist.
+bl_removed_range: '{0} IDs were removed from the blacklist.'
 bl_title: Blacklist
 bot_settings_title: Global Settings
 channel: Channel
@@ -62,6 +68,8 @@ cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide n
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_kick: Kicks a user.
+cmd_massban: Bans multiple users.
+cmd_massunban: Unbans multiple users.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
 cmd_sban: Kicks a user and deletes their messages.
@@ -123,6 +131,13 @@ id: Id
 kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
 locales_title: Available Languages
+massban: Massban
+massban_description: Banning {0} users. This operation might take up to {1} seconds.
+massban_failure: No user was banned either because none of the IDs were valid or the users are already banned.
+massban_success: '{0} users were banned from the server.'
+massunban: Massunban
+massunban_failed: There was no user to unban.
+massunban_succeded: '{0} users were unbanned from the server.'
 minutes: Minutes
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.
@@ -151,9 +166,3 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
-
-bl_added_range: '{0} IDs were added to the blacklist.'
-arg_ulong_id_col: Multiple valid Discord IDs.
-bl_removed_range: '{0} IDs were removed from the blacklist.'
-arg_mention: A valid Discord ID or mention.
-arg_unpunishment_reason: The reason for lifting the punishment.

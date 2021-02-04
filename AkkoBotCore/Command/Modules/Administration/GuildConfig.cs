@@ -128,7 +128,7 @@ namespace AkkoBot.Command.Modules.Administration
                     .WithDescription(
                         context.FormatLocalized(
                             "guild_locale_unavailable",
-                            Formatter.InlineCode(context.GetGuildPrefix() + context.Command.QualifiedName)
+                            Formatter.InlineCode(context.Prefix + context.Command.QualifiedName)
                         )
                     );
 
