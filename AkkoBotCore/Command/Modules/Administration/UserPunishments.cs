@@ -169,7 +169,7 @@ namespace AkkoBot.Command.Modules.Administration
         public async Task Unban(
             CommandContext context,
             [Description("arg_ulong_id")] ulong userId,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
             // Get the user
             var user = (await context.Guild.GetBansAsync()).FirstOrDefault(u => u.User.Id == userId);

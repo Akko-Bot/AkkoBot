@@ -155,3 +155,5 @@ value: Value
 bl_added_range: '{0} IDs were added to the blacklist.'
 arg_ulong_id_col: Multiple valid Discord IDs.
 bl_removed_range: '{0} IDs were removed from the blacklist.'
+arg_mention: A valid Discord ID or mention.
+arg_unpunishment_reason: The reason for lifting the punishment.

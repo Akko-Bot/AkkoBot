@@ -23,21 +23,21 @@ namespace AkkoBot.Command.Modules.Self
         public Blacklist(BlacklistService service)
             => _service = service;
 
-        [Command("add")]
-        public async Task BlacklistAdd(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+        [Command("add"), HiddenOverload]
+        public async Task BlacklistAdd(CommandContext context, DiscordChannel channel)
             => await BlacklistAdd(context, BlacklistType.Channel, channel.Id);
 
         [Command("add")]
-        public async Task BlacklistAdd(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
-            => await BlacklistAdd(context, BlacklistType.User, user.Id);
+        public async Task BlacklistAdd(CommandContext context, [Description("arg_mention")] DiscordUser entity)
+            => await BlacklistAdd(context, BlacklistType.User, entity.Id);
 
-        [Command("remove")]
-        public async Task BlacklistRemove(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+        [Command("remove"), HiddenOverload]
+        public async Task BlacklistRemove(CommandContext context, DiscordChannel channel)
             => await BlacklistRemove(context, channel.Id);
 
         [Command("remove")]
-        public async Task BlacklistRemove(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
-            => await BlacklistRemove(context, user.Id);
+        public async Task BlacklistRemove(CommandContext context, [Description("arg_mention")] DiscordUser entity)
+            => await BlacklistRemove(context, entity.Id);
 
         [Command("add")]
         [Description("cmd_blacklist_add")]
@@ -75,6 +75,7 @@ namespace AkkoBot.Command.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
+        [HiddenOverload]
         [Command("remove"), Aliases("rem")]
         [Description("cmd_blacklist_rem")]
         public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
