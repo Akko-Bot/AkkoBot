@@ -22,14 +22,17 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("kick"), Aliases("k")]
         [Description("cmd_kick")]
         [RequirePermissions(Permissions.KickMembers)]
-        public async Task Kick(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_punishment_reason")] string reason = null)
+        public async Task Kick(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordMember user,
+            [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleservice.CheckHierarchyAsync(context, user, "kick_error"))
+            if (!await _roleservice.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // Create the notification dm
             var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("kick_notification", context.Guild.Name));
+                .WithDescription(context.FormatLocalized("kick_notification", Formatter.Bold(context.Guild.Name)));
 
             if (reason is not null)
                 dm.AddField(context.FormatLocalized("reason"), reason);
@@ -43,10 +46,11 @@ namespace AkkoBot.Command.Modules.Administration
             // Send kick message to the context channel
             var result = new DiscordEmbedBuilder()
                 .WithTitle("kick_title")
-                .WithDescription("kick_description");
+                .AddField("user", user.GetFullname(), true)
+                .AddField("id", user.Id.ToString(), true);
 
             if (dmSuccess is null && !user.IsBot)
-                result.WithFooter("kick_dm_failed");
+                result.WithFooter("punishment_dm_failed");
 
             await context.RespondLocalizedAsync(result, false);
         }
@@ -56,7 +60,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_sban")]
         [RequireBotPermissions(Permissions.BanMembers)]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task SoftBan(CommandContext context, DiscordMember user, string reason = null)
+        public async Task SoftBan(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
             => await SoftBan(context, user, null, reason);
 
         [Command("softban")]
@@ -64,14 +68,14 @@ namespace AkkoBot.Command.Modules.Administration
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_ban_deletion")] TimeSpan? time = null,
-            [Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleservice.CheckHierarchyAsync(context, user, "sban_error"))
+            if (!await _roleservice.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // Create the notification dm
             var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("sban_notification", context.Guild.Name));
+                .WithDescription(context.FormatLocalized("sban_notification", Formatter.Bold(context.Guild.Name)));
 
             if (reason is not null)
                 dm.AddField(context.FormatLocalized("reason"), reason);
@@ -87,11 +91,12 @@ namespace AkkoBot.Command.Modules.Administration
 
             // Send ban message to the context channel
             var result = new DiscordEmbedBuilder()
-                .WithTitle("sban_title")
-                .WithDescription("sban_description");
+                .WithTitle(":biohazard: " + context.FormatLocalized("sban_title"))
+                .AddField("user", user.GetFullname(), true)
+                .AddField("id", user.Id.ToString(), true);
 
             if (dmSuccess is null && !user.IsBot)
-                result.WithFooter("ban_dm_failed");
+                result.WithFooter("punishment_dm_failed");
 
             await context.RespondLocalizedAsync(result, false);
         }
@@ -100,7 +105,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("ban"), Aliases("b")]
         [Description("cmd_ban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task Ban(CommandContext context, DiscordMember user, string reason = null)
+        public async Task Ban(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
             => await Ban(context, user, null, reason);
 
         [Command("ban")]
@@ -108,14 +113,14 @@ namespace AkkoBot.Command.Modules.Administration
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_ban_deletion")] TimeSpan? time = null,
-            [Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleservice.CheckHierarchyAsync(context, user, "ban_error"))
+            if (!await _roleservice.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // Create the notification dm
             var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("ban_notification", context.Guild.Name));
+                .WithDescription(context.FormatLocalized("ban_notification", Formatter.Bold(context.Guild.Name)));
 
             if (reason is not null)
                 dm.AddField(context.FormatLocalized("reason"), reason);
@@ -128,24 +133,27 @@ namespace AkkoBot.Command.Modules.Administration
 
             // Send ban message to the context channel
             var result = new DiscordEmbedBuilder()
-                .WithTitle("ban_title")
-                .WithDescription("ban_description");
+                .WithTitle("⛔️ " + context.FormatLocalized("ban_title"))
+                .AddField("user", user.GetFullname(), true)
+                .AddField("id", user.Id.ToString(), true);
 
             if (dmSuccess is null && !user.IsBot)
-                result.WithFooter("ban_dm_failed");
+                result.WithFooter("punishment_dm_failed");
 
             await context.RespondLocalizedAsync(result, false);
         }
 
         [Command("ban"), HiddenOverload]
-        public async Task HackBan(CommandContext context, ulong userId, string reason = null)
+        public async Task HackBan(CommandContext context, DiscordUser user, [RemainingText] string reason = null)
         {
             // Ban the user
-            await context.Guild.BanMemberAsync(userId, 1, context.Member.GetFullname() + " | " + reason);
+            await context.Guild.BanMemberAsync(user.Id, 1, context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
             var embed = new DiscordEmbedBuilder()
-                .WithDescription("ban_hackban");
+                .WithTitle("⛔️ " + context.FormatLocalized("hackban_title"))
+                .AddField("user", user.GetFullname(), true)
+                .AddField("id", user.Id.ToString(), true);
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -158,16 +166,17 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("unban")]
         [Description("cmd_unban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task Unban(CommandContext context, [Description("arg_ulong_id")] ulong userId, [Description("arg_punishment_reason")] string reason = null)
+        public async Task Unban(
+            CommandContext context,
+            [Description("arg_ulong_id")] ulong userId,
+            [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
             // Get the user
             var user = (await context.Guild.GetBansAsync()).FirstOrDefault(u => u.User.Id == userId);
 
             if (user is null)
             {
-                var embed = new DiscordEmbedBuilder()
-                    .WithDescription("unban_not_found");
-
+                var embed = new DiscordEmbedBuilder().WithDescription("unban_not_found");
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
             else
@@ -177,7 +186,7 @@ namespace AkkoBot.Command.Modules.Administration
 
                 // Send unban message to the context channel
                 var embed = new DiscordEmbedBuilder()
-                    .WithDescription(context.FormatLocalized("unban_success", user.User.GetFullname()));
+                    .WithDescription(context.FormatLocalized("unban_success", Formatter.Bold(user.User.GetFullname())));
 
                 await context.RespondLocalizedAsync(embed);
             }

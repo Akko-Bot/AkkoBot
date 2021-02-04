@@ -19,10 +19,9 @@ namespace AkkoBot.Command.Modules.Administration.Services
         {
             if (context.Member.Hierarchy <= user.Hierarchy && context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
             {
-                var embed = new DiscordEmbedBuilder()
-                    .WithDescription(errorMessage);
-
+                var embed = new DiscordEmbedBuilder().WithDescription(errorMessage);
                 await context.RespondLocalizedAsync(embed, isError: true);
+                
                 return false;
             }
 

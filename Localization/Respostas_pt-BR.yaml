@@ -1,15 +1,21 @@
+arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
 arg_bool: __true__ para ativar, __false__ para desativar.
 arg_color: Um código de cor hexadecimal de seis dígitos.
+arg_command: Um comand válido.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_double: Um número real.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
+arg_module: Um módulo válido.
 arg_prefix: O novo prefixo.
+arg_punishment_reason: O motivo da punição.
 arg_timeout: Um número inteiro maior que 10 e menor que 120.
 arg_uint: Um número inteiro maior ou igual a zero.
 arg_ulong_id: Um ID válido do Discord.
+ban_notification: Você foi banido do servidor {0}.
+ban_title: Usuário Banido
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
 bl_clear: '{0} registros foram removidos da lista negra.'
 bl_empty: Não há registros na lista negra.
@@ -19,6 +25,7 @@ bl_removed: '{0} {1} {2} foi removido da lista negra.'
 bl_title: Lista Negra
 bot_settings_title: Configurações Globais
 channel: Canal
+cmd_ban: Bane um usuário.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
 cmd_blacklist_clear: Limpa a lista negra.
@@ -53,14 +60,24 @@ cmd_guild_locale: Define o idioma a ser utilizado pelo bot nesse servidor. Forne
 cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor.
 cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
 cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela resposta do usuário, em segundos. Forneça nenhum parâmetro para redefini-lo para o valor padrão.
+cmd_help: Exibe ajuda para o comand especificado ou a ajuda padrão se nenhum comando for especificado.
+cmd_kick: Expulsa um usuário.
+cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
+cmd_sban: Expulsa um usuário e exclui suas mensagens.
+cmd_sudo: Executa um comando como se fosse o usuário especificado.
+cmd_unban: Desbane um usuário.
 command: Comando
+command_check_failed: O usuário não possui permissões suficientes para executar esse comando.
 command_modules_footer: Utilize {0} para visualizar o uso de um comando específico.
+command_not_found: Comando não encontrado.
 commands: Comandos
 days: Dias
 disabled: desativado
 enabled: ativado
+error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o seu e o meu na hierarquia de cargos.
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
+error_user_not_found: Usuário não encontrado.
 guild_embed_change: O uso de embeds nesse servidor foi {0}.
 guild_errorcolor: ErrorColor foi alterada para {0}.
 guild_locale_changed: O idioma desse servidor foi alterado para {0}.
@@ -71,6 +88,7 @@ guild_prefix_check: O prefixo nesse servidor é {0}
 guild_settings_title: Configurações de Servidor
 guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
 guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
+hackban_title: Usuário preventivamente banido
 help_add_reactions: Adicionar Reações
 help_administrator: Administrador
 help_attach_files: Anexar Arquivos
@@ -91,6 +109,7 @@ help_manage_webhooks: Gerenciar Webhooks
 help_mention_everyone: Mencionar Everyone
 help_move_members: Mover Membros
 help_mute_members: Silenciar Membros
+help_optional: Opcional
 help_priority_speaker: Voz Prioritária
 help_send_messages: Enviar Mensagens
 help_speak: Falar
@@ -99,7 +118,10 @@ help_use_external_emojis: Usar Emojis Externos
 help_use_voice: Conectar
 help_view_audit_log: Ver o Registro de Auditoria
 hours: Horas
+id: ID
 id: Id
+kick_notification: Você foi expulso do servidor {0}.
+kick_title: Usuário Expulso
 locales_title: Idiomas Disponíveis
 minutes: Minutos
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
@@ -107,32 +129,25 @@ modules_footer: Use {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis
 name: Nome
 online_since: Online desde
+punishment_dm_failed: Falha ao enviar a notificação de punição.
 q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
 q_blclear: remover todos os registros da lista negra
 q_no: 'não'
 q_yes: 'sim'
+reason: Motivo
 requires: Requer
+sban_notification: Você foi expulso do servidor {0}.
+sban_title: Usuário Expulso
 seconds: Segundos
 server: Servidor
 settings: Configuração
 shutdown: Desligando.
 type: Tipo
+unban_not_found: Esse usuário não está banido.
+unban_success: Usuário {0} foi desbanido.
 unknown: Desconhecido
 unspecified: Não especificado
 uptime: Tempo Online
 usage: Uso
 user: Usuário
 value: Valor
-
-
-cmd_help: Exibe ajuda para o comand especificado ou a ajuda padrão se nenhum comando for especificado.
-arg_command: Um comand válido.
-cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
-arg_module: Um módulo válido.
-cmd_kick: Expulsa um usuário.
-arg_punishment_reason: O motivo da punição.
-cmd_sban: Expulsa um usuário e exclui suas mensagens.
-cmd_ban: Bane um usuário.
-cmd_unban: Desbane um usuário.
-arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
-help_optional: Opcional

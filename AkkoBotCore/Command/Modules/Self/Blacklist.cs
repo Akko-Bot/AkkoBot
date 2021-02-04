@@ -147,7 +147,7 @@ namespace AkkoBot.Command.Modules.Self
                     )
                 );
 
-            // Send the interactive message and perform the action if user comfirms it
+            // Send the interactive message and perform the action if user confirms it
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
                 var rows = await _service.ClearAsync(context);

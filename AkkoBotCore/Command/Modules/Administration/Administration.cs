@@ -18,16 +18,15 @@ namespace AkkoBot.Command.Modules.Administration
         public async Task Sudo(
             CommandContext context,
             [Description("arg_discord_user")] DiscordUser user,
-            [RemainingText, Description("cmd_sudo")] string command)
+            [RemainingText, Description("arg_command")] string command)
         {
             var cmd = context.CommandsNext.FindCommand(command, out var args);
 
             if (cmd is null)
             {
-                var embed = new DiscordEmbedBuilder()
-                    .WithDescription("command_not_found");
-
+                var embed = new DiscordEmbedBuilder().WithDescription("command_not_found");
                 await context.RespondLocalizedAsync(embed, isError: true);
+
                 return;
             }
             
@@ -36,9 +35,7 @@ namespace AkkoBot.Command.Modules.Administration
 
             if (failedChecks.Any())
             {
-                var embed = new DiscordEmbedBuilder()
-                    .WithDescription("command_check_failed");
-
+                var embed = new DiscordEmbedBuilder().WithDescription("command_check_failed");
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
             else

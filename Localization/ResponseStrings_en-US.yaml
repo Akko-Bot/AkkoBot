@@ -1,15 +1,21 @@
+arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
 arg_bool: __true__ to enable, __false__ to disable.
 arg_color: A 6-digit, hexadecimal code of a color.
+arg_command: A valid command.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_user: ID or mention to a Discord user.
 arg_double: A real number.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
+arg_module: A valid module.
 arg_prefix: The new prefix.
+arg_punishment_reason: The reason for the punishment.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
+ban_notification: You have been banned from the {0} server.
+ban_title: User Banned
 bl_added: Successfully added {0} {1} {2} to the blacklist.
 bl_clear: '{0} entries were successfully removed from the blacklist.'
 bl_empty: There are no entries in the blacklist.
@@ -19,6 +25,7 @@ bl_removed: Successfully removed {0} {1} {2} from the blacklist.
 bl_title: Blacklist
 bot_settings_title: Global Settings
 channel: Channel
+cmd_ban: Bans a user.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
 cmd_blacklist_clear: Clears the blacklist.
@@ -53,14 +60,24 @@ cmd_guild_locale: Changes the language the bot should use in this server. Provid
 cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
+cmd_help: Shows help for the specified command or the default help message if no command is specified.
+cmd_kick: Kicks a user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
+cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
+cmd_sban: Kicks a user and deletes their messages.
+cmd_sudo: Executes a command as the specified user.
+cmd_unban: Unbans a user.
 command: Command
+command_check_failed: The user does not have enough permissions to execute this command.
 command_modules_footer: Use {0} to see the usage for a specific command.
+command_not_found: Command not found.
 commands: Commands
 days: Days
 disabled: disabled
 enabled: enabled
+error_hierarchy: This command can only be used on users with a role lower to yours and mine in the role hierarchy.
 error_not_found: 'Error: the requested response string was not found.'
+error_user_not_found: User not found.
 guild_embed_change: Embed usage on this server has been {0}.
 guild_errorcolor: ErrorColor has been changed to {0}.
 guild_locale_changed: The language for this server has been changed to {0}.
@@ -71,6 +88,7 @@ guild_prefix_check: The prefix on this server is {0}
 guild_settings_title: Server Settings
 guild_timeout_changed: Command timeout on this server has been set to {0} seconds.
 guild_timeout_reset: Command timeout on this server has been reset.
+hackban_title: User Hackbanned
 help_add_reactions: Add Reactions
 help_administrator: Administrator
 help_attach_files: Attach Files
@@ -91,6 +109,7 @@ help_manage_webhooks: Manage Webhooks
 help_mention_everyone: Mention Everyone
 help_move_members: Move Members
 help_mute_members: Mute Members
+help_optional: Optional
 help_priority_speaker: Priority Speaker
 help_send_messages: Send Messages
 help_speak: Speak
@@ -99,7 +118,10 @@ help_use_external_emojis: Use External Emojis
 help_use_voice: Connect
 help_view_audit_log: View Audit Log
 hours: Hours
+id: ID
 id: Id
+kick_notification: You have been kicked from the {0} server.
+kick_title: User Kicked
 locales_title: Available Languages
 minutes: Minutes
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
@@ -107,33 +129,25 @@ modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules
 name: Name
 online_since: Online since
+punishment_dm_failed: Failed to deliver the punishment notification.
 q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
 q_blclear: remove all blacklist entries
 q_no: 'no'
 q_yes: 'yes'
+reason: Reason
 requires: Requires
+sban_notification: You have been soft-banned from the {0} server.
+sban_title: User Soft-banned
 seconds: Seconds
 server: Server
 settings: Settings
 shutdown: Shutting down.
 type: Type
+unban_not_found: This user is not banned.
+unban_success: User {0} has been unbanned.
 unknown: Unknown
 unspecified: Unspecified
 uptime: Uptime
 usage: Usage
 user: User
 value: Value
-
-
-
-cmd_help: Shows help for the specified command or the default help message if no command is specified.
-arg_command: A valid command.
-cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
-arg_module: A valid module.
-cmd_kick: Kicks a user.
-arg_punishment_reason: The reason for the punishment.
-cmd_sban: Kicks a user and deletes their messages.
-cmd_ban: Bans a user.
-cmd_unban: Unbans a user.
-arg_ban_deletion: How many days to remove messages from. Default is __1d__.
-help_optional: Optional
