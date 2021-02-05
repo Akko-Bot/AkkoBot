@@ -19,6 +19,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <param name="context">The command context</param>
         /// <param name="type">Type of blacklist entry provided by the user.</param>
         /// <param name="id">ID of the entry, provided by the user.</param>
+        /// <param name="reason">The reason for the blacklist.</param>
         /// <returns>
         /// A tuple with the database entry and a boolean indicating whether the operation
         /// was successful or not.

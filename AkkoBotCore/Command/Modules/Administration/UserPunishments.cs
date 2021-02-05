@@ -9,15 +9,20 @@ using System.Threading.Tasks;
 using AkkoBot.Command.Modules.Administration.Services;
 using System.Linq;
 using AkkoBot.Command.Attributes;
+using AkkoBot.Services.Database.Entities;
 
 namespace AkkoBot.Command.Modules.Administration
 {
-    public class UserPunishments : AkkoCommandModule
+    public class UserPunishment : AkkoCommandModule
     {
-        private readonly RoleService _roleservice;
+        private readonly RoleService _roleService;
+        private readonly UserPunishmentService _punishService;
 
-        public UserPunishments(RoleService roleservice)
-            => _roleservice = roleservice;
+        public UserPunishment(RoleService roleservice, UserPunishmentService punishService)
+        {
+            _roleService = roleservice;
+            _punishService = punishService;
+        }
 
         [Command("kick"), Aliases("k")]
         [Description("cmd_kick")]
@@ -27,18 +32,11 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleservice.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
-            // Create the notification dm
-            var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("kick_notification", Formatter.Bold(context.Guild.Name)));
-
-            if (reason is not null)
-                dm.AddField(context.FormatLocalized("reason"), reason);
-
             // This returns null if it fails
-            var dmSuccess = await context.SendLocalizedDmAsync(user, dm);
+            var dmSuccess = _punishService.SendPunishmentDm(context, user, "kick_notification", reason);
 
             // Kick the user
             await user.RemoveAsync(context.Member.GetFullname() + " | " + reason);
@@ -70,18 +68,11 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_ban_deletion")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleservice.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
-            // Create the notification dm
-            var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("sban_notification", Formatter.Bold(context.Guild.Name)));
-
-            if (reason is not null)
-                dm.AddField(context.FormatLocalized("reason"), reason);
-
             // This returns null if it fails
-            var dmSuccess = await context.SendLocalizedDmAsync(user, dm);
+            var dmSuccess = _punishService.SendPunishmentDm(context, user, "sban_notification", reason);
 
             // Ban the user
             await user.BanAsync((int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
@@ -115,18 +106,11 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_ban_deletion")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleservice.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
-            // Create the notification dm
-            var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("ban_notification", Formatter.Bold(context.Guild.Name)));
-
-            if (reason is not null)
-                dm.AddField(context.FormatLocalized("reason"), reason);
-
             // This returns null if it fails
-            var dmSuccess = await context.SendLocalizedDmAsync(user, dm);
+            var dmSuccess = _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
 
             // Ban the user
             await context.Guild.BanMemberAsync(user.Id, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
@@ -204,7 +188,22 @@ namespace AkkoBot.Command.Modules.Administration
 
         // public async Task TimedBan(CommandContext context, DiscordMember user, TimeSpan time, string reason = null)
         // {
-        //     //
+        //     // Execute ban and send confirmation message
+
+        //     // create db entry and save it - if it already exists, update it
+        //     var entry = new TimerEntity()
+        //     {
+        //         GuildId = context.Guild.Id,
+        //         UserId = user.Id,
+        //         Interval = time,
+        //         Type = TimerType.Unban,
+        //         ElapseAt = DateTimeOffset.Now.Add(time)
+        //     };
+
+        //     // have a singleton object for timer actions?
+
+
+        //     // create timer and cache it, if appropriate
         // }
 
         [Command("unban")]

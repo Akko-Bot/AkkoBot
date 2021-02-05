@@ -58,9 +58,9 @@ namespace AkkoBot.Command.Modules.Self
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(
                     context.FormatLocalized(
-                        (success) ? "bl_added" : "bl_exist",    // <- Key | Args ↓ 
-                        entry.Type.ToString().ToSnakeCase(),    // User, Channel, Server or Unspecified
-                        Formatter.Bold(entryName),              // Name or Unknown
+                        (success) ? "bl_added" : "bl_exist",                // <- Key | Args ↓ 
+                        entry.Type.ToString().ToSnakeCase(),                // User, Channel, Server or Unspecified
+                        Formatter.Bold(entryName),                          // Name or Unknown
                         Formatter.InlineCode(entry.ContextId.ToString())    // ID
                     )
                 );
