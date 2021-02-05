@@ -55,7 +55,7 @@ namespace AkkoBot.Extensions
             using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
             // Get the timeout
-            var timeout = (await db.GuildConfigs.GetAsync(context.Guild.Id)).InteractiveTimeout;
+            var timeout = (await db.GuildConfig.GetAsync(context.Guild.Id)).InteractiveTimeout;
             var globalTimeout = (await db.BotConfig.GetAllAsync()).FirstOrDefault().InteractiveTimeout;
 
             // Send the question
@@ -94,7 +94,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (context.Guild is null)
                 ? db.BotConfig.GetAllSync().FirstOrDefault()
-                : db.GuildConfigs.GetGuild(context.Guild.Id);
+                : db.GuildConfig.GetGuild(context.Guild.Id);
 
             var responseString = GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
@@ -158,7 +158,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (context.Guild is null)
                 ? db.BotConfig.GetAllSync().FirstOrDefault()
-                : db.GuildConfigs.GetGuild(context.Guild.Id);
+                : db.GuildConfig.GetGuild(context.Guild.Id);
 
             var responseString = GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
@@ -189,7 +189,7 @@ namespace AkkoBot.Extensions
 
             var locale = (context.Guild is null)
                 ? db.BotConfig.GetAllSync().FirstOrDefault().Locale
-                : db.GuildConfigs.GetSync(context.Guild.Id).Locale;
+                : db.GuildConfig.GetSync(context.Guild.Id).Locale;
 
             for (int index = 0; index < args.Length; index++)
             {

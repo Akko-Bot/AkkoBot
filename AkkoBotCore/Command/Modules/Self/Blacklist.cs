@@ -24,12 +24,12 @@ namespace AkkoBot.Command.Modules.Self
             => _service = service;
 
         [Command("add"), HiddenOverload]
-        public async Task BlacklistAdd(CommandContext context, DiscordChannel channel)
-            => await BlacklistAdd(context, BlacklistType.Channel, channel.Id);
+        public async Task BlacklistAdd(CommandContext context, DiscordChannel channel, [RemainingText] string reason = null)
+            => await BlacklistAdd(context, BlacklistType.Channel, channel.Id, reason);
 
         [Command("add")]
-        public async Task BlacklistAdd(CommandContext context, [Description("arg_mention")] DiscordUser entity)
-            => await BlacklistAdd(context, BlacklistType.User, entity.Id);
+        public async Task BlacklistAdd(CommandContext context, [Description("arg_mention")] DiscordUser entity, [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            => await BlacklistAdd(context, BlacklistType.User, entity.Id, reason);
 
         [Command("remove"), HiddenOverload]
         public async Task BlacklistRemove(CommandContext context, DiscordChannel channel)
@@ -41,9 +41,13 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("add")]
         [Description("cmd_blacklist_add")]
-        public async Task BlacklistAdd(CommandContext context, [Description("arg_bltype")] BlacklistType type, [Description("arg_ulong_id")] ulong id)
+        public async Task BlacklistAdd(
+            CommandContext context,
+            [Description("arg_bltype")] BlacklistType type,
+            [Description("arg_ulong_id")] ulong id,
+            [RemainingText] string reason = null)
         {
-            var (entry, success) = await _service.TryAddAsync(context, type, id);
+            var (entry, success) = await _service.TryAddAsync(context, type, id, reason);
 
             var entryName = (string.IsNullOrEmpty(entry.Name))
                 ? context.FormatLocalized("unknown")
@@ -180,6 +184,31 @@ namespace AkkoBot.Command.Modules.Self
 
                 await context.RespondLocalizedAsync(embed);
             });
+        }
+
+        [Command("check")]
+        [Description("cmd_bl_check")]
+        public async Task BlacklistCheck(CommandContext context, [Description("arg_ulong_id")] ulong id)
+        {
+            var entity = (await _service.GetAsync(context, x => x.ContextId == id)).FirstOrDefault();
+
+            if (entity is null)
+            {
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription("bl_not_found");
+
+                await context.RespondLocalizedAsync(embed, isError: true);
+            }
+            else
+            {
+                var embed = new DiscordEmbedBuilder()
+                    .AddField("name", entity.Name.ToString(), true)
+                    .AddField("type", entity.Type.ToString(), true)
+                    .AddField("id", entity.ContextId.ToString(), true)
+                    .AddField("reason", string.IsNullOrWhiteSpace(entity.Reason) ? "-" : entity.Reason, false);
+
+                await context.RespondLocalizedAsync(embed);
+            }
         }
     }
 }

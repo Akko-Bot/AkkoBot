@@ -72,23 +72,23 @@ namespace AkkoBot.Core.Common
 
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
-                .Except((await _db.GuildConfigs.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
+                .Except((await _db.GuildConfig.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
                 .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
                 .ToArray();
 
             // Save the new guilds to the database
-            _db.GuildConfigs.CreateRange(newGuilds);
+            _db.GuildConfig.CreateRange(newGuilds);
             await _db.SaveChangesAsync();
 
             // Cache the new guilds
             foreach (var guild in newGuilds)
-                _db.GuildConfigs.Cache.TryAdd(guild.GuildId, guild);
+                _db.GuildConfig.Cache.TryAdd(guild.GuildId, guild);
         }
 
         // Saves default guild settings to the db and caches it
         private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
-            _db.GuildConfigs.TryCreate(eventArgs.Guild);
+            _db.GuildConfig.TryCreate(eventArgs.Guild);
             _db.SaveChanges();
 
             return Task.CompletedTask;
@@ -97,7 +97,7 @@ namespace AkkoBot.Core.Common
         // Remove a guild from the cache when the bot is removed from it.
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
         {
-            _db.GuildConfigs.Cache.TryRemove(eventArgs.Guild.Id, out _);
+            _db.GuildConfig.Cache.TryRemove(eventArgs.Guild.Id, out _);
             return Task.CompletedTask;
         }
 

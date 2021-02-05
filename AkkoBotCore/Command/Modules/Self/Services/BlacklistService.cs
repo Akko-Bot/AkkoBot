@@ -23,16 +23,17 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// A tuple with the database entry and a boolean indicating whether the operation
         /// was successful or not.
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> TryAddAsync(CommandContext context, BlacklistType type, ulong id)
+        public async Task<(BlacklistEntity, bool)> TryAddAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
             using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
-            // Generte the database entry
+            // Generate the database entry
             var entry = new BlacklistEntity()
             {
                 ContextId = id,
                 Type = type,
-                Name = GetBlacklistedName(context, type, id)
+                Name = GetBlacklistedName(context, type, id),
+                Reason = reason
             };
 
             var success = await db.Blacklist.TryCreateAsync(entry);

@@ -41,7 +41,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (context.Guild is null)
                 ? db.BotConfig.GetAllSync().FirstOrDefault()
-                : db.GuildConfigs.GetGuild(context.Guild.Id);
+                : db.GuildConfig.GetGuild(context.Guild.Id);
 
             // Reset the embed's current color
             if (isError)

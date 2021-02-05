@@ -14,7 +14,7 @@ namespace AkkoBot.Services.Database
         public BlacklistRepo Blacklist { get; private set; }
         public BotConfigRepo BotConfig { get; private set; }
         public LogConfigRepo LogConfig { get; private set; }
-        public GuildConfigRepo GuildConfigs { get; private set; }
+        public GuildConfigRepo GuildConfig { get; private set; }
         public PlayingStatusRepo PlayingStatuses { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)
@@ -25,7 +25,7 @@ namespace AkkoBot.Services.Database
             Blacklist = new(db, dbCacher);
             BotConfig = new(db, dbCacher);
             LogConfig = new(db, dbCacher);
-            GuildConfigs = new(db, dbCacher);
+            GuildConfig = new(db, dbCacher);
             PlayingStatuses = new(db, dbCacher);
         }
 
@@ -67,7 +67,7 @@ namespace AkkoBot.Services.Database
                 DiscordUsers = null;
                 Blacklist = null;
                 BotConfig = null;
-                GuildConfigs = null;
+                GuildConfig = null;
                 PlayingStatuses = null;
 
                 _isDisposed = true;

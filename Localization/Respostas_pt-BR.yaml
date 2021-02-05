@@ -96,7 +96,7 @@ guild_prefix_check: O prefixo nesse servidor é {0}
 guild_settings_title: Configurações de Servidor
 guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
 guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
-hackban_title: Usuário preventivamente banido
+hackban_title: Usuário Preventivamente Banido
 help_add_reactions: Adicionar Reações
 help_administrator: Administrador
 help_attach_files: Anexar Arquivos
@@ -127,7 +127,6 @@ help_use_voice: Conectar
 help_view_audit_log: Ver o Registro de Auditoria
 hours: Horas
 id: ID
-id: Id
 kick_notification: Você foi expulso do servidor {0}.
 kick_title: Usuário Expulso
 locales_title: Idiomas Disponíveis

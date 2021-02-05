@@ -12,7 +12,7 @@ namespace AkkoBot.Services.Database.Entities
         private string _logFormat = "Default";
 
         [Key]
-        public int Id { get; init; }
+        public uint Id { get; init; }
 
         [Required]
         [MaxLength(20)]

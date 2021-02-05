@@ -18,7 +18,7 @@ namespace AkkoBot.Services.Database.Entities
         private string _errorColor = "FB3D28";
 
         [Key]
-        public int Id { get; init; }
+        public uint Id { get; init; }
 
         [Required]
         [MaxLength(10)]

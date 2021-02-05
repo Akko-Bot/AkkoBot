@@ -44,10 +44,10 @@ namespace AkkoBot.Command.Modules.Administration.Services
         public T GetOrSetProperty<T>(CommandContext context, Func<GuildConfigEntity, T> selector)
         {
             using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            var guild = db.GuildConfigs.GetGuild(context.Guild.Id);
+            var guild = db.GuildConfig.GetGuild(context.Guild.Id);
             var result = selector(guild);
 
-            db.GuildConfigs.Update(guild);
+            db.GuildConfig.Update(guild);
             db.SaveChanges();
 
             return result;
@@ -56,7 +56,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
         public IReadOnlyDictionary<string, string> GetGuildSettings(CommandContext context)
         {
             using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            return db.GuildConfigs.GetGuild(context.Guild.Id).GetSettings();
+            return db.GuildConfig.GetGuild(context.Guild.Id).GetSettings();
         }
     }
 }

@@ -14,18 +14,26 @@ namespace AkkoBot.Services.Database.Entities
     public class BlacklistEntity : DbEntity
     {
         private string _name;
+        private string _reason;
 
         [Key]
-        public ulong ContextId { get; set; }
+        public ulong ContextId { get; init; }
 
         [Required]
-        public BlacklistType Type { get; set; }
+        public BlacklistType Type { get; init; }
 
         [MaxLength(37)]
         public string Name
         {
             get => _name;
-            set => _name = value?.MaxLength(37);
+            init => _name = value?.MaxLength(37);
+        }
+
+        [MaxLength(200)]
+        public string Reason
+        {
+            get => _reason;
+            init => _reason = value?.MaxLength(200);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Database
         {
             Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
             BotConfig = dbContext.BotConfig.FirstOrDefault();
-            LogConfig = dbContext.LogConfigs.FirstOrDefault();
+            LogConfig = dbContext.LogConfig.FirstOrDefault();
             Guilds = new(); // Guild configs will be loaded into the cache as needed.
             PlayingStatuses = dbContext.PlayingStatuses.ToList();
         }

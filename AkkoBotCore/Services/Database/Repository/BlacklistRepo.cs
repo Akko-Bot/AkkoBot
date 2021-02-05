@@ -87,8 +87,8 @@ namespace AkkoBot.Services.Database.Repository
         public async Task<bool> TryCreateAsync(BlacklistEntity value)
         {
             await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO blacklist(context_id, type, name, date_added) " +
-                $"VALUES({value.ContextId}, {(int)value.Type}, '{value.Name}', '{value.DateAdded:O}') " +
+                @"INSERT INTO blacklist(context_id, type, name, date_added, reason) " +
+                $"VALUES({value.ContextId}, {(int)value.Type}, '{value.Name}', '{value.DateAdded:O}', '{value.Reason}') " +
                 @"ON CONFLICT (context_id) " +
                 @"DO NOTHING;"
             );

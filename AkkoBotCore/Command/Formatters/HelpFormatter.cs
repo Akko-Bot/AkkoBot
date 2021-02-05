@@ -170,7 +170,7 @@ namespace AkkoBot.Command.Formatters
         public (string, DiscordEmbedBuilder) Build()
         {
             using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var guildSettings = db.GuildConfigs.GetGuild(_cmdContext.Guild.Id);
+            var guildSettings = db.GuildConfig.GetGuild(_cmdContext.Guild.Id);
 
             if (guildSettings.UseEmbed)
             {

@@ -13,7 +13,7 @@ namespace AkkoBot.Services.Database.Abstractions
         public BlacklistRepo Blacklist { get; }
         public BotConfigRepo BotConfig { get; }
         public LogConfigRepo LogConfig { get; }
-        public GuildConfigRepo GuildConfigs { get; }
+        public GuildConfigRepo GuildConfig { get; }
         public PlayingStatusRepo PlayingStatuses { get; }
 
         /// <summary>

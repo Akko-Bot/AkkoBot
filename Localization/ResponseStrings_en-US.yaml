@@ -127,7 +127,6 @@ help_use_voice: Connect
 help_view_audit_log: View Audit Log
 hours: Hours
 id: ID
-id: Id
 kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
 locales_title: Available Languages
