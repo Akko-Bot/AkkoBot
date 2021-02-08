@@ -1,6 +1,5 @@
 ﻿using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Repository;
-using AkkoBot.Services.Timers;
 using System;
 using System.Threading.Tasks;
 

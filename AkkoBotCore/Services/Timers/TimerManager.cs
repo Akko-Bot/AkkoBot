@@ -6,18 +6,17 @@ using System.Linq;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
-using AkkoBot.Command.Abstractions;
-using DSharpPlus.CommandsNext;
+using AkkoBot.Services.Timers.Abstractions;
 
 namespace AkkoBot.Services.Timers
 {
     /// <summary>
     /// This class initializes timers from the database and manages their execution and lifetime.
     /// </summary>
-    public class TimerManager : ICommandService, IDisposable// Implement an interface here
+    public class TimerManager : ITimerManager
     {
         private const int _timerDayAge = 2;
-        private readonly ConcurrentDictionary<int, AkkoTimer> _timers = new();
+        private readonly ConcurrentDictionary<int, IAkkoTimer> _timers = new();
         private readonly TimerActions _action;
 
         public TimerManager(DiscordShardedClient clients, AkkoDbContext dbContext, TimerActions action)
@@ -30,32 +29,32 @@ namespace AkkoBot.Services.Timers
             foreach (var client in clients.ShardClients.Values)
                 GenerateGuildTimers(timerEntities, client);
 
-            // Make another method for timers that don't rely on guild ids
+            // TODO: Make another method for timers that don't rely on guild ids
         }
 
         /// <summary>
-        /// Attempts to get the <see cref="AkkoTimer"/> associated with a certain ID.
+        /// Attempts to get the <see cref="IAkkoTimer"/> associated with a certain ID.
         /// </summary>
-        /// <param name="id">The ID of the <see cref="AkkoTimer"/>.</param>
-        /// <param name="timer">An <see cref="AkkoTimer"/> if the timer is found, <see langword="null"/> otherwise.</param>
+        /// <param name="id">The ID of the <see cref="IAkkoTimer"/>.</param>
+        /// <param name="timer">An <see cref="IAkkoTimer"/> if the timer is found, <see langword="null"/> otherwise.</param>
         /// <returns><see langword="true"/> if the timer is found, <see langword="false"/> otherwise.</returns>
-        public bool TryGetValue(int id, out AkkoTimer timer)
+        public bool TryGetValue(int id, out IAkkoTimer timer)
             => _timers.TryGetValue(id, out timer);
 
         /// <summary>
-        /// Attempts to remove the specified <see cref="AkkoTimer"/> from the cache.
+        /// Attempts to remove the specified <see cref="IAkkoTimer"/> from the cache.
         /// </summary>
         /// <param name="timer">The timer to be removed.</param>
         /// <returns><see langword="true"/> if it is successfully removed, <see langword="false"/> otherwise.</returns>
-        public bool TryRemove(AkkoTimer timer)
+        public bool TryRemove(IAkkoTimer timer)
             => TryRemove(timer.Id);
 
         /// <summary>
-        /// Attempts to add the specified <see cref="AkkoTimer"/> to the cache.
+        /// Attempts to add the specified <see cref="IAkkoTimer"/> to the cache.
         /// </summary>
         /// <param name="timer">The timer to be added.</param>
         /// <returns><see langword="true"/> if it is successfully added, <see langword="false"/> otherwise.</returns>
-        public bool TryAdd(AkkoTimer timer)
+        public bool TryAdd(IAkkoTimer timer)
         {
             if (_timers.TryAdd(timer.Id, timer))
             {
@@ -67,7 +66,7 @@ namespace AkkoBot.Services.Timers
         }
 
         /// <summary>
-        /// Attempts to remove an <see cref="AkkoTimer"/> with the specified ID.
+        /// Attempts to remove an <see cref="IAkkoTimer"/> with the specified ID.
         /// </summary>
         /// <param name="id">The ID of the timer to be removed.</param>
         /// <returns><see langword="true"/> if it gets successfully removed, <see langword="false"/> otherwise.</returns>
@@ -84,11 +83,11 @@ namespace AkkoBot.Services.Timers
         }
 
         /// <summary>
-        /// Attempts to update an <see cref="AkkoTimer"/> object stored in the cache.
+        /// Attempts to update an <see cref="IAkkoTimer"/> object stored in the cache.
         /// </summary>
         /// <param name="timer">The timer to replace the instance present in the cache.</param>
         /// <returns><see langword="true"/> if it gets successfully updated, <see langword="false"/> otherwise.</returns>
-        public bool TryUpdate(AkkoTimer timer)
+        public bool TryUpdate(IAkkoTimer timer)
         {
             if (!_timers.TryGetValue(timer.Id, out var oldTimer))
                 return false;
@@ -105,7 +104,7 @@ namespace AkkoBot.Services.Timers
         }
 
         /// <summary>
-        /// Generates an <see cref="AkkoTimer"/> based on a database entry and adds it to the cache.
+        /// Generates an <see cref="IAkkoTimer"/> based on a database entry and adds it to the cache.
         /// </summary>
         /// <param name="client">The Discord client that fetched the database entry.</param>
         /// <param name="entity">The database entry.</param>
@@ -148,8 +147,8 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         /// <param name="client">The Discord client that fetched the database entry.</param>
         /// <param name="entity">The database entry.</param>
-        /// <returns>A started <see cref="AkkoTimer"/>.</returns>
-        private AkkoTimer GenerateTimer(DiscordClient client, TimerEntity entity)
+        /// <returns>An active <see cref="AkkoTimer"/>.</returns>
+        private IAkkoTimer GenerateTimer(DiscordClient client, TimerEntity entity)
         {
             var timer = entity.Type switch
             {
@@ -169,14 +168,14 @@ namespace AkkoBot.Services.Timers
         /// Removes an element from the internal cache.
         /// </summary>
         /// <remarks>
-        /// This method is used by <see cref="AkkoTimer"/> objects to notify
+        /// This method is used by <see cref="IAkkoTimer"/> objects to notify
         /// the <see cref="TimerManager"/> that they need to be removed from the cache.
         /// </remarks>
-        /// <param name="obj">An object representing an <see cref="AkkoTimer"/>.</param>
+        /// <param name="obj">An object representing an <see cref="IAkkoTimer"/>.</param>
         /// <param name="args">Event arguments.</param>
         private void AutoRemoval(object obj, EventArgs args)
         {
-            var timer = obj as AkkoTimer;
+            var timer = obj as IAkkoTimer;
             _timers.TryRemove(timer.Id, out _);
         }
 

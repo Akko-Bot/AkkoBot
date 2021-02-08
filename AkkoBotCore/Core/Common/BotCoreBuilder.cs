@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Collections.Immutable;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
@@ -13,6 +15,8 @@ using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging;
 using AkkoBot.Services.Logging.Abstractions;
+using AkkoBot.Services.Timers;
+using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
@@ -240,8 +244,7 @@ namespace AkkoBot.Core.Common
             _cmdServices.AddDbContext<AkkoDbContext>(options =>
                 options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(GetConnectionString())
-            ).AddSingleton<IDbCacher, AkkoDbCacher>()
-            .AddScoped<IUnitOfWork, AkkoUnitOfWork>();
+            );
 
             return this;
         }
@@ -267,7 +270,7 @@ namespace AkkoBot.Core.Common
         /// assuming <see langword="abstract"/> default database is being used.
         /// </summary>
         /// <returns>A <see cref="BotCore"/>.</returns>
-        /// <exception cref="NullReferenceException"/>
+        /// <exception cref="NullReferenceException">Occurs when no credentials file is provided to this builder.</exception>
         public async Task<BotCore> BuildDefaultAsync()
         {
             var (botSettings, _) = GetBotSettings();
@@ -287,17 +290,70 @@ namespace AkkoBot.Core.Common
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
-        /// <exception cref="NullReferenceException"/>
+        /// <exception cref="NullReferenceException">Occurs when no credentials object is provided to this builder.</exception>
         public async Task<BotCore> BuildAsync(double? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
             if (_creds is null)
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var botClients = GetBotClient(timeout); // Initialize the sharded clients
-            _cmdServices.AddSingleton(botClients);  // Add the clients to the IoC container
+            
+            RegisterFinalServices(botClients);                  // Add the last services needed
+            var services = _cmdServices.BuildServiceProvider(); // Initialize the IoC container
+            
+            // Initialize the command handlers
+            var cmdHandlers = await GetCommandHandlers(botClients, services, isCaseSensitive, withDms, withMentionPrefix);
 
-            var services = _cmdServices.BuildServiceProvider();     // Initialize the IoC container
-            var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>()); // Initialize the prefix resolver
+            // Build the bot
+            var bot = new BotCore(botClients, cmdHandlers);
+
+            // Register core events
+            var startup = new Startup(services.GetService<IUnitOfWork>());
+            startup.RegisterEvents(bot);
+
+            return bot;
+        }
+
+        /// <summary>
+        /// Adds the last default services needed for the bot to function.
+        /// </summary>
+        /// <param name="client">The bot's sharded clients.</param>
+        /// <remarks>It won't add services whose interface type has already been registered to <see cref="_cmdServices"/>.</remarks>
+        private void RegisterFinalServices(DiscordShardedClient client)
+        {
+            // Add the clients to the IoC container
+            _cmdServices.AddSingleton(client);
+
+            var servicesList = new List<ServiceDescriptor>()
+            {
+                // Add subsystems in here as needed
+                // > Database
+                ServiceDescriptor.Singleton<IDbCacher, AkkoDbCacher>(),
+                ServiceDescriptor.Scoped<IUnitOfWork, AkkoUnitOfWork>(),
+
+                // > Timers
+                ServiceDescriptor.Singleton<ITimerManager, TimerManager>()
+            };
+            
+            foreach (var service in servicesList)
+            {
+                if (!_cmdServices.Any(x => x.ServiceType == service.ServiceType))
+                    _cmdServices.Add(service);
+            }
+        }
+
+        /// <summary>
+        /// Gets the command handlers for this bot.
+        /// </summary>
+        /// <param name="botClients">The bot's sharded clients.</param>
+        /// <param name="services">The services to be accessible through the command handlers.</param>
+        /// <param name="isCaseSensitive">Sets whether the bot ignores case sensitivity on commands or not.</param>
+        /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
+        /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
+        /// <returns>A collection of command handlers.</returns>
+        private async Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlers(DiscordShardedClient botClients, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
+        {
+            var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
 
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()
@@ -312,18 +368,14 @@ namespace AkkoBot.Core.Common
             };
 
             // Initialize the command handlers
-            var cmdHandlers = await botClients.UseCommandsNextAsync(cmdExtConfig);
-
-            // Build the bot
-            var bot = new BotCore(botClients, cmdHandlers);
-
-            // Register core events
-            var startup = new Startup(services.GetService<IUnitOfWork>());
-            startup.RegisterEvents(bot);
-
-            return bot;
+            return await botClients.UseCommandsNextAsync(cmdExtConfig);
         }
 
+        /// <summary>
+        /// Gets the sharded client for this bot.
+        /// </summary>
+        /// <param name="timeout">Sets the interactivity action timeout.</param>
+        /// <returns>A sharded client properly configured.</returns>
         private DiscordShardedClient GetBotClient(double? timeout)
         {
             // Setup client configuration
@@ -343,7 +395,7 @@ namespace AkkoBot.Core.Common
                 PaginationBehaviour = PaginationBehaviour.WrapAround,   // Sets whether paginated responses should wrap from first page to last page and vice-versa
                 PaginationDeletion = PaginationDeletion.DeleteEmojis,   // Sets whether emojis or the paginated message should be deleted after timeout
                 PollBehaviour = PollBehaviour.KeepEmojis,               // Sets whether emojis should be deleted after a poll ends
-                Timeout = TimeSpan.FromSeconds(timeout ?? 30.0),          // Sets how long it takes for an interactive response to timeout
+                Timeout = TimeSpan.FromSeconds(timeout ?? 30.0),        // Sets how long it takes for an interactive response to timeout
                 // setup customized paginated emojis
             };
 
@@ -360,6 +412,7 @@ namespace AkkoBot.Core.Common
         /// Gets the settings stored in the default database, if there are any.
         /// </summary>
         /// <returns>The settings stored in the database, default ones if none is found.</returns>
+        /// <exception cref="NullReferenceException">Occurs when no dbContext is provided to this builder.</exception>
         private (BotConfigEntity, LogConfigEntity) GetBotSettings()
         {
             using var dbContext = new AkkoDbContext(
@@ -380,7 +433,7 @@ namespace AkkoBot.Core.Common
         /// Gets the default database connection string.
         /// </summary>
         /// <returns>The connection string.</returns>
-        /// <exception cref="NullReferenceException"/>
+        /// <exception cref="NullReferenceException">Occurs when no credentials object is provided to this builder.</exception>
         private string GetConnectionString()
         {
             return

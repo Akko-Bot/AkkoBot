@@ -184,7 +184,7 @@ namespace AkkoBot.Command.Modules.Administration
             // Execute ban and send confirmation message
             await _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
 
-            // create db entry and save it - if it already exists, update it
+            // Perform the timed ban
             await _punishService.TimedBan(context, time, user.Id, reason);
 
             // Send ban message to the context channel

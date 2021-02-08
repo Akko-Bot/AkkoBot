@@ -160,7 +160,7 @@ seconds: Segundos
 server: Servidor
 settings: Configuração
 shutdown: Desligando.
-timedban_title: Banimento Temporário
+timedban_title: Banido Temporariamente
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.

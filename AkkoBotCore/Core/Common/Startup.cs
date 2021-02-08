@@ -5,11 +5,10 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using AkkoBot.Services.Timers;
+using AkkoBot.Services.Timers.Abstractions;
 
 namespace AkkoBot.Core.Common
 {
@@ -77,7 +76,7 @@ namespace AkkoBot.Core.Common
         private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             var cmdHandler = _botCore.CommandExt[client.ShardId];
-            cmdHandler.Services.GetService<IDbCacher>().Timers = cmdHandler.Services.GetService<TimerManager>();
+            cmdHandler.Services.GetService<IDbCacher>().Timers = cmdHandler.Services.GetService<ITimerManager>();
 
             return Task.CompletedTask;
         }

@@ -2,6 +2,7 @@
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers;
+using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus;
 using System;
@@ -25,7 +26,7 @@ namespace AkkoBot.Services.Database
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
 
         // Lazily instantiated
-        public TimerManager Timers { get; set; }
+        public ITimerManager Timers { get; set; }
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {

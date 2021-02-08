@@ -1,5 +1,6 @@
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Timers.Abstractions;
 using System;
 using System.Timers;
 
@@ -8,7 +9,7 @@ namespace AkkoBot.Services.Timers
     /// <summary>
     /// Encapsulates a timed action created by a Discord user.
     /// </summary>
-    public sealed class AkkoTimer : IDisposable
+    public sealed class AkkoTimer : IAkkoTimer
     {
         private readonly Timer _internalTimer;
         private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;

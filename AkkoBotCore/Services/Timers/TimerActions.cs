@@ -1,7 +1,5 @@
-using System.Linq;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;

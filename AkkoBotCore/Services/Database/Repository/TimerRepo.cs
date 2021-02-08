@@ -1,15 +1,14 @@
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Timers;
+using AkkoBot.Services.Timers.Abstractions;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Repository
 {
     public class TimerRepo : DbRepository<TimerEntity>
     {
-        public TimerManager Cache { get; }
+        public ITimerManager Cache { get; }
 
         public TimerRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
             => Cache = dbCacher.Timers;
