@@ -1,7 +1,9 @@
 ﻿using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Timers;
 using ConcurrentCollections;
+using DSharpPlus;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,6 +23,9 @@ namespace AkkoBot.Services.Database
         public LogConfigEntity LogConfig { get; set; }
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
+
+        // Lazily instantiated
+        public TimerManager Timers { get; set; }
 
         public AkkoDbCacher(AkkoDbContext dbContext)
         {
@@ -61,6 +66,7 @@ namespace AkkoBot.Services.Database
                 {
                     Blacklist.Clear();
                     Guilds.Clear();
+                    Timers.Dispose();
                     PlayingStatuses.Clear();
                     PlayingStatuses.TrimExcess();
                 }
@@ -69,6 +75,7 @@ namespace AkkoBot.Services.Database
                 BotConfig = null;
                 LogConfig = null;
                 Guilds = null;
+                Timers = null;
                 PlayingStatuses = null;
 
                 _isDisposed = true;

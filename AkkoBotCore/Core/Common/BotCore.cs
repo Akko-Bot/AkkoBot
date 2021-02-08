@@ -17,12 +17,12 @@ namespace AkkoBot.Core.Common
     /// </summary>
     public class BotCore
     {
-        public DiscordShardedClient BotClient { get; }
+        public DiscordShardedClient BotShardedClient { get; }
         public IReadOnlyDictionary<int, CommandsNextExtension> CommandExt { get; }
 
         public BotCore(DiscordShardedClient client, IReadOnlyDictionary<int, CommandsNextExtension> cmdHandler)
         {
-            BotClient = client;
+            BotShardedClient = client;
             CommandExt = cmdHandler;
 
             // Register command modules
@@ -61,7 +61,7 @@ namespace AkkoBot.Core.Common
                     cmdHandler.RegisterCommands(cog);
             }
 
-            BotClient.Logger.LogInformation(
+            BotShardedClient.Logger.LogInformation(
                 new EventId(LoggerEvents.Startup.Id, "Startup"),
                 $"{modules.Length + cogs.Length} command modules were successfully loaded."
             );

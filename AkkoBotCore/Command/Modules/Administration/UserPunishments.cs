@@ -42,15 +42,12 @@ namespace AkkoBot.Command.Modules.Administration
             await user.RemoveAsync(context.Member.GetFullname() + " | " + reason);
 
             // Send kick message to the context channel
-            var result = new DiscordEmbedBuilder()
-                .WithTitle("kick_title")
-                .AddField("user", user.GetFullname(), true)
-                .AddField("id", user.Id.ToString(), true);
+            var embed = _punishService.GetPunishEmbed(context, user, string.Empty, "kick_title");
 
             if (dmSuccess is null && !user.IsBot)
-                result.WithFooter("punishment_dm_failed");
+                embed.WithFooter("punishment_dm_failed");
 
-            await context.RespondLocalizedAsync(result, false);
+            await context.RespondLocalizedAsync(embed, false);
         }
 
         [HiddenOverload]
@@ -80,16 +77,13 @@ namespace AkkoBot.Command.Modules.Administration
             // Unban the user
             await context.Guild.UnbanMemberAsync(user);
 
-            // Send ban message to the context channel
-            var result = new DiscordEmbedBuilder()
-                .WithTitle(":biohazard: " + context.FormatLocalized("sban_title"))
-                .AddField("user", user.GetFullname(), true)
-                .AddField("id", user.Id.ToString(), true);
+            // Send soft-ban message to the context channel
+            var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
 
             if (dmSuccess is null && !user.IsBot)
-                result.WithFooter("punishment_dm_failed");
+                embed.WithFooter("punishment_dm_failed");
 
-            await context.RespondLocalizedAsync(result, false);
+            await context.RespondLocalizedAsync(embed, false);
         }
 
         [HiddenOverload]
@@ -116,15 +110,12 @@ namespace AkkoBot.Command.Modules.Administration
             await context.Guild.BanMemberAsync(user.Id, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
-            var result = new DiscordEmbedBuilder()
-                .WithTitle("⛔️ " + context.FormatLocalized("ban_title"))
-                .AddField("user", user.GetFullname(), true)
-                .AddField("id", user.Id.ToString(), true);
+            var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
 
             if (dmSuccess is null && !user.IsBot)
-                result.WithFooter("punishment_dm_failed");
+                embed.WithFooter("punishment_dm_failed");
 
-            await context.RespondLocalizedAsync(result, false);
+            await context.RespondLocalizedAsync(embed, false);
         }
 
         [Command("ban"), HiddenOverload]
@@ -134,11 +125,7 @@ namespace AkkoBot.Command.Modules.Administration
             await context.Guild.BanMemberAsync(user.Id, 1, context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
-            var embed = new DiscordEmbedBuilder()
-                .WithTitle(":no_entry: " + context.FormatLocalized("hackban_title"))
-                .AddField("user", user.GetFullname(), true)
-                .AddField("id", user.Id.ToString(), true);
-
+            var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "hackban_title");
             await context.RespondLocalizedAsync(embed);
         }
 
@@ -186,25 +173,45 @@ namespace AkkoBot.Command.Modules.Administration
             }
         }
 
-        // public async Task TimedBan(CommandContext context, DiscordMember user, TimeSpan time, string reason = null)
-        // {
-        //     // Execute ban and send confirmation message
+        [Command("timedban"), Aliases("tb")]
+        [Description("cmd_timedban")]
+        public async Task TimedBan(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordMember user,
+            [Description("arg_timed_ban")] TimeSpan time,
+            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+        {
+            // Execute ban and send confirmation message
+            await _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
 
-        //     // create db entry and save it - if it already exists, update it
-        //     var entry = new TimerEntity()
-        //     {
-        //         GuildId = context.Guild.Id,
-        //         UserId = user.Id,
-        //         Interval = time,
-        //         Type = TimerType.Unban,
-        //         ElapseAt = DateTimeOffset.Now.Add(time)
-        //     };
+            // create db entry and save it - if it already exists, update it
+            await _punishService.TimedBan(context, time, user.Id, reason);
 
-        //     // have a singleton object for timer actions?
+            // Send ban message to the context channel
+            var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "timedban_title")
+                .WithFooter(
+                    context.FormatLocalized("banned_for") + ": " +
+                    context.FormatLocalized("days_hours_minutes", time.Days, time.Hours, time.Minutes)
+                );
 
+            await context.RespondLocalizedAsync(embed);
+        }
 
-        //     // create timer and cache it, if appropriate
-        // }
+        [Command("timedban"), HiddenOverload]
+        public async Task TimedHackBan(CommandContext context, DiscordUser user, TimeSpan time, [RemainingText] string reason = null)
+        {
+            // Perform the timed ban
+            await _punishService.TimedBan(context, time, user.Id, reason);
+
+            // Send ban message to the context channel
+            var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "timedban_title")
+                .WithFooter(
+                    context.FormatLocalized("banned_for") + ": " +
+                    context.FormatLocalized("days_hours_minutes", time.Days, time.Hours, time.Minutes)
+                );
+
+            await context.RespondLocalizedAsync(embed);
+        }
 
         [Command("unban")]
         [Description("cmd_unban")]

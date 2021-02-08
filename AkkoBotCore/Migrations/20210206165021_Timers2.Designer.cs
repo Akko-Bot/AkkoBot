@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210206165021_Timers2")]
+    partial class Timers2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -332,9 +334,6 @@ namespace AkkoBot.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_timers");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_timers_id");
 
                     b.ToTable("timers");
                 });

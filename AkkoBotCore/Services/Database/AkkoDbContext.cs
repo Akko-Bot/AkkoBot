@@ -29,7 +29,7 @@ namespace AkkoBot.Services.Database
                 .HasIndex(g => g.GuildId);
 
             modelBuilder.Entity<TimerEntity>()
-                .HasKey(x => x.Id);
+                .HasIndex(x => x.Id);
 
             modelBuilder.Entity<LogConfigEntity>()
                 .HasKey(x => x.Id);

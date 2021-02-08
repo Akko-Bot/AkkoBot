@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Repository;
+using AkkoBot.Services.Timers;
 using System;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace AkkoBot.Services.Database
         public BotConfigRepo BotConfig { get; private set; }
         public LogConfigRepo LogConfig { get; private set; }
         public GuildConfigRepo GuildConfig { get; private set; }
+        public TimerRepo Timers { get; set; }
         public PlayingStatusRepo PlayingStatuses { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)
@@ -26,6 +28,7 @@ namespace AkkoBot.Services.Database
             BotConfig = new(db, dbCacher);
             LogConfig = new(db, dbCacher);
             GuildConfig = new(db, dbCacher);
+            Timers = new(db, dbCacher);
             PlayingStatuses = new(db, dbCacher);
         }
 

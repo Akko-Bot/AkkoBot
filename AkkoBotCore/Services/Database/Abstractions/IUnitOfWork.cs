@@ -14,6 +14,7 @@ namespace AkkoBot.Services.Database.Abstractions
         public BotConfigRepo BotConfig { get; }
         public LogConfigRepo LogConfig { get; }
         public GuildConfigRepo GuildConfig { get; }
+        public TimerRepo Timers { get; }
         public PlayingStatusRepo PlayingStatuses { get; }
 
         /// <summary>

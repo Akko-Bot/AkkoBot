@@ -13,7 +13,7 @@ namespace AkkoBot.Services.Database.Repository
     /// </summary>
     public class DbRepository<T> : IRepository<T> where T : DbEntity
     {
-        protected DbSet<T> Table { get; }
+        public DbSet<T> Table { get; }
 
         public DbRepository(AkkoDbContext db)
             => Table = db.Set<T>();

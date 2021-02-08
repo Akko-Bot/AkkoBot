@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Timers;
 using ConcurrentCollections;
 
 namespace AkkoBot.Services.Database.Abstractions
@@ -15,6 +16,7 @@ namespace AkkoBot.Services.Database.Abstractions
         BotConfigEntity BotConfig { get; set; }
         LogConfigEntity LogConfig { get; set; }
         ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
+        TimerManager Timers { get; set; }
         List<PlayingStatusEntity> PlayingStatuses { get; }
 
         /// <summary>

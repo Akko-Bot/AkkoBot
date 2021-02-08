@@ -8,6 +8,8 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using AkkoBot.Services.Timers;
 
 namespace AkkoBot.Core.Common
 {
@@ -17,6 +19,7 @@ namespace AkkoBot.Core.Common
     public class Startup
     {
         private readonly IUnitOfWork _db;
+        private BotCore _botCore;
 
         public Startup(IUnitOfWork db)
             => _db = db;
@@ -31,17 +34,22 @@ namespace AkkoBot.Core.Common
             if (_db is null)
                 throw new NullReferenceException("No database Unit of Work was found.");
 
+            _botCore = botCore;
+
             // Create bot configs on ready, if there isn't one already
-            botCore.BotClient.Ready += LoadBotConfig;
+            botCore.BotShardedClient.Ready += LoadBotConfig;
+
+            // Initialize the timers stored in the database
+            botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
 
             // Save visible guilds on ready
-            botCore.BotClient.GuildDownloadCompleted += SaveNewGuildsAsync;
+            botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuildsAsync;
 
             // Save guild on join
-            botCore.BotClient.GuildCreated += SaveGuildOnJoin;
+            botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
 
             // Decache guild on leave
-            botCore.BotClient.GuildDeleted += DecacheGuildOnLeave;
+            botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
 
             // Command logging
             foreach (var cmdHandler in botCore.CommandExt.Values)
@@ -61,6 +69,15 @@ namespace AkkoBot.Core.Common
             _db.LogConfig.TryCreate();
             _db.BotConfig.TryCreate();
             _db.SaveChanges();
+
+            return Task.CompletedTask;
+        }
+
+        // Initialize the timers
+        private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        {
+            var cmdHandler = _botCore.CommandExt[client.ShardId];
+            cmdHandler.Services.GetService<IDbCacher>().Timers = cmdHandler.Services.GetService<TimerManager>();
 
             return Task.CompletedTask;
         }
@@ -117,11 +134,11 @@ namespace AkkoBot.Core.Common
         // Log exceptions thrown on command execution.
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
-            if (eventArgs.Exception
-            is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
-            and not ChecksFailedException       // Ignore command check fails
-            and not CommandNotFoundException    // Ignore commands that do not exist
-            and not InvalidOperationException)  // Ignore groups that are not commands themselves
+            // if (eventArgs.Exception
+            // is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
+            // and not ChecksFailedException       // Ignore command check fails
+            // and not CommandNotFoundException    // Ignore commands that do not exist
+            // and not InvalidOperationException)  // Ignore groups that are not commands themselves
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
 

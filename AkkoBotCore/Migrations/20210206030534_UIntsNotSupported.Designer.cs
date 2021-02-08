@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210206030534_UIntsNotSupported")]
+    partial class UIntsNotSupported
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,13 +312,9 @@ namespace AkkoBot.Migrations
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("guild_id");
 
-                    b.Property<TimeSpan>("Interval")
+                    b.Property<TimeSpan?>("Interval")
                         .HasColumnType("interval")
                         .HasColumnName("interval");
-
-                    b.Property<bool>("IsAbsolute")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_absolute");
 
                     b.Property<bool>("IsRepeatable")
                         .HasColumnType("boolean")
@@ -332,9 +330,6 @@ namespace AkkoBot.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_timers");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_timers_id");
 
                     b.ToTable("timers");
                 });

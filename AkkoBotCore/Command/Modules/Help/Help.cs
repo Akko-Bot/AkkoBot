@@ -79,6 +79,7 @@ namespace AkkoBot.Command.Modules.Help
                     return nspaces[^Math.Min(2, nspaces.Length - 1)];
                 })
                 .Distinct()                                                             // Remove the repeated sections
+                .OrderBy(x => x)
                 .ToArray();
 
             var embed = new DiscordEmbedBuilder()
@@ -101,10 +102,11 @@ namespace AkkoBot.Command.Modules.Help
             var cmdGroup = await context.CommandsNext.RegisteredCommands.Values
                 .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
                 .Distinct()
+                .OrderBy(x => x.Name)
                 .Select(async cmd =>
                 {
                     var emote = (await cmd.RunChecksAsync(context, false)).Any() ? "❌" : "✅";
-                    return $"{emote} {context.Prefix}{cmd.QualifiedName}";
+                    return emote + context.Prefix + cmd.QualifiedName;
                 })
                 .ToListAsync();
 

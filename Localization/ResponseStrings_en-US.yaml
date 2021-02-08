@@ -12,6 +12,7 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_prefix: The new prefix.
 arg_punishment_reason: The reason for the punishment.
+arg_timed_ban: For how long the user should remain banned.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
@@ -20,6 +21,7 @@ arg_ulong_user_col: Multiple valid user IDs.
 arg_unpunishment_reason: The reason for lifting the punishment.
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
+banned_for: Banned for
 bl_added: Successfully added {0} {1} {2} to the blacklist.
 bl_added_range: '{0} IDs were added to the blacklist.'
 bl_clear: '{0} entries were successfully removed from the blacklist.'
@@ -67,20 +69,22 @@ cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
-cmd_kick: Kicks a user.
-cmd_massban: Bans multiple users.
-cmd_massunban: Unbans multiple users.
+cmd_kick: Kicks a user from the server.
+cmd_massban: Bans multiple users from the server.
+cmd_massunban: Unbans multiple users from the server.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
-cmd_sban: Kicks a user and deletes their messages.
+cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_sudo: Executes a command as the specified user.
-cmd_unban: Unbans a user.
+cmd_timedban: Temporarily bans a user from the server.
+cmd_unban: Unbans a user from the server.
 command: Command
 command_check_failed: The user does not have enough permissions to execute this command.
 command_modules_footer: Use {0} to see the usage for a specific command.
 command_not_found: Command not found.
 commands: Commands
 days: Days
+days_hours_minutes: '{0} days, {1} hours, {2} minutes'
 disabled: disabled
 enabled: enabled
 error_hierarchy: This command can only be used on users with a role lower to yours and mine in the role hierarchy.
@@ -156,6 +160,7 @@ seconds: Seconds
 server: Server
 settings: Settings
 shutdown: Shutting down.
+timedban_title: Temporary Ban
 type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.

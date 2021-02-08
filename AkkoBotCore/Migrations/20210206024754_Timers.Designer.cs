@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210206024754_Timers")]
+    partial class Timers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,11 +60,11 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.BotConfigEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("bigint")
                         .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
                     b.Property<string>("BotPrefix")
                         .IsRequired()
@@ -222,11 +224,11 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.LogConfigEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("bigint")
                         .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
@@ -288,11 +290,11 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.TimerEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("bigint")
                         .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
                     b.Property<decimal?>("ChannelId")
                         .HasColumnType("numeric(20,0)")
@@ -310,13 +312,9 @@ namespace AkkoBot.Migrations
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("guild_id");
 
-                    b.Property<TimeSpan>("Interval")
+                    b.Property<TimeSpan?>("Interval")
                         .HasColumnType("interval")
                         .HasColumnName("interval");
-
-                    b.Property<bool>("IsAbsolute")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_absolute");
 
                     b.Property<bool>("IsRepeatable")
                         .HasColumnType("boolean")
@@ -332,9 +330,6 @@ namespace AkkoBot.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_timers");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_timers_id");
 
                     b.ToTable("timers");
                 });

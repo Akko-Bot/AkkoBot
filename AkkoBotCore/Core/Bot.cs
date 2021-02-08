@@ -29,11 +29,11 @@ namespace AkkoBot.Core
             // Connect to Discord
             try
             {
-                await botCore.BotClient.StartAsync();
+                await botCore.BotShardedClient.StartAsync();
             }
             catch (Exception ex)
             {
-                botCore.BotClient.Logger.LogError(
+                botCore.BotShardedClient.Logger.LogError(
                     new EventId(LoggerEvents.ConnectionFailure.Id, "Startup"),
                     @"An error has occurred while attempting to connect to Discord. " +
                     @"Make sure your credentials are correct and that you don't have " +

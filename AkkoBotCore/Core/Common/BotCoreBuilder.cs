@@ -273,7 +273,7 @@ namespace AkkoBot.Core.Common
             var (botSettings, _) = GetBotSettings();
 
             return await BuildAsync(
-                (long)botSettings.InteractiveTimeout.Value.TotalSeconds,
+                botSettings.InteractiveTimeout.Value.TotalSeconds,
                 botSettings.CaseSensitiveCommands,
                 botSettings.RespondToDms,
                 botSettings.MentionPrefix
@@ -288,24 +288,16 @@ namespace AkkoBot.Core.Common
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
         /// <exception cref="NullReferenceException"/>
-        public async Task<BotCore> BuildAsync(long? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
+        public async Task<BotCore> BuildAsync(double? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
             if (_creds is null)
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
-            var services = _cmdServices.BuildServiceProvider();
-            var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
+            var botClients = GetBotClient(timeout); // Initialize the sharded clients
+            _cmdServices.AddSingleton(botClients);  // Add the clients to the IoC container
 
-            // Setup client configuration
-            var botConfig = new DiscordConfiguration()
-            {
-                Token = _creds.Token,           // Sets the bot token
-                TokenType = TokenType.Bot,      // Defines the type of token; User = 0, Bot = 1, Bearer = 2
-                AutoReconnect = true,           // Sets whether the bot should automatically reconnect in case it disconnects
-                ReconnectIndefinitely = false,  // Sets whether the bot should attempt to reconnect indefinitely
-                MessageCacheSize = 200,         // Defines how many messages should be cached by the library, per channel
-                LoggerFactory = _loggerFactory  // Overrides D#+ default logger with your own
-            };
+            var services = _cmdServices.BuildServiceProvider();     // Initialize the IoC container
+            var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>()); // Initialize the prefix resolver
 
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()
@@ -315,8 +307,34 @@ namespace AkkoBot.Core.Common
                 EnableMentionPrefix = withMentionPrefix,                // Sets whether the bot accepts its own mention as a prefix for commands
                 IgnoreExtraArguments = false,                           // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                    // Sets the dependencies used by the command modules
-                EnableDefaultHelp = false,                           // Sets whether the bot should use the default help command from the library
+                EnableDefaultHelp = false,                              // Sets whether the bot should use the default help command from the library
                 PrefixResolver = (msg) => pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
+            };
+
+            // Initialize the command handlers
+            var cmdHandlers = await botClients.UseCommandsNextAsync(cmdExtConfig);
+
+            // Build the bot
+            var bot = new BotCore(botClients, cmdHandlers);
+
+            // Register core events
+            var startup = new Startup(services.GetService<IUnitOfWork>());
+            startup.RegisterEvents(bot);
+
+            return bot;
+        }
+
+        private DiscordShardedClient GetBotClient(double? timeout)
+        {
+            // Setup client configuration
+            var botConfig = new DiscordConfiguration()
+            {
+                Token = _creds.Token,           // Sets the bot token
+                TokenType = TokenType.Bot,      // Defines the type of token; User = 0, Bot = 1, Bearer = 2
+                AutoReconnect = true,           // Sets whether the bot should automatically reconnect in case it disconnects
+                ReconnectIndefinitely = false,  // Sets whether the bot should attempt to reconnect indefinitely
+                MessageCacheSize = 200,         // Defines how many messages should be cached by the library, per channel
+                LoggerFactory = _loggerFactory  // Overrides D#+ default logger with my own
             };
 
             // Setup client interactivity
@@ -325,25 +343,17 @@ namespace AkkoBot.Core.Common
                 PaginationBehaviour = PaginationBehaviour.WrapAround,   // Sets whether paginated responses should wrap from first page to last page and vice-versa
                 PaginationDeletion = PaginationDeletion.DeleteEmojis,   // Sets whether emojis or the paginated message should be deleted after timeout
                 PollBehaviour = PollBehaviour.KeepEmojis,               // Sets whether emojis should be deleted after a poll ends
-                Timeout = new TimeSpan(timeout ?? 30),                  // Sets how long it takes for an interactive response to timeout
+                Timeout = TimeSpan.FromSeconds(timeout ?? 30.0),          // Sets how long it takes for an interactive response to timeout
                 // setup customized paginated emojis
             };
 
-            var botClient = new DiscordShardedClient(botConfig);                    // Initialize the sharded clients
-            var cmdHandlers = await botClient.UseCommandsNextAsync(cmdExtConfig);   // Initialize the command handlers
+            var shardedClients = new DiscordShardedClient(botConfig);   // Initialize the sharded clients
 
             // Add interactivity to the sharded clients
-            foreach (var client in botClient.ShardClients.Values)
+            foreach (var client in shardedClients.ShardClients.Values)
                 client.UseInteractivity(interactivityOptions);
 
-            // Build the bot
-            var bot = new BotCore(botClient, cmdHandlers);
-
-            // Register core events
-            var startup = new Startup(services.GetService<IUnitOfWork>());
-            startup.RegisterEvents(bot);
-
-            return bot;
+            return shardedClients;
         }
 
         /// <summary>
