@@ -50,7 +50,7 @@ namespace AkkoBot.Services
         /// <param name="filePath">Relative or absolute directory path to the file.</param>
         /// <remarks><paramref name="filePath"/> must contain at least one <see cref="Path.DirectorySeparatorChar"/>.</remarks>
         /// <returns>The directory path of the specified file.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <exception cref="ArgumentOutOfRangeException">Occurs when the string terminates in <see cref="OsSlash"/>.</exception>
         public static string GetFileDirectoryPath(string filePath)
             => filePath.Substring(0, filePath.LastIndexOf(OsSlash) + 1);
 

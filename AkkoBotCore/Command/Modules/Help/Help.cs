@@ -2,6 +2,7 @@ using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Formatters;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -53,7 +54,7 @@ namespace AkkoBot.Command.Modules.Help
             if (botPerms.HasPermission(Permissions.SendMessages))
                 await context.RespondLocalizedAsync(content, embed, helpBuilder.IsErroed, helpBuilder.IsErroed);
             else if (botPerms.HasPermission(Permissions.AddReactions))
-                await context.Message.CreateReactionAsync(DiscordEmoji.FromName(context.Client, ":warning:"));
+                await context.Message.CreateReactionAsync(AkkoEntities.WarningEmoji);
             else
             {
                 // Might consider placing a global ratelimit on !help because of this

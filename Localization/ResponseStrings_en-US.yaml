@@ -1,3 +1,4 @@
+app_owners: Application Owners
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
 arg_bool: __true__ to enable, __false__ to disable.
@@ -58,6 +59,10 @@ cmd_config_log_timeformat: Sets the time format used for logging on the console.
 cmd_config_log_timeformat_arg: The time format to be used. Leave it empty to reset to the default.
 cmd_config_mention: Sets whether the bot should respond to commands executed with a mention to itself as a prefix. Requires a restart to take effect.
 cmd_config_okcolor: Sets the default color that should be used on embeds.
+cmd_config_owner: Groups commands related to the bot owners.
+cmd_config_owner_add: Adds a bot owner to the credentials file.
+cmd_config_owner_list: Lists the bot owners.
+cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
@@ -107,6 +112,7 @@ help_attach_files: Attach Files
 help_ban_members: Ban Members
 help_bot_owner: Bot Ownership
 help_change_nickname: Change Nickname
+help_cmd_not_found: Command not found. Use {0} and/or {1} to find the command you're looking for.
 help_create_invite: Create Invite
 help_deafen_members: Deafen Members
 help_footer: Use {0} to get help for a specific command.
@@ -147,6 +153,7 @@ modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules
 name: Name
 online_since: Online since
+owners: Owners
 punishment_dm_failed: Failed to deliver the punishment notification.
 q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
 q_blclear: remove all blacklist entries

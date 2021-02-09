@@ -1,7 +1,6 @@
 ﻿using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Extensions;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -29,7 +28,7 @@ namespace AkkoBot.Command.Modules.Administration
 
                 return;
             }
-            
+
             var fakeContext = context.CommandsNext.CreateFakeContext(user, context.Channel, command, context.Prefix, cmd, args);
             var failedChecks = await cmd.RunChecksAsync(fakeContext, false);
 

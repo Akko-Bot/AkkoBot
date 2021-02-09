@@ -1,8 +1,9 @@
+app_owners: Donos da Aplicação
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
 arg_bool: __true__ para ativar, __false__ para desativar.
 arg_color: Um código de cor hexadecimal de seis dígitos.
-arg_command: Um comand válido.
+arg_command: Um comando válido.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_double: Um número real.
@@ -58,6 +59,10 @@ cmd_config_log_timeformat: Define o formato de hora a ser utilizado nos logs. Vo
 cmd_config_log_timeformat_arg: O formato de hora a ser utilizado. Deixe vazio para redefini-lo de volta ao valor padrão.
 cmd_config_mention: Define se o bot deve responder a comandos executados com uma menção a si como prefixo. Requer reinicialização para tomar efeito.
 cmd_config_okcolor: Define a cor padrão a ser utilizada em embeds.
+cmd_config_owner: Agrupa comandos relacionados aos donos to bot.
+cmd_config_owner_add: Adiciona um dono às credenciais do bot.
+cmd_config_owner_list: Lista os donos do bot.
+cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
@@ -107,6 +112,7 @@ help_attach_files: Anexar Arquivos
 help_ban_members: Banir Membros
 help_bot_owner: Autoria do Bot
 help_change_nickname: Alterar Apelido
+help_cmd_not_found: Comando não encontrado. Utilize {0} e/ou {1} para encontrar o comando que você procura.
 help_create_invite: Criar Convite
 help_deafen_members: Ensurdecer Membros
 help_footer: Utilize {0} para receber ajuda sobre um comando específico.
@@ -147,6 +153,7 @@ modules_footer: Utilize {0} para visualizar os comandos sob um determinado módu
 modules_title: Módulos Disponíveis
 name: Nome
 online_since: Online desde
+owners: Donos
 punishment_dm_failed: Falha ao enviar a notificação de punição.
 q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
 q_blclear: remover todos os registros da lista negra

@@ -82,7 +82,7 @@ namespace AkkoBot.Services.Timers
         {
             var timeDifference = entity.ElapseAt.Subtract(DateTimeOffset.Now);
 
-            timeDifference = (timeDifference.Ticks <= 0)
+            timeDifference = (timeDifference <= TimeSpan.Zero)
                 ? TimeFromExpiredEntity(entity)
                 : TimeFromValidEntry(timeDifference, entity);
 

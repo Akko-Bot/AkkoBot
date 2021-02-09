@@ -7,6 +7,10 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
+using AkkoBot.Credential;
+using AkkoBot.Services;
+using System.IO;
+using YamlDotNet.Serialization;
 
 namespace AkkoBot.Command.Modules.Self.Services
 {
@@ -72,6 +76,16 @@ namespace AkkoBot.Command.Modules.Self.Services
                 settings.TryAdd(propPair.Key, propPair.Value);
 
             return settings;
+        }
+
+        /// <summary>
+        /// Serializes a credentials file.
+        /// </summary>
+        /// <param name="creds">The data to be serialized.</param>
+        public void SerializeCredentials(Credentials creds)
+        {
+            using var writer = File.CreateText(AkkoEnvironment.CredsPath);
+            new Serializer().Serialize(writer, creds);
         }
     }
 }

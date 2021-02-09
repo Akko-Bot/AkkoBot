@@ -17,11 +17,13 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <returns><see langword="true"/> if the context user is above in the hierarchy, <see langword="false"/> otherwise.</returns>
         public async Task<bool> CheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
         {
-            if (context.Member.Hierarchy <= user.Hierarchy && context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
+            if ((context.Member.Hierarchy <= user.Hierarchy 
+            && context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
+            || user.Equals(context.Guild.CurrentMember))
             {
                 var embed = new DiscordEmbedBuilder().WithDescription(errorMessage);
                 await context.RespondLocalizedAsync(embed, isError: true);
-                
+
                 return false;
             }
 

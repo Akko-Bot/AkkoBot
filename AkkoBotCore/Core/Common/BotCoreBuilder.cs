@@ -1,11 +1,8 @@
-﻿using System.Collections.Immutable;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
-using AkkoBot.Command.Attributes;
-using AkkoBot.Command.Formatters;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
@@ -105,8 +102,7 @@ namespace AkkoBot.Core.Common
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultServices()
         {
-            _cmdServices.AddSingletonServices(typeof(ICommandService))
-                .AddSingleton<ILocalizer, AkkoLocalizer>();
+            _cmdServices.AddSingletonServices(typeof(ICommandService));
 
             return this;
         }
@@ -324,19 +320,24 @@ namespace AkkoBot.Core.Common
             // Add the clients to the IoC container
             _cmdServices.AddSingleton(client);
 
-            var servicesList = new List<ServiceDescriptor>()
+            var servicesList = new ServiceDescriptor[]
             {
                 // Add subsystems in here as needed
                 // > Database
                 ServiceDescriptor.Singleton<IDbCacher, AkkoDbCacher>(),
                 ServiceDescriptor.Scoped<IUnitOfWork, AkkoUnitOfWork>(),
 
+                // > Localization
+                ServiceDescriptor.Singleton<ILocalizer, AkkoLocalizer>(),
+
                 // > Timers
                 ServiceDescriptor.Singleton<ITimerManager, TimerManager>()
+                //ServiceDescriptor.Singleton(typeof(TimerActions))
             };
-            
+
             foreach (var service in servicesList)
             {
+                // Add the services. Ignore any whose interface has already been registered.
                 if (!_cmdServices.Any(x => x.ServiceType == service.ServiceType))
                     _cmdServices.Add(service);
             }

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -96,15 +97,15 @@ namespace AkkoBot.Extensions
                 ? db.BotConfig.GetAllSync().FirstOrDefault()
                 : db.GuildConfig.GetGuild(context.Guild.Id);
 
-            var responseString = GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
-            var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
+            var responseString = GeneralService.GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
+            var localizedEmbed = GeneralService.LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
 
             if (isMarked && !string.IsNullOrWhiteSpace(embed?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return settings.UseEmbed
                 ? await context.RespondAsync(responseString, false, localizedEmbed)
-                : await context.RespondAsync(responseString + "\n\n" + DeconstructEmbed(embed));
+                : await context.RespondAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
         }
 
         /// <summary>
@@ -160,14 +161,14 @@ namespace AkkoBot.Extensions
                 ? db.BotConfig.GetAllSync().FirstOrDefault()
                 : db.GuildConfig.GetGuild(context.Guild.Id);
 
-            var responseString = GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
-            var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
+            var responseString = GeneralService.GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
+            var localizedEmbed = GeneralService.LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
 
             try
             {
                 return settings.UseEmbed
                     ? await user.SendMessageAsync(responseString, false, localizedEmbed)
-                    : await user.SendMessageAsync(responseString + "\n\n" + DeconstructEmbed(embed));
+                    : await user.SendMessageAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
             }
             catch
             {
@@ -194,127 +195,14 @@ namespace AkkoBot.Extensions
             for (int index = 0; index < args.Length; index++)
             {
                 if (args[index] is string)
-                    args[index] = GetLocalizedResponse(localizer, locale, args[index] as string);
+                    args[index] = GeneralService.GetLocalizedResponse(localizer, locale, args[index] as string);
             }
 
-            key = GetLocalizedResponse(localizer, locale, key);
+            key = GeneralService.GetLocalizedResponse(localizer, locale, key);
 
             return string.Format(key, args);
         }
 
-        /// <summary>
-        /// Localizes the content of an embed to its corresponding response string(s).
-        /// </summary>
-        /// <param name="localizer">The response strings cache.</param>
-        /// <param name="embed">Embed to be localized.</param>
-        /// <param name="locale">Locale to localize to.</param>
-        /// <param name="okColor">OkColor to set the embed to, if it doesn't have one already.</param>
-        /// <param name="errorColor">ErrorColor to set the embed to, if it doesn't have one already.</param>
-        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
-        /// <remarks>It ignores strings that don't match any key for a response string.</remarks>
-        /// <returns>The localized embed or <see langword="null"/> if the embed is null.</returns>
-        internal static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, IMessageSettings settings, DiscordEmbedBuilder embed, bool isError = false)
-        {
-            if (embed is null)
-                return null;
-
-            if (embed.Title is not null)
-                embed.Title = GetLocalizedResponse(localizer, settings.Locale, embed.Title);
-
-            if (embed.Description is not null)
-                embed.Description = GetLocalizedResponse(localizer, settings.Locale, embed.Description);
-
-            if (embed.Url is not null)
-                embed.Url = GetLocalizedResponse(localizer, settings.Locale, embed.Url);
-
-            if (!embed.Color.HasValue)
-                embed.Color = new DiscordColor((isError) ? settings.ErrorColor : settings.OkColor);
-
-            if (embed.Author is not null)
-                embed.Author.Name = GetLocalizedResponse(localizer, settings.Locale, embed.Author.Name);
-
-            if (embed.Footer is not null)
-                embed.Footer.Text = GetLocalizedResponse(localizer, settings.Locale, embed.Footer.Text);
-
-            foreach (var field in embed.Fields)
-            {
-                field.Name = GetLocalizedResponse(localizer, settings.Locale, field.Name);
-                field.Value = GetLocalizedResponse(localizer, settings.Locale, field.Value);
-            }
-
-            return embed;
-        }
-
-        /// <summary>
-        /// Converts all text content from an embed into a string.
-        /// </summary>
-        /// <param name="embed">Embed to be deconstructed.</param>
-        /// <remarks>It ignores image links, except for the one on the image field.</remarks>
-        /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
-        internal static string DeconstructEmbed(DiscordEmbedBuilder embed)
-        {
-            if (embed is null)
-                return null;
-
-            var dEmbed = new StringBuilder(
-                ((embed.Author is null) ? string.Empty : embed.Author.Name + "\n\n") +
-                ((embed.Title is null) ? string.Empty : Formatter.Bold(embed.Title) + "\n") +
-                ((embed.Description is null) ? string.Empty : embed.Description + "\n\n")
-            );
-
-            // var fieldNames = embed.Fields.Select(x => x.Name).ToArray();
-            // var fieldValues = embed.Fields.Select(x => x.Value).ToArray();
-
-            // for (int index = 0; index < embed.Fields.Count; index++)
-            // {
-            //     if (embed.Fields[index].Inline)
-            //     {
-            //         if (index == fieldNames.Length - 1)
-            //             continue;
-
-            //         var valueLines = fieldValues[index].Split("\n"); // 15
-            //         var valueLines2 = fieldValues[index + 1].Split("\n");
-
-            //         dEmbed.AppendLine("```");
-            //         dEmbed.AppendLine($"{fieldNames[index].MaxLength(15), -15} {fieldNames[++index]}");
-
-            //         for (int line = 0; line < valueLines.Length; line++)
-            //         {
-            //             dEmbed.AppendLine($"{valueLines[line].MaxLength(15), -15} {valueLines2[line]}");
-            //         }
-
-            //         dEmbed.Append("```");
-            //     }
-            //     else
-            //     {
-            //         dEmbed.AppendLine(Formatter.BlockCode(fieldNames[index] + "\n" + fieldValues[index] + "\n"));
-            //     }
-            // }
-
-            foreach (var field in embed.Fields)
-                dEmbed.AppendLine(Formatter.BlockCode(field.Name + "\n" + field.Value + "\n"));
-
-            dEmbed.Append(
-                ((embed.ImageUrl is null) ? string.Empty : $"{embed.ImageUrl}\n\n") +
-                ((embed.Footer is null) ? string.Empty : embed.Footer.Text + "\n") +
-                ((embed.Timestamp is null) ? string.Empty : embed.Timestamp.ToString())
-            );
-
-            return dEmbed.ToString();
-        }
-
-        /// <summary>
-        /// Gets the localized response string.
-        /// </summary>
-        /// <param name="localizer">The response strings cache.</param>
-        /// <param name="locale">The locale of the response string.</param>
-        /// <param name="sample">The key of the response string.</param>
-        /// <returns>The localized response string. If it does not exist, returns <paramref name="sample"/>.</returns>
-        internal static string GetLocalizedResponse(ILocalizer localizer, string locale, string sample)
-        {
-            return (sample is not null && localizer.ContainsResponse(locale, sample))
-                ? localizer.GetResponseString(locale, sample)
-                : sample ?? string.Empty;
-        }
+        
     }
 }

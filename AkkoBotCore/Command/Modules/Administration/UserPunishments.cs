@@ -36,7 +36,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmSuccess = _punishService.SendPunishmentDm(context, user, "kick_notification", reason);
+            var dmMsg = _punishService.SendPunishmentDm(context, user, "kick_notification", reason);
 
             // Kick the user
             await user.RemoveAsync(context.Member.GetFullname() + " | " + reason);
@@ -44,7 +44,7 @@ namespace AkkoBot.Command.Modules.Administration
             // Send kick message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, string.Empty, "kick_title");
 
-            if (dmSuccess is null && !user.IsBot)
+            if (dmMsg is null && !user.IsBot)
                 embed.WithFooter("punishment_dm_failed");
 
             await context.RespondLocalizedAsync(embed, false);
@@ -69,7 +69,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmSuccess = _punishService.SendPunishmentDm(context, user, "sban_notification", reason);
+            var dmMsg = _punishService.SendPunishmentDm(context, user, "sban_notification", reason);
 
             // Ban the user
             await user.BanAsync((int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
@@ -80,7 +80,7 @@ namespace AkkoBot.Command.Modules.Administration
             // Send soft-ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
 
-            if (dmSuccess is null && !user.IsBot)
+            if (dmMsg is null && !user.IsBot)
                 embed.WithFooter("punishment_dm_failed");
 
             await context.RespondLocalizedAsync(embed, false);
@@ -104,7 +104,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmSuccess = _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
+            var dmMsg = _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
 
             // Ban the user
             await context.Guild.BanMemberAsync(user.Id, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
@@ -112,7 +112,7 @@ namespace AkkoBot.Command.Modules.Administration
             // Send ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
 
-            if (dmSuccess is null && !user.IsBot)
+            if (dmMsg is null && !user.IsBot)
                 embed.WithFooter("punishment_dm_failed");
 
             await context.RespondLocalizedAsync(embed, false);

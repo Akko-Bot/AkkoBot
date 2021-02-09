@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using DSharpPlus;
+using AkkoBot.Services;
 
 namespace AkkoBot.Extensions
 {
@@ -47,15 +48,15 @@ namespace AkkoBot.Extensions
             if (isError)
                 embed.Color = default;
 
-            var responseString = CommandContextExt.GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
-            var localizedEmbed = CommandContextExt.LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
+            var responseString = GeneralService.GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
+            var localizedEmbed = GeneralService.LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
 
             if (isMarked && !string.IsNullOrWhiteSpace(embed?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return settings.UseEmbed
                 ? await msg.ModifyAsync(responseString, localizedEmbed.Build())
-                : await msg.ModifyAsync(responseString + "\n\n" + CommandContextExt.DeconstructEmbed(embed));
+                : await msg.ModifyAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
         }
     }
 }

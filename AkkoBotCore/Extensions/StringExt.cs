@@ -44,7 +44,12 @@ namespace AkkoBot.Extensions
             return buffer.ToString().ToLowerInvariant();
         }
 
-        public static string Capitalize(this string text) 
+        /// <summary>
+        /// Returns a string whose first character is uppercase and all others are lowercase.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns>This string capitalized.</returns>
+        public static string Capitalize(this string text)
             => char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
     }
 }

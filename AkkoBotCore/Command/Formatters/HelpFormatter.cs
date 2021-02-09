@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using System.Reflection;
 using System;
 using System.Collections.Generic;
@@ -41,21 +42,14 @@ namespace AkkoBot.Command.Formatters
             _helpDescription = _cmdContext.FormatLocalized(cmd.Description);
 
             // Add requirements
-            var requirements = (cmd is CommandGroup)
-                ? GetCmdGroupRequirements(cmd)
-                : GetCmdRequirements(cmd);
+            var requirements = GetCmdRequirements(cmd);
 
             foreach (var att in requirements.OrderBy(x => x.AttributeType.Name))
             {
                 if (att.AttributeType == typeof(BotOwnerAttribute))
-                {
                     _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_bot_owner"));
-                }
                 else
-                {
-                    Enum.TryParse(typeof(Permissions), att.ConstructorArguments.FirstOrDefault().Value.ToString(), true, out var result);
-                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_" + result.ToString().ToSnakeCase()));
-                }
+                    _helpRequiresField.AppendLine(GetLocalizedPermissions(att.ConstructorArguments));
             }
 
             // If this is a group, there are no arguments to be shown
@@ -158,7 +152,12 @@ namespace AkkoBot.Command.Formatters
         public HelpFormatter WithCmdNotFound()
         {
             IsErroed = true;
-            _helpDescription = _cmdContext.FormatLocalized("help_cmd_not_found");
+            _helpDescription = _cmdContext.FormatLocalized(
+                "help_cmd_not_found",
+                Formatter.InlineCode(_cmdContext.Prefix + "module"),
+                Formatter.InlineCode(_cmdContext.Prefix + "module" + " <" + _cmdContext.FormatLocalized("name").ToLowerInvariant() + ">")
+            );
+
             return this;
         }
 
@@ -243,28 +242,25 @@ namespace AkkoBot.Command.Formatters
                     )
                 )
                 .SelectMany(method => method.CustomAttributes)
-                .Concat(cmd.Module.ModuleType.CustomAttributes)
+                .Concat(GetAttributeTree(cmd))
                 .Where(
                     attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
                         || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
                         || attribute.AttributeType == typeof(RequirePermissionsAttribute)
                 )
-                .DistinctBy(x => x.ConstructorArguments.FirstOrDefault().Value);
+                .DistinctBy(attribute => attribute.ConstructorArguments.FirstOrDefault().Value);
         }
 
         /// <summary>
-        /// Gets the requirements from a command group.
+        /// Gets all attributes from a command and the groups it belongs to.
         /// </summary>
-        /// <param name="cmd">The command to get the requirements from.</param>
-        /// <returns>A list of attributes with the requirements.</returns>
-        private IEnumerable<CustomAttributeData> GetCmdGroupRequirements(DSharpPlus.CommandsNext.Command cmd)
+        /// <param name="cmd">The command to get the attributes from.</param>
+        /// <returns>A collection of attributes.</returns>
+        private IEnumerable<CustomAttributeData> GetAttributeTree(DSharpPlus.CommandsNext.Command cmd)
         {
-            return cmd.Module.ModuleType.CustomAttributes
-                .Where(
-                    attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
-                    || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
-                    || attribute.AttributeType == typeof(RequirePermissionsAttribute)
-                );
+            return (cmd.Parent is null)
+                ? cmd.Module.ModuleType.CustomAttributes
+                : cmd.Parent.Module.ModuleType.CustomAttributes.Concat(GetAttributeTree(cmd.Parent));
         }
 
         /// <summary>
@@ -324,6 +320,28 @@ namespace AkkoBot.Command.Formatters
 
             // Overload didn't match all reflected parameters
             return false;
+        }
+
+        /// <summary>
+        /// Gets the localized permissions of a permission attribute.
+        /// </summary>
+        /// <param name="permissions">Collection of attributes to have their permissions taken from.</param>
+        /// <returns>A string with all localized attributes separated by a newline.</returns>
+        private string GetLocalizedPermissions(IEnumerable<CustomAttributeTypedArgument> permissions)
+        {
+            var localizedPerms = new List<string>();
+
+            foreach (var perm in permissions)
+            {
+                Enum.TryParse(typeof(Permissions), perm.Value.ToString(), true, out var r);
+
+                var results = r.ToString().Replace(",", string.Empty).Split(" ");
+
+                foreach (var result in results)
+                    localizedPerms.Add(_cmdContext.FormatLocalized("help_" + result.ToSnakeCase()));
+            }
+
+            return string.Join("\n", localizedPerms);
         }
     }
 }

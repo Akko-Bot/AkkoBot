@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Self.Services;
+using AkkoBot.Credential;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -16,7 +18,7 @@ using Microsoft.Extensions.Logging;
 namespace AkkoBot.Command.Modules.Self
 {
     [BotOwner]
-    [RequireBotPermissions(Permissions.AddReactions)]
+    [RequireBotPermissions(Permissions.AddReactions | Permissions.SendMessages)]
     [Group("botconfig"), Aliases("self", "botcfg")]
     [Description("cmd_config")]
     public class BotConfig : AkkoCommandModule
@@ -114,14 +116,9 @@ namespace AkkoBot.Command.Modules.Self
         private async Task ChangeProperty(CommandContext context, Action<BotConfigEntity> selector)
         {
             _service.SetProperty(context, selector);
-
-            await context.Message.CreateReactionAsync(
-                DiscordEmoji.FromName(context.Client, ":white_check_mark:")
-            );
+            await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
-        [BotOwner]
-        [RequireBotPermissions(Permissions.AddReactions)]
         [Group("log"), Aliases("logs", "logging")]
         [Description("cmd_config_log")]
         public class LogConfig : AkkoCommandModule
@@ -160,9 +157,58 @@ namespace AkkoBot.Command.Modules.Self
             {
                 _service.SetProperty(context, selector);
 
-                await context.Message.CreateReactionAsync(
-                    DiscordEmoji.FromName(context.Client, ":white_check_mark:")
-                );
+                await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
+            }
+        }
+
+        [Group("owner"), Aliases("owners")]
+        [Description("cmd_config_owner")]
+        public class OwnerConfig : AkkoCommandModule
+        {
+            private readonly Credentials _creds;
+            private readonly BotConfigService _service;
+
+            public OwnerConfig(Credentials creds, BotConfigService service)
+            {
+                _creds = creds;
+                _service = service;
+            }
+
+            [Command("add")]
+            [Description("cmd_config_owner_add")]
+            public async Task AddOwner(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
+            {
+                if (_creds.OwnerIds.Add(user.Id))
+                {
+                    _service.SerializeCredentials(_creds);
+                    await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
+                }
+                else
+                    await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+            }
+
+            [Command("remove"), Aliases("rem")]
+            [Description("cmd_config_owner_rem")]
+            public async Task RemoveOwner(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
+            {
+                if (_creds.OwnerIds.Remove(user.Id))
+                {
+                    _service.SerializeCredentials(_creds);
+                    await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
+                }
+                else
+                    await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+            }
+
+            [GroupCommand, Command("list")]
+            [Description("cmd_config_owner_list")]
+            public async Task ListOwners(CommandContext context)
+            {
+                var embed = new DiscordEmbedBuilder()
+                    .AddField("owners", string.Join("\n", _creds.OwnerIds.DefaultIfEmpty()), true)
+                    .AddField("app_owners", string.Join("\n", context.Client.CurrentApplication.Owners.Select(x => x.Id).ToArray()), true);
+
+                await context.RespondLocalizedAsync(embed);
             }
         }
     }

@@ -9,6 +9,8 @@ using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using AkkoBot.Services.Timers.Abstractions;
+using DSharpPlus.CommandsNext.Exceptions;
+using AkkoBot.Services;
 
 namespace AkkoBot.Core.Common
 {
@@ -133,11 +135,11 @@ namespace AkkoBot.Core.Common
         // Log exceptions thrown on command execution.
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
-            // if (eventArgs.Exception
-            // is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
-            // and not ChecksFailedException       // Ignore command check fails
-            // and not CommandNotFoundException    // Ignore commands that do not exist
-            // and not InvalidOperationException)  // Ignore groups that are not commands themselves
+            if (eventArgs.Exception
+            is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
+            and not ChecksFailedException       // Ignore command check fails
+            and not CommandNotFoundException    // Ignore commands that do not exist
+            and not InvalidOperationException)  // Ignore groups that are not commands themselves
             {
                 cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
 
