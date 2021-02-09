@@ -1,9 +1,11 @@
+using System;
 using System.Windows.Input;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
+using AkkoBot.Extensions;
 
 namespace AkkoBot.Services.Timers
 {
@@ -12,12 +14,12 @@ namespace AkkoBot.Services.Timers
     /// </summary>
     public class TimerActions : ICommandService
     {
-        private readonly IUnitOfWork _db;
+        private readonly IServiceProvider _services;
         private readonly ILocalizer _localizer;
 
-        public TimerActions(IUnitOfWork db, ILocalizer localizer)
+        public TimerActions(IServiceProvider services, ILocalizer localizer)
         {
-            _db = db;
+            _services = services;
             _localizer = localizer;
         }
 
@@ -29,17 +31,19 @@ namespace AkkoBot.Services.Timers
         /// <param name="userId">The ID of the user to be unbanned.</param>
         public async Task Unban(int entryId, DiscordGuild server, ulong userId)
         {
-            var settings = _db.GuildConfig.GetGuild(server.Id);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            
+            var settings = db.GuildConfig.GetGuild(server.Id);
             var localizedReason = _localizer.GetResponseString(settings.Locale, "timedban_title");
 
             // Perform the action
             await server.UnbanMemberAsync(userId, localizedReason);
 
             // Remove the entry
-            var dbEntity = await _db.Timers.GetAsync(entryId);
-            _db.Timers.Delete(dbEntity);
+            var dbEntity = await db.Timers.GetAsync(entryId);
+            db.Timers.Delete(dbEntity);
 
-            await _db.SaveChangesAsync();
+            await db.SaveChangesAsync();
         }
     }
 }

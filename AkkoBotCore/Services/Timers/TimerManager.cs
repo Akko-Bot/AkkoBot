@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System;
-using AkkoBot.Services.Database;
 using System.Collections.Concurrent;
 using System.Linq;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using AkkoBot.Services.Timers.Abstractions;
+using AkkoBot.Services.Database.Abstractions;
+using System.Timers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Services.Timers
 {
@@ -16,20 +18,28 @@ namespace AkkoBot.Services.Timers
     public class TimerManager : ITimerManager
     {
         private const int _timerDayAge = 2;
-        private readonly ConcurrentDictionary<int, IAkkoTimer> _timers = new();
+        private const int _updateTimerDayAge = 1;
+        private readonly IServiceProvider _services;
         private readonly TimerActions _action;
+        private readonly Timer _updateTimer = new(TimeSpan.FromDays(_updateTimerDayAge).TotalMilliseconds);
+        private readonly ConcurrentDictionary<int, IAkkoTimer> _timers = new();
 
-        public TimerManager(DiscordShardedClient clients, AkkoDbContext dbContext, TimerActions action)
+        public TimerManager(IServiceProvider services, DiscordShardedClient clients, TimerActions action)
         {
+            _services = services;
             _action = action;
 
+            // Initialize the internal update timer
+            _updateTimer.Elapsed += UpdateFromDb;
+            _updateTimer.Start();
+
             // Initialize the cache
-            var timerEntities = dbContext.Timers.ToList();
+            using var scope = services.GetScopedService<IUnitOfWork>(out var db);
+            var timerEntries = db.Timers.GetAllSync()
+                .Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) < TimeSpan.FromDays(_timerDayAge));
 
             foreach (var client in clients.ShardClients.Values)
-                GenerateGuildTimers(timerEntities, client);
-
-            // TODO: Make another method for timers that don't rely on guild ids
+                GenerateTimers(timerEntries, client);
         }
 
         /// <summary>
@@ -118,7 +128,7 @@ namespace AkkoBot.Services.Timers
             if (entity.ElapseAt.Subtract(DateTimeOffset.Now) > TimeSpan.FromDays(_timerDayAge))
                 return false;
 
-            var timer = GenerateTimer(client, entity);
+            var timer = GetTimer(client, entity);
 
             return (_timers.ContainsKey(entity.Id))
                 ? TryUpdate(timer)
@@ -130,16 +140,23 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         /// <param name="entities">The collection of database entries.</param>
         /// <param name="client">A Discord client to get its visible guilds from.</param>
-        private void GenerateGuildTimers(IEnumerable<TimerEntity> entities, DiscordClient client)
+        private void GenerateTimers(IEnumerable<TimerEntity> entities, DiscordClient client)
         {
-            var filteredEntities = entities.Where(entity =>
+            var guildEntities = entities.Where(entity =>
                 entity.GuildId.HasValue
                 && client.Guilds.ContainsKey(entity.GuildId.Value)
-                && entity.ElapseAt.Subtract(DateTimeOffset.Now) <= TimeSpan.FromDays(_timerDayAge)
             );
 
-            foreach (var entity in filteredEntities)
-                _timers.TryAdd(entity.Id, GenerateTimer(client, entity));
+            var nonGuildEntities = entities.Where(entity => !entity.GuildId.HasValue);
+
+            foreach (var entity in guildEntities)
+                _timers.TryAdd(entity.Id, GetTimer(client, entity));
+
+            foreach (var entity in nonGuildEntities)
+            {
+                if (!_timers.ContainsKey(entity.Id))
+                    _timers.TryAdd(entity.Id, GetTimer(client, entity));
+            }
         }
 
         /// <summary>
@@ -148,7 +165,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="client">The Discord client that fetched the database entry.</param>
         /// <param name="entity">The database entry.</param>
         /// <returns>An active <see cref="AkkoTimer"/>.</returns>
-        private IAkkoTimer GenerateTimer(DiscordClient client, TimerEntity entity)
+        private IAkkoTimer GetTimer(DiscordClient client, TimerEntity entity)
         {
             var timer = entity.Type switch
             {
@@ -180,10 +197,29 @@ namespace AkkoBot.Services.Timers
         }
 
         /// <summary>
+        /// Reads the next timers from the database to be elapsed, initializes and caches them. 
+        /// </summary>
+        private void UpdateFromDb(object obj, ElapsedEventArgs args)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var clients = _services.GetService<DiscordShardedClient>();
+
+            var nextEntries = db.Timers.GetAllSync()
+                .Where(x =>
+                    !_timers.ContainsKey(x.Id)
+                    && x.ElapseAt.Subtract(DateTimeOffset.Now) < TimeSpan.FromDays(_timerDayAge)
+                );
+
+            foreach (var client in clients.ShardClients.Values)
+                GenerateTimers(nextEntries, client);
+        }
+
+        /// <summary>
         /// Releases all resources used by this <see cref="TimerManager"/>.
         /// </summary>
         public void Dispose()
         {
+            // Clear the timer cache
             foreach (var timer in _timers)
             {
                 timer.Value.OnDispose -= AutoRemoval;
@@ -191,6 +227,11 @@ namespace AkkoBot.Services.Timers
             }
 
             _timers.Clear();
+
+            // Dispose the internal timer
+            _updateTimer.Elapsed -= UpdateFromDb;
+            _updateTimer.Stop();
+            _updateTimer.Dispose();
 
             GC.SuppressFinalize(this);
         }
