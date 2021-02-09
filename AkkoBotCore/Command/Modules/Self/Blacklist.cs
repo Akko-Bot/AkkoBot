@@ -71,7 +71,7 @@ namespace AkkoBot.Command.Modules.Self
         [Command("add")]
         public async Task MassBlacklist(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
-            var amount = _service.AddRange(context, ids);
+            var amount = _service.AddRange(ids);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("bl_added_range", amount));
@@ -84,7 +84,7 @@ namespace AkkoBot.Command.Modules.Self
         [Description("cmd_blacklist_rem")]
         public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
-            var (entry, success) = await _service.TryRemoveAsync(context, id);
+            var (entry, success) = await _service.TryRemoveAsync(id);
 
             var entryName = (string.IsNullOrEmpty(entry?.Name))
                 ? context.FormatLocalized("unknown")
@@ -108,7 +108,7 @@ namespace AkkoBot.Command.Modules.Self
         [Command("remove")]
         public async Task MassRemove(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
-            var amount = _service.RemoveRange(context, ids);
+            var amount = _service.RemoveRange(ids);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("bl_removed_range", amount));
@@ -122,8 +122,8 @@ namespace AkkoBot.Command.Modules.Self
         {
             // Get the blacklist. Returns an empty collection if there is nothing there.
             var blacklist = (type is null)
-                ? await _service.GetAllAsync(context)
-                : await _service.GetAsync(context, b => b.Type == type.Value);
+                ? await _service.GetAllAsync()
+                : await _service.GetAsync(b => b.Type == type.Value);
 
             // Prepare localized response
             StringBuilder responseIds = new(), responseTypes = new(), responseNames = new();
@@ -156,7 +156,7 @@ namespace AkkoBot.Command.Modules.Self
         public async Task BlacklistClear(CommandContext context)
         {
             // If blacklist is empty, return error
-            if (!(await _service.GetAllAsync(context)).Any())
+            if (!(await _service.GetAllAsync()).Any())
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription("bl_empty");
@@ -177,7 +177,7 @@ namespace AkkoBot.Command.Modules.Self
             // Send the interactive message and perform the action if user confirms it
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
-                var rows = await _service.ClearAsync(context);
+                var rows = await _service.ClearAsync();
 
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription(context.FormatLocalized("bl_clear", rows));
@@ -190,7 +190,7 @@ namespace AkkoBot.Command.Modules.Self
         [Description("cmd_bl_check")]
         public async Task BlacklistCheck(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
-            var entity = (await _service.GetAsync(context, x => x.ContextId == id)).FirstOrDefault();
+            var entity = (await _service.GetAsync(x => x.ContextId == id)).FirstOrDefault();
 
             if (entity is null)
             {

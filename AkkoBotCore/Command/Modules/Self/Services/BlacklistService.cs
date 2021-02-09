@@ -13,6 +13,11 @@ namespace AkkoBot.Command.Modules.Self.Services
 {
     public class BlacklistService : ICommandService
     {
+        private readonly IServiceProvider _services;
+
+        public BlacklistService(IServiceProvider services)
+            => _services = services;
+
         /// <summary>
         /// Tries to add a blacklist entry to the database.
         /// </summary>
@@ -45,13 +50,12 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <summary>
         /// Adds multiple blacklist entries to the database.
         /// </summary>
-        /// <param name="context">The command context.</param>
         /// <param name="ids">IDs to be added.</param>
         /// <remarks>The entries will be added as <see cref="BlacklistType.Unspecified"/>.</remarks>
         /// <returns>The amount of entries that have been added to the database.</returns>
-        public int AddRange(CommandContext context, ulong[] ids)
+        public int AddRange(ulong[] ids)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var entries = ids.Distinct().Select(id => new BlacklistEntity()
             {
@@ -69,12 +73,11 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <summary>
         /// Removes multiple blacklist entries from the database.
         /// </summary>
-        /// <param name="context">The command context.</param>
         /// <param name="ids">IDs to be removed.</param>
         /// <returns>The amount of entries that have been removed to the database.</returns>
-        public int RemoveRange(CommandContext context, ulong[] ids)
+        public int RemoveRange(ulong[] ids)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var entries = ids.Distinct().Select(id => new BlacklistEntity()
             {
@@ -92,15 +95,14 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <summary>
         /// Tries to remove a blacklist entry from the database, if it exists.
         /// </summary>
-        /// <param name="context">The command context.</param>
         /// <param name="id">The ID of the entry, provided by the user.</param>
         /// <returns>
         /// The entry and <see langword="true"/>, if the removal was successful, 
         /// <see langword="null"/> and <see langword="false"/> otherwise.
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> TryRemoveAsync(CommandContext context, ulong id)
+        public async Task<(BlacklistEntity, bool)> TryRemoveAsync(ulong id)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             if (!db.Blacklist.IsBlacklisted(id))
                 return (null, false);
@@ -114,34 +116,31 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// <summary>
         /// Gets all blacklist entries from the database that meet the criteria of the <paramref name="selector"/>.
         /// </summary>
-        /// <param name="context">The command context.</param>
         /// <param name="selector">Expression tree to filter the result.</param>
         /// <returns>A collection of database entries that match the criteria of <paramref name="selector"/>.</returns>
-        public async Task<IEnumerable<BlacklistEntity>> GetAsync(CommandContext context, Expression<Func<BlacklistEntity, bool>> selector)
+        public async Task<IEnumerable<BlacklistEntity>> GetAsync(Expression<Func<BlacklistEntity, bool>> selector)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.GetAsync(selector);
         }
 
         /// <summary>
         /// Gets all blacklist entries from the database.
         /// </summary>
-        /// <param name="context">The command context.</param>
         /// <returns>A collection of all blacklist entries.</returns>
-        public async Task<IEnumerable<BlacklistEntity>> GetAllAsync(CommandContext context)
+        public async Task<IEnumerable<BlacklistEntity>> GetAllAsync()
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.GetAllAsync();
         }
 
         /// <summary>
         /// Removes all blacklist entries from the database.
         /// </summary>
-        /// <param name="context">The command context.</param>
         /// <returns>The amount of entries removed.</returns>
-        public async Task<int> ClearAsync(CommandContext context)
+        public async Task<int> ClearAsync()
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.ClearAsync();
         }
 

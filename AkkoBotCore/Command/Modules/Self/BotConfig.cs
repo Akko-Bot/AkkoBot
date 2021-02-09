@@ -37,7 +37,7 @@ namespace AkkoBot.Command.Modules.Self
         [Description("cmd_config_locale")]
         public async Task ListLocales(CommandContext context)
         {
-            var locales = _service.GetLocales(context)
+            var locales = _service.GetLocales()
                 .Select(x => $"{Formatter.InlineCode(x)} - {new CultureInfo(x).NativeName}")
                 .OrderBy(x => x)
                 .ToArray();
@@ -103,7 +103,7 @@ namespace AkkoBot.Command.Modules.Self
         [Description("cmd_config_list")]
         public async Task ListBotSettings(CommandContext context)
         {
-            var settings = _service.GetConfigs(context);
+            var settings = _service.GetConfigs();
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("bot_settings_title")
@@ -115,7 +115,7 @@ namespace AkkoBot.Command.Modules.Self
 
         private async Task ChangeProperty(CommandContext context, Action<BotConfigEntity> selector)
         {
-            _service.SetProperty(context, selector);
+            _service.SetProperty(selector);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
@@ -155,7 +155,7 @@ namespace AkkoBot.Command.Modules.Self
 
             private async Task ChangeProperty(CommandContext context, Action<LogConfigEntity> selector)
             {
-                _service.SetProperty(context, selector);
+                _service.SetProperty(selector);
 
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
             }
