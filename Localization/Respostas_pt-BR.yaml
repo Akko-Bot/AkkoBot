@@ -68,7 +68,7 @@ cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar p
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
-cmd_guild_list: Exibe as configurações de servidor atuais.
+cmd_guild_list: Exibe as configurações atuais do servidor.
 cmd_guild_locale: Define o idioma a ser utilizado pelo bot nesse servidor. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
 cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor.
 cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
@@ -102,7 +102,7 @@ guild_locale_unavailable: Esse idioma não está disponível. Use {0} para ver a
 guild_okcolor: OkColor foi alterada para {0}.
 guild_prefix_change: O prefixo nesse servidor foi alterado para {0}
 guild_prefix_check: O prefixo nesse servidor é {0}
-guild_settings_title: Configurações de Servidor
+guild_settings_title: Configurações do Servidor
 guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
 guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
 hackban_title: Usuário Preventivamente Banido

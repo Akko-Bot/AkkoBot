@@ -1,4 +1,3 @@
-using DSharpPlus.CommandsNext;
 using System;
 
 namespace AkkoBot.Extensions

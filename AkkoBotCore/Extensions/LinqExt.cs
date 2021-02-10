@@ -185,5 +185,33 @@ namespace AkkoBot.Extensions
                     yield return element;
             }
         }
+
+        /// <summary>
+        /// Adds the <typeparamref name="T"/> defined in <paramref name="sample"/> to the inner collections
+        /// of this <see cref="IEnumerable{T}"/> until all of them reach the same amount of elements.
+        /// </summary>
+        /// <param name="collection">This collection of collections of <typeparamref name="T"/>.</param>
+        /// <param name="sample">The <typeparamref name="T"/> object to be added to the inner collections.</param>
+        /// <typeparam name="T">Data type contained in the inner collections.</typeparam>
+        /// <returns>An <see cref="IEnumerable{T}"/> with collections of the same size.</returns>
+        /// <exception cref="NullReferenceException">Occurs when <paramref name="sample"/> is <see langword="null"/>.</exception>
+        public static IEnumerable<IEnumerable<T>> Fill<T>(this IEnumerable<IEnumerable<T>> collection, T sample)
+        {
+            var outerCollection = collection.ToList();
+
+            // Get the max count of the inner collections
+            var max = 0;
+            foreach (var innerCollection in outerCollection)
+                max = Math.Max(max, innerCollection.Count());
+
+            // Fill the collections until they have the same size
+            for (var index = 0; index < collection.Count(); index++)
+            {
+                while (outerCollection[index].Count() != max)
+                    outerCollection[index] = outerCollection[index].Append(sample);
+            }
+
+            return outerCollection;
+        }
     }
 }

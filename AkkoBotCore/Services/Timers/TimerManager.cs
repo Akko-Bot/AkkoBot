@@ -143,20 +143,21 @@ namespace AkkoBot.Services.Timers
         private void GenerateTimers(IEnumerable<TimerEntity> entities, DiscordClient client)
         {
             var guildEntities = entities.Where(entity =>
-                entity.GuildId.HasValue
+                !_timers.ContainsKey(entity.Id)
+                && entity.GuildId.HasValue
                 && client.Guilds.ContainsKey(entity.GuildId.Value)
             );
 
-            var nonGuildEntities = entities.Where(entity => !entity.GuildId.HasValue);
+            var nonGuildEntities = entities.Where(entity =>
+                !_timers.ContainsKey(entity.Id)
+                && !entity.GuildId.HasValue
+            );
 
             foreach (var entity in guildEntities)
                 _timers.TryAdd(entity.Id, GetTimer(client, entity));
 
             foreach (var entity in nonGuildEntities)
-            {
-                if (!_timers.ContainsKey(entity.Id))
-                    _timers.TryAdd(entity.Id, GetTimer(client, entity));
-            }
+                _timers.TryAdd(entity.Id, GetTimer(client, entity));
         }
 
         /// <summary>
@@ -205,10 +206,7 @@ namespace AkkoBot.Services.Timers
             var clients = _services.GetService<DiscordShardedClient>();
 
             var nextEntries = db.Timers.GetAllSync()
-                .Where(x =>
-                    !_timers.ContainsKey(x.Id)
-                    && x.ElapseAt.Subtract(DateTimeOffset.Now) < TimeSpan.FromDays(_timerDayAge)
-                );
+                .Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) < TimeSpan.FromDays(_timerDayAge));
 
             foreach (var client in clients.ShardClients.Values)
                 GenerateTimers(nextEntries, client);

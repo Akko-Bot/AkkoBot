@@ -1,4 +1,5 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -111,37 +112,8 @@ namespace AkkoBot.Services
                 ((embed.Description is null) ? string.Empty : embed.Description + "\n\n")
             );
 
-            // var fieldNames = embed.Fields.Select(x => x.Name).ToArray();
-            // var fieldValues = embed.Fields.Select(x => x.Value).ToArray();
-
-            // for (int index = 0; index < embed.Fields.Count; index++)
-            // {
-            //     if (embed.Fields[index].Inline)
-            //     {
-            //         if (index == fieldNames.Length - 1)
-            //             continue;
-
-            //         var valueLines = fieldValues[index].Split("\n"); // 15
-            //         var valueLines2 = fieldValues[index + 1].Split("\n");
-
-            //         dEmbed.AppendLine("```");
-            //         dEmbed.AppendLine($"{fieldNames[index].MaxLength(15), -15} {fieldNames[++index]}");
-
-            //         for (int line = 0; line < valueLines.Length; line++)
-            //         {
-            //             dEmbed.AppendLine($"{valueLines[line].MaxLength(15), -15} {valueLines2[line]}");
-            //         }
-
-            //         dEmbed.Append("```");
-            //     }
-            //     else
-            //     {
-            //         dEmbed.AppendLine(Formatter.BlockCode(fieldNames[index] + "\n" + fieldValues[index] + "\n"));
-            //     }
-            // }
-
-            foreach (var field in embed.Fields)
-                dEmbed.AppendLine(Formatter.BlockCode(field.Name + "\n" + field.Value + "\n"));
+            if (embed.Fields.Count != 0)
+                dEmbed.Append(DeconstructEmbedFields(embed.Fields));
 
             dEmbed.Append(
                 ((embed.ImageUrl is null) ? string.Empty : $"{embed.ImageUrl}\n\n") +
@@ -164,6 +136,74 @@ namespace AkkoBot.Services
             return (sample is not null && localizer.ContainsResponse(locale, sample))
                 ? localizer.GetResponseString(locale, sample)
                 : sample ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Extracts the contents of embed fields into a formatted code block.
+        /// </summary>
+        /// <param name="originalFields">The collection of embed fields.</param>
+        /// <returns>The formatted content of the fields.</returns>
+        private static string DeconstructEmbedFields(IEnumerable<DiscordEmbedField> originalFields)
+        {
+            // Redistribute the fields into groups based on their inline property
+            var sisterFields = new List<List<DiscordEmbedField>> { new List<DiscordEmbedField>() };
+            var sisterGroup = 0;
+
+            foreach (var field in originalFields)
+            {
+                if (!field.Inline)
+                {
+                    sisterFields.Add(new List<DiscordEmbedField>());
+                    sisterGroup++;
+                }
+
+                sisterFields[sisterGroup].Add(field);
+            }
+
+            // Extract the content of the fields
+            var result = new StringBuilder();
+
+            foreach (var fields in sisterFields)
+            {
+                // Get the names and values of the grouped fields
+                var names = fields.Select(x => $"{x.Name.MaxLength(17), -17}").ToArray();
+                var values = fields
+                    .Select(x => x.Value.Split('\n'))
+                    .Fill(string.Empty)
+                    .Select(x => x.Select(x => $"{x.MaxLength(17),-17}").ToArray())
+                    .ToArray();
+
+                var valueLines = new List<string>(values.Length);
+                var counter = 0;
+
+                for (int index = 0, totalIterations = 0; totalIterations < values.Length * values[0].Length; totalIterations++)
+                {
+                    if (counter < names.Length - 1)
+                    {
+                        // If value is not the last in the line
+                        valueLines.Add(values[counter++][index]);
+                    }
+                    else
+                    {
+                        // If value is the last in the line
+                        valueLines.Add(values[counter][index++] + "|\n");
+                        counter = 0;
+                    }
+                }
+
+                // Assemble the field string
+                result.Append(" | ");                   // Add the first |
+                result.AppendJoin(" | ", names);        // Add the table's header
+                result.AppendLine("|\n " + new string('-', 20 * names.Length)); // Add header separator
+                result.Append(" | ");                   // Add the first | for the values
+                result.AppendJoin(" | ", valueLines);   // Add the values
+
+                // Add code bock
+                result.Insert(0, "```");
+                result.Append("```");
+            }
+
+            return result.ToString();
         }
     }
 }

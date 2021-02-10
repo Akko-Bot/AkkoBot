@@ -70,7 +70,7 @@ namespace AkkoBot.Command.Modules.Basic
                     context.FormatLocalized("{0}: {1}\n", "days", elapsed.Days) +
                     context.FormatLocalized("{0}: {1}\n", "hours", elapsed.Hours) +
                     context.FormatLocalized("{0}: {1}\n", "minutes", elapsed.Minutes) +
-                    context.FormatLocalized("{0}: {1}\n", "seconds", elapsed.Seconds),
+                    context.FormatLocalized("{0}: {1}", "seconds", elapsed.Seconds),
                     inline: true
                 );
 

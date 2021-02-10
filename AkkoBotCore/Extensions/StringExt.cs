@@ -24,6 +24,14 @@ namespace AkkoBot.Extensions
             => text.Substring(0, Math.Min(text.Length, maxLength));
 
         /// <summary>
+        /// Returns a string whose first character is uppercase and all others are lowercase.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns>This string capitalized.</returns>
+        public static string Capitalize(this string text)
+            => char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
+
+        /// <summary>
         /// Converts a string to the snake_case format.
         /// </summary>
         /// <param name="text">This <see cref="string"/> to be converted.</param>
@@ -45,11 +53,22 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Returns a string whose first character is uppercase and all others are lowercase.
+        /// Gets the amount of occurences of a given character in this string.
         /// </summary>
         /// <param name="text">This string.</param>
-        /// <returns>This string capitalized.</returns>
-        public static string Capitalize(this string text)
-            => char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
+        /// <param name="target">The character to check for.</param>
+        /// <returns>The amount of occurences of <paramref name="target"/> in this string.</returns>
+        public static int Occurrences(this string text, char target)
+        {
+            var counter = 0;
+
+            foreach (var letter in text)
+            {
+                if (letter == target)
+                    counter++;
+            }
+
+            return counter;
+        }
     }
 }
