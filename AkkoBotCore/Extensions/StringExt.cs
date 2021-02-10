@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace AkkoBot.Extensions
@@ -70,5 +71,33 @@ namespace AkkoBot.Extensions
 
             return counter;
         }
+
+        /// <summary>
+        /// Get the length of the longest string of this collection.
+        /// </summary>
+        /// <param name="collection">This collection of strings.</param>
+        /// <returns>The length of the longest element.</returns>
+        public static int MaxElementLength(this IEnumerable<string> collection)
+        {
+            int max = 0;
+
+            foreach (var element in collection)
+                max = Math.Max(max, element.Length);
+
+            return max;
+        }
+
+        /// <summary>
+        /// Returns a new string that has a space character inserted at its begining and that 
+        /// left-aligns the characters in this string by padding them with spaces on the right,
+        /// for a specified total length.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="totalLength">The length of the resulting string.</param>
+        /// <returns>This string padded to the right.</returns>
+        public static string HardPad(this string text, int totalLength)
+            => (string.IsNullOrWhiteSpace(text))
+                ? text?.PadRight(totalLength)
+                : text.Insert(0, " ").PadRight(totalLength);
     }
 }

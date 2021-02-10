@@ -149,6 +149,7 @@ namespace AkkoBot.Services
             var sisterFields = new List<List<DiscordEmbedField>> { new List<DiscordEmbedField>() };
             var sisterGroup = 0;
 
+            // Build the groups
             foreach (var field in originalFields)
             {
                 if (!field.Inline)
@@ -160,48 +161,84 @@ namespace AkkoBot.Services
                 sisterFields[sisterGroup].Add(field);
             }
 
+            // Extract the contents
+            var result = new StringBuilder();
+
+            foreach (var fieldGroup in sisterFields)
+            {
+                if (fieldGroup.Count > 1)
+                    result.AppendLine(Formatter.BlockCode(ExtractInLineFields(fieldGroup)));
+                else
+                {
+                    foreach (var field in fieldGroup)
+                        result.AppendLine(Formatter.BlockCode(field.Name + "\n" + field.Value + "\n"));
+                }
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Gets the content of a group of embed fields.
+        /// </summary>
+        /// <param name="fields">A collection of embed fields.</param>
+        /// <returns>The formatted content of all fields.</returns>
+        private static string ExtractInLineFields(IEnumerable<DiscordEmbedField> fields)
+        {
             // Extract the content of the fields
             var result = new StringBuilder();
 
-            foreach (var fields in sisterFields)
-            {
-                // Get the names and values of the grouped fields
-                var names = fields.Select(x => $"{x.Name.MaxLength(17), -17}").ToArray();
-                var values = fields
-                    .Select(x => x.Value.Split('\n'))
-                    .Fill(string.Empty)
-                    .Select(x => x.Select(x => $"{x.MaxLength(17),-17}").ToArray())
-                    .ToArray();
+            // Get the names and values of the grouped fields
+            var names = fields.Select(x => x.Name).ToArray();
+            var namesLengthCounter = 0;
 
-                var valueLines = new List<string>(values.Length);
-                var counter = 0;
-
-                for (int index = 0, totalIterations = 0; totalIterations < values.Length * values[0].Length; totalIterations++)
+            var values = fields
+                .Select(x => x.Value.Split('\n'))
+                .Fill(string.Empty)
+                .Select(x =>
                 {
-                    if (counter < names.Length - 1)
-                    {
-                        // If value is not the last in the line
-                        valueLines.Add(values[counter++][index]);
-                    }
-                    else
-                    {
-                        // If value is the last in the line
-                        valueLines.Add(values[counter][index++] + "|\n");
-                        counter = 0;
-                    }
+                    var maxLength = Math.Max(x.MaxElementLength(), names[namesLengthCounter++].Length);
+                    return x.Select(x => x.HardPad(maxLength + 2)).ToArray();
+                }).ToArray();
+
+            var valueLines = new List<string>(values.Length);
+            var counter = 0;
+
+            // Format the values
+            for (int index = 0, totalIterations = 0; totalIterations < values.Length * values[0].Length; totalIterations++)
+            {
+                if (counter < names.Length - 1)
+                {
+                    // If value is not the last in the line
+                    valueLines.Add(values[counter++][index]);
                 }
-
-                // Assemble the field string
-                result.Append(" | ");                   // Add the first |
-                result.AppendJoin(" | ", names);        // Add the table's header
-                result.AppendLine("|\n " + new string('-', 20 * names.Length)); // Add header separator
-                result.Append(" | ");                   // Add the first | for the values
-                result.AppendJoin(" | ", valueLines);   // Add the values
-
-                // Add code bock
-                result.Insert(0, "```");
-                result.Append("```");
+                else
+                {
+                    // If value is the last in the line
+                    valueLines.Add(values[counter][index++] + "|\n");
+                    counter = 0;
+                }
             }
+
+            // Format the header
+            for (int index = 0; index < names.Length; index++)
+            {
+                var toPad = values[index].MaxElementLength();
+                if (names[index].Length < toPad)
+                    names[index] = names[index].HardPad(toPad);
+            }
+
+            // Get the total length of the table
+            var totalLength = 1;
+            foreach (var column in values)
+                totalLength += column.MaxElementLength();
+
+            // Assemble the field string
+            result.Append('|');                   // Add the first |
+            result.AppendJoin("|", names);        // Add the table's header
+            result.AppendLine("|\n" + new string('-', totalLength + values.Length)); // Add header separator
+            result.Append('|');                   // Add the first | for the values
+            result.AppendJoin("|", valueLines);   // Add the values
 
             return result.ToString();
         }

@@ -177,3 +177,6 @@ uptime: Uptime
 usage: Usage
 user: User
 value: Value
+
+code: Code
+language: Language

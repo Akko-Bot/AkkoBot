@@ -107,13 +107,13 @@ namespace AkkoBot.Command.Modules.Administration
         public async Task ListLocales(CommandContext context)
         {
             var locales = _service.GetLocales()
-                .Select(x => $"{Formatter.InlineCode(x)} - {new CultureInfo(x).NativeName}")
-                .OrderBy(x => x)
-                .ToArray();
+                .Select(code => (code, new CultureInfo(code).NativeName))
+                .OrderBy(code => code);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("locales_title")
-                .WithDescription(string.Join("\n", locales));
+                .AddField("code", string.Join('\n', locales.Select(x => x.code).ToArray()), true)
+                .AddField("language", string.Join('\n', locales.Select(x => x.NativeName).ToArray()), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
