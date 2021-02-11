@@ -17,9 +17,6 @@ namespace AkkoBot.Services.Database.Entities
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
-        [Key]
-        public int Id { get; init; }
-
         [Required]
         [MaxLength(10)]
         [Column(TypeName = "varchar(10)")]
@@ -55,22 +52,16 @@ namespace AkkoBot.Services.Database.Entities
             set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
-        [Required]
         public bool UseEmbed { get; set; } = true;
 
-        [Required]
         public bool RespondToDms { get; set; } = true;
 
-        [Required]
         public bool MentionPrefix { get; set; } = false;
 
-        [Required]
         public bool EnableHelp { get; set; } = true;
 
-        [Required]
         public bool CaseSensitiveCommands { get; set; } = true;
 
-        [Required]
         public int MessageSizeCache { get; set; } = 200;
 
         [Required]

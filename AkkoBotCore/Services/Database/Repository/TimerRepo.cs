@@ -14,9 +14,9 @@ namespace AkkoBot.Services.Database.Repository
             => Cache = dbCacher.Timers;
 
         /// <summary>
-        /// Upserts an entry to the database.
+        /// Upserts the specified <paramref name="newEntry"/> do the database.
         /// </summary>
-        /// <param name="newEntry">The entry to be added or updated to.</param>
+        /// <param name="newEntry">The entry to be added or updated.</param>
         /// <param name="selector">A method that defines the entry that needs to be updated, if it exists.</param>
         /// <param name="dbEntry">The tracked resulting entity to be upserted.</param>
         /// <returns><see langword="true"/> if <paramref name="dbEntry"/> is being tracked for creation, <see langword="false"/> if for updating.</returns>
@@ -33,7 +33,7 @@ namespace AkkoBot.Services.Database.Repository
             else
             {
                 base.Delete(dbEntry);       // This is needed to change the tracking internal state. TODO: investigate further
-                newEntry.Id = dbEntry.Id;
+                newEntry.Id = dbEntry.Id;   // Seems to be caused by the fact that the tracked entity is an out var
                 dbEntry = newEntry;
                 base.Update(dbEntry);
 

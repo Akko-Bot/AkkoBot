@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210211143119_Uniqueness")]
+    partial class Uniqueness
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,7 +96,6 @@ namespace AkkoBot.Migrations
                         .HasColumnName("error_color");
 
                     b.Property<TimeSpan?>("InteractiveTimeout")
-                        .IsRequired()
                         .HasColumnType("interval")
                         .HasColumnName("interactive_timeout");
 
@@ -291,9 +292,9 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
 
-                    b.Property<DateTimeOffset>("ElapseAt")
+                    b.Property<DateTimeOffset>("ElapsesAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("elapse_at");
+                        .HasColumnName("elapses_at");
 
                     b.Property<decimal>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")

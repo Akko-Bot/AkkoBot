@@ -1,4 +1,5 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using System.Linq;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using System.Collections.Concurrent;
@@ -20,15 +21,20 @@ namespace AkkoBot.Services.Database.Repository
         /// Gets the settings of the specified Discord guild.
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>
-        /// <returns>The guild settings.</returns>
+        /// <returns>
+        /// The guild settings, <see langword="null"/> if for some reason the bot tries
+        /// to get a guild it has never been to.
+        /// </returns>
         public GuildConfigEntity GetGuild(ulong sid)
         {
             if (Cache.ContainsKey(sid))
                 return Cache[sid];
             else
             {
-                var guild = base.GetSync(sid);
-                Cache.TryAdd(guild.GuildId, guild);
+                var guild = base.Table.FirstOrDefault(x => x.GuildId == sid);
+
+                if (guild is not null)
+                    Cache.TryAdd(guild.GuildId, guild);
 
                 return guild;
             }
@@ -58,7 +64,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <summary>
         /// Upserts an entry for the specified guild into the database.
         /// </summary>
-        /// <param name="guild">The ID of the Discord guild.</param>
+        /// <param name="guild">A guild database entity.</param>
         /// <remarks>This method will always add an entry to EF Core's tracker.</remarks>
         /// <returns><see langword="true"/> if the entry got added to the cache, <see langword="false"/> if it got updated.</returns>
         public bool CreateOrUpdate(GuildConfigEntity guild)

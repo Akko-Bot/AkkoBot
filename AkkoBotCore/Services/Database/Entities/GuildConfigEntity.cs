@@ -17,7 +17,8 @@ namespace AkkoBot.Services.Database.Entities
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
-        [Key]
+        public IEnumerable<MutedUserEntity> MutedUserRel { get; set; }
+
         public ulong GuildId { get; set; }
 
         [Required]
@@ -37,7 +38,6 @@ namespace AkkoBot.Services.Database.Entities
             set => _locale = value?.MaxLength(10);
         }
 
-        [Required]
         public bool UseEmbed { get; set; } = true;
 
         [Required]
@@ -57,6 +57,8 @@ namespace AkkoBot.Services.Database.Entities
             get => _errorColor;
             set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
+
+        public ulong MuteRoleId { get; set; }
 
         public TimeSpan? InteractiveTimeout { get; set; } = null;
 

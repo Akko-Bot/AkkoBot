@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using AkkoBot.Command.Modules.Administration.Services;
 using System.Linq;
 using AkkoBot.Command.Attributes;
-using AkkoBot.Services.Database.Entities;
 
 namespace AkkoBot.Command.Modules.Administration
 {
@@ -175,6 +174,7 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("timedban"), Aliases("tb")]
         [Description("cmd_timedban")]
+        [RequirePermissions(Permissions.BanMembers)]
         public async Task TimedBan(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,

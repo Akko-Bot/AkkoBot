@@ -11,9 +11,6 @@ namespace AkkoBot.Services.Database.Entities
     {
         private string _logFormat = "Default";
 
-        [Key]
-        public int Id { get; init; }
-
         [Required]
         [MaxLength(20)]
         [Column(TypeName = "varchar(20)")]

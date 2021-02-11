@@ -9,7 +9,6 @@ namespace AkkoBot.Services.Database.Entities
     [Comment("Stores data and settings related to individual Discord users.")]
     public class DiscordUserEntity : DbEntity
     {
-        [Key]
         public ulong UserId { get; set; }
 
         [Required]

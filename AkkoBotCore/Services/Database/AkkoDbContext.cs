@@ -1,7 +1,6 @@
 ﻿using AkkoBot.Services.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace AkkoBot.Services.Database
 {
     public class AkkoDbContext : DbContext
@@ -11,6 +10,7 @@ namespace AkkoBot.Services.Database
         public DbSet<GuildConfigEntity> GuildConfig { get; set; }
         public DbSet<LogConfigEntity> LogConfig { get; set; }
         public DbSet<TimerEntity> Timers { get; set; }
+        public DbSet<MutedUserEntity> MutedUsers { get; set; }
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
 
@@ -19,26 +19,42 @@ namespace AkkoBot.Services.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DiscordUserEntity>()
-                .HasIndex(u => u.UserId);
+            #region Bot Configuration
 
             modelBuilder.Entity<BotConfigEntity>()
                 .HasKey(x => x.Id);
-
-            modelBuilder.Entity<GuildConfigEntity>()
-                .HasIndex(g => g.GuildId);
-
-            modelBuilder.Entity<TimerEntity>()
-                .HasIndex(x => x.Id);
 
             modelBuilder.Entity<LogConfigEntity>()
                 .HasKey(x => x.Id);
 
             modelBuilder.Entity<BlacklistEntity>()
-                .HasIndex(g => g.ContextId);
+                .HasAlternateKey(g => g.ContextId);
 
             modelBuilder.Entity<PlayingStatusEntity>()
-                .HasNoKey(); // Make this dependent on BotConfigEntity?
+                .HasKey(x => x.Id); // Make this dependent on BotConfigEntity?
+
+            #endregion
+
+            #region Guild Configuration
+
+            modelBuilder.Entity<GuildConfigEntity>()
+                .HasMany(x => x.MutedUserRel)
+                .WithOne(x => x.GuildConfigRel)
+                .HasPrincipalKey(x => x.GuildId);
+
+            modelBuilder.Entity<MutedUserEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.MutedUserRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            modelBuilder.Entity<DiscordUserEntity>()
+                .HasAlternateKey(x => x.UserId);
+
+            modelBuilder.Entity<TimerEntity>()
+                .HasIndex(x => x.Id);
         }
     }
 }

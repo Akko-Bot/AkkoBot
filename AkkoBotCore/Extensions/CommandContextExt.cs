@@ -189,7 +189,7 @@ namespace AkkoBot.Extensions
 
             var locale = (context.Guild is null)
                 ? db.BotConfig.GetAllSync().FirstOrDefault().Locale
-                : db.GuildConfig.GetSync(context.Guild.Id).Locale;
+                : db.GuildConfig.GetGuild(context.Guild.Id).Locale;
 
             for (int index = 0; index < args.Length; index++)
             {

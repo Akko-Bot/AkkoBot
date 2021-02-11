@@ -16,10 +16,8 @@ namespace AkkoBot.Services.Database.Entities
         private string _name;
         private string _reason;
 
-        [Key]
         public ulong ContextId { get; init; }
 
-        [Required]
         public BlacklistType Type { get; init; }
 
         [MaxLength(37)]

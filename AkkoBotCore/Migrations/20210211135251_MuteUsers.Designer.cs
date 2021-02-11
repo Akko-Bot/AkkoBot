@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210211135251_MuteUsers")]
+    partial class MuteUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -291,9 +293,9 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
 
-                    b.Property<DateTimeOffset>("ElapseAt")
+                    b.Property<DateTimeOffset>("ElapsesAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("elapse_at");
+                        .HasColumnName("elapses_at");
 
                     b.Property<decimal>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
@@ -314,15 +316,13 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.PlayingStatusEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -337,9 +337,6 @@ namespace AkkoBot.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("type");
-
-                    b.HasKey("Id")
-                        .HasName("pk_playing_statuses");
 
                     b.ToTable("playing_statuses");
 

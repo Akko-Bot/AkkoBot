@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210210230037_MuteRole")]
+    partial class MuteRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,13 +23,8 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.BlacklistEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
                     b.Property<decimal>("ContextId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("context_id");
 
@@ -49,11 +46,11 @@ namespace AkkoBot.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("type");
 
-                    b.HasKey("Id")
+                    b.HasKey("ContextId")
                         .HasName("pk_blacklist");
 
-                    b.HasAlternateKey("ContextId")
-                        .HasName("ak_blacklist_context_id");
+                    b.HasIndex("ContextId")
+                        .HasDatabaseName("ix_blacklist_context_id");
 
                     b.ToTable("blacklist");
 
@@ -137,11 +134,10 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.DiscordUserEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<decimal>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("user_id");
 
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
@@ -153,21 +149,17 @@ namespace AkkoBot.Migrations
                         .HasColumnType("varchar(4)")
                         .HasColumnName("discriminator");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("user_id");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
                         .HasColumnName("username");
 
-                    b.HasKey("Id")
+                    b.HasKey("UserId")
                         .HasName("pk_discord_users");
 
-                    b.HasAlternateKey("UserId")
-                        .HasName("ak_discord_users_user_id");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_discord_users_user_id");
 
                     b.ToTable("discord_users");
 
@@ -177,11 +169,10 @@ namespace AkkoBot.Migrations
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.GuildConfigEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<decimal>("GuildId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
 
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
@@ -192,10 +183,6 @@ namespace AkkoBot.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("varchar(6)")
                         .HasColumnName("error_color");
-
-                    b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id");
 
                     b.Property<TimeSpan?>("InteractiveTimeout")
                         .HasColumnType("interval")
@@ -227,11 +214,11 @@ namespace AkkoBot.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("use_embed");
 
-                    b.HasKey("Id")
+                    b.HasKey("GuildId")
                         .HasName("pk_guild_config");
 
-                    b.HasAlternateKey("GuildId")
-                        .HasName("ak_guild_config_guild_id");
+                    b.HasIndex("GuildId")
+                        .HasDatabaseName("ix_guild_config_guild_id");
 
                     b.ToTable("guild_config");
 
@@ -279,47 +266,8 @@ namespace AkkoBot.Migrations
                     b.ToTable("log_config");
                 });
 
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.MutedUserEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<DateTimeOffset>("DateAdded")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_added");
-
-                    b.Property<DateTimeOffset>("ElapseAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("elapse_at");
-
-                    b.Property<decimal>("GuildIdFK")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id_fk");
-
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_muted_users");
-
-                    b.HasIndex("GuildIdFK")
-                        .HasDatabaseName("ix_muted_users_guild_id_fk");
-
-                    b.ToTable("muted_users");
-                });
-
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.PlayingStatusEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
@@ -337,9 +285,6 @@ namespace AkkoBot.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("type");
-
-                    b.HasKey("Id")
-                        .HasName("pk_playing_statuses");
 
                     b.ToTable("playing_statuses");
 
@@ -398,24 +343,6 @@ namespace AkkoBot.Migrations
                         .HasDatabaseName("ix_timers_id");
 
                     b.ToTable("timers");
-                });
-
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.MutedUserEntity", b =>
-                {
-                    b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
-                        .WithMany("MutedUserRel")
-                        .HasForeignKey("GuildIdFK")
-                        .HasConstraintName("fk_muted_users_guild_config_guild_config_rel_id")
-                        .HasPrincipalKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GuildConfigRel");
-                });
-
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.GuildConfigEntity", b =>
-                {
-                    b.Navigation("MutedUserRel");
                 });
 #pragma warning restore 612, 618
         }

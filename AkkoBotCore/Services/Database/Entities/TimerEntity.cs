@@ -16,25 +16,30 @@ namespace AkkoBot.Services.Database.Entities
 
     public class TimerEntity : DbEntity
     {
-        [Key]
-        public int Id { get; set; }
         public ulong? UserId { get; init; }
         public ulong? GuildId { get; init; }
         public ulong? ChannelId { get; init; }
-
-        [Required]
         public TimeSpan Interval { get; init; }
-
-        [Required]
         public bool IsRepeatable { get; init; }
-
-        [Required]
         public bool IsAbsolute { get; init; }
-
-        [Required]
         public TimerType Type { get; init; }
-
-        [Required]
         public DateTimeOffset ElapseAt { get; init; }
+
+        public TimerEntity() { }
+
+        public TimerEntity(MutedUserEntity muteUser)
+        {
+            UserId = muteUser.UserId;
+            GuildId = muteUser.GuildIdFK;
+            ChannelId = null;
+            Interval = (muteUser.ElapseAt == DateTimeOffset.MinValue)
+                ? TimeSpan.Zero
+                : DateTimeOffset.Now.Subtract(muteUser.ElapseAt);
+
+            IsRepeatable = false;
+            IsAbsolute = true;
+            Type = TimerType.TimedMute;
+            ElapseAt = muteUser.ElapseAt;
+        }
     }
 }

@@ -8,6 +8,9 @@ namespace AkkoBot.Services.Database.Abstractions
     /// </summary>
     public abstract class DbEntity
     {
+        [Key]
+        public int Id { get; set; }
+
         [Required]
         public DateTimeOffset DateAdded { get; init; } = DateTimeOffset.Now;
     }
