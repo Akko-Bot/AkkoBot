@@ -180,7 +180,18 @@ value: Value
 
 code: Code
 language: Language
-cmd_mute: Mutes a user from text chat and voice chat.
+cmd_mute: Mutes a user from text and voice channels.
+cmd_unmute: Unmutes a user from text and voice channels.
 mute_success: User {0} has been muted.
 unmute_success: User {0} has been unmuted.
 timedmute: Expired Mute
+arg_timed_mute: For how long the user should remain muted. Default is __1h__.
+voicemute_success: User {0} has been muted from voice channels.
+voiceunmute_success: User {0} has been unmuted from voice channels.
+voice_failure: The user needs to be connected to a voice channel for this command to work.
+cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
+cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
+cmd_deafen: Applies server deafening to a user.
+cmd_undeafen: Removes server deafening from a user.
+deafen_success: User {0} can no longer hear other users speaking in voice channels.
+deafen_success: User {0} can now hear other users speaking in voice channels.

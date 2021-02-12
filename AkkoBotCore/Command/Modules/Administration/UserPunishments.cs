@@ -186,6 +186,12 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_timed_ban")] TimeSpan time,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
+            if (time <= TimeSpan.Zero)
+            {
+                await Ban(context, user, reason);
+                return;
+            }
+
             // Execute ban and send confirmation message
             await _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
 

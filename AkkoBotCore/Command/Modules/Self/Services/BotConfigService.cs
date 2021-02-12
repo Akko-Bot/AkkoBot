@@ -5,7 +5,6 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
-using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using AkkoBot.Credential;
 using AkkoBot.Services;
@@ -14,6 +13,9 @@ using YamlDotNet.Serialization;
 
 namespace AkkoBot.Command.Modules.Self.Services
 {
+    /// <summary>
+    /// Groups utility methods for retrieving and manipulating <see cref="BotConfigEntity"/> objects.
+    /// </summary>
     public class BotConfigService : ICommandService
     {
         private readonly IServiceProvider _services;

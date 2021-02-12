@@ -103,7 +103,7 @@ namespace AkkoBot.Extensions
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return settings.UseEmbed
-                ? await context.RespondAsync(responseString, false, localizedEmbed)
+                ? await context.RespondAsync(responseString, localizedEmbed)
                 : await context.RespondAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
         }
 
@@ -166,7 +166,7 @@ namespace AkkoBot.Extensions
             try
             {
                 return settings.UseEmbed
-                    ? await user.SendMessageAsync(responseString, false, localizedEmbed)
+                    ? await user.SendMessageAsync(responseString, localizedEmbed)
                     : await user.SendMessageAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
             }
             catch

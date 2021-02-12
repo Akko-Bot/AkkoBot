@@ -170,8 +170,8 @@ namespace AkkoBot.Services.Timers
         {
             var timer = entity.Type switch
             {
-                TimerType.TimedBan => new AkkoTimer(entity, async () => await _action.Unban(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
-                TimerType.TimedMute => new AkkoTimer(entity, async () => await _action.Unmute(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedBan => new AkkoTimer(entity, () => _ = _action.Unban(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedMute => new AkkoTimer(entity, () => _ = _action.Unmute(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
                 TimerType.TimedWarn => throw new NotImplementedException(),
                 TimerType.Reminder => throw new NotImplementedException(),
                 TimerType.Repeater => throw new NotImplementedException(),

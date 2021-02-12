@@ -2,25 +2,19 @@ using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Timers;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Administration.Services
 {
+    /// <summary>
+    /// Groups utility methods for issuing punishments to Discord users.
+    /// </summary>
     public class UserPunishmentService : ICommandService
     {
-        private readonly TimerActions _timerActions;
-
-        public UserPunishmentService(TimerActions actions)
-            => _timerActions = actions;
-
-
         /// <summary>
         /// Sends a direct message to the specified user with a localized message of the punishment they
         /// received in the context guild.

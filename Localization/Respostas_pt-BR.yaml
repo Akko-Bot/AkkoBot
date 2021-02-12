@@ -92,7 +92,7 @@ days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
 disabled: desativado
 enabled: ativado
-error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o seu e o meu na hierarquia de cargos.
+error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o meu e o seu na hierarquia de cargos.
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 guild_embed_change: O uso de embeds nesse servidor foi {0}.

@@ -10,11 +10,14 @@ using DSharpPlus.CommandsNext;
 
 namespace AkkoBot.Command.Modules.Administration.Services
 {
+    /// <summary>
+    /// Groups utility methods for retrieving and manipulating <see cref="GuildConfigEntity"/> objects.
+    /// </summary>
     public class GuildConfigService : ICommandService
     {
         private readonly ILocalizer _localizer;
 
-        public GuildConfigService(ILocalizer localizer) 
+        public GuildConfigService(ILocalizer localizer)
             => _localizer = localizer;
 
         /// <summary>

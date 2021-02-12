@@ -11,6 +11,9 @@ using DSharpPlus.CommandsNext;
 
 namespace AkkoBot.Command.Modules.Self.Services
 {
+    /// <summary>
+    /// Groups utility methods for retrieving and manipulating <see cref="BlacklistEntity"/> objects.
+    /// </summary>
     public class BlacklistService : ICommandService
     {
         private readonly IServiceProvider _services;
