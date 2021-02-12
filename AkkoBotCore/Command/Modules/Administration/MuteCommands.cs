@@ -43,7 +43,7 @@ namespace AkkoBot.Command.Modules.Administration
 
             // Get the mute role
             var role = await _roleService.FetchMuteRoleAsync(context.Guild);
-            await _channelServices.SetMuteOverwritesAsync(context.Guild, role);
+            await _channelServices.SetMuteOverwritesAsync(context.Guild, role, reason);
 
             // Apply it to the user
             await _roleService.MuteUserAsync(context, role, user, time ?? TimeSpan.FromHours(1), reason);
@@ -143,7 +143,7 @@ namespace AkkoBot.Command.Modules.Administration
         public async Task Undeaf(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -158,12 +158,15 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_chatmute")]
         [RequireUserPermissions(Permissions.MuteMembers)]
         [RequireBotPermissions(Permissions.ManageChannels)]
-        public async Task ChatMute(CommandContext context, DiscordMember user)
+        public async Task ChatMute(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordMember user,
+            [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
-            await _channelServices.SetMuteOverwritesAsync(context.Guild, user);
+            await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("chatmute_success", Formatter.Bold(user.GetFullname())));
@@ -175,12 +178,15 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_chatunmute")]
         [RequireUserPermissions(Permissions.MuteMembers)]
         [RequireBotPermissions(Permissions.ManageChannels)]
-        public async Task ChatUnmute(CommandContext context, DiscordMember user)
+        public async Task ChatUnmute(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordMember user,
+            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
-            await _channelServices.RemoveOverwritesAsync(context.Guild, x => x.Id == user.Id);
+            await _channelServices.RemoveOverwritesAsync(context.Guild, reason, x => x.Id == user.Id);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("chatunmute_success", Formatter.Bold(user.GetFullname())));

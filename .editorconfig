@@ -213,3 +213,6 @@ dotnet_diagnostic.CA1309.severity = none
 
 # IDE0058: Expression value is never used
 dotnet_diagnostic.IDE0058.severity = none
+
+# IDE0011: Add braces to 'if'/'else' statement
+dotnet_diagnostic.IDE0011.severity = none

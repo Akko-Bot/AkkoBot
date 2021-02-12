@@ -10,50 +10,53 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext.Exceptions;
-using AkkoBot.Services;
+using AkkoBot.Core.Common;
+using AkkoBot.Extensions;
 
-namespace AkkoBot.Core.Common
+namespace AkkoBot.Core.Services
 {
     /// <summary>
     /// Registers events the bot should listen to once it connects to Discord.
     /// </summary>
-    public class Startup
+    internal class Startup
     {
-        private readonly IUnitOfWork _db;
-        private BotCore _botCore;
+        private readonly IServiceProvider _services;
+        private readonly BotCore _botCore;
 
-        public Startup(IUnitOfWork db)
-            => _db = db;
+        internal Startup(BotCore botCore, IServiceProvider services)
+        {
+            _botCore = botCore;
+            _services = services;
+        }
 
         /// <summary>
         /// Defines the core behavior the bot should have for specific Discord events.
         /// </summary>
-        /// <param name="botCore">The bot to register the events to.</param>
         /// <exception cref="NullReferenceException"/>
-        public void RegisterEvents(BotCore botCore)
+        internal void RegisterEvents()
         {
-            if (_db is null)
-                throw new NullReferenceException("No database Unit of Work was found.");
-
-            _botCore = botCore;
+            if (_services is null)
+                throw new NullReferenceException("No IoC container was found.");
+            else if (_botCore is null)
+                throw new NullReferenceException("Bot core cannot be null.");
 
             // Create bot configs on ready, if there isn't one already
-            botCore.BotShardedClient.Ready += LoadBotConfig;
+            _botCore.BotShardedClient.Ready += LoadBotConfig;
 
             // Initialize the timers stored in the database
-            botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
+            _botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
 
             // Save visible guilds on ready
-            botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuildsAsync;
+            _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuildsAsync;
 
             // Save guild on join
-            botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
+            _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
 
             // Decache guild on leave
-            botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
+            _botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
 
             // Command logging
-            foreach (var cmdHandler in botCore.CommandExt.Values)
+            foreach (var cmdHandler in _botCore.CommandExt.Values)
             {
                 cmdHandler.CommandExecuted += LogCmdExecution;
                 cmdHandler.CommandErrored += LogCmdError;
@@ -66,10 +69,12 @@ namespace AkkoBot.Core.Common
         // Creates bot settings on startup, if there isn't one already
         private Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
             // If there is no BotConfig entry in the database, create one.
-            _db.LogConfig.TryCreate();
-            _db.BotConfig.TryCreate();
-            _db.SaveChanges();
+            db.LogConfig.TryCreate();
+            db.BotConfig.TryCreate();
+            db.SaveChanges();
 
             return Task.CompletedTask;
         }
@@ -86,28 +91,32 @@ namespace AkkoBot.Core.Common
         // Saves guilds to the db on startup
         private async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            var botConfig = _db.BotConfig.Cache;
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var botConfig = db.BotConfig.Cache;
 
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
-                .Except((await _db.GuildConfig.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
+                .Except((await db.GuildConfig.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
                 .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
                 .ToArray();
 
             // Save the new guilds to the database
-            _db.GuildConfig.CreateRange(newGuilds);
-            await _db.SaveChangesAsync();
+            db.GuildConfig.CreateRange(newGuilds);
+            await db.SaveChangesAsync();
 
             // Cache the new guilds
             foreach (var guild in newGuilds)
-                _db.GuildConfig.Cache.TryAdd(guild.GuildId, guild);
+                db.GuildConfig.Cache.TryAdd(guild.GuildId, guild);
         }
 
         // Saves default guild settings to the db and caches it
         private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
-            _db.GuildConfig.TryCreate(eventArgs.Guild);
-            _db.SaveChanges();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            db.GuildConfig.TryCreate(eventArgs.Guild);
+            db.SaveChanges();
 
             return Task.CompletedTask;
         }
@@ -115,7 +124,9 @@ namespace AkkoBot.Core.Common
         // Remove a guild from the cache when the bot is removed from it.
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
         {
-            _db.GuildConfig.Cache.TryRemove(eventArgs.Guild.Id, out _);
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            db.GuildConfig.Cache.TryRemove(eventArgs.Guild.Id, out _);
+
             return Task.CompletedTask;
         }
 

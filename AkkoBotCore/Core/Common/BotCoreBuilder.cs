@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
+using AkkoBot.Core.Services;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
@@ -293,10 +294,10 @@ namespace AkkoBot.Core.Common
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
             var botClients = GetBotClient(timeout); // Initialize the sharded clients
-            
+
             RegisterFinalServices(botClients);                  // Add the last services needed
             var services = _cmdServices.BuildServiceProvider(); // Initialize the IoC container
-            
+
             // Initialize the command handlers
             var cmdHandlers = await GetCommandHandlers(botClients, services, isCaseSensitive, withDms, withMentionPrefix);
 
@@ -304,8 +305,11 @@ namespace AkkoBot.Core.Common
             var bot = new BotCore(botClients, cmdHandlers);
 
             // Register core events
-            var startup = new Startup(services.GetService<IUnitOfWork>());
-            startup.RegisterEvents(bot);
+            var startup = new Startup(bot, services);
+            startup.RegisterEvents();
+
+            var globalEvents = new GlobalCommandEvents(bot, services);
+            globalEvents.RegisterEvents();
 
             return bot;
         }
@@ -382,6 +386,7 @@ namespace AkkoBot.Core.Common
             // Setup client configuration
             var botConfig = new DiscordConfiguration()
             {
+                Intents = DiscordIntents.All,   // Sign up for all intents. Forgetting to enable them on the developer portal will throw an exception!
                 Token = _creds.Token,           // Sets the bot token
                 TokenType = TokenType.Bot,      // Defines the type of token; User = 0, Bot = 1, Bearer = 2
                 AutoReconnect = true,           // Sets whether the bot should automatically reconnect in case it disconnects

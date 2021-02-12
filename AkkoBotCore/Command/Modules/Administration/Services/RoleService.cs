@@ -99,6 +99,9 @@ namespace AkkoBot.Command.Modules.Administration.Services
             // Mute the user
             await user.GrantRoleAsync(muteRole, reason);
 
+            if (user.VoiceState is not null)
+                await user.SetMuteAsync(true);
+
             // Save to the database
             var muteEntry = new MutedUserEntity()
             {
@@ -138,6 +141,9 @@ namespace AkkoBot.Command.Modules.Administration.Services
 
             // Unmute the user
             await user.RevokeRoleAsync(muteRole, reason);
+
+            if (user.VoiceState is not null)
+                await user.SetMuteAsync(false);
 
             // Remove from the database
             var muteEntry = db.MutedUsers.GetMutedUser(server, user);

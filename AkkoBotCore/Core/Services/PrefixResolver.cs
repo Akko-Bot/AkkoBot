@@ -4,16 +4,16 @@ using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 
-namespace AkkoBot.Core.Common
+namespace AkkoBot.Core.Services
 {
     /// <summary>
     /// Class that encapsulates the prefix resolver.
     /// </summary>
-    public class PrefixResolver
+    internal class PrefixResolver
     {
         private readonly IUnitOfWork _db;
 
-        public PrefixResolver(IUnitOfWork db)
+        internal PrefixResolver(IUnitOfWork db)
             => _db = db;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace AkkoBot.Core.Common
         /// </summary>
         /// <param name="msg">Message to be processed.</param>
         /// <returns>Positive integer if the prefix is present, -1 otherwise.</returns>
-        public Task<int> ResolvePrefix(DiscordMessage msg)
+        internal Task<int> ResolvePrefix(DiscordMessage msg)
         {
             // Server prefix needs to be changed
             return (msg.Channel.IsPrivate)

@@ -14,6 +14,7 @@ arg_module: Um módulo válido.
 arg_prefix: O novo prefixo.
 arg_punishment_reason: O motivo da punição.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
+arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
 arg_timeout: Um número inteiro maior que 10 e menor que 120.
 arg_uint: Um número inteiro maior ou igual a zero.
 arg_ulong_id: Um ID válido do Discord.
@@ -34,12 +35,16 @@ bl_removed_range: '{0} IDs foram removidos da lista negra.'
 bl_title: Lista Negra
 bot_settings_title: Configurações Globais
 channel: Canal
+chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
+chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
 cmd_ban: Bane um usuário.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
 cmd_blacklist_clear: Limpa a lista negra.
 cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâmetro for fornecido.
 cmd_blacklist_rem: Remove um registro da lista negra.
+cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
+cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
 cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
 cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
 cmd_config_case: Define se o bot deve diferenciar letras maiúsculas de minúsculas nos comandos. Requer reinicialização para tomar efeito.
@@ -65,6 +70,7 @@ cmd_config_owner_list: Lista os donos do bot.
 cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
+cmd_deafen: Ensurdece um usuário.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
@@ -79,10 +85,16 @@ cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
+cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_timedban: Bane um usuário temporariamente do servidor.
 cmd_unban: Desbane um usuário do servidor.
+cmd_undeafen: Remove o ensurdecimento de um usuário.
+cmd_unmute: Remove o silenciamento de um usuário nos canais de voz e texto.
+cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
+cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
+code: Código
 command: Comando
 command_check_failed: O usuário não possui permissões suficientes para executar esse comando.
 command_modules_footer: Utilize {0} para visualizar o uso de um comando específico.
@@ -90,6 +102,8 @@ command_not_found: Comando não encontrado.
 commands: Comandos
 days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
+deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de voz.
+deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 disabled: desativado
 enabled: ativado
 error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o meu e o seu na hierarquia de cargos.
@@ -139,6 +153,7 @@ hours: Horas
 id: ID
 kick_notification: Você foi expulso do servidor {0}.
 kick_title: Usuário Expulso
+language: Idioma
 locales_title: Idiomas Disponíveis
 massban: Banimento em Massa
 massban_description: Banindo {0} usuários. Essa operação pode lovar até {1} segundos.
@@ -151,6 +166,7 @@ minutes: Minutos
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis
+mute_success: Usuário {0} foi silenciado.
 name: Nome
 online_since: Online desde
 owners: Donos
@@ -168,15 +184,17 @@ server: Servidor
 settings: Configuração
 shutdown: Desligando.
 timedban_title: Banido Temporariamente
+timedmute: Silenciamento Expirado
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.
 unknown: Desconhecido
+unmute_success: Usuário {0} pode falar novamente.
 unspecified: Não especificado
 uptime: Tempo Online
 usage: Uso
 user: Usuário
 value: Valor
-
-code: Código
-language: Idioma
+voice_failure: O usuário precisa estar conectado a um canal de voz para este comando funcionar.
+voicemute_success: Usuário {0} foi silenciado nos canais de voz.
+voiceunmute_success: Usuário {0} pode voltar a falar nos canais de voz.

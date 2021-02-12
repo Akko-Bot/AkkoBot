@@ -17,10 +17,11 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord server.</param>
         /// <param name="muteRole">The mute role.</param>
-        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordRole muteRole)
+        /// <param name="reason">The reason for the mute.</param>
+        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordRole muteRole, string reason)
         {
             foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
-                await channel.AddOverwriteAsync(muteRole, Permissions.None, RoleService.MutePermsDeny);
+                await channel.AddOverwriteAsync(muteRole, Permissions.None, RoleService.MutePermsDeny, reason);
         }
 
         /// <summary>
@@ -28,10 +29,11 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord server.</param>
         /// <param name="user">The muted user.</param>
-        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordMember user)
+        /// <param name="reason">The reason for the mute.</param>
+        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordMember user, string reason)
         {
             foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
-                await channel.AddOverwriteAsync(user, Permissions.None, RoleService.MutePermsDeny);
+                await channel.AddOverwriteAsync(user, Permissions.None, RoleService.MutePermsDeny, reason);
         }
 
         /// <summary>
@@ -39,14 +41,15 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord server.</param>
         /// <param name="selector">A method that defines what overwrites should be removed.</param>
-        public async Task RemoveOverwritesAsync(DiscordGuild server, Func<DiscordOverwrite, bool> selector)
+        /// <param name="reason">The reason for the mute.</param>
+        public async Task RemoveOverwritesAsync(DiscordGuild server, string reason, Func<DiscordOverwrite, bool> selector)
         {
             var overwrites = server.Channels.Values
                 .Where(x => x.Users.Contains(server.CurrentMember))
                 .SelectMany(x => x.PermissionOverwrites.Where(selector));
 
             foreach (var overwrite in overwrites)
-                await overwrite.DeleteAsync();
+                await overwrite.DeleteAsync(reason);
         }
     }
 }

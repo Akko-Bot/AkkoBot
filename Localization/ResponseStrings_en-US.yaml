@@ -14,6 +14,7 @@ arg_module: A valid module.
 arg_prefix: The new prefix.
 arg_punishment_reason: The reason for the punishment.
 arg_timed_ban: For how long the user should remain banned.
+arg_timed_mute: For how long the user should remain muted. Default is __1h__.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
@@ -34,12 +35,16 @@ bl_removed_range: '{0} IDs were removed from the blacklist.'
 bl_title: Blacklist
 bot_settings_title: Global Settings
 channel: Channel
+chatmute_success: User {0} can no longer message on text channels.
+chatunmute_success: User {0} can now message on text channels.
 cmd_ban: Bans a user.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
 cmd_blacklist_clear: Clears the blacklist.
 cmd_blacklist_list: Shows the blacklist. Provide no parameter to show all entry types.
 cmd_blacklist_rem: Removes an entry from the blacklist.
+cmd_chatmute: Server mutes a user, preventing them from messaging on text channels.
+cmd_chatunmute: Server unmutes a user, allowing them to message on text channels.
 cmd_config: Groups settings that define how the bot should behave globally.
 cmd_config_cache: Sets how many messages should be cached per channel. Requires a restart to take effect.
 cmd_config_case: Sets whether commands should be case sensitive or not. Requires a restart to take effect.
@@ -65,6 +70,7 @@ cmd_config_owner_list: Lists the bot owners.
 cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
+cmd_deafen: Applies server deafening to a user.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
@@ -79,10 +85,16 @@ cmd_massban: Bans multiple users from the server.
 cmd_massunban: Unbans multiple users from the server.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
+cmd_mute: Mutes a user from text and voice channels.
 cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_sudo: Executes a command as the specified user.
 cmd_timedban: Temporarily bans a user from the server.
 cmd_unban: Unbans a user from the server.
+cmd_undeafen: Removes server deafening from a user.
+cmd_unmute: Unmutes a user from text and voice channels.
+cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
+cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
+code: Code
 command: Command
 command_check_failed: The user does not have enough permissions to execute this command.
 command_modules_footer: Use {0} to see the usage for a specific command.
@@ -90,6 +102,8 @@ command_not_found: Command not found.
 commands: Commands
 days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'
+deafen_success: User {0} can no longer hear other users speaking in voice channels.
+deafen_success: User {0} can now hear other users speaking in voice channels.
 disabled: disabled
 enabled: enabled
 error_hierarchy: This command can only be used on users with a role lower to yours and mine in the role hierarchy.
@@ -139,6 +153,7 @@ hours: Hours
 id: ID
 kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
+language: Language
 locales_title: Available Languages
 massban: Massban
 massban_description: Banning {0} users. This operation might take up to {1} seconds.
@@ -151,6 +166,7 @@ minutes: Minutes
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules
+mute_success: User {0} has been muted.
 name: Name
 online_since: Online since
 owners: Owners
@@ -168,30 +184,17 @@ server: Server
 settings: Settings
 shutdown: Shutting down.
 timedban_title: Temporary Ban
+timedmute: Expired Mute
 type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.
 unknown: Unknown
+unmute_success: User {0} has been unmuted.
 unspecified: Unspecified
 uptime: Uptime
 usage: Usage
 user: User
 value: Value
-
-code: Code
-language: Language
-cmd_mute: Mutes a user from text and voice channels.
-cmd_unmute: Unmutes a user from text and voice channels.
-mute_success: User {0} has been muted.
-unmute_success: User {0} has been unmuted.
-timedmute: Expired Mute
-arg_timed_mute: For how long the user should remain muted. Default is __1h__.
+voice_failure: The user needs to be connected to a voice channel for this command to work.
 voicemute_success: User {0} has been muted from voice channels.
 voiceunmute_success: User {0} has been unmuted from voice channels.
-voice_failure: The user needs to be connected to a voice channel for this command to work.
-cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
-cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
-cmd_deafen: Applies server deafening to a user.
-cmd_undeafen: Removes server deafening from a user.
-deafen_success: User {0} can no longer hear other users speaking in voice channels.
-deafen_success: User {0} can now hear other users speaking in voice channels.
