@@ -54,10 +54,12 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_sban")]
         [RequireBotPermissions(Permissions.BanMembers)]
         [RequireUserPermissions(Permissions.KickMembers)]
+        [Priority(0)]
         public async Task SoftBan(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
             => await SoftBan(context, user, null, reason);
 
         [Command("softban")]
+        [Priority(1)]
         public async Task SoftBan(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
@@ -89,10 +91,12 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("ban"), Aliases("b")]
         [Description("cmd_ban")]
         [RequirePermissions(Permissions.BanMembers)]
+        [Priority(1)]
         public async Task Ban(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
             => await Ban(context, user, null, reason);
 
         [Command("ban")]
+        [Priority(2)]
         public async Task Ban(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
@@ -118,6 +122,7 @@ namespace AkkoBot.Command.Modules.Administration
         }
 
         [Command("ban"), HiddenOverload]
+        [Priority(0)]
         public async Task HackBan(CommandContext context, DiscordUser user, [RemainingText] string reason = null)
         {
             // Ban the user

@@ -40,56 +40,102 @@ namespace AkkoBot.Command.Modules.Administration.Services
             return true;
         }
 
-        public async Task<DiscordRole> GetMuteRole(DiscordGuild server)
+        /// <summary>
+        /// Gets the mute role of the specified server.
+        /// </summary>
+        /// <param name="server">The Discord server.</param>
+        /// <remarks>If there isn't one, a new mute role is created.</remarks>
+        /// <returns>The server mute role.</returns>
+        public async Task<DiscordRole> FetchMuteRole(DiscordGuild server)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             var guildSettings = db.GuildConfig.GetGuild(server.Id);
 
-            if (!server.Roles.TryGetValue(guildSettings.MuteRoleId, out var role))
+            if (!server.Roles.TryGetValue(guildSettings.MuteRoleId, out var muteRole))
             {
                 // Create a new mute role
-                role = await server.CreateRoleAsync("AkkoMute", Permissions.ReadMessageHistory);
+                muteRole = await server.CreateRoleAsync("AkkoMute", Permissions.ReadMessageHistory);
 
                 // Save it to the database
-                guildSettings.MuteRoleId = role.Id;
+                guildSettings.MuteRoleId = muteRole.Id;
                 db.GuildConfig.CreateOrUpdate(guildSettings);
                 await db.SaveChangesAsync();
             }
-            
-            return role;
+
+            return muteRole;
         }
 
-        public async Task SetMuteOverwrites(DiscordGuild server, DiscordRole role)
+        /// <summary>
+        /// Sets the channel overriders for the mute role on all channels visible to the bot.
+        /// </summary>
+        /// <param name="server">The Discord server.</param>
+        /// <param name="muteRole">The mute role.</param>
+        public async Task SetMuteOverwrites(DiscordGuild server, DiscordRole muteRole)
         {
             foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
-                await channel.AddOverwriteAsync(role, Permissions.None, Permissions.SendMessages | Permissions.AddReactions | Permissions.AttachFiles | Permissions.Speak);
+                await channel.AddOverwriteAsync(muteRole, Permissions.None, Permissions.SendMessages | Permissions.AddReactions | Permissions.AttachFiles | Permissions.Speak);
         }
 
-        public async Task PermaMuteUser(DiscordGuild server, DiscordRole role, DiscordMember user, string reason)
+        /// <summary>
+        /// Assigns the mute role to a Discord <paramref name="user"/>, registers the muted user
+        /// to the database and creates a timer for when they should be unmuted.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="muteRole">The mute role.</param>
+        /// <param name="user">The Discord user being muted.</param>
+        /// <param name="time">For how long the user should remain muted.</param>
+        /// <param name="reason">The reason for the mute.</param>
+        /// <remarks>
+        /// If <paramref name="time"/> is <see cref="TimeSpan.Zero"/>, no timer is created,
+        /// effectively making the mute permanent.
+        /// </remarks>
+        /// <returns><see langword="true"/> if a timer was created, <see langword="false"/> otherwise.</returns>
+        public async Task<bool> MuteUser(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string reason)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Mute the user
-            await user.GrantRoleAsync(role, reason);
+            await user.GrantRoleAsync(muteRole, reason);
 
             // Save to the database
-            var newEntry = new MutedUserEntity()
+            var muteEntry = new MutedUserEntity()
             {
-                GuildIdFK = server.Id,
+                GuildIdFK = context.Guild.Id,
                 UserId = user.Id,
-                ElapseAt = DateTimeOffset.Now.Add(TimeSpan.FromHours(1))
+                ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
-            db.MutedUsers.AddOrUpdate(newEntry);
+            db.MutedUsers.AddOrUpdate(muteEntry);
+
+            // Add timer if mute is not permanent
+            if (time != TimeSpan.Zero)
+            {
+                var timerEntry = new TimerEntity(muteEntry);
+
+                db.Timers.AddOrUpdate(timerEntry, out var dbTimerEntry);
+                await db.SaveChangesAsync();
+
+                db.Timers.Cache.AddOrUpdateByEntity(context.Client, dbTimerEntry);
+                return true;
+            }
+
             await db.SaveChangesAsync();
+            return false;
         }
 
-        public async Task UnmuteUser(DiscordGuild server, DiscordRole role, DiscordMember user, string reason)
+        /// <summary>
+        /// Unmutes a Discord user and removes their associated register and timer.
+        /// </summary>
+        /// <param name="server">The Discord server.</param>
+        /// <param name="muteRole">The mute role.</param>
+        /// <param name="user">The Discord user being unmuted.</param>
+        /// <param name="reason">The reason for the unmute.</param>
+        public async Task UnmuteUser(DiscordGuild server, DiscordRole muteRole, DiscordMember user, string reason)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Unmute the user
-            await user.RevokeRoleAsync(role, reason);
+            await user.RevokeRoleAsync(muteRole, reason);
 
             // Remove from the database
             var muteEntry = db.MutedUsers.GetMutedUser(server.Id, user.Id);

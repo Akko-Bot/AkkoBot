@@ -32,10 +32,7 @@ namespace AkkoBot.Services.Database.Entities
             UserId = muteUser.UserId;
             GuildId = muteUser.GuildIdFK;
             ChannelId = null;
-            Interval = (muteUser.ElapseAt == DateTimeOffset.MinValue)
-                ? TimeSpan.Zero
-                : DateTimeOffset.Now.Subtract(muteUser.ElapseAt);
-
+            Interval = muteUser.ElapseAt.Subtract(DateTimeOffset.Now);
             IsRepeatable = false;
             IsAbsolute = true;
             Type = TimerType.TimedMute;

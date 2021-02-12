@@ -14,15 +14,30 @@ namespace AkkoBot.Services.Database.Repository
             => Cache = dbCacher.Timers;
 
         /// <summary>
+        /// Gets a database entry from the reference entity object.
+        /// </summary>
+        /// <param name="referenceEntity">The model to look for in the database.</param>
+        /// <remarks>The entry is filtered by TimerType, GuildId, UserId and ChannelId.</remarks>
+        /// <returns>The tracked database entry, <see langword="null"/> if the entry doesn't exist.</returns>
+        public TimerEntity GetTimerEntity(TimerEntity referenceEntity)
+        {
+            return base.Table.FirstOrDefault(x =>
+                x.Type == referenceEntity.Type
+                && x.GuildId == referenceEntity.GuildId
+                && x.UserId == referenceEntity.UserId
+                && x.ChannelId == referenceEntity.ChannelId
+            );
+        }
+
+        /// <summary>
         /// Upserts the specified <paramref name="newEntry"/> do the database.
         /// </summary>
         /// <param name="newEntry">The entry to be added or updated.</param>
-        /// <param name="selector">A method that defines the entry that needs to be updated, if it exists.</param>
         /// <param name="dbEntry">The tracked resulting entity to be upserted.</param>
         /// <returns><see langword="true"/> if <paramref name="dbEntry"/> is being tracked for creation, <see langword="false"/> if for updating.</returns>
-        public bool AddOrUpdate(TimerEntity newEntry, Func<TimerEntity, bool> selector, out TimerEntity dbEntry)
+        public bool AddOrUpdate(TimerEntity newEntry, out TimerEntity dbEntry)
         {
-            dbEntry = base.Table.FirstOrDefault(selector);
+            dbEntry = GetTimerEntity(newEntry);
 
             if (dbEntry is null)
             {
@@ -33,7 +48,7 @@ namespace AkkoBot.Services.Database.Repository
             else
             {
                 base.Delete(dbEntry);       // This is needed to change the tracking internal state. TODO: investigate further
-                newEntry.Id = dbEntry.Id;   // Seems to be caused by the fact that the tracked entity is an out var
+                newEntry.Id = dbEntry.Id;   // Seems to be caused by the fact that the tracked entity is an out var (??)
                 dbEntry = newEntry;
                 base.Update(dbEntry);
 

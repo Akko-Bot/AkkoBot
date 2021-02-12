@@ -180,3 +180,7 @@ value: Value
 
 code: Code
 language: Language
+cmd_mute: Mutes a user from text chat and voice chat.
+mute_success: User {0} has been muted.
+unmute_success: User {0} has been unmuted.
+timedmute: Expired Mute

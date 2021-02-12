@@ -45,5 +45,42 @@ namespace AkkoBot.Services.Timers
 
             await db.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Unmutes a user on a Discord server.
+        /// </summary>
+        /// <param name="entryId">The ID of the database entry.</param>
+        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="userId">The ID of the user to be unmuted.</param>
+        public async Task Unmute(int entryId, DiscordGuild server, ulong userId)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var settings = db.GuildConfig.GetGuild(server.Id);
+            var localizedReason = _localizer.GetResponseString(settings.Locale, "timedmute");
+
+            try
+            {
+                // User may not be in the guild when this method runs
+                // Or role may not exist anymore
+                var role = server.GetRole(settings.MuteRoleId);
+                var user = await server.GetMemberAsync(userId);
+                await user.RevokeRoleAsync(role, localizedReason);
+            }
+            catch
+            {
+                return;
+            }
+            finally
+            {
+                // Remove the entries from the database
+                var timerEntry = await db.Timers.GetAsync(entryId);
+                var muteEntry = db.MutedUsers.GetMutedUser(server.Id, userId);
+                db.Timers.Delete(timerEntry);
+                db.MutedUsers.Delete(muteEntry);
+
+                await db.SaveChangesAsync();
+            }
+        }
     }
 }

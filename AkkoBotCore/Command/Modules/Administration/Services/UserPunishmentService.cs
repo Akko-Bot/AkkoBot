@@ -90,12 +90,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
             };
 
             // Upsert the entry
-            db.Timers.AddOrUpdate(
-                newEntry,
-                x => x.Type is TimerType.TimedBan && x.GuildId == newEntry.GuildId && x.UserId == newEntry.UserId,
-                out var dbEntry
-            );
-
+            db.Timers.AddOrUpdate(newEntry, out var dbEntry);
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
