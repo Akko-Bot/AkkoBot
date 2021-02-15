@@ -42,6 +42,13 @@ namespace AkkoBot.Services.Database.Repository
             }
         }
 
+        public async Task<GuildConfigEntity> GetGuildWithMutesAsync(ulong sid)
+        {
+            return await base.Table
+                .Include(x => x.MutedUserRel)
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+        }
+
         /// <summary>
         /// Gets the settings of the specified Discord guild with the warnings of a specific user.
         /// </summary>

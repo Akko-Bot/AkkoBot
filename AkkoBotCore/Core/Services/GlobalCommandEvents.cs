@@ -43,8 +43,8 @@ namespace AkkoBot.Core.Services
             var botPerms = eventArgs.Guild.CurrentMember.PermissionsIn(anyChannel);
 
             // Check if user is in the database
-            var mutedUser = db.MutedUsers.GetMutedUser(eventArgs.Guild, eventArgs.Member);
-            var guildSettings = db.GuildConfig.GetGuild(eventArgs.Guild.Id);
+            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
+            var mutedUser = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == eventArgs.Member.Id);
 
             if (mutedUser is not null && botPerms.HasFlag(Permissions.ManageRoles))
             {
@@ -56,12 +56,10 @@ namespace AkkoBot.Core.Services
                 }
                 else
                 {
-                    // If mute role doesn't exist anymore, delete all registers of it
-                    var toDelete = db.MutedUsers.Table
-                        .Where(x => x.GuildIdFK == eventArgs.Guild.Id)
-                        .ToArray();
+                    // If mute role doesn't exist anymore, delete the mute from the database
+                    guildSettings.MutedUserRel.Clear();
 
-                    db.MutedUsers.DeleteRange(toDelete);
+                    db.GuildConfig.Update(guildSettings);
                     await db.SaveChangesAsync();
                 }
             }

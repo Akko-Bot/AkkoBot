@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Windows.Input;
 using AkkoBot.Command.Abstractions;
@@ -56,21 +57,22 @@ namespace AkkoBot.Services.Timers
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
-            var settings = db.GuildConfig.GetGuild(server.Id);
-            var localizedReason = _localizer.GetResponseString(settings.Locale, "timedmute");
+            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(server.Id);
+            var localizedReason = _localizer.GetResponseString(guildSettings.Locale, "timedmute");
 
             try
             {
                 // *User may not be in the guild when this method runs
                 // Or role may not exist anymore
                 // Or bot may not have role permissions anymore
-                var role = server.GetRole(settings.MuteRoleId);
+                server.Roles.TryGetValue(guildSettings.MuteRoleId, out var muteRole);
                 var user = await server.GetMemberAsync(userId);
 
                 if (user.VoiceState is not null)
                     await user.SetMuteAsync(false);
 
-                await user.RevokeRoleAsync(role, localizedReason);
+                if (muteRole is not null)
+                    await user.RevokeRoleAsync(muteRole, localizedReason);
             }
             catch
             {
@@ -80,9 +82,11 @@ namespace AkkoBot.Services.Timers
             {
                 // Remove the entries from the database
                 var timerEntry = await db.Timers.GetAsync(entryId);
-                var muteEntry = db.MutedUsers.GetMutedUser(server.Id, userId);
+                var muteEntry = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == userId);
+                guildSettings.MutedUserRel.Remove(muteEntry);
+
                 db.Timers.Delete(timerEntry);
-                db.MutedUsers.Delete(muteEntry);
+                db.GuildConfig.Update(guildSettings);
 
                 await db.SaveChangesAsync();
             }

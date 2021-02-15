@@ -15,8 +15,7 @@ namespace AkkoBot.Services.Database
         public BotConfigRepo BotConfig { get; private set; }
         public LogConfigRepo LogConfig { get; private set; }
         public GuildConfigRepo GuildConfig { get; private set; }
-        public MutedUserRepo MutedUsers { get; private set; }
-        public TimerRepo Timers { get; private set; } // Add Warn and WarnPunish in here?
+        public TimerRepo Timers { get; private set; }
         public PlayingStatusRepo PlayingStatuses { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)
@@ -28,7 +27,6 @@ namespace AkkoBot.Services.Database
             BotConfig = new(db, dbCacher);
             LogConfig = new(db, dbCacher);
             GuildConfig = new(db, dbCacher);
-            MutedUsers = new(db);
             Timers = new(db, dbCacher);
             PlayingStatuses = new(db, dbCacher);
         }
@@ -72,7 +70,6 @@ namespace AkkoBot.Services.Database
                 Blacklist = null;
                 BotConfig = null;
                 GuildConfig = null;
-                MutedUsers = null;
                 PlayingStatuses = null;
 
                 _isDisposed = true;
