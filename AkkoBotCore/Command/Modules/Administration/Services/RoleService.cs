@@ -106,16 +106,15 @@ namespace AkkoBot.Command.Modules.Administration.Services
             var muteEntry = new MutedUserEntity()
             {
                 GuildIdFK = context.Guild.Id,
-                UserId = user.Id,
-                ElapseAt = DateTimeOffset.Now.Add(time)
+                UserId = user.Id
             };
 
-            db.MutedUsers.AddOrUpdate(muteEntry);
+            db.MutedUsers.Update(muteEntry);
 
             // Add timer if mute is not permanent
             if (time >= TimeSpan.Zero)
             {
-                var timerEntry = new TimerEntity(muteEntry);
+                var timerEntry = new TimerEntity(muteEntry, time);
 
                 db.Timers.AddOrUpdate(timerEntry, out var dbTimerEntry);
                 await db.SaveChangesAsync();

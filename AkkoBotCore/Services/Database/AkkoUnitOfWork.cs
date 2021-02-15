@@ -16,7 +16,7 @@ namespace AkkoBot.Services.Database
         public LogConfigRepo LogConfig { get; private set; }
         public GuildConfigRepo GuildConfig { get; private set; }
         public MutedUserRepo MutedUsers { get; private set; }
-        public TimerRepo Timers { get; set; }
+        public TimerRepo Timers { get; private set; } // Add Warn and WarnPunish in here?
         public PlayingStatusRepo PlayingStatuses { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)

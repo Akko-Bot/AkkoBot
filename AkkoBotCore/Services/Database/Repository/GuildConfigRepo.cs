@@ -3,6 +3,8 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Repository
 {
@@ -38,6 +40,37 @@ namespace AkkoBot.Services.Database.Repository
 
                 return guild;
             }
+        }
+
+        /// <summary>
+        /// Gets the settings of the specified Discord guild with the warnings of a specific user.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <param name="uid">The ID of the Discord user.</param>
+        /// <param name="type">The type of entry to be collected</param>
+        /// <remarks>The warnings will be empty if the user has none. This overload returns entries specified by <paramref name="type"/>.</remarks>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
+        public async Task<GuildConfigEntity> GetGuildWithWarningsAsync(ulong sid, ulong uid, WarnType type)
+        {
+            return await base.Table
+                .Include(x => x.WarnRel.Where(x => x.UserId == uid && x.Type == type))
+                .Include(x => x.WarnPunishRel)
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+        }
+
+        /// <summary>
+        /// Gets the settings of the specified Discord guild with the warnings of a specific user.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <param name="uid">The ID of the Discord user.</param>
+        /// <remarks>The warnings will be empty if the user has none. This overload returns notices and warnings.</remarks>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
+        public async Task<GuildConfigEntity> GetGuildWithWarningsAsync(ulong sid, ulong uid)
+        {
+            return await base.Table
+                .Include(x => x.WarnRel.Where(x => x.UserId == uid))
+                .Include(x => x.WarnPunishRel)
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
         }
 
         /// <summary>

@@ -11,6 +11,8 @@ namespace AkkoBot.Services.Database
         public DbSet<LogConfigEntity> LogConfig { get; set; }
         public DbSet<TimerEntity> Timers { get; set; }
         public DbSet<MutedUserEntity> MutedUsers { get; set; }
+        public DbSet<WarnEntity> Warnings { get; set; }
+        public DbSet<WarnPunishEntity> WarnPunishments { get; set; }
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
 
@@ -38,14 +40,27 @@ namespace AkkoBot.Services.Database
             #region Guild Configuration
 
             modelBuilder.Entity<GuildConfigEntity>()
-                .HasMany(x => x.MutedUserRel)
-                .WithOne(x => x.GuildConfigRel)
-                .HasPrincipalKey(x => x.GuildId);
+                .HasAlternateKey(x => x.GuildId);
 
             modelBuilder.Entity<MutedUserEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.MutedUserRel)
                 .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WarnEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.WarnRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WarnPunishEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.WarnPunishRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion

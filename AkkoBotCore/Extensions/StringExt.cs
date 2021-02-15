@@ -22,7 +22,7 @@ namespace AkkoBot.Extensions
         /// <param name="maxLength">The maximum length the string should have.</param>
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         public static string MaxLength(this string text, int maxLength)
-            => text.Substring(0, Math.Min(text.Length, maxLength));
+            => text?.Substring(0, Math.Min(text.Length, maxLength));
 
         /// <summary>
         /// Returns a string whose first character is uppercase and all others are lowercase.

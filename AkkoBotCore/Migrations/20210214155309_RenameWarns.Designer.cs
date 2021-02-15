@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210214155309_RenameWarns")]
+    partial class RenameWarns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,10 +409,6 @@ namespace AkkoBot.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id")
                         .UseIdentityByDefaultColumn();
-
-                    b.Property<decimal>("AuthorId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("author_id");
 
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")

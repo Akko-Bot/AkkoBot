@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210213140348_RemoveMutedElapsed")]
+    partial class RemoveMutedElapsed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -408,10 +410,6 @@ namespace AkkoBot.Migrations
                         .HasColumnName("id")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<decimal>("AuthorId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("author_id");
-
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
@@ -419,60 +417,18 @@ namespace AkkoBot.Migrations
                     b.Property<decimal>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("guild_id_fk");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
 
                     b.Property<decimal>("UserId")
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("user_id");
 
-                    b.Property<string>("WarningText")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("warning_text");
-
                     b.HasKey("Id")
-                        .HasName("pk_warnings");
+                        .HasName("pk_warn_entity");
 
                     b.HasIndex("GuildIdFK")
-                        .HasDatabaseName("ix_warnings_guild_id_fk");
+                        .HasDatabaseName("ix_warn_entity_guild_id_fk");
 
-                    b.ToTable("warnings");
-                });
-
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.WarnPunishEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<DateTimeOffset>("DateAdded")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_added");
-
-                    b.Property<decimal>("GuildIdFK")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id_fk");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.Property<int>("WarnAmount")
-                        .HasColumnType("integer")
-                        .HasColumnName("warn_amount");
-
-                    b.HasKey("Id")
-                        .HasName("pk_warn_punishments");
-
-                    b.HasIndex("GuildIdFK")
-                        .HasDatabaseName("ix_warn_punishments_guild_id_fk");
-
-                    b.ToTable("warn_punishments");
+                    b.ToTable("warn_entity");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.MutedUserEntity", b =>
@@ -493,20 +449,7 @@ namespace AkkoBot.Migrations
                     b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
                         .WithMany("WarnRel")
                         .HasForeignKey("GuildIdFK")
-                        .HasConstraintName("fk_warnings_guild_config_guild_config_rel_id")
-                        .HasPrincipalKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GuildConfigRel");
-                });
-
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.WarnPunishEntity", b =>
-                {
-                    b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
-                        .WithMany("WarnPunishRel")
-                        .HasForeignKey("GuildIdFK")
-                        .HasConstraintName("fk_warn_punishments_guild_config_guild_config_rel_id")
+                        .HasConstraintName("fk_warn_entity_guild_config_guild_config_rel_id")
                         .HasPrincipalKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -517,8 +460,6 @@ namespace AkkoBot.Migrations
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.GuildConfigEntity", b =>
                 {
                     b.Navigation("MutedUserRel");
-
-                    b.Navigation("WarnPunishRel");
 
                     b.Navigation("WarnRel");
                 });

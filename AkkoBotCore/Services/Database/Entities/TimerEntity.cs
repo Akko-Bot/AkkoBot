@@ -27,16 +27,16 @@ namespace AkkoBot.Services.Database.Entities
 
         public TimerEntity() { }
 
-        public TimerEntity(MutedUserEntity muteUser)
+        public TimerEntity(MutedUserEntity muteUser, TimeSpan time)
         {
             UserId = muteUser.UserId;
             GuildId = muteUser.GuildIdFK;
             ChannelId = null;
-            Interval = muteUser.ElapseAt.Subtract(DateTimeOffset.Now);
+            Interval = time;
             IsRepeatable = false;
             IsAbsolute = true;
             Type = TimerType.TimedMute;
-            ElapseAt = muteUser.ElapseAt;
+            ElapseAt = DateTimeOffset.Now.Add(time);
         }
     }
 }

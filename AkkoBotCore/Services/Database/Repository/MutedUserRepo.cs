@@ -25,24 +25,5 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns>The database of the muted user, <see langword="null"/> if it doesn't exist.</returns>
         public MutedUserEntity GetMutedUser(ulong sid, ulong uid)
             => base.Table.FirstOrDefault(x => x.GuildIdFK == sid && x.UserId == uid);
-
-        /// <summary>
-        /// Upserts the specified <paramref name="entry"/> do the database.
-        /// </summary>
-        /// <param name="entry">The entry to be added or updated.</param>
-        /// <returns><see langword="true"/> if the entry is being tracked for creation, <see langword="false"/> if for updating.</returns>
-        public bool AddOrUpdate(MutedUserEntity entry)
-        {
-            var dbEntry = GetMutedUser(entry.GuildIdFK, entry.UserId);
-
-            if (dbEntry is not null)
-            {
-                dbEntry.ElapseAt = entry.ElapseAt;
-                return false;
-            }
-
-            base.Create(entry);
-            return true;
-        }
     }
 }

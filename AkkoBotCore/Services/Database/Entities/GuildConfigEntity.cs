@@ -17,7 +17,9 @@ namespace AkkoBot.Services.Database.Entities
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
-        public IEnumerable<MutedUserEntity> MutedUserRel { get; set; }
+        public List<MutedUserEntity> MutedUserRel { get; set; }
+        public List<WarnEntity> WarnRel { get; set; }
+        public List<WarnPunishEntity> WarnPunishRel { get; set; }
 
         public ulong GuildId { get; set; }
 
@@ -60,13 +62,14 @@ namespace AkkoBot.Services.Database.Entities
 
         public ulong MuteRoleId { get; set; }
 
-        public TimeSpan? InteractiveTimeout { get; set; } = null;
+        public TimeSpan WarnExpire { get; set; }
+
+        public TimeSpan? InteractiveTimeout { get; set; }
 
         // Greet and Bye channels and messages
         // .asar - .iam/.iamnot roles
         // .fi - .sfi/.cfi Server invite filter
         // .fw - .sfq/.cfw Word filter
-        // Muted users
         // .repeat and .remind
         // Warnings, warn expire and warn punishments
         // Xp notification
@@ -102,6 +105,31 @@ namespace AkkoBot.Services.Database.Entities
             }
 
             return result;
+        }
+
+        public GuildConfigEntity AddDefaultWarnPunishments()
+        {
+            var defaultPunishments = new WarnPunishEntity[]
+            {
+                new WarnPunishEntity()
+                {
+                    GuildIdFK = GuildId,
+                    WarnAmount = 3,
+                    Type = WarnPunishType.Kick
+                },
+                new WarnPunishEntity()
+                {
+                    GuildIdFK = GuildId,
+                    WarnAmount = 5,
+                    Type = WarnPunishType.Ban
+                }
+            };
+
+            if (WarnPunishRel is null)
+                WarnPunishRel = new(2);
+
+            WarnPunishRel.AddRange(defaultPunishments);
+            return this;
         }
     }
 }

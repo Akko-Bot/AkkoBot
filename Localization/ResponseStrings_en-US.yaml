@@ -198,3 +198,22 @@ value: Value
 voice_failure: The user needs to be connected to a voice channel for this command to work.
 voicemute_success: User {0} has been muted from voice channels.
 voiceunmute_success: User {0} has been unmuted from voice channels.
+
+note_success: Note added successfully.
+cmd_note: Adds a note about a user.
+cmd_warn: Warns a user.
+warn_dm: You have been warned on {0}.
+warn_success: User {0} has been warned.
+cmd_warnc: Clears all warnings from a user. Provide a number to clear a specific one.
+unwarn_success: Removed warning {0} from {1}.
+unwarn_all_success: Removed all warnings from {0}.
+cmd_warnlog: Shows the list of warnings and notes from a user.
+warnlog_empty: There are no warnings to show.
+warnlog_title: Infractions for {0}
+registerlog_field: '{0} at {1} by {2}'
+warning: Warning
+mute_enum: muted
+kick_enum: kicked
+softban_enum: soft-banned
+ban_enum: banned
+warn_and_punish: User {0} has been warned and {1}.
