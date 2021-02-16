@@ -32,13 +32,24 @@ namespace AkkoBot.Command.Modules.Administration.Services
             => _services = services;
 
         /// <summary>
+        /// A more permissive version of <see cref="HierarchyCheckAsync(CommandContext, DiscordMember, string)"/>
+        /// that does not check for the bot's position in the role hierarchy.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="user">The targeted user.</param>
+        /// <param name="errorMessage">The error message to be sent if the check fails.</param>
+        /// <returns><see langword="true"/> if the context user is higher than the target user, <see langword="false"/> otherwise.</returns>
+        public async Task<bool> SoftHierarchyCheckAsync(CommandContext context, DiscordMember user, string errorMessage)
+            => context.Member.Hierarchy >= user.Hierarchy || await HierarchyCheckAsync(context, user, errorMessage);
+
+        /// <summary>
         /// Checks if the <paramref name="context"/> user can perform actions on the specified <paramref name="user"/> and sends an error message if the check fails.
         /// </summary>
         /// <param name="context">This command context.</param>
         /// <param name="user">The targeted user.</param>
         /// <param name="errorMessage">The error message to be sent if the check fails.</param>
         /// <returns><see langword="true"/> if the context user is above in the hierarchy, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> CheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
+        public async Task<bool> HierarchyCheckAsync(CommandContext context, DiscordMember user, string errorMessage)
         {
             if ((context.Member.Hierarchy <= user.Hierarchy
             && context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
@@ -109,7 +120,18 @@ namespace AkkoBot.Command.Modules.Administration.Services
                 UserId = user.Id
             };
 
-            db.MutedUsers.Update(muteEntry);
+            var occurrence = new OccurrenceEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserId = user.Id,
+                Mutes = 1
+            };
+
+            await db.GuildConfig.CreateOccurrenceAsync(context.Guild, user.Id, occurrence);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(context.Guild.Id);
+            guildSettings.MutedUserRel.Add(muteEntry);
+            db.GuildConfig.Update(guildSettings);
 
             // Add timer if mute is not permanent
             if (time >= TimeSpan.Zero)

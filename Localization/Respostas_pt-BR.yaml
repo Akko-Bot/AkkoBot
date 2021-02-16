@@ -7,10 +7,12 @@ arg_command: Um comando válido.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_double: Um número real.
+arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
 arg_mention: Um ID ou menção válido do Discord.
 arg_module: Um módulo válido.
+arg_notice: A anotação a ser adicionada ao modlog desse usuário.
 arg_prefix: O novo prefixo.
 arg_punishment_reason: O motivo da punição.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
@@ -21,6 +23,7 @@ arg_ulong_id: Um ID válido do Discord.
 arg_ulong_id_col: Múltiplos IDs válidos do Discord.
 arg_ulong_user_col: Múltiplos IDs válidos de usuários.
 arg_unpunishment_reason: O motivo para a remoção da punição.
+ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
 ban_title: Usuário Banido
 banned_for: Banido por
@@ -80,12 +83,15 @@ cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor
 cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
 cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela resposta do usuário, em segundos. Forneça nenhum parâmetro para redefini-lo para o valor padrão.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
+cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_kick: Expulsa um usuário do servidor.
 cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
+cmd_modlog: Exibe anotações e infrações de um usuário.
 cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
 cmd_mute: Silencia um usuário nos canais de voz e texto.
+cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_timedban: Bane um usuário temporariamente do servidor.
@@ -94,6 +100,8 @@ cmd_undeafen: Remove o ensurdecimento de um usuário.
 cmd_unmute: Remove o silenciamento de um usuário nos canais de voz e texto.
 cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
 cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
+cmd_warn: Adverte um usuário.
+cmd_warnc: Remove todas as anotações e advertências de um usuário ou uma específica se o ID for fornecido.
 code: Código
 command: Comando
 command_check_failed: O usuário não possui permissões suficientes para executar esse comando.
@@ -151,6 +159,11 @@ help_use_voice: Conectar
 help_view_audit_log: Ver o Registro de Auditoria
 hours: Horas
 id: ID
+infraction: Infração
+infractions_empty: Esse usuário não possui infrações.
+infractions_field: '{0} às {1} por {2}'
+infractions_title: Infrações do {0}
+kick_enum: expulso
 kick_notification: Você foi expulso do servidor {0}.
 kick_title: Usuário Expulso
 language: Idioma
@@ -163,11 +176,14 @@ massunban: Desbanimento em Massa
 massunban_failed: Não há usuário a desbanir.
 massunban_succeded: '{0} usuários foram desbanidos do servidor.'
 minutes: Minutos
+modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} expulsões, {4} expulsões com deleção, {5} banimentos.'
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis
+mute_enum: silenciado
 mute_success: Usuário {0} foi silenciado.
 name: Nome
+notice_success: Anotação adicionada com sucesso.
 online_since: Online desde
 owners: Donos
 punishment_dm_failed: Falha ao enviar a notificação de punição.
@@ -183,6 +199,7 @@ seconds: Segundos
 server: Servidor
 settings: Configuração
 shutdown: Desligando.
+softban_enum: expulso
 timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 type: Tipo
@@ -191,6 +208,9 @@ unban_success: Usuário {0} foi desbanido.
 unknown: Desconhecido
 unmute_success: Usuário {0} pode falar novamente.
 unspecified: Não especificado
+unwarn_all: Todas as advertências do usuário {0} foram removidas.
+unwarn_failure: A infração de ID {0} não foi encontrada.
+unwarn_success: A advertência número {0} do usuário {1} foi removida.
 uptime: Tempo Online
 usage: Uso
 user: Usuário
@@ -198,3 +218,6 @@ value: Valor
 voice_failure: O usuário precisa estar conectado a um canal de voz para este comando funcionar.
 voicemute_success: Usuário {0} foi silenciado nos canais de voz.
 voiceunmute_success: Usuário {0} pode voltar a falar nos canais de voz.
+warn_and_punish: Usuário {0} foi advertido e {1}.
+warn_dm: Você foi advertido no servidor {0}.
+warn_success: Usuário {0} foi advertido.

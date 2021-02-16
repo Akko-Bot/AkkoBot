@@ -3,10 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Services.Database.Entities
 {
+    [Comment("Stores data and settings related to how the bot logs command usage.")]
     public class LogConfigEntity : DbEntity
     {
         private string _logFormat = "Default";

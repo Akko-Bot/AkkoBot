@@ -42,11 +42,49 @@ namespace AkkoBot.Services.Database.Repository
             }
         }
 
+        /// <summary>
+        /// Gets the settings of the specified Discord guild with all users that are muted on the server.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
         public async Task<GuildConfigEntity> GetGuildWithMutesAsync(ulong sid)
         {
             return await base.Table
                 .Include(x => x.MutedUserRel)
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
+        }
+
+        /// <summary>
+        /// Creates or updates the punishment occurence for a given user in the specified server.
+        /// </summary>
+        /// <param name="server">The Discord guild the punishment took place.</param>
+        /// <param name="userId">The Id of the punished Discord user.</param>
+        /// <param name="newEntry">The new entry to be created, if there isn't one yet.</param>
+        /// <remarks>Don't forget to call <see cref="IUnitOfWork.SaveChangesAsync()"/> to apply the changes.</remarks>
+        /// <returns><see langword="true"/> if a new occurence was created, <see langword="false"/> if it updated.</returns>
+        public async Task<bool> CreateOccurrenceAsync(DiscordGuild server, ulong userId, OccurrenceEntity newEntry)
+        {
+            var guildSettings = await base.Table
+                .Include(x => x.OccurrenceRel.Where(x => x.UserId == userId))
+                .FirstOrDefaultAsync(x => x.GuildId == server.Id);
+
+            var occurrency = guildSettings.OccurrenceRel.FirstOrDefault(x => x.UserId == userId);
+            var isCreated = false;
+
+            if (occurrency is null)
+            {
+                guildSettings.OccurrenceRel.Add(newEntry);
+                isCreated = true;
+            }
+            else
+            {
+                guildSettings.OccurrenceRel.Remove(occurrency);
+                occurrency += newEntry;
+                guildSettings.OccurrenceRel.Add(occurrency);
+            }
+
+            base.Update(guildSettings);
+            return isCreated;
         }
 
         /// <summary>
@@ -60,6 +98,7 @@ namespace AkkoBot.Services.Database.Repository
         public async Task<GuildConfigEntity> GetGuildWithWarningsAsync(ulong sid, ulong uid, WarnType type)
         {
             return await base.Table
+                .Include(x => x.OccurrenceRel.Where(x => x.UserId == uid))
                 .Include(x => x.WarnRel.Where(x => x.UserId == uid && x.Type == type))
                 .Include(x => x.WarnPunishRel)
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
@@ -70,11 +109,12 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>
         /// <param name="uid">The ID of the Discord user.</param>
-        /// <remarks>The warnings will be empty if the user has none. This overload returns notices and warnings.</remarks>
+        /// <remarks>The warnings will be empty if the user has none. This overload returns notices, warnings and occurrences.</remarks>
         /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
         public async Task<GuildConfigEntity> GetGuildWithWarningsAsync(ulong sid, ulong uid)
         {
             return await base.Table
+                .Include(x => x.OccurrenceRel.Where(x => x.UserId == uid))
                 .Include(x => x.WarnRel.Where(x => x.UserId == uid))
                 .Include(x => x.WarnPunishRel)
                 .FirstOrDefaultAsync(x => x.GuildId == sid);

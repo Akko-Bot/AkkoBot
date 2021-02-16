@@ -31,14 +31,14 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // This returns null if it fails
             var dmMsg = _punishService.SendPunishmentDm(context, user, "kick_notification", reason);
 
             // Kick the user
-            await user.RemoveAsync(context.Member.GetFullname() + " | " + reason);
+            await _punishService.KickUser(context.Guild, user, context.Member.GetFullname() + " | " + reason);
 
             // Send kick message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, string.Empty, "kick_title");
@@ -66,17 +66,14 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_ban_deletion")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // This returns null if it fails
             var dmMsg = _punishService.SendPunishmentDm(context, user, "sban_notification", reason);
 
-            // Ban the user
-            await user.BanAsync((int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
-
-            // Unban the user
-            await context.Guild.UnbanMemberAsync(user);
+            // Softban the user
+            await _punishService.SoftbanUser(context.Guild, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send soft-ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
@@ -103,14 +100,14 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_ban_deletion")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // This returns null if it fails
             var dmMsg = _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
 
             // Ban the user
-            await context.Guild.BanMemberAsync(user.Id, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+            await _punishService.BanUser(context.Guild, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
@@ -125,7 +122,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Priority(0)]
         public async Task HackBan(CommandContext context, DiscordUser user, [RemainingText] string reason = null)
         {
-            // Ban the user
+            // Ban the user - Don't register any occurrency
             await context.Guild.BanMemberAsync(user.Id, 1, context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
@@ -157,7 +154,7 @@ namespace AkkoBot.Command.Modules.Administration
             var fails = 0;
             foreach (var userId in nonBanned)
             {
-                try { await context.Guild.BanMemberAsync(userId, 1, context.Member.GetFullname() + " | " + context.FormatLocalized("massban")); }
+                try { await _punishService.BanUser(context.Guild, userId, 1, context.Member.GetFullname() + " | " + context.FormatLocalized("massban")); }
                 catch { fails += 1; }
 
                 // Safety delay

@@ -7,10 +7,12 @@ arg_command: A valid command.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_user: ID or mention to a Discord user.
 arg_double: A real number.
+arg_infraction: The infraction to be added to the user's modlog.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
 arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
+arg_notice: The notice to be added to this user's modlog.
 arg_prefix: The new prefix.
 arg_punishment_reason: The reason for the punishment.
 arg_timed_ban: For how long the user should remain banned.
@@ -21,6 +23,7 @@ arg_ulong_id: A valid Discord ID.
 arg_ulong_id_col: Multiple valid Discord IDs.
 arg_ulong_user_col: Multiple valid user IDs.
 arg_unpunishment_reason: The reason for lifting the punishment.
+ban_enum: banned
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
 banned_for: Banned for
@@ -80,12 +83,15 @@ cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
+cmd_infractions: Shows the list of infractions of a user.
 cmd_kick: Kicks a user from the server.
 cmd_massban: Bans multiple users from the server.
 cmd_massunban: Unbans multiple users from the server.
+cmd_modlog: Shows notices and infractions of a user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
 cmd_mute: Mutes a user from text and voice channels.
+cmd_notice: Adds a notice about a user.
 cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_sudo: Executes a command as the specified user.
 cmd_timedban: Temporarily bans a user from the server.
@@ -94,6 +100,8 @@ cmd_undeafen: Removes server deafening from a user.
 cmd_unmute: Unmutes a user from text and voice channels.
 cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
+cmd_warn: Warns a user.
+cmd_warnc: Clears all notices and warnings from a user or a specific one if the ID is provided.
 code: Code
 command: Command
 command_check_failed: The user does not have enough permissions to execute this command.
@@ -151,6 +159,11 @@ help_use_voice: Connect
 help_view_audit_log: View Audit Log
 hours: Hours
 id: ID
+infraction: Infraction
+infractions_empty: There are no infractions to show.
+infractions_field: '{0} at {1} by {2}'
+infractions_title: Infractions for {0}
+kick_enum: kicked
 kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
 language: Language
@@ -163,11 +176,14 @@ massunban: Massunban
 massunban_failed: There was no user to unban.
 massunban_succeded: '{0} users were unbanned from the server.'
 minutes: Minutes
+modlog_description: '{0} notices, {1} infractions, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules
+mute_enum: muted
 mute_success: User {0} has been muted.
 name: Name
+notice_success: Notice added successfully.
 online_since: Online since
 owners: Owners
 punishment_dm_failed: Failed to deliver the punishment notification.
@@ -183,6 +199,7 @@ seconds: Seconds
 server: Server
 settings: Settings
 shutdown: Shutting down.
+softban_enum: soft-banned
 timedban_title: Temporary Ban
 timedmute: Expired Mute
 type: Type
@@ -191,6 +208,9 @@ unban_success: User {0} has been unbanned.
 unknown: Unknown
 unmute_success: User {0} has been unmuted.
 unspecified: Unspecified
+unwarn_all: Removed all warnings from {0}.
+unwarn_failure: Infraction of ID {0} was not found.
+unwarn_success: Removed warning {0} from {1}.
 uptime: Uptime
 usage: Usage
 user: User
@@ -198,22 +218,6 @@ value: Value
 voice_failure: The user needs to be connected to a voice channel for this command to work.
 voicemute_success: User {0} has been muted from voice channels.
 voiceunmute_success: User {0} has been unmuted from voice channels.
-
-note_success: Note added successfully.
-cmd_note: Adds a note about a user.
-cmd_warn: Warns a user.
+warn_and_punish: User {0} has been warned and {1}.
 warn_dm: You have been warned on {0}.
 warn_success: User {0} has been warned.
-cmd_warnc: Clears all warnings from a user. Provide a number to clear a specific one.
-unwarn_success: Removed warning {0} from {1}.
-unwarn_all_success: Removed all warnings from {0}.
-cmd_warnlog: Shows the list of warnings and notes from a user.
-warnlog_empty: There are no warnings to show.
-warnlog_title: Infractions for {0}
-registerlog_field: '{0} at {1} by {2}'
-warning: Warning
-mute_enum: muted
-kick_enum: kicked
-softban_enum: soft-banned
-ban_enum: banned
-warn_and_punish: User {0} has been warned and {1}.

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Administration
 {
-    
     public class WarningCommands : AkkoCommandModule
     {
         private readonly WarningService _warnService;
@@ -25,24 +24,33 @@ namespace AkkoBot.Command.Modules.Administration
             _roleService = roleService;
         }
 
-        [Command("note")]
-        [Description("cmd_note")]
+        [Command("notice"), Aliases("note")]
+        [Description("cmd_notice")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task Note(CommandContext context, DiscordMember user, [RemainingText] string note)
+        public async Task Notice(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordMember user,
+            [RemainingText, Description("arg_notice")] string notice)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
-            await Note(context, user, note);
+            await Notice(context, user as DiscordUser, notice);
         }
 
-        [Command("note"), HiddenOverload]
-        public async Task Note(CommandContext context, DiscordUser user, [RemainingText] string note)
+        [Command("notice"), HiddenOverload]
+        public async Task Notice(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordUser user,
+            [RemainingText, Description("arg_notice")] string note)
         {
+            if (string.IsNullOrWhiteSpace(note))
+                return;
+
             await _warnService.SaveRecord(context, user, note);
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription("note_success");
+                .WithDescription("notice_success");
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -50,9 +58,11 @@ namespace AkkoBot.Command.Modules.Administration
         [Command("warn")]
         [Description("cmd_warn")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task Warn(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
+        public async Task Warn(CommandContext context,
+        [Description("arg_discord_user")] DiscordMember user,
+        [RemainingText, Description("arg_infraction")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // Dm the user about the warn
@@ -93,59 +103,50 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("warnclear"), Aliases("warnc")]
         [Description("cmd_warnc")]
-        [RequireUserPermissions(Permissions.BanMembers)]
-        public async Task Unwarn(CommandContext context, DiscordMember user, int position)
+        [RequireUserPermissions(Permissions.KickMembers)]
+        public async Task Unwarn(
+            CommandContext context,
+            [Description("arg_discord_user")] DiscordMember user,
+            [Description("arg_uint")] int? id = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.SoftHierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // Remove from the database
-            await _warnService.RemoveNote(context.Guild, user, position, WarnType.Warning);
+            var amount = await _warnService.RemoveRegister(context.Guild, user, id);
 
             // Send confirmation message
-            var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("unwarn_success", Formatter.Bold("#" + position), Formatter.Bold(user.GetFullname())));
+            var embed = new DiscordEmbedBuilder();
 
-            await context.RespondLocalizedAsync(embed);
+            if (amount == 1)
+                embed.WithDescription(context.FormatLocalized("unwarn_success", Formatter.InlineCode("#" + id), Formatter.Bold(user.GetFullname())));
+            else if (amount > 1)
+                embed.WithDescription(context.FormatLocalized("unwarn_all", Formatter.Bold(user.GetFullname())));
+            else
+                embed.WithDescription(context.FormatLocalized("unwarn_failure", Formatter.InlineCode("#" + id)));
+
+            await context.RespondLocalizedAsync(embed, true, amount == 0);
         }
 
-        [Command("warnlog")]
-        [Description("cmd_warnlog")]
-        public async Task WarnLog(CommandContext context, DiscordUser user = null)
+        [Command("infractions"), Aliases("warnlog")]
+        [Description("cmd_infractions")]
+        public async Task Infractions(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
         {
             if (!context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.KickMembers) && user is not null)
                 return;
             else if (user is null)
                 user = context.User;
 
-            await ListRecords(context, user, WarnType.Warning, "warnlog");
-        }
-
-        [Command("noticelog")]
-        [Description("cmd_noticelog")]
-        [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task NoticeLog(CommandContext context, DiscordUser user = null)
-        {
-            if (user is null)
-                user = context.User;
-
-            await ListRecords(context, user, WarnType.Notice, "notice");
-        }
-
-        // Make modlog that merges both and tracks notices, warnings, mutes, kicks, sbs and bans?
-        private async Task ListRecords(CommandContext context, DiscordUser user, WarnType type, string keyType)
-        {
-            var (warnings, users) = await _warnService.GetRecords(context.Guild, user, type);
+            var (guildSettings, users) = await _warnService.GetRecords(context.Guild, user, WarnType.Warning);
 
             var embed = new DiscordEmbedBuilder()
-                .WithTitle(context.FormatLocalized($"{keyType}_title", user.GetFullname()));
+                .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
 
-            var counter = 1;
-            foreach (var warn in warnings)
+            foreach (var warn in guildSettings.WarnRel)
             {
-                var position = "#" + Formatter.InlineCode(counter++.ToString());
+                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
                 var fieldName = context.FormatLocalized(
-                    "registerlog_field",
+                    "infractions_field",
                     $"{position} {warn.DateAdded.Date.ToShortDateString()}",
                     $"{warn.DateAdded.Hour}:{warn.DateAdded.Minute}",
                     users.FirstOrDefault(x => x.UserId == warn.AuthorId).ToString()
@@ -154,10 +155,51 @@ namespace AkkoBot.Command.Modules.Administration
                 embed.AddField(fieldName, warn.WarningText);
             }
 
-            if (warnings.Count == 0)
-                embed.WithDescription($"{keyType}_empty");
+            if (guildSettings.WarnRel.Count == 0)
+                embed.WithDescription("infractions_empty");
 
-            await context.RespondLocalizedAsync(embed, false, warnings.Count == 0);
+            await context.RespondLocalizedAsync(embed, false, guildSettings.WarnRel.Count == 0);
+        }
+
+        [Command("modlog")]
+        [Description("cmd_modlog")]
+        [RequireUserPermissions(Permissions.KickMembers)]
+        public async Task ListAllRecords(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
+        {
+            if (user is null)
+                user = context.User;
+
+            var (guildSettings, users) = await _warnService.GetRecords(context.Guild, user);
+            var occurrence = guildSettings.OccurrenceRel.FirstOrDefault() ?? new OccurrenceEntity();
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()))
+                .WithDescription(
+                    context.FormatLocalized(
+                        "modlog_description",
+                        occurrence.Notices, occurrence.Warnings, occurrence.Mutes,
+                        occurrence.Kicks, occurrence.Softbans, occurrence.Bans
+                    )
+                );
+
+            foreach (var warn in guildSettings.WarnRel.OrderBy(x => x.Type))
+            {
+                var emote = (warn.Type == WarnType.Notice) ? "📝" : "⚠️";
+                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
+                var fieldName = context.FormatLocalized(
+                    "infractions_field",
+                    $"{emote} {position} {warn.DateAdded.Date.ToShortDateString()}",
+                    $"{warn.DateAdded.Hour}:{warn.DateAdded.Minute}",
+                    users.FirstOrDefault(x => x.UserId == warn.AuthorId).ToString()
+                );
+
+                embed.AddField(fieldName, warn.WarningText);
+            }
+
+            if (guildSettings.WarnRel.Count == 0)
+                embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
+
+            await context.RespondLocalizedAsync(embed, false, guildSettings.WarnRel.Count == 0);
         }
     }
 }

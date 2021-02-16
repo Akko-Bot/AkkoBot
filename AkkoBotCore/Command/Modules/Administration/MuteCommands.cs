@@ -38,7 +38,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_timed_mute")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // Get the mute role
@@ -67,7 +67,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             // Get the mute role
@@ -94,7 +94,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user, 
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetVoiceMuteAsync(user, true, "voicemute_success", reason);
@@ -111,7 +111,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetVoiceMuteAsync(user, false, "voiceunmute_success", reason);
@@ -128,7 +128,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetDeafAsync(user, true, "deafen_success", reason);
@@ -145,7 +145,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetDeafAsync(user, false, "undeafen_success", reason);
@@ -163,7 +163,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason);
@@ -183,7 +183,7 @@ namespace AkkoBot.Command.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
         {
-            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
             await _channelServices.RemoveOverwritesAsync(context.Guild, reason, x => x.Id == user.Id);

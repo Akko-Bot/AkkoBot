@@ -1,6 +1,6 @@
 using System;
 using AkkoBot.Services.Database.Abstractions;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -14,6 +14,7 @@ namespace AkkoBot.Services.Database.Entities
      */
     public enum TimerType { TimedMute, TimedBan, TimedWarn, Reminder, Repeater }
 
+    [Comment("Stores actions that need to be performed at some point in the future.")]
     public class TimerEntity : DbEntity
     {
         public ulong? UserId { get; init; }

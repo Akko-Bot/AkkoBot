@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210215230309_Occurrencies")]
+    partial class Occurrencies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,10 +333,6 @@ namespace AkkoBot.Migrations
                     b.Property<decimal>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("guild_id_fk");
-
-                    b.Property<int>("Kicks")
-                        .HasColumnType("integer")
-                        .HasColumnName("kicks");
 
                     b.Property<int>("Mutes")
                         .HasColumnType("integer")

@@ -13,6 +13,7 @@ namespace AkkoBot.Services.Database
         public DbSet<MutedUserEntity> MutedUsers { get; set; }
         public DbSet<WarnEntity> Warnings { get; set; }
         public DbSet<WarnPunishEntity> WarnPunishments { get; set; }
+        public DbSet<OccurrenceEntity> Occurrencies { get; set; }
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
 
@@ -59,6 +60,13 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<WarnPunishEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.WarnPunishRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OccurrenceEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.OccurrenceRel)
                 .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
