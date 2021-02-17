@@ -47,7 +47,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (string.IsNullOrWhiteSpace(note))
                 return;
 
-            await _warnService.SaveRecord(context, user, note);
+            await _warnService.SaveRecordAsync(context, user, note);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("notice_success");
@@ -75,7 +75,7 @@ namespace AkkoBot.Command.Modules.Administration
             await context.SendLocalizedDmAsync(user, dm, true);
 
             // Save warning to the database
-            var (wasPunished, punishment) = await _warnService.SaveWarn(context, user, reason);
+            var (wasPunished, punishment) = await _warnService.SaveWarnAsync(context, user, reason);
             var embed = new DiscordEmbedBuilder();
 
             if (wasPunished)
@@ -118,9 +118,9 @@ namespace AkkoBot.Command.Modules.Administration
             // Send confirmation message
             var embed = new DiscordEmbedBuilder();
 
-            if (amount == 1)
+            if (amount == 1 && id.HasValue)
                 embed.WithDescription(context.FormatLocalized("unwarn_success", Formatter.InlineCode("#" + id), Formatter.Bold(user.GetFullname())));
-            else if (amount > 1)
+            else if (amount >= 1)
                 embed.WithDescription(context.FormatLocalized("unwarn_all", Formatter.Bold(user.GetFullname())));
             else
                 embed.WithDescription(context.FormatLocalized("unwarn_failure", Formatter.InlineCode("#" + id)));
@@ -148,7 +148,7 @@ namespace AkkoBot.Command.Modules.Administration
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
                     $"{position} {warn.DateAdded.Date.ToShortDateString()}",
-                    $"{warn.DateAdded.Hour}:{warn.DateAdded.Minute}",
+                    $"{warn.DateAdded.Hour:00.}:{warn.DateAdded.Minute:00.}",
                     users.FirstOrDefault(x => x.UserId == warn.AuthorId).ToString()
                 );
 
@@ -158,13 +158,13 @@ namespace AkkoBot.Command.Modules.Administration
             if (guildSettings.WarnRel.Count == 0)
                 embed.WithDescription("infractions_empty");
 
-            await context.RespondLocalizedAsync(embed, false, guildSettings.WarnRel.Count == 0);
+            await context.RespondLocalizedAsync(embed, false);
         }
 
         [Command("modlog")]
         [Description("cmd_modlog")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task ListAllRecords(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
+        public async Task ModLog(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
         {
             if (user is null)
                 user = context.User;
@@ -189,7 +189,7 @@ namespace AkkoBot.Command.Modules.Administration
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
                     $"{emote} {position} {warn.DateAdded.Date.ToShortDateString()}",
-                    $"{warn.DateAdded.Hour}:{warn.DateAdded.Minute}",
+                    $"{warn.DateAdded.Hour:00.}:{warn.DateAdded.Minute:00.}",
                     users.FirstOrDefault(x => x.UserId == warn.AuthorId).ToString()
                 );
 
@@ -199,7 +199,82 @@ namespace AkkoBot.Command.Modules.Administration
             if (guildSettings.WarnRel.Count == 0)
                 embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
-            await context.RespondLocalizedAsync(embed, false, guildSettings.WarnRel.Count == 0);
+            await context.RespondLocalizedAsync(embed, false);
+        }
+
+        [Command("warnpunishment"), HiddenOverload]
+        public async Task Warnp(CommandContext context, int amount, WarnPunishType punishmentType, TimeSpan? time = null)
+            => await Warnp(context, amount, punishmentType, null, time);
+
+        [Command("warnpunishment"), Aliases("warnp")]
+        [Description("cmd_warnp")]
+        [RequireUserPermissions(Permissions.BanMembers)]
+        public async Task Warnp(
+            CommandContext context,
+            [Description("arg_warnp_amount")] int amount,
+            [Description("arg_warnp_type")] WarnPunishType punishmentType,
+            [Description("arg_warnp_role")] DiscordRole role = null,
+            [Description("arg_warnp_time")] TimeSpan? time = null)
+        {
+            await _warnService.SaveWarnPunishmentAsync(context.Guild, amount, punishmentType, role, time);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription("warnp_success");
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("warnpunishment")]
+        public async Task Warnp(CommandContext context, [Description("arg_warnp_rem_amount")] int amount)
+        {
+            var embed = new DiscordEmbedBuilder();
+            var isRemoved = await _warnService.RemoveWarnPunishmentAsync(context.Guild, amount);
+
+            if (isRemoved)
+                embed.WithDescription("warnp_rem_success");
+            else
+                embed.WithDescription("warnp_rem_failure");
+
+            await context.RespondLocalizedAsync(embed, true, !isRemoved);
+        }
+
+        [Command("warnpunishmentlist"), Aliases("warnpl")]
+        [Description("cmd_warnpl")]
+        public async Task Warnpl(CommandContext context)
+        {
+            var punishments = await _warnService.GetServerPunishmentsAsync(context.Guild);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("warnpl_title");
+
+            if (punishments.Count == 0)
+            {
+                embed.WithDescription("warnpl_empty");
+                await context.RespondLocalizedAsync(embed, false, true);
+                return;
+            }
+
+            var amount = string.Join("\n", punishments.Select(x => x.WarnAmount).ToArray());
+
+            var punish = string.Join(
+                "\n",
+                punishments.Select(x =>
+                {
+                    return (context.Guild.Roles.TryGetValue(x.PunishRoleId, out var punishRole))
+                        ? context.FormatLocalized(x.Type.ToString().ToLowerInvariant()) + " - " + punishRole.Name
+                        : context.FormatLocalized(x.Type.ToString().ToLowerInvariant());
+                }).ToArray()
+            );
+            
+            var interval = string.Join("\n", punishments.Select(x => x.Interval?.ToString(@"%d\d\ %h\h\ %m\m") ?? "-").ToArray());
+
+            embed.AddField("warnpl_amount", amount, true);
+            embed.AddField("warnpl_punish", punish, true);
+
+            if (!string.IsNullOrWhiteSpace(interval))
+                embed.AddField("warnpl_interval", interval, true);
+
+            await context.RespondLocalizedAsync(embed);
         }
     }
 }

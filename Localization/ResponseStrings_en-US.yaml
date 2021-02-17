@@ -1,3 +1,5 @@
+addrole: Add Role
+addrole_enum: received a punishment role
 app_owners: Application Owners
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
@@ -23,6 +25,12 @@ arg_ulong_id: A valid Discord ID.
 arg_ulong_id_col: Multiple valid Discord IDs.
 arg_ulong_user_col: Multiple valid user IDs.
 arg_unpunishment_reason: The reason for lifting the punishment.
+arg_warnp_amount: The amount of warnings needed to trigger the punishment.
+arg_warnp_rem_amount: The amount of warnings of the punishment to be removed.
+arg_warnp_role: A role to be added or removed from the user, if applicable.
+arg_warnp_time: For how long the punishment should last. Leave it empty to make it permanent.
+arg_warnp_type: The type of punishment to be applied.
+ban: Ban
 ban_enum: banned
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
@@ -102,6 +110,8 @@ cmd_voicemute: Server mutes a user, preventing them from speaking in voice chann
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
 cmd_warn: Warns a user.
 cmd_warnc: Clears all notices and warnings from a user or a specific one if the ID is provided.
+cmd_warnp: 'Sets an automatic punishment to be applied on a user that reaches a certain amount of warnings. Omit the punishment to remove it. The valid punishments are: __Mute__, __Kick__, __Softban__, __Ban__, __AddRole__ and __RemoveRole__.'
+cmd_warnpl: Shows the punishments enabled for this server.
 code: Code
 command: Command
 command_check_failed: The user does not have enough permissions to execute this command.
@@ -163,6 +173,7 @@ infraction: Infraction
 infractions_empty: There are no infractions to show.
 infractions_field: '{0} at {1} by {2}'
 infractions_title: Infractions for {0}
+kick: Kick
 kick_enum: kicked
 kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
@@ -180,6 +191,7 @@ modlog_description: '{0} notices, {1} infractions, {2} mutes, {3} kicks, {4} sof
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules
+mute: Mute
 mute_enum: muted
 mute_success: User {0} has been muted.
 name: Name
@@ -192,6 +204,8 @@ q_blclear: remove all blacklist entries
 q_no: 'no'
 q_yes: 'yes'
 reason: Reason
+removerole: Remove Role
+removerole_enum: had a role removed
 requires: Requires
 sban_notification: You have been soft-banned from the {0} server.
 sban_title: User Soft-banned
@@ -199,9 +213,12 @@ seconds: Seconds
 server: Server
 settings: Settings
 shutdown: Shutting down.
+softban: Soft-ban
 softban_enum: soft-banned
 timedban_title: Temporary Ban
 timedmute: Expired Mute
+timedrole: Punishment Role
+timedunrole: Punishment Role Removal
 type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.
@@ -221,3 +238,11 @@ voiceunmute_success: User {0} has been unmuted from voice channels.
 warn_and_punish: User {0} has been warned and {1}.
 warn_dm: You have been warned on {0}.
 warn_success: User {0} has been warned.
+warnp_rem_failure: Punishment not found.
+warnp_rem_success: Punishment removed successfully.
+warnp_success: Added punishment successfully.
+warnpl_amount: Warnings
+warnpl_empty: There are no punishments for this server.
+warnpl_interval: Expires in
+warnpl_punish: Punishment
+warnpl_title: Server Punishments

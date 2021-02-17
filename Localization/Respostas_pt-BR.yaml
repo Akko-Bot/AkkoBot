@@ -1,3 +1,5 @@
+addrole: Adicionar Cargo
+addrole_enum: recebeu um cargo de punição
 app_owners: Donos da Aplicação
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
@@ -23,6 +25,12 @@ arg_ulong_id: Um ID válido do Discord.
 arg_ulong_id_col: Múltiplos IDs válidos do Discord.
 arg_ulong_user_col: Múltiplos IDs válidos de usuários.
 arg_unpunishment_reason: O motivo para a remoção da punição.
+arg_warnp_amount: A quantidade de advertências necessárias para ativar a punição.
+arg_warnp_rem_amount: A quantidade de advertências da punição a ser removida.
+arg_warnp_role: Um cargo a ser adicionado ou removido do usuário, se aplicável.
+arg_warnp_time: Por quanto tempo a punição deve durar. Deixe em branco para torná-la permanente.
+arg_warnp_type: O tipo de punição a ser aplicada.
+ban: Banir
 ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
 ban_title: Usuário Banido
@@ -102,6 +110,8 @@ cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
 cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
 cmd_warn: Adverte um usuário.
 cmd_warnc: Remove todas as anotações e advertências de um usuário ou uma específica se o ID for fornecido.
+cmd_warnp: 'Define uma punição automática a ser aplicada em um usuário que atingir uma determinada quantidade de advertências. Omita a punição para removê-la. As punições válidas são: __Mute__, __Kick__, __Softban__, __Ban__, __AddRole__ e __RemoveRole__.'
+cmd_warnpl: Exibe as punições habilitadas nesse servidor.
 code: Código
 command: Comando
 command_check_failed: O usuário não possui permissões suficientes para executar esse comando.
@@ -163,6 +173,7 @@ infraction: Infração
 infractions_empty: Esse usuário não possui infrações.
 infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
+kick: Expulsar
 kick_enum: expulso
 kick_notification: Você foi expulso do servidor {0}.
 kick_title: Usuário Expulso
@@ -180,6 +191,7 @@ modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} e
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis
+mute: Silenciar
 mute_enum: silenciado
 mute_success: Usuário {0} foi silenciado.
 name: Nome
@@ -192,6 +204,8 @@ q_blclear: remover todos os registros da lista negra
 q_no: 'não'
 q_yes: 'sim'
 reason: Motivo
+removerole: Remover Cargo
+removerole_enum: teve um cargo removido
 requires: Requer
 sban_notification: Você foi expulso do servidor {0}.
 sban_title: Usuário Expulso
@@ -199,9 +213,12 @@ seconds: Segundos
 server: Servidor
 settings: Configuração
 shutdown: Desligando.
+softban: Expulsar e Excluir
 softban_enum: expulso
 timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
+timedrole: Cargo de Punição
+timedunrole: Remoção de Cargo de Punição
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.
@@ -221,3 +238,11 @@ voiceunmute_success: Usuário {0} pode voltar a falar nos canais de voz.
 warn_and_punish: Usuário {0} foi advertido e {1}.
 warn_dm: Você foi advertido no servidor {0}.
 warn_success: Usuário {0} foi advertido.
+warnp_rem_failure: Punição não encontrada.
+warnp_rem_success: Punição removida com sucesso.
+warnp_success: Punição adicionada com sucesso.
+warnpl_amount: Advertências
+warnpl_empty: Não há punições nesse servidor.
+warnpl_interval: Expira em
+warnpl_punish: Punição
+warnpl_title: Punições do Servidor

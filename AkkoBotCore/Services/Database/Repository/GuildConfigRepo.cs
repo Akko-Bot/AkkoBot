@@ -88,6 +88,18 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
+        /// Gets the settings of the specified Discord guild with the server punishments.
+        /// </summary>
+        /// <param name="sid">The ID of the Discod guild.</param>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
+        public async Task<GuildConfigEntity> GetGuildWithPunishmentsAsync(ulong sid)
+        {
+            return await base.Table
+                .Include(x => x.WarnPunishRel.OrderBy(x => x.WarnAmount))
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+        }
+
+        /// <summary>
         /// Gets the settings of the specified Discord guild with the warnings of a specific user.
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>
@@ -131,7 +143,7 @@ namespace AkkoBot.Services.Database.Repository
             if (!Cache.ContainsKey(guild.Id))
             {
                 var dGuild = new GuildConfigEntity(_botConfig) { GuildId = guild.Id };
-                                
+    
                 base.Create(dGuild);                    // Add to the database
                 Cache.TryAdd(dGuild.GuildId, dGuild);   // Add to the cache
 

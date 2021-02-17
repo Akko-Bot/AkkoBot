@@ -32,7 +32,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <param name="note">The note to be added.</param>
         /// <param name="type">The type of note to be added.</param>
         /// <returns>The saved guild settings.</returns>
-        public async Task<GuildConfigEntity> SaveRecord(CommandContext context, DiscordUser user, string note, WarnType? type = null)
+        public async Task<GuildConfigEntity> SaveRecordAsync(CommandContext context, DiscordUser user, string note, WarnType? type = null)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
@@ -87,13 +87,23 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <param name="user">The user to be warned.</param>
         /// <param name="warn">The warning to be added.</param>
         /// <returns><see langword="true"/> and the punishment type if a punishment was applied, <see langword="false"/> and <see langword="null"/> otherwise.</returns>
-        public async Task<(bool, WarnPunishType?)> SaveWarn(CommandContext context, DiscordUser user, string warn)
+        public async Task<(bool, WarnPunishType?)> SaveWarnAsync(CommandContext context, DiscordUser user, string warn)
         {
-            var guildSettings = await SaveRecord(context, user, warn, WarnType.Warning);
+            var guildSettings = await SaveRecordAsync(context, user, warn, WarnType.Warning);
 
             var punishment = guildSettings.WarnPunishRel
                 .FirstOrDefault(x => x.WarnAmount == guildSettings.WarnRel.Where(x => x.Type == WarnType.Warning).Count());
 
+            if (punishment?.PunishRoleId != default)
+            {
+                // If punishment role doesn't exist anymore, delete the punishment from the database
+                if (!context.Guild.Roles.TryGetValue(punishment.PunishRoleId, out var punishRole))
+                {
+                    await RemoveWarnPunishmentAsync(punishment);
+                    return (false, null);
+                }
+            }
+            
             if (punishment is not null)
             {
                 await ApplyPunishment(context, user, punishment, warn);
@@ -101,6 +111,103 @@ namespace AkkoBot.Command.Modules.Administration.Services
             }
 
             return (false, null);
+        }
+
+        /// <summary>
+        /// Gets the punishments of a Discord guild.
+        /// </summary>
+        /// <param name="server">Discord guild to get the punishments from.</param>
+        /// <returns>A collection of server punishments.</returns>
+        public async Task<List<WarnPunishEntity>> GetServerPunishmentsAsync(DiscordGuild server)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
+
+            return guildSettings.WarnPunishRel;
+        }
+
+        /// <summary>
+        /// Saves a new server punishment to the database.
+        /// </summary>
+        /// <param name="server">The Discord guild the punishment applies for.</param>
+        /// <param name="amount">The amount of warnings required to trigger the punishment.</param>
+        /// <param name="type">The type of punishment that should be issued.</param>
+        /// <param name="interval">If the punishment is temporary, for how long it should be.</param>
+        /// <returns><see langword="true"/> if the punishment was saved, <see langword="false"/> if it was updated.</returns>
+        public async Task<bool> SaveWarnPunishmentAsync(DiscordGuild server, int amount, WarnPunishType type, DiscordRole role, TimeSpan? interval)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
+            var punishment = guildSettings.WarnPunishRel.FirstOrDefault(x => x.WarnAmount == amount);
+            var isUpdated = false;
+
+            var newPunishment = new WarnPunishEntity()
+            {
+                GuildIdFK = server.Id,
+                WarnAmount = amount,
+                Type = type,
+                Interval = (type is WarnPunishType.Ban or WarnPunishType.AddRole or WarnPunishType.RemoveRole) ? interval : null,
+                PunishRoleId = role?.Id ?? default
+            };
+
+            if (punishment is not null)
+            {
+                guildSettings.WarnPunishRel.Remove(punishment);
+                isUpdated = true;
+            }
+
+            guildSettings.WarnPunishRel.Add(newPunishment);
+
+            db.GuildConfig.Update(guildSettings);
+            await db.SaveChangesAsync();
+
+            return isUpdated;
+        }
+
+        /// <summary>
+        /// Removes a server punishment from the database.
+        /// </summary>
+        /// <param name="server">Discord guild to remove the punishment from.</param>
+        /// <param name="amount">The amount required by the punishment.</param>
+        /// <returns><see langword="true"/> if the punishment was removed, <see langword="false"/> if it didn't exist.</returns>
+        public async Task<bool> RemoveWarnPunishmentAsync(DiscordGuild server, int amount)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
+            var punishment = guildSettings.WarnPunishRel.FirstOrDefault(x => x.WarnAmount == amount);
+            var isRemoved = false;
+
+            if (punishment is not null)
+            {
+                guildSettings.WarnPunishRel.Remove(punishment);
+                isRemoved = true;
+            }
+
+            db.GuildConfig.Update(guildSettings);
+            await db.SaveChangesAsync();
+
+            return isRemoved;
+        }
+
+        /// <summary>
+        /// Removes a server punishment from the database.
+        /// </summary>
+        /// <param name="entity">The punishment to be removed.</param>
+        /// <returns><see langword="true"/> if the punishment was removed, <see langword="false"/> otherwise.</returns>
+        public async Task<bool> RemoveWarnPunishmentAsync(WarnPunishEntity entity)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(entity.GuildIdFK);
+            var toRemove = guildSettings.WarnPunishRel.FirstOrDefault(x => x.WarnAmount == entity.WarnAmount);
+            var isRemoved = guildSettings.WarnPunishRel.Remove(toRemove);
+
+            db.GuildConfig.Update(guildSettings);
+            await db.SaveChangesAsync();
+
+            return isRemoved;
         }
 
         /// <summary>
@@ -196,7 +303,25 @@ namespace AkkoBot.Command.Modules.Administration.Services
                     break;
 
                 case WarnPunishType.Ban:
-                    await _punishService.BanUser(context.Guild, user.Id, 1, warnString + " | " + reason);
+                    if (punishment.Interval.HasValue)
+                        await _punishService.TimedBan(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
+                    else
+                        await _punishService.BanUser(context.Guild, user.Id, 1, warnString + " | " + reason);
+
+                    break;
+
+                case WarnPunishType.AddRole:
+                case WarnPunishType.RemoveRole:
+                    if (member is null || !context.Guild.Roles.TryGetValue(punishment.PunishRoleId, out var punishRole))
+                        break;
+
+                    if (punishment.Interval.HasValue)
+                        await _punishService.TimedRolePunish(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
+                    else if (punishment.Type == WarnPunishType.AddRole)
+                        await member.GrantRoleAsync(punishRole, warnString + " | " + reason);
+                    else
+                        await member.RevokeRoleAsync(punishRole, warnString + " | " + reason);
+
                     break;
 
                 default:

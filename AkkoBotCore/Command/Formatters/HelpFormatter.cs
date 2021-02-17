@@ -298,19 +298,21 @@ namespace AkkoBot.Command.Formatters
         /// <returns><see langword="true"/> if the overload is present in the collection, <see langword="false"/> otherwise.</returns>
         private bool IsValidOverload(CommandOverload overload, IEnumerable<ParameterInfo[]> methodParameters)
         {
-            var matches = 0;
-
             foreach (var parameters in methodParameters)
             {
+                var matches = 0;
+
                 // If command and reflected method have no parameters, return true
                 if (parameters.Length == 0 && overload.Arguments.Count == 0)
                     return true;
+                else if (parameters.Length != overload.Arguments.Count)
+                    continue;
 
                 foreach (var param in parameters)
                 {
                     foreach (var ovArg in overload.Arguments)
                     {
-                        if (ovArg.Name.Equals(param.Name) 
+                        if (ovArg.Name.Equals(param.Name)
                             && (param.ParameterType.BaseType == typeof(Array) || ovArg.Type == param.ParameterType) // This is needed for variable arrays
                             && ++matches == parameters.Length)
                             return true; // Overload is valid

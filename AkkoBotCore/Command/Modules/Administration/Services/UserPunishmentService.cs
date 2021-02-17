@@ -194,6 +194,64 @@ namespace AkkoBot.Command.Modules.Administration.Services
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
+            var occurrence = new OccurrenceEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserId = userId,
+                Bans = 1
+            };
+
+            await db.GuildConfig.CreateOccurrenceAsync(context.Guild, userId, occurrence);
+
+            // Upsert the entry
+            db.Timers.AddOrUpdate(newEntry, out var dbEntry);
+            await db.SaveChangesAsync();
+
+            // Add the timer to the cache
+            db.Timers.Cache.AddOrUpdateByEntity(context.Client, dbEntry);
+        }
+
+        /// <summary>
+        /// Adds or removes a <paramref name="role"/> to the <paramref name="user"/> and creates a timer for it.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="type"><see cref="WarnPunishType.AddRole"/> to add a temporary role or <see cref="WarnPunishType.RemoveRole"/> to remove a role temporarily.</param>
+        /// <param name="time">For how long the role should be added/removed.</param>
+        /// <param name="user">The Discord user to have the role added/removed from.</param>
+        /// <param name="role">The Discord role to be added/removed.</param>
+        /// <param name="reason">The reason for the punishment.</param>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
+        public async Task TimedRolePunish(CommandContext context, WarnPunishType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
+        {
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+
+            // If time is less than a minute, set it to a minute.
+            if (time < TimeSpan.FromMinutes(1))
+                time = TimeSpan.FromMinutes(1);
+
+            // Determine which action should be taken
+            if (type == WarnPunishType.AddRole)
+                await user.GrantRoleAsync(role, reason);
+            else if (type == WarnPunishType.RemoveRole)
+                await user.RevokeRoleAsync(role, reason);
+            else
+                throw new ArgumentException(@"Only punishment types of type ""AddRole"" and ""RemoveRole"" are supported.");
+
+            // Create the new database entry
+            var newEntry = new TimerEntity()
+            {
+                GuildId = context.Guild.Id,
+                UserId = user.Id,
+                RoleId = role.Id,
+                IsAbsolute = true,
+                IsRepeatable = false,
+                Interval = time,
+                Type = (type == WarnPunishType.AddRole) ? TimerType.TimedUnrole : TimerType.TimedRole,
+                ElapseAt = DateTimeOffset.Now.Add(time)
+            };
+
+            // *Not sure if I should support occurrences here* //
+
             // Upsert the entry
             db.Timers.AddOrUpdate(newEntry, out var dbEntry);
             await db.SaveChangesAsync();

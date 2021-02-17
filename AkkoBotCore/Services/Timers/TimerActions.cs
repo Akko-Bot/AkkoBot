@@ -7,6 +7,7 @@ using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Entities;
 
 namespace AkkoBot.Services.Timers
 {
@@ -88,6 +89,70 @@ namespace AkkoBot.Services.Timers
                 db.Timers.Delete(timerEntry);
                 db.GuildConfig.Update(guildSettings);
 
+                await db.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Adds a role to a Discord user.
+        /// </summary>
+        /// <param name="entryId">The ID of the database entry.</param>
+        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="userId">The ID of the user to be unmuted.</param>
+        public async Task AddWarnRole(int entryId, DiscordGuild server, ulong userId)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, userId);
+            var timerEntry = await db.Timers.GetAsync(entryId);
+            var localizedReason = _localizer.GetResponseString(guildSettings.Locale, "timedrole");
+
+            try
+            {
+                server.Roles.TryGetValue(timerEntry.RoleId.Value, out var punishRole);
+                var user = await server.GetMemberAsync(userId);
+
+                await user.GrantRoleAsync(punishRole, localizedReason);
+            }
+            catch
+            {
+                return;
+            }
+            finally
+            {
+                db.Timers.Delete(timerEntry);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Removes a role from a Discord user.
+        /// </summary>
+        /// <param name="entryId">The ID of the database entry.</param>
+        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="userId">The ID of the user to be unmuted.</param>
+        public async Task RemoveWarnRole(int entryId, DiscordGuild server, ulong userId)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, userId);
+            var timerEntry = await db.Timers.GetAsync(entryId);
+            var localizedReason = _localizer.GetResponseString(guildSettings.Locale, "timedunrole");
+
+            try
+            {
+                server.Roles.TryGetValue(timerEntry.RoleId.Value, out var punishRole);
+                var user = await server.GetMemberAsync(userId);
+
+                await user.RevokeRoleAsync(punishRole, localizedReason);
+            }
+            catch
+            {
+                return;
+            }
+            finally
+            {
+                db.Timers.Delete(timerEntry);
                 await db.SaveChangesAsync();
             }
         }

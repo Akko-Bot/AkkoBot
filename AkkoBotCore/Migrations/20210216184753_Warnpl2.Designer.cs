@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210216184753_Warnpl2")]
+    partial class Warnpl2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,10 +446,6 @@ namespace AkkoBot.Migrations
                     b.Property<bool>("IsRepeatable")
                         .HasColumnType("boolean")
                         .HasColumnName("is_repeatable");
-
-                    b.Property<decimal?>("RoleId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("role_id");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer")

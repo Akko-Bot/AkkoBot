@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210216155826_Warnpl")]
+    partial class Warnpl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -445,10 +447,6 @@ namespace AkkoBot.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_repeatable");
 
-                    b.Property<decimal?>("RoleId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("role_id");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("type");
@@ -533,10 +531,6 @@ namespace AkkoBot.Migrations
                     b.Property<TimeSpan?>("Interval")
                         .HasColumnType("interval")
                         .HasColumnName("interval");
-
-                    b.Property<decimal>("PunishRoleId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("punish_role_id");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer")

@@ -8,11 +8,13 @@ namespace AkkoBot.Services.Database.Entities
      * TimedBan: Absolute, Non-repeatable
      * TimedMute: Absolute, Non-repeatable
      * TimedWarn: Absolute, Non-repeatable
+     * TimedRole: Absolute, Non-repeatable
+     * TimedUnrole: Absolute, Non-repeatable
      * Reminder: Relative, Non-repeatable
      * Repeater: Relative, Repeatable
      * Daily Repeater: Absolute, Repeatable
      */
-    public enum TimerType { TimedMute, TimedBan, TimedWarn, Reminder, Repeater }
+    public enum TimerType { TimedMute, TimedBan, TimedWarn, TimedRole, TimedUnrole, Reminder, Repeater }
 
     [Comment("Stores actions that need to be performed at some point in the future.")]
     public class TimerEntity : DbEntity
@@ -20,6 +22,7 @@ namespace AkkoBot.Services.Database.Entities
         public ulong? UserId { get; init; }
         public ulong? GuildId { get; init; }
         public ulong? ChannelId { get; init; }
+        public ulong? RoleId { get; init; }
         public TimeSpan Interval { get; init; }
         public bool IsRepeatable { get; init; }
         public bool IsAbsolute { get; init; }
@@ -33,6 +36,7 @@ namespace AkkoBot.Services.Database.Entities
             UserId = muteUser.UserId;
             GuildId = muteUser.GuildIdFK;
             ChannelId = null;
+            RoleId = muteUser.GuildConfigRel?.MuteRoleId;
             Interval = time;
             IsRepeatable = false;
             IsAbsolute = true;
