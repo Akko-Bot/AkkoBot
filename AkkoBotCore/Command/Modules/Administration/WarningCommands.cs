@@ -260,7 +260,7 @@ namespace AkkoBot.Command.Modules.Administration
                 "\n",
                 punishments.Select(x =>
                 {
-                    return (context.Guild.Roles.TryGetValue(x.PunishRoleId, out var punishRole))
+                    return (context.Guild.Roles.TryGetValue(x.PunishRoleId ?? default, out var punishRole))
                         ? context.FormatLocalized(x.Type.ToString().ToLowerInvariant()) + " - " + punishRole.Name
                         : context.FormatLocalized(x.Type.ToString().ToLowerInvariant());
                 }).ToArray()

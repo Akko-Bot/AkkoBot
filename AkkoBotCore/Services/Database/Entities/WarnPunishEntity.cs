@@ -15,6 +15,6 @@ namespace AkkoBot.Services.Database.Entities
         public int WarnAmount { get; set; }
         public WarnPunishType Type { get; set; }
         public TimeSpan? Interval { get; set; }
-        public ulong PunishRoleId { get; set; }
+        public ulong? PunishRoleId { get; set; }
     }
 }

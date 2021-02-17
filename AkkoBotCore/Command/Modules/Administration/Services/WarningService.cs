@@ -94,16 +94,16 @@ namespace AkkoBot.Command.Modules.Administration.Services
             var punishment = guildSettings.WarnPunishRel
                 .FirstOrDefault(x => x.WarnAmount == guildSettings.WarnRel.Where(x => x.Type == WarnType.Warning).Count());
 
-            if (punishment?.PunishRoleId != default)
+            if (punishment?.PunishRoleId is not null)
             {
                 // If punishment role doesn't exist anymore, delete the punishment from the database
-                if (!context.Guild.Roles.TryGetValue(punishment.PunishRoleId, out var punishRole))
+                if (!context.Guild.Roles.TryGetValue(punishment.PunishRoleId.Value, out var punishRole))
                 {
                     await RemoveWarnPunishmentAsync(punishment);
                     return (false, null);
                 }
             }
-            
+
             if (punishment is not null)
             {
                 await ApplyPunishment(context, user, punishment, warn);
@@ -147,8 +147,15 @@ namespace AkkoBot.Command.Modules.Administration.Services
                 GuildIdFK = server.Id,
                 WarnAmount = amount,
                 Type = type,
-                Interval = (type is WarnPunishType.Ban or WarnPunishType.AddRole or WarnPunishType.RemoveRole) ? interval : null,
-                PunishRoleId = role?.Id ?? default
+                Interval =
+                    (type is WarnPunishType.Mute
+                    or WarnPunishType.Ban
+                    or WarnPunishType.AddRole
+                    or WarnPunishType.RemoveRole)
+                        ? interval
+                        : null,
+
+                PunishRoleId = role?.Id
             };
 
             if (punishment is not null)
@@ -290,7 +297,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
                 case WarnPunishType.Mute:
                     if (member is null) break;
                     var muteRole = await _roleService.FetchMuteRoleAsync(context.Guild);
-                    await _roleService.MuteUserAsync(context, muteRole, member, TimeSpan.FromHours(1), warnString + " | " + reason);
+                    await _roleService.MuteUserAsync(context, muteRole, member, punishment.Interval ?? TimeSpan.Zero, warnString + " | " + reason);
                     break;
 
                 case WarnPunishType.Kick:
@@ -312,7 +319,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
 
                 case WarnPunishType.AddRole:
                 case WarnPunishType.RemoveRole:
-                    if (member is null || !context.Guild.Roles.TryGetValue(punishment.PunishRoleId, out var punishRole))
+                    if (member is null || !context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole))
                         break;
 
                     if (punishment.Interval.HasValue)

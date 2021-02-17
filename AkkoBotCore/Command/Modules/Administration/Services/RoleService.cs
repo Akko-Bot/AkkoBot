@@ -114,6 +114,8 @@ namespace AkkoBot.Command.Modules.Administration.Services
                 await user.SetMuteAsync(true);
 
             // Save to the database
+            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(context.Guild.Id);
+
             var muteEntry = new MutedUserEntity()
             {
                 GuildIdFK = context.Guild.Id,
@@ -127,14 +129,16 @@ namespace AkkoBot.Command.Modules.Administration.Services
                 Mutes = 1
             };
 
-            await db.GuildConfig.CreateOccurrenceAsync(context.Guild, user.Id, occurrence);
-
-            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(context.Guild.Id);
-            guildSettings.MutedUserRel.Add(muteEntry);
-            db.GuildConfig.Update(guildSettings);
+            // If user is already muted, do nothing
+            if (!guildSettings.MutedUserRel.Any(x => x.UserId == user.Id))
+            {
+                await db.GuildConfig.CreateOccurrenceAsync(context.Guild, user.Id, occurrence);
+                guildSettings.MutedUserRel.Add(muteEntry);
+                db.GuildConfig.Update(guildSettings);
+            }
 
             // Add timer if mute is not permanent
-            if (time >= TimeSpan.Zero)
+            if (time > TimeSpan.Zero)
             {
                 var timerEntry = new TimerEntity(muteEntry, time);
 
