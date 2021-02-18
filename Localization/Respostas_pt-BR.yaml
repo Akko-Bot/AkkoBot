@@ -6,6 +6,7 @@ arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __serve
 arg_bool: __true__ para ativar, __false__ para desativar.
 arg_color: Um código de cor hexadecimal de seis dígitos.
 arg_command: Um comando válido.
+arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos. Mínimo de __10s__.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_double: Um número real.
@@ -63,7 +64,7 @@ cmd_config_case: Define se o bot deve diferenciar letras maiúsculas de minúscu
 cmd_config_dm: Define se o bot deve responder a comandos executados em mensagem privada. Requer reinicialização para tomar efeito.
 cmd_config_embed: Define se o bot deve utilizar embeds em suas respostas.
 cmd_config_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro.
-cmd_config_help: Define se o bot deve responder a comandos de ajuda. Requer reinicialização para tomar efeito.
+cmd_config_help: Define se o bot deve responder a comandos de ajuda.
 cmd_config_list: Mostra as configurações atuais do bot.
 cmd_config_locale: Define o idioma padrão do bot. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
 cmd_config_log: Agrupa configuracões que controlam como logs devem ser tratados.

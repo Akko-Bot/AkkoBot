@@ -64,12 +64,14 @@ namespace AkkoBot.Services.Database.Entities
 
         public int MessageSizeCache { get; set; } = 200;
 
+        public TimeSpan MinWarnExpire { get; set; } = TimeSpan.FromDays(30);
+
         [Required]
-        public TimeSpan? InteractiveTimeout { get; set; } = new(0, 0, 30);
+        public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
         // Implement .gcmd and .gmod?
         // Implement forward dms to owners?
-        // Might be an issue with "message staff" type of features
+        // Might be an issue for "message staff" type of features
 
         /// <summary>
         /// Gets all settings from this table.

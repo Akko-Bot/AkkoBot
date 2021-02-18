@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using AkkoBot.Command.Abstractions;
@@ -60,6 +61,16 @@ namespace AkkoBot.Command.Modules.Self.Services
             // Set the database entry to the modified cached settings
             db.LogConfig.Update(db.LogConfig.Cache);
             db.SaveChanges();
+        }
+
+        /// <summary>
+        /// Gets the bot global settings.
+        /// </summary>
+        /// <returns>The bot settings.</returns>
+        public BotConfigEntity GetConfig()
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            return db.BotConfig.Cache;
         }
 
         /// <summary>

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Help
 {
+    [HelpCommand]
     public class Help : AkkoCommandModule
     {
         [HiddenOverload]

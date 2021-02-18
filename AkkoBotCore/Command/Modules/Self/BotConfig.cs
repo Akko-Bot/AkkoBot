@@ -96,8 +96,13 @@ namespace AkkoBot.Command.Modules.Self
 
         [Command("timeout")]
         [Description("cmd_config_timeout")]
-        public async Task SetBotTimeout(CommandContext context, [Description("arg_uint")] uint time)
-            => await ChangeProperty(context, x => x.InteractiveTimeout = new TimeSpan(0, 0, (time < 10) ? 10 : (int)time));
+        public async Task SetBotTimeout(CommandContext context, [Description("arg_config_timeout")] TimeSpan time)
+            => await ChangeProperty(context, x => x.InteractiveTimeout = (time < TimeSpan.FromSeconds(10) ? TimeSpan.FromSeconds(10) : time));
+
+        [Command("warnexpire"), Aliases("warne")]
+        [Description("cmd_warne")]
+        public async Task SetMinWarnExpire(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
+            => await ChangeProperty(context, x => x.MinWarnExpire = time);
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_config_list")]

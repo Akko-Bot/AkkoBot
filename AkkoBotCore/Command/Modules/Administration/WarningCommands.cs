@@ -10,6 +10,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System.Linq;
 using System.Threading.Tasks;
+using AkkoBot.Command.Modules.Self.Services;
 
 namespace AkkoBot.Command.Modules.Administration
 {
@@ -17,11 +18,13 @@ namespace AkkoBot.Command.Modules.Administration
     {
         private readonly WarningService _warnService;
         private readonly RoleService _roleService;
+        private readonly BotConfigService _botService;
 
-        public WarningCommands(WarningService warnService, RoleService roleService)
+        public WarningCommands(WarningService warnService, RoleService roleService, BotConfigService botService)
         {
             _warnService = warnService;
             _roleService = roleService;
+            _botService = botService;
         }
 
         [Command("notice"), Aliases("note")]
@@ -279,11 +282,12 @@ namespace AkkoBot.Command.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task Warne(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
         {
+            var botConfig = _botService.GetConfig();
             var embed = new DiscordEmbedBuilder();
 
-            if (time < TimeSpan.FromDays(30) && time != TimeSpan.Zero)
+            if (time < botConfig.MinWarnExpire && time != TimeSpan.Zero)
             {
-                embed.WithDescription(context.FormatLocalized("warne_failure", TimeSpan.FromDays(30).Days));
+                embed.WithDescription(context.FormatLocalized("warne_failure", botConfig.MinWarnExpire.Days));
                 await context.RespondLocalizedAsync(embed, isError: true);
 
                 return;

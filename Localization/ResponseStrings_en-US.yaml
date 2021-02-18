@@ -6,6 +6,7 @@ arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server_
 arg_bool: __true__ to enable, __false__ to disable.
 arg_color: A 6-digit, hexadecimal code of a color.
 arg_command: A valid command.
+arg_config_timeout: How long the bot should wait on interactive commands. Minimum of __10s__.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_user: ID or mention to a Discord user.
 arg_double: A real number.
@@ -63,7 +64,7 @@ cmd_config_case: Sets whether commands should be case sensitive or not. Requires
 cmd_config_dm: Sets whether the bot should execute commands in direct messages or not. Requires a restart to take effect.
 cmd_config_embed: Sets whether the bot should use embeds for responses or not.
 cmd_config_errorcolor: Sets the default color that should be used on embeds that return an error message.
-cmd_config_help: Sets whether the bot should respond to help commands or not. Requires a restart to take effect.
+cmd_config_help: Sets whether the bot should respond to help commands or not.
 cmd_config_list: Shows the bot's current settings.
 cmd_config_locale: Sets the default language for the bot. Provide no parameter to see the list of available languages.
 cmd_config_log: Groups settings that control how logs should be handled.

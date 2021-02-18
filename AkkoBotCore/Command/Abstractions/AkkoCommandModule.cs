@@ -6,7 +6,7 @@ using DSharpPlus.CommandsNext;
 
 namespace AkkoBot.Command.Abstractions
 {
-    [IsNotBot, IsNotBlacklisted]
+    [IsNotBlacklisted]
     public abstract class AkkoCommandModule : BaseCommandModule
     {
         public override async Task BeforeExecutionAsync(CommandContext context)

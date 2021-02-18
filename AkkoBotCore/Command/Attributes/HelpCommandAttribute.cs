@@ -1,26 +1,27 @@
-﻿using AkkoBot.Services.Database.Abstractions;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using System;
 using System.Threading.Tasks;
+using AkkoBot.Command.Modules.Self.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 
 namespace AkkoBot.Command.Attributes
 {
     /// <summary>
-    /// Checks if the command was issued in a blacklisted context and cancels execution if it was.
+    /// Checks if this help command or module has permission to run and cancels execution if it doesn't.
     /// </summary>
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
     AllowMultiple = true,
     Inherited = false)]
-    public sealed class IsNotBlacklistedAttribute : CheckBaseAttribute
+    public sealed class HelpCommandAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
             using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            return Task.FromResult(!db.Blacklist.IsBlacklisted(context));
+            return Task.FromResult(db.BotConfig.Cache.EnableHelp);
         }
     }
 }
