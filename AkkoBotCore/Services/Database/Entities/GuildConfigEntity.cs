@@ -63,7 +63,7 @@ namespace AkkoBot.Services.Database.Entities
 
         public ulong MuteRoleId { get; set; }
 
-        public TimeSpan WarnExpire { get; set; }
+        public TimeSpan WarnExpire { get; set; } = TimeSpan.FromDays(30 * 6);
 
         public TimeSpan? InteractiveTimeout { get; set; }
 

@@ -204,11 +204,11 @@ namespace AkkoBot.Command.Modules.Administration.Services
             await db.GuildConfig.CreateOccurrenceAsync(context.Guild, userId, occurrence);
 
             // Upsert the entry
-            db.Timers.AddOrUpdate(newEntry, out var dbEntry);
+            db.Timers.Update(newEntry);
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            db.Timers.Cache.AddOrUpdateByEntity(context.Client, dbEntry);
+            db.Timers.Cache.AddOrUpdateByEntity(context.Client, newEntry);
         }
 
         /// <summary>

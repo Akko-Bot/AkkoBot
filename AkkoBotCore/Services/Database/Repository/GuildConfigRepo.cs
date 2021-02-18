@@ -133,6 +133,20 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
+        /// Gets the settings of the specified Discord guild with all warnings, punishments and occurrences.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
+        public async Task<GuildConfigEntity> GetGuildWithWarningsAsync(ulong sid)
+        {
+            return await base.Table
+                .Include(x => x.OccurrenceRel)
+                .Include(x => x.WarnRel)
+                .Include(x => x.WarnPunishRel)
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+        }
+
+        /// <summary>
         /// Adds an entry for the specified guild into the database.
         /// </summary>
         /// <param name="guild">The ID of the Discord guild.</param>

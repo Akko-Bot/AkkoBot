@@ -170,11 +170,11 @@ namespace AkkoBot.Services.Timers
         {
             var timer = entity.Type switch
             {
-                TimerType.TimedBan => new AkkoTimer(entity, () => _ = _action.Unban(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
-                TimerType.TimedMute => new AkkoTimer(entity, () => _ = _action.Unmute(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
-                TimerType.TimedWarn => throw new NotImplementedException(), // warn expire
-                TimerType.TimedRole => new AkkoTimer(entity, () => _ = _action.AddWarnRole(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
-                TimerType.TimedUnrole => new AkkoTimer(entity, () => _ = _action.RemoveWarnRole(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedBan => new AkkoTimer(entity, () => _ = _action.UnbanAsync(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedMute => new AkkoTimer(entity, () => _ = _action.UnmuteAsync(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedWarn => new AkkoTimer(entity, () => _ = _action.RemoveOldWarningAsync(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedRole => new AkkoTimer(entity, () => _ = _action.AddPunishRoleAsync(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
+                TimerType.TimedUnrole => new AkkoTimer(entity, () => _ = _action.RemovePunishRoleAsync(entity.Id, client.Guilds[entity.GuildId.Value], entity.UserId.Value)),
                 TimerType.Reminder => throw new NotImplementedException(),
                 TimerType.Repeater => throw new NotImplementedException(),
                 _ => throw new NotImplementedException(),

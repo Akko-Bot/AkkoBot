@@ -26,6 +26,7 @@ namespace AkkoBot.Services.Database.Repository
                 && x.GuildId == referenceEntity.GuildId
                 && x.UserId == referenceEntity.UserId
                 && x.ChannelId == referenceEntity.ChannelId
+                && x.RoleId == referenceEntity.RoleId
             );
         }
 

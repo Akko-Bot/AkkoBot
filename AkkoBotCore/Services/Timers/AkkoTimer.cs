@@ -80,13 +80,13 @@ namespace AkkoBot.Services.Timers
         /// <returns>A <see cref="Timer"/>> object.</returns>
         private Timer GetTimer(TimerEntity entity)
         {
-            var timeDifference = entity.ElapseAt.Subtract(DateTimeOffset.Now);
+            var timeLeft = entity.ElapseAt.Subtract(DateTimeOffset.Now);
 
-            timeDifference = (timeDifference <= TimeSpan.Zero)
+            timeLeft = (timeLeft <= TimeSpan.Zero)
                 ? TimeFromExpiredEntity(entity)
-                : TimeFromValidEntry(timeDifference, entity);
+                : TimeFromValidEntry(timeLeft, entity);
 
-            return new Timer(timeDifference.TotalMilliseconds) { AutoReset = entity.IsRepeatable };
+            return new Timer(timeLeft.TotalMilliseconds) { AutoReset = entity.IsRepeatable };
         }
 
         /// <summary>

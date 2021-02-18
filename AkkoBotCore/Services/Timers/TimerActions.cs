@@ -1,13 +1,11 @@
 using System.Linq;
 using System;
-using System.Windows.Input;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Entities;
 
 namespace AkkoBot.Services.Timers
 {
@@ -31,7 +29,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="entryId">The ID of the database entry.</param>
         /// <param name="server">The Discord server to unban from.</param>
         /// <param name="userId">The ID of the user to be unbanned.</param>
-        public async Task Unban(int entryId, DiscordGuild server, ulong userId)
+        public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             
@@ -54,7 +52,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="entryId">The ID of the database entry.</param>
         /// <param name="server">The Discord server to unmute from.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
-        public async Task Unmute(int entryId, DiscordGuild server, ulong userId)
+        public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
@@ -99,7 +97,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="entryId">The ID of the database entry.</param>
         /// <param name="server">The Discord server to unmute from.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
-        public async Task AddWarnRole(int entryId, DiscordGuild server, ulong userId)
+        public async Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
@@ -131,7 +129,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="entryId">The ID of the database entry.</param>
         /// <param name="server">The Discord server to unmute from.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
-        public async Task RemoveWarnRole(int entryId, DiscordGuild server, ulong userId)
+        public async Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
@@ -155,6 +153,28 @@ namespace AkkoBot.Services.Timers
                 db.Timers.Delete(timerEntry);
                 await db.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        /// Removes old warnings from the specified user.
+        /// </summary>
+        /// <param name="entryId">The ID of the database entry.</param>
+        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="userId">The ID of the user to be unmuted.</param>
+        public async Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, userId);
+            var timer = await db.Timers.GetAsync(entryId);
+
+            guildSettings.WarnRel.RemoveAll(x => x.DateAdded.Add(guildSettings.WarnExpire).Subtract(DateTimeOffset.Now) <= TimeSpan.Zero);
+
+            // Update the entries
+            db.GuildConfig.Update(guildSettings);
+            db.Timers.Delete(timer);
+
+            await db.SaveChangesAsync();
         }
     }
 }

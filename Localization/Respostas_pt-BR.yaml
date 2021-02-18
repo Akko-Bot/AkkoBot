@@ -19,6 +19,7 @@ arg_prefix: O novo prefixo.
 arg_punishment_reason: O motivo da punição.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
 arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
+arg_timed_warn: Quanto tempo as advertências devem durar.
 arg_timeout: Um número inteiro maior que 10 e menor que 120.
 arg_uint: Um número inteiro maior ou igual a zero.
 arg_ulong_id: Um ID válido do Discord.
@@ -110,6 +111,7 @@ cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
 cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
 cmd_warn: Adverte um usuário.
 cmd_warnc: Remove todas as anotações e advertências de um usuário ou uma específica se o ID for fornecido.
+cmd_warne: Define por quanto tempo as advertências devem permanecer antes de serem automaticamente removidas. Definir essa configuração para __0d__ desabilita a remoção automática.
 cmd_warnp: 'Define uma punição automática a ser aplicada em um usuário que atingir uma determinada quantidade de advertências. Omita a punição para removê-la. As punições válidas são: __Mute__, __Kick__, __Softban__, __Ban__, __AddRole__ e __RemoveRole__.'
 cmd_warnpl: Exibe as punições habilitadas nesse servidor.
 code: Código
@@ -238,6 +240,8 @@ voiceunmute_success: Usuário {0} pode voltar a falar nos canais de voz.
 warn_and_punish: Usuário {0} foi advertido e {1}.
 warn_dm: Você foi advertido no servidor {0}.
 warn_success: Usuário {0} foi advertido.
+warne_failure: Advertências não podem expirar em menos de {0} dias.
+warne_success: Advertências expirarão automaticamente depois de {0} dias.
 warnp_rem_failure: Punição não encontrada.
 warnp_rem_success: Punição removida com sucesso.
 warnp_success: Punição adicionada com sucesso.

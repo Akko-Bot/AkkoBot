@@ -47,7 +47,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (string.IsNullOrWhiteSpace(note))
                 return;
 
-            await _warnService.SaveRecordAsync(context, user, note);
+            await _warnService.SaveInfractionAsync(context, user, note);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("notice_success");
@@ -113,7 +113,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // Remove from the database
-            var amount = await _warnService.RemoveRegister(context.Guild, user, id);
+            var amount = await _warnService.RemoveInfractionAsync(context.Guild, user, id);
 
             // Send confirmation message
             var embed = new DiscordEmbedBuilder();
@@ -137,7 +137,7 @@ namespace AkkoBot.Command.Modules.Administration
             else if (user is null)
                 user = context.User;
 
-            var (guildSettings, users) = await _warnService.GetRecords(context.Guild, user, WarnType.Warning);
+            var (guildSettings, users) = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
@@ -169,7 +169,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (user is null)
                 user = context.User;
 
-            var (guildSettings, users) = await _warnService.GetRecords(context.Guild, user);
+            var (guildSettings, users) = await _warnService.GetInfractionsAsync(context.Guild, user);
             var occurrence = guildSettings.OccurrenceRel.FirstOrDefault() ?? new OccurrenceEntity();
 
             var embed = new DiscordEmbedBuilder()
@@ -208,7 +208,7 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("warnpunishment"), Aliases("warnp")]
         [Description("cmd_warnp")]
-        [RequireUserPermissions(Permissions.BanMembers)]
+        [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task Warnp(
             CommandContext context,
             [Description("arg_warnp_amount")] int amount,
@@ -259,20 +259,38 @@ namespace AkkoBot.Command.Modules.Administration
             var punish = string.Join(
                 "\n",
                 punishments.Select(x =>
-                {
-                    return (context.Guild.Roles.TryGetValue(x.PunishRoleId ?? default, out var punishRole))
-                        ? context.FormatLocalized(x.Type.ToString().ToLowerInvariant()) + " - " + punishRole.Name
-                        : context.FormatLocalized(x.Type.ToString().ToLowerInvariant());
-                }).ToArray()
+                    (context.Guild.Roles.TryGetValue(x.PunishRoleId ?? default, out var punishRole))
+                        ? context.FormatLocalized(x.Type.ToString().ToLowerInvariant()) + ": " + punishRole.Name
+                        : context.FormatLocalized(x.Type.ToString().ToLowerInvariant())
+                ).ToArray()
             );
-            
+
             var interval = string.Join("\n", punishments.Select(x => x.Interval?.ToString(@"%d\d\ %h\h\ %m\m") ?? "-").ToArray());
 
-            embed.AddField("warnpl_amount", amount, true);
-            embed.AddField("warnpl_punish", punish, true);
+            embed.AddField("warnpl_amount", amount, true)
+                .AddField("warnpl_punish", punish, true)
+                .AddField("warnpl_interval", interval, true);
 
-            if (!string.IsNullOrWhiteSpace(interval))
-                embed.AddField("warnpl_interval", interval, true);
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("warnexpire"), Aliases("warne")]
+        [Description("cmd_warne")]
+        [RequireUserPermissions(Permissions.ManageGuild)]
+        public async Task Warne(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
+        {
+            var embed = new DiscordEmbedBuilder();
+
+            if (time < TimeSpan.FromDays(30) && time != TimeSpan.Zero)
+            {
+                embed.WithDescription(context.FormatLocalized("warne_failure", TimeSpan.FromDays(30).Days));
+                await context.RespondLocalizedAsync(embed, isError: true);
+
+                return;
+            }
+
+            await _warnService.SaveWarnExpireAsync(context, time);
+            embed.WithDescription(context.FormatLocalized("warne_success", time.Days));
 
             await context.RespondLocalizedAsync(embed);
         }

@@ -19,6 +19,7 @@ arg_prefix: The new prefix.
 arg_punishment_reason: The reason for the punishment.
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
+arg_timed_warn: How long the warnings should last for.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
@@ -110,6 +111,7 @@ cmd_voicemute: Server mutes a user, preventing them from speaking in voice chann
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
 cmd_warn: Warns a user.
 cmd_warnc: Clears all notices and warnings from a user or a specific one if the ID is provided.
+cmd_warne: Sets for how long warnings should last before being automatically removed. Set it to __0d__ to disable automatic deletion.
 cmd_warnp: 'Sets an automatic punishment to be applied on a user that reaches a certain amount of warnings. Omit the punishment to remove it. The valid punishments are: __Mute__, __Kick__, __Softban__, __Ban__, __AddRole__ and __RemoveRole__.'
 cmd_warnpl: Shows the punishments enabled for this server.
 code: Code
@@ -238,6 +240,8 @@ voiceunmute_success: User {0} has been unmuted from voice channels.
 warn_and_punish: User {0} has been warned and {1}.
 warn_dm: You have been warned on {0}.
 warn_success: User {0} has been warned.
+warne_failure: Warnings should not expire before {0} days.
+warne_success: Warnings will now automatically expire after {0} days.
 warnp_rem_failure: Punishment not found.
 warnp_rem_success: Punishment removed successfully.
 warnp_success: Added punishment successfully.
