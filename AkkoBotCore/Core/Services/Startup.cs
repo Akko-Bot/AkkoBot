@@ -66,7 +66,9 @@ namespace AkkoBot.Core.Services
 
         /* Event Methods */
 
-        // Creates bot settings on startup, if there isn't one already
+        /// <summary>
+        /// Creates bot settings on startup, if there isn't one already.
+        /// </summary>
         private Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
@@ -79,16 +81,21 @@ namespace AkkoBot.Core.Services
             return Task.CompletedTask;
         }
 
-        // Initialize the timers
+        /// <summary>
+        /// Initializes the timers.
+        /// </summary>
         private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
+            // May want to remove this method
             var cmdHandler = _botCore.CommandExt[client.ShardId];
             cmdHandler.Services.GetService<IDbCacher>().Timers = cmdHandler.Services.GetService<ITimerManager>();
 
             return Task.CompletedTask;
         }
 
-        // Saves guilds to the db on startup
+        /// <summary>
+        /// Saves new guilds to the database on startup and caches them.
+        /// </summary>
         private async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
@@ -110,7 +117,9 @@ namespace AkkoBot.Core.Services
                 db.GuildConfig.Cache.TryAdd(guild.GuildId, guild);
         }
 
-        // Saves default guild settings to the db and caches it
+        /// <summary>
+        /// Saves default guild settings to the database and caches when the bot joins a guild.
+        /// </summary>
         private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
@@ -121,7 +130,9 @@ namespace AkkoBot.Core.Services
             return Task.CompletedTask;
         }
 
-        // Remove a guild from the cache when the bot is removed from it.
+        /// <summary>
+        /// Remove a guild from the cache when the bot is removed from it.
+        /// </summary>
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
@@ -130,20 +141,15 @@ namespace AkkoBot.Core.Services
             return Task.CompletedTask;
         }
 
-        // Log basic information about command execution.
+        /// <summary>
+        /// Logs basic information about command execution.
+        /// </summary>
         private Task LogCmdExecution(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
-        {
-            cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
+            => cmdHandler.Client.Logger.LogCommand(LogLevel.Information, eventArgs.Context);
 
-            cmdHandler.Client.Logger.LogInformation(
-                new EventId(LoggerEvents.Misc.Id, "Command"),
-                eventArgs.Context.Message.Content
-            );
-
-            return Task.CompletedTask;
-        }
-
-        // Log exceptions thrown on command execution.
+        /// <summary>
+        /// Logs exceptions thrown during command execution.
+        /// </summary>
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
             if (eventArgs.Exception
@@ -152,12 +158,10 @@ namespace AkkoBot.Core.Services
             and not CommandNotFoundException    // Ignore commands that do not exist
             and not InvalidOperationException)  // Ignore groups that are not commands themselves
             {
-                cmdHandler.Client.Logger.BeginScope(eventArgs.Context);
-
-                cmdHandler.Client.Logger.LogError(
-                    new EventId(LoggerEvents.Misc.Id, "Command"),
-                    eventArgs.Exception,
-                    eventArgs.Context.Message.Content
+                cmdHandler.Client.Logger.LogCommand(
+                    LogLevel.Error,
+                    eventArgs.Context,
+                    eventArgs.Exception
                 );
             }
 

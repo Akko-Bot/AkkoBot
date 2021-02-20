@@ -38,20 +38,23 @@ namespace AkkoBot.Command.Modules.Administration.Services
             => _localizer.GetLocales();
 
         /// <summary>
-        /// Gets the specified guild setting.
+        /// Gets or sets the specified guild setting.
         /// </summary>
         /// <typeparam name="T">The type of the setting to be returned.</typeparam>
         /// <param name="context">The command context.</param>
-        /// <param name="selector">The action to get the property.</param>
-        /// <returns>The requested setting.</returns>
+        /// <param name="selector">A method to get or set the property.</param>
+        /// <returns>The requested setting, <see langword="null"/> if the context is from a private context.</returns>
         public T GetOrSetProperty<T>(CommandContext context, Func<GuildConfigEntity, T> selector)
         {
             using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            var guild = db.GuildConfig.GetGuild(context.Guild.Id);
+            var guild = db.GuildConfig.GetGuild(context.Guild?.Id ?? 0);
             var result = selector(guild);
 
-            db.GuildConfig.Update(guild);
-            db.SaveChanges();
+            if (guild is not null)
+            {
+                db.GuildConfig.Update(guild);
+                db.SaveChanges();
+            }
 
             return result;
         }

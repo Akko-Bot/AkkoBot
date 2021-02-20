@@ -32,35 +32,39 @@ namespace AkkoBot.Command.Modules.Self.Services
             => _services.GetService<ILocalizer>().GetLocales();
 
         /// <summary>
-        /// Changes the bot configuration according to the actions defined in <paramref name="selector"/>.
+        /// Gets or sets the specified bot configuration.
         /// </summary>
-        /// <param name="selector">A method that assigns values to the properties of a <see cref="BotConfigEntity"/> object.</param>
-        public void SetProperty(Action<BotConfigEntity> selector)
+        /// <param name="selector">A method to get or set the property.</param>
+        public T GetOrSetProperty<T>(Func<BotConfigEntity, T> selector)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Change the cached settings
-            selector(db.BotConfig.Cache);
+            var result = selector(db.BotConfig.Cache);
 
             // Set the database entry to the modified cached settings
             db.BotConfig.Update(db.BotConfig.Cache);
             db.SaveChanges();
+
+            return result;
         }
 
         /// <summary>
-        /// Changes the bot configuration according to the actions defined in <paramref name="selector"/>.
+        /// Gets or sets the specified bot configuration.
         /// </summary>
-        /// <param name="selector">A method that assigns values to the properties of a <see cref="LogConfigEntity"/> object.</param>
-        public void SetProperty(Action<LogConfigEntity> selector)
+        /// <param name="selector">A method to get or set the property.</param>
+        public T GetOrSetProperty<T>(Func<LogConfigEntity, T> selector)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Change the cached settings
-            selector(db.LogConfig.Cache);
+            var result = selector(db.LogConfig.Cache);
 
             // Set the database entry to the modified cached settings
             db.LogConfig.Update(db.LogConfig.Cache);
             db.SaveChanges();
+
+            return result;
         }
 
         /// <summary>

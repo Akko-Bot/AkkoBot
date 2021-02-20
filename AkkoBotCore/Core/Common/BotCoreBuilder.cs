@@ -428,11 +428,11 @@ namespace AkkoBot.Core.Common
                     .Options
             );
 
-            using var uow = new AkkoUnitOfWork(dbContext, new AkkoDbCacher(dbContext));
-            var botConfigs = uow.BotConfig.GetAllSync().FirstOrDefault() ?? new BotConfigEntity();
-            var logConfigs = uow.LogConfig.GetAllSync().FirstOrDefault() ?? new LogConfigEntity();
+            var botConfig = dbContext.BotConfig.FirstOrDefault() ?? new BotConfigEntity();
+            var logConfig = dbContext.LogConfig.FirstOrDefault() ?? new LogConfigEntity();
+            dbContext.Dispose();
 
-            return (botConfigs, logConfigs);
+            return (botConfig, logConfig);
         }
 
         /// <summary>

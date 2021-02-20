@@ -83,7 +83,7 @@ namespace AkkoBot.Services.Database.Entities
             var result = new Dictionary<string, string>(props.Length);
 
             // Index should skip undesirable props at the start
-            for (int index = 2; index < props.Length - 1; index++)
+            for (var index = 2; index < props.Length - 1; index++)
             {
                 result.TryAdd(
                     props[index].Name.ToSnakeCase(),

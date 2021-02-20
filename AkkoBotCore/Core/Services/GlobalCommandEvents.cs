@@ -6,6 +6,8 @@ using DSharpPlus.EventArgs;
 using System.Threading.Tasks;
 using AkkoBot.Extensions;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Core.Services
 {
@@ -27,6 +29,9 @@ namespace AkkoBot.Core.Services
         {
             // Prevent mute evasion
             _botCore.BotShardedClient.GuildMemberAdded += ReMute;
+
+            // Show prefix regardless of current config
+            _botCore.BotShardedClient.MessageCreated += DefaultPrefix;
         }
 
 
@@ -57,12 +62,43 @@ namespace AkkoBot.Core.Services
                 else
                 {
                     // If mute role doesn't exist anymore, delete the mute from the database
-                    guildSettings.MutedUserRel.Clear();
+                    guildSettings.MutedUserRel.Remove(mutedUser);
 
                     db.GuildConfig.Update(guildSettings);
                     await db.SaveChangesAsync();
                 }
             }
+        }
+
+        /// <summary>
+        /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
+        /// </summary>
+        private Task DefaultPrefix(object sender, MessageCreateEventArgs eventArgs)
+        {
+            if (eventArgs.Message.Content.Equals("!prefix", StringComparison.InvariantCultureIgnoreCase))
+            {
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+                var prefix = db.GuildConfig.GetGuild(eventArgs.Guild?.Id ?? 0)?.Prefix
+                    ?? db.BotConfig.Cache.BotPrefix;
+
+                if (eventArgs.Guild is not null && prefix.Equals("!"))
+                    return Task.CompletedTask;
+
+                // Get client, command handler and prefix command
+                var client = sender as DiscordClient;
+                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var cmd = cmdHandler.FindCommand("prefix", out _);
+
+                // Create the context and execute the command
+                var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd);
+                Task.Run(() =>
+                {
+                    cmd.ExecuteAsync(context);
+                    client.Logger.LogCommand(LogLevel.Information, context);
+                });
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

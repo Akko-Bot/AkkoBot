@@ -22,29 +22,6 @@ namespace AkkoBot.Command.Modules.Administration
         public GuildConfig(GuildConfigService service)
             => _service = service;
 
-        [Command("prefix")]
-        [Description("cmd_guild_prefix")]
-        public async Task CheckPrefix(CommandContext context)
-        {
-            var prefix = _service.GetOrSetProperty(context, x => x.Prefix);
-
-            var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_prefix_check", Formatter.InlineCode(prefix)));
-
-            await context.RespondLocalizedAsync(embed);
-        }
-
-        [Command("prefix")]
-        public async Task ChangePrefix(CommandContext context, [Description("arg_prefix")] string prefix)
-        {
-            _service.GetOrSetProperty(context, x => x.Prefix = prefix);
-
-            var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(prefix)));
-
-            await context.RespondLocalizedAsync(embed);
-        }
-
         [Command("embed")]
         [Description("cmd_guild_embed")]
         public async Task ChangeEmbed(CommandContext context)

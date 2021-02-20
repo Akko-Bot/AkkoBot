@@ -118,9 +118,9 @@ namespace AkkoBot.Command.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
-        private async Task ChangeProperty(CommandContext context, Action<BotConfigEntity> selector)
+        private async Task ChangeProperty<T>(CommandContext context, Func<BotConfigEntity, T> selector)
         {
-            _service.SetProperty(selector);
+            _service.GetOrSetProperty(selector);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
@@ -158,10 +158,9 @@ namespace AkkoBot.Command.Modules.Self
             public async Task SetFileMaxSize(CommandContext context, [Description("arg_double")] double size)
                 => await ChangeProperty(context, x => x.LogSizeMB = size);
 
-            private async Task ChangeProperty(CommandContext context, Action<LogConfigEntity> selector)
+            private async Task ChangeProperty<T>(CommandContext context, Func<LogConfigEntity, T> selector)
             {
-                _service.SetProperty(selector);
-
+                _service.GetOrSetProperty(selector);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
             }
         }
