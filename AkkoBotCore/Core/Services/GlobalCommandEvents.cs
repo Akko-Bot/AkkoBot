@@ -28,10 +28,10 @@ namespace AkkoBot.Core.Services
         internal void RegisterEvents()
         {
             // Prevent mute evasion
-            _botCore.BotShardedClient.GuildMemberAdded += ReMute;
+            _botCore.BotShardedClient.GuildMemberAdded += ReMuteAsync;
 
             // Show prefix regardless of current config
-            _botCore.BotShardedClient.MessageCreated += DefaultPrefix;
+            _botCore.BotShardedClient.MessageCreated += DefaultPrefixAsync;
         }
 
 
@@ -40,7 +40,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Mutes a user that has been previously muted.
         /// </summary>
-        private async Task ReMute(object sender, GuildMemberAddEventArgs eventArgs)
+        private async Task ReMuteAsync(object sender, GuildMemberAddEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
@@ -48,7 +48,7 @@ namespace AkkoBot.Core.Services
             var botPerms = eventArgs.Guild.CurrentMember.PermissionsIn(anyChannel);
 
             // Check if user is in the database
-            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
+            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id).ConfigureAwait(false);
             var mutedUser = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == eventArgs.Member.Id);
 
             if (mutedUser is not null && botPerms.HasFlag(Permissions.ManageRoles))
@@ -57,7 +57,7 @@ namespace AkkoBot.Core.Services
                 {
                     // If mute role exists, apply to the user
                     muteRole = eventArgs.Guild.GetRole(guildSettings.MuteRoleId);
-                    await eventArgs.Member.GrantRoleAsync(muteRole);
+                    await eventArgs.Member.GrantRoleAsync(muteRole).ConfigureAwait(false);
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace AkkoBot.Core.Services
                     guildSettings.MutedUserRel.Remove(mutedUser);
 
                     db.GuildConfig.Update(guildSettings);
-                    await db.SaveChangesAsync();
+                    await db.SaveChangesAsync().ConfigureAwait(false);
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
         /// </summary>
-        private Task DefaultPrefix(object sender, MessageCreateEventArgs eventArgs)
+        private async Task DefaultPrefixAsync(object sender, MessageCreateEventArgs eventArgs)
         {
             if (eventArgs.Message.Content.Equals("!prefix", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -82,7 +82,7 @@ namespace AkkoBot.Core.Services
                     ?? db.BotConfig.Cache.BotPrefix;
 
                 if (eventArgs.Guild is not null && prefix.Equals("!"))
-                    return Task.CompletedTask;
+                    return;
 
                 // Get client, command handler and prefix command
                 var client = sender as DiscordClient;
@@ -91,14 +91,8 @@ namespace AkkoBot.Core.Services
 
                 // Create the context and execute the command
                 var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd);
-                Task.Run(() =>
-                {
-                    cmd.ExecuteAsync(context);
-                    client.Logger.LogCommand(LogLevel.Information, context);
-                });
+                await cmd.ExecuteAndLogAsync(context).ConfigureAwait(false);
             }
-
-            return Task.CompletedTask;
         }
     }
 }

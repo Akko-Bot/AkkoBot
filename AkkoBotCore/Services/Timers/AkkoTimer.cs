@@ -2,6 +2,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using System;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace AkkoBot.Services.Timers
@@ -57,7 +58,7 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         /// <param name="entity">Database entry to use as reference to build this timer.</param>
         /// <param name="action">Operation to be performed when this timer triggers.</param>
-        public AkkoTimer(TimerEntity entity, Action action)
+        public AkkoTimer(TimerEntity entity, Func<Task> action)
         {
             Id = entity.Id;
             Interval = entity.Interval;
@@ -67,7 +68,7 @@ namespace AkkoBot.Services.Timers
             _internalTimer.Elapsed += TriggerAction;
 
             // Initialize the event handler
-            ActionHandler += (x, y) => action();
+            ActionHandler += async (x, y) => await action();
 
             // Start the timer
             _internalTimer.Start();

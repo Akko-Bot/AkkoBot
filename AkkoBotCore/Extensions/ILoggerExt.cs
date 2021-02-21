@@ -2,7 +2,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
 {
@@ -15,7 +14,7 @@ namespace AkkoBot.Extensions
         /// <param name="level">The severity level of the log.</param>
         /// <param name="context">The command context.</param>
         /// <param name="exception">The excetion that occurred during command execution.</param>
-        public static Task LogCommand(this ILogger logger, LogLevel level, CommandContext context, Exception exception = null)
+        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, Exception exception = null)
         {
             logger.BeginScope(context);
 
@@ -25,8 +24,6 @@ namespace AkkoBot.Extensions
                 exception,
                 context.Message.Content
             );
-
-            return Task.CompletedTask;
         }
     }
 }

@@ -8,6 +8,8 @@ using DSharpPlus.Entities;
 using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
 using AkkoBot.Command.Attributes;
+using DSharpPlus.Interactivity.Extensions;
+using DSharpPlus.Interactivity.Enums;
 
 namespace AkkoBot.Command.Modules.Basic
 {
@@ -43,11 +45,7 @@ namespace AkkoBot.Command.Modules.Basic
             await context.RespondLocalizedAsync(embed);
 
             // Log to the console
-            context.Client.Logger.BeginScope(context);
-            context.Client.Logger.LogInformation(
-                new EventId(LoggerEvents.ConnectionClose.Id, "Command"),
-                context.Message.Content
-            );
+            context.Client.Logger.LogCommand(LogLevel.Information, context);
 
             // Clean-up
             await context.Client.DisconnectAsync();

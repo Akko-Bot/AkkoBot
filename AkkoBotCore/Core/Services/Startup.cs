@@ -145,7 +145,10 @@ namespace AkkoBot.Core.Services
         /// Logs basic information about command execution.
         /// </summary>
         private Task LogCmdExecution(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
-            => cmdHandler.Client.Logger.LogCommand(LogLevel.Information, eventArgs.Context);
+        {
+            cmdHandler.Client.Logger.LogCommand(LogLevel.Information, eventArgs.Context);
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Logs exceptions thrown during command execution.
