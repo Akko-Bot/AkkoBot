@@ -251,3 +251,5 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
+
+pages: Page {0}/{1}

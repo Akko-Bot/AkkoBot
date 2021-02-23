@@ -2,7 +2,9 @@
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -102,6 +104,15 @@ namespace AkkoBot.Services
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
         internal static string DeconstructEmbed(DiscordEmbedBuilder embed)
+            => DeconstructEmbed(embed.Build());
+
+        /// <summary>
+        /// Converts all text content from an embed into a string.
+        /// </summary>
+        /// <param name="embed">Embed to be deconstructed.</param>
+        /// <remarks>It ignores image links, except for the one on the image field.</remarks>
+        /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
+        internal static string DeconstructEmbed(DiscordEmbed embed)
         {
             if (embed is null)
                 return null;
@@ -116,7 +127,7 @@ namespace AkkoBot.Services
                 dEmbed.Append(DeconstructEmbedFields(embed.Fields));
 
             dEmbed.Append(
-                ((embed.ImageUrl is null) ? string.Empty : $"{embed.ImageUrl}\n\n") +
+                ((embed.Image is null) ? string.Empty : $"{embed.Image.Url}\n\n") +
                 ((embed.Footer is null) ? string.Empty : embed.Footer.Text + "\n") +
                 ((embed.Timestamp is null) ? string.Empty : embed.Timestamp.ToString())
             );
@@ -136,6 +147,30 @@ namespace AkkoBot.Services
             return (sample is not null && localizer.ContainsResponse(locale, sample))
                 ? localizer.GetResponseString(locale, sample)
                 : sample ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Gets the localized Discord message.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="message">The message content.</param>
+        /// <param name="embed">The message embed.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The localized message content, embed, and the message settings.</returns>
+        internal static (string, DiscordEmbedBuilder, IMessageSettings) GetLocalizedMessage(CommandContext context, string message, DiscordEmbedBuilder embed, bool isError)
+        {
+            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
+
+            // Get the message settings (guild or dm)
+            IMessageSettings settings = (context.Guild is null)
+                ? db.BotConfig.Cache
+                : db.GuildConfig.GetGuild(context.Guild.Id);
+
+            var responseString = GetLocalizedResponse(localizer, settings.Locale, message);  // Localize the content message, if there is one
+            var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);         // Localize the embed message
+
+            return (responseString, localizedEmbed, settings);
         }
 
         /// <summary>
@@ -171,7 +206,15 @@ namespace AkkoBot.Services
                 else
                 {
                     foreach (var field in fieldGroup)
-                        result.AppendLine(Formatter.BlockCode(field.Name + "\n" + field.Value + "\n"));
+                    {
+                        result.AppendLine(
+                            Formatter.BlockCode(
+                                $"|{field.Name.HardPad(field.Name.Length + 2)}|\n" +
+                                new string('-', field.Name.Length + 4) + '\n' +
+                                field.Value
+                            )
+                        );
+                    }
                 }
             }
 
@@ -221,7 +264,7 @@ namespace AkkoBot.Services
             }
 
             // Format the header
-            for (int index = 0; index < names.Length; index++)
+            for (var index = 0; index < names.Length; index++)
             {
                 var toPad = values[index].MaxElementLength();
                 if (names[index].Length < toPad)

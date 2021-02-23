@@ -161,7 +161,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (guildSettings.WarnRel.Count == 0)
                 embed.WithDescription("infractions_empty");
 
-            await context.RespondLocalizedAsync(embed, false);
+            await context.RespondLocalizedPaginatedByFieldsAsync(embed);
         }
 
         [Command("modlog")]
@@ -202,8 +202,12 @@ namespace AkkoBot.Command.Modules.Administration
             if (guildSettings.WarnRel.Count == 0)
                 embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
-            await context.RespondLocalizedAsync(embed, false);
+            await context.RespondLocalizedPaginatedByFieldsAsync(embed);
         }
+
+        [Command("warnpunishment"), HiddenOverload]
+        public async Task Warnp(CommandContext context)
+            => await Warnpl(context);
 
         [Command("warnpunishment"), HiddenOverload]
         public async Task Warnp(CommandContext context, int amount, WarnPunishType punishmentType, TimeSpan? time = null)

@@ -2,6 +2,7 @@ using ConcurrentCollections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -212,6 +213,32 @@ namespace AkkoBot.Extensions
             }
 
             return outerCollection;
+        }
+
+        /// <summary>
+        /// Splits the elements of this <paramref name="collection"/> into several subcollections by the specified <paramref name="amount"/>.
+        /// </summary>
+        /// <param name="collection">This collection.</param>
+        /// <param name="amount">The maximum amount of elements per subcollection.</param>
+        /// <typeparam name="T">Data type of this collection.</typeparam>
+        /// <returns>A collection of <see cref="IEnumerable{T}"/>.</returns>
+        public static IEnumerable<IEnumerable<T>> SplitInto<T>(this IEnumerable<T> collection, int amount)
+        {
+            var result = new List<List<T>>() { new List<T>(amount) };
+            var index = 0;
+
+            foreach (var element in collection)
+            {
+                result[index].Add(element);
+
+                if (result[index].Count >= amount)
+                {
+                    result.Add(new List<T>(amount));
+                    index++;
+                }
+            }
+
+            return result;
         }
     }
 }

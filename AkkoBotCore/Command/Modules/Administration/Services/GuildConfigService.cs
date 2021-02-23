@@ -7,6 +7,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 
 namespace AkkoBot.Command.Modules.Administration.Services
 {
@@ -15,10 +16,14 @@ namespace AkkoBot.Command.Modules.Administration.Services
     /// </summary>
     public class GuildConfigService : ICommandService
     {
+        private readonly IServiceProvider _services;
         private readonly ILocalizer _localizer;
 
-        public GuildConfigService(ILocalizer localizer)
-            => _localizer = localizer;
+        public GuildConfigService(IServiceProvider services, ILocalizer localizer)
+        {
+            _services = services;
+            _localizer = localizer;
+        }
 
         /// <summary>
         /// Checks if the specified locale is available and returns it if so.
@@ -28,7 +33,6 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <returns><see langword="true"/> if a match is found, <see langword="false"/> otherwise.</returns>
         public bool IsLocaleRegistered(string locale, out string match)
             => _localizer.GetLocales().Contains(locale, StringComparison.InvariantCultureIgnoreCase, out match);
-            //=> _localizer.GetLocales().Any(x => x.Equals(locale, StringComparison.InvariantCultureIgnoreCase));
 
         /// <summary>
         /// Gets all registered localed.
@@ -59,10 +63,15 @@ namespace AkkoBot.Command.Modules.Administration.Services
             return result;
         }
 
-        public IReadOnlyDictionary<string, string> GetGuildSettings(CommandContext context)
+        /// <summary>
+        /// Returns the settings of the specified Discord guild.
+        /// </summary>
+        /// <param name="server">The Discord guild.</param>
+        /// <returns>A collection of settings.</returns>
+        public IReadOnlyDictionary<string, string> GetGuildSettings(DiscordGuild server)
         {
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            return db.GuildConfig.GetGuild(context.Guild.Id).GetSettings();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            return db.GuildConfig.GetGuild(server.Id).GetSettings();
         }
     }
 }

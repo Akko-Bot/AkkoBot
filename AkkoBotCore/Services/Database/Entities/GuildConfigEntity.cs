@@ -87,27 +87,6 @@ namespace AkkoBot.Services.Database.Entities
             ErrorColor = config.ErrorColor;
         }
 
-        /// <summary>
-        /// Gets all settings from this table.
-        /// </summary>
-        /// <returns>A dictionary of setting name/value pairs.</returns>
-        public IReadOnlyDictionary<string, string> GetSettings()
-        {
-            var props = this.GetType().GetProperties();
-            var result = new Dictionary<string, string>(props.Length);
-
-            // Index should skip undesirable props at the start
-            for (int index = 1; index < props.Length - 1; index++)
-            {
-                result.TryAdd(
-                    props[index].Name.ToSnakeCase(),
-                    props[index].GetValue(this)?.ToString()
-                );
-            }
-
-            return result;
-        }
-
         public GuildConfigEntity AddDefaultWarnPunishments()
         {
             var defaultPunishments = new WarnPunishEntity[]

@@ -127,7 +127,7 @@ namespace AkkoBot.Command.Modules.Administration
         [Description("cmd_guild_list")]
         public async Task ListGuildConfigs(CommandContext context)
         {
-            var settings = _service.GetGuildSettings(context);
+            var settings = _service.GetGuildSettings(context.Guild);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("guild_settings_title")

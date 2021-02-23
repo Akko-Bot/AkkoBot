@@ -293,7 +293,7 @@ namespace AkkoBot.Core.Common
             if (_creds is null)
                 throw new NullReferenceException("No 'Credentials' object was provided.");
 
-            var botClients = GetBotClient(timeout); // Initialize the sharded clients
+            var botClients = await GetBotClientAsync(timeout); // Initialize the sharded clients
 
             RegisterFinalServices(botClients);                  // Add the last services needed
             var services = _cmdServices.BuildServiceProvider(); // Initialize the IoC container
@@ -381,7 +381,7 @@ namespace AkkoBot.Core.Common
         /// </summary>
         /// <param name="timeout">Sets the interactivity action timeout.</param>
         /// <returns>A sharded client properly configured.</returns>
-        private DiscordShardedClient GetBotClient(double? timeout)
+        private async Task<DiscordShardedClient> GetBotClientAsync(double? timeout)
         {
             // Setup client configuration
             var botConfig = new DiscordConfiguration()
@@ -408,8 +408,7 @@ namespace AkkoBot.Core.Common
             var shardedClients = new DiscordShardedClient(botConfig);   // Initialize the sharded clients
 
             // Add interactivity to the sharded clients
-            foreach (var client in shardedClients.ShardClients.Values)
-                client.UseInteractivity(interactivityOptions);
+            await shardedClients.UseInteractivityAsync(interactivityOptions);
 
             return shardedClients;
         }

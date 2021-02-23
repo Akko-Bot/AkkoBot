@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using AkkoBot.Command.Attributes;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity;
 
 namespace AkkoBot.Command.Modules.Basic
 {

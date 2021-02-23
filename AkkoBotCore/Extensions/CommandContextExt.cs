@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Services;
@@ -8,6 +9,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -73,7 +75,7 @@ namespace AkkoBot.Extensions
             // If user replied with the expected response, execute the action
             if (!result.TimedOut && result.Result.Content.EqualsOrStartsWith(response))
                 action();
-                
+
             return result;
         }
 
@@ -88,16 +90,8 @@ namespace AkkoBot.Extensions
         /// <returns>The <see cref="DiscordMessage"/> that has been sent.</returns>
         public static async Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
-
-            // Get the message settings (guild or dm)
-            IMessageSettings settings = (context.Guild is null)
-                ? db.BotConfig.GetAllSync().FirstOrDefault()
-                : db.GuildConfig.GetGuild(context.Guild.Id);
-
-            var responseString = GeneralService.GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
-            var localizedEmbed = GeneralService.LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
+            // Get the localized message and its settings (guild or dm)
+            var (responseString, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, message, embed, isError);
 
             if (isMarked && !string.IsNullOrWhiteSpace(embed?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
@@ -191,7 +185,7 @@ namespace AkkoBot.Extensions
                 ? db.BotConfig.GetAllSync().FirstOrDefault().Locale
                 : db.GuildConfig.GetGuild(context.Guild.Id).Locale;
 
-            for (int index = 0; index < args.Length; index++)
+            for (var index = 0; index < args.Length; index++)
             {
                 if (args[index] is string)
                     args[index] = GeneralService.GetLocalizedResponse(localizer, locale, args[index] as string);
@@ -202,6 +196,90 @@ namespace AkkoBot.Extensions
             return string.Format(key, args);
         }
 
-        
+        /// <summary>
+        /// Sends a localized, paginated message and sends it to the context that triggered the command.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="embed">The embed to be split into multiple pages.</param>
+        /// <param name="maxFields">The maximum amount of fields each page is allowed to have.</param>
+        /// <param name="message">The message outside of the embed.</param>
+        /// <remarks>
+        /// If you only want to paginate the message content or the embed description, consider using
+        /// <see cref="InteractivityExtension.SendPaginatedMessageAsync(DiscordChannel, DiscordUser, IEnumerable{Page}, PaginationEmojis, PaginationBehaviour?, PaginationDeletion?, TimeSpan?)"/>
+        /// instead.
+        /// </remarks>
+        public static async Task RespondLocalizedPaginatedByFieldsAsync(this CommandContext context, DiscordEmbedBuilder embed, int maxFields = 5, string message = null)
+        {
+            if (embed.Fields.Count <= maxFields)
+            {
+                await context.RespondLocalizedAsync(message, embed, false);
+                return;
+            }
+
+            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
+
+            // Get the message settings (guild or dm)
+            IMessageSettings settings = (context.Guild is null)
+                ? db.BotConfig.Cache
+                : db.GuildConfig.GetGuild(context.Guild.Id);
+
+            var pages = (settings.UseEmbed)
+                ? context.GenerateLocalizedPages(embed, maxFields, message)
+                : ConvertToContentPages(context.GenerateLocalizedPages(embed, maxFields, message));
+
+            await context.Channel.SendPaginatedMessageAsync(context.Member, pages, timeoutoverride: settings.InteractiveTimeout);
+        }
+
+        /// <summary>
+        /// Localizes an embed and generates paginable embeds from it.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <param name="embed">The embed to create pages from.</param>
+        /// <param name="maxFields">The maximum amount of fields a page is allowed to have.</param>
+        /// <param name="content">The message outside the embed.</param>
+        /// <remarks>The only thing that changes across the pages are its embed fields.</remarks>
+        /// <returns>A collection of paginable embeds.</returns>
+        private static IEnumerable<Page> GenerateLocalizedPages(this CommandContext context, DiscordEmbedBuilder embed, int maxFields, string content = null)
+        {
+            var localizer = context.Services.GetService<ILocalizer>();
+
+            var result = new List<Page>();
+            var sanitizedContent = content.MaxLength(2000);
+            var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
+
+            var (localizedMessage, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, sanitizedContent, embed, false);
+            var footerPrepend = GeneralService.GetLocalizedResponse(localizer, settings.Locale, "pages");
+            var counter = 0;
+
+            foreach (var fields in splitFields)
+            {
+                var embedCopy = localizedEmbed?.DeepCopy(fields);
+
+                if (embedCopy?.Footer is null)
+                    embedCopy?.WithFooter(string.Format(footerPrepend, ++counter, splitFields.Length));
+                else
+                    embedCopy?.Footer.Text.Insert(0, string.Format(footerPrepend, ++counter, splitFields.Length));
+
+                result.Add(new Page(localizedMessage, embedCopy));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts a collection of embed pages to a collection of page content.
+        /// </summary>
+        /// <param name="pages">The pages to be converted.</param>
+        /// <returns>A collection of pages whose embed is <see langword="null"/>.</returns>
+        private static IEnumerable<Page> ConvertToContentPages(IEnumerable<Page> pages)
+        {
+            foreach (var page in pages)
+            {
+                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(2000);
+                page.Embed = null;
+            }
+
+            return pages;
+        }
     }
 }

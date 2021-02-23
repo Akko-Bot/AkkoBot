@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
@@ -72,26 +73,5 @@ namespace AkkoBot.Services.Database.Entities
         // Implement .gcmd and .gmod?
         // Implement forward dms to owners?
         // Might be an issue for "message staff" type of features
-
-        /// <summary>
-        /// Gets all settings from this table.
-        /// </summary>
-        /// <returns>A dictionary of setting name/value pairs.</returns>
-        public IReadOnlyDictionary<string, string> GetSettings()
-        {
-            var props = this.GetType().GetProperties();
-            var result = new Dictionary<string, string>(props.Length);
-
-            // Index should skip undesirable props at the start
-            for (var index = 2; index < props.Length - 1; index++)
-            {
-                result.TryAdd(
-                    props[index].Name.ToSnakeCase(),
-                    props[index].GetValue(this)?.ToString()
-                );
-            }
-
-            return result;
-        }
     }
 }
