@@ -1,3 +1,4 @@
+using System.Globalization;
 using System;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
@@ -145,9 +146,9 @@ namespace AkkoBot.Command.Modules.Administration
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
 
-            foreach (var warn in guildSettings.WarnRel)
+            foreach (var warn in guildSettings.WarnRel.OrderByDescending(x => x.Id))
             {
-                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
+                var position = "#" + Formatter.InlineCode(warn.Id.ToString(CultureInfo.InvariantCulture));
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
                     $"{position} {warn.DateAdded.Date.ToShortDateString()}",
@@ -161,7 +162,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (guildSettings.WarnRel.Count == 0)
                 embed.WithDescription("infractions_empty");
 
-            await context.RespondLocalizedPaginatedByFieldsAsync(embed);
+            await context.RespondPaginatedByFieldsAsync(embed);
         }
 
         [Command("modlog")]
@@ -185,10 +186,10 @@ namespace AkkoBot.Command.Modules.Administration
                     )
                 );
 
-            foreach (var warn in guildSettings.WarnRel.OrderBy(x => x.Type))
+            foreach (var warn in guildSettings.WarnRel.OrderBy(x => x.Type).ThenByDescending(x => x.Id))
             {
                 var emote = (warn.Type == WarnType.Notice) ? "📝" : "⚠️";
-                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
+                var position = "#" + Formatter.InlineCode(warn.Id.ToString(CultureInfo.InvariantCulture));
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
                     $"{emote} {position} {warn.DateAdded.Date.ToShortDateString()}",
@@ -202,7 +203,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (guildSettings.WarnRel.Count == 0)
                 embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
-            await context.RespondLocalizedPaginatedByFieldsAsync(embed);
+            await context.RespondPaginatedByFieldsAsync(embed);
         }
 
         [Command("warnpunishment"), HiddenOverload]
