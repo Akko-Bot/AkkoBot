@@ -21,5 +21,10 @@ namespace AkkoBot.Services
         /// Represents an emoji for warning the user that something went wrong.
         /// </summary>
         public static DiscordEmoji WarningEmoji { get; } = DiscordEmoji.FromUnicode("⚠️");
+
+        /// <summary>
+        /// Represents the maximum message length allowed by Discord.
+        /// </summary>
+        public const int MessageMaxLength = 2000;
     }
 }

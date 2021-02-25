@@ -318,7 +318,7 @@ namespace AkkoBot.Extensions
             var localizer = context.Services.GetService<ILocalizer>();
 
             var result = new List<Page>();
-            var sanitizedContent = content.MaxLength(2000);
+            var sanitizedContent = content.MaxLength(AkkoEntities.MessageMaxLength);
             var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
 
             var (localizedMessage, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, sanitizedContent, embed, false);
@@ -349,7 +349,7 @@ namespace AkkoBot.Extensions
         {
             foreach (var page in pages)
             {
-                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(2000);
+                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(AkkoEntities.MessageMaxLength);
                 page.Embed = null;
             }
 
