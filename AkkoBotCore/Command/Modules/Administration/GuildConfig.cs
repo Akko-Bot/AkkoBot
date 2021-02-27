@@ -14,7 +14,7 @@ namespace AkkoBot.Command.Modules.Administration
 {
     [Group("serverconfig"), Aliases("guildconfig", "servercfg", "guildcfg")]
     [Description("cmd_guild")]
-    [RequireUserPermissions(Permissions.ManageGuild)]
+    [RequireGuild, RequireUserPermissions(Permissions.ManageGuild)]
     public class GuildConfig : AkkoCommandModule
     {
         private readonly GuildConfigService _service;

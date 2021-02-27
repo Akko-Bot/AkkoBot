@@ -15,6 +15,7 @@ using AkkoBot.Command.Modules.Self.Services;
 
 namespace AkkoBot.Command.Modules.Administration
 {
+    [RequireGuild]
     public class WarningCommands : AkkoCommandModule
     {
         private readonly WarningService _warnService;

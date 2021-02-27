@@ -31,7 +31,7 @@ namespace AkkoBot.Core.Services
             _botCore.BotShardedClient.GuildMemberAdded += ReMuteAsync;
 
             // Show prefix regardless of current config
-            _botCore.BotShardedClient.MessageCreated += DefaultPrefixAsync;
+            _botCore.BotShardedClient.MessageCreated += DefaultPrefix;
         }
 
 
@@ -73,26 +73,33 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
         /// </summary>
-        private async Task DefaultPrefixAsync(object sender, MessageCreateEventArgs eventArgs)
+        private Task DefaultPrefix(object sender, MessageCreateEventArgs eventArgs)
         {
-            if (eventArgs.Message.Content.Equals("!prefix", StringComparison.InvariantCultureIgnoreCase))
+            var msgCmd = eventArgs.Message.Content.Substring(0, Math.Min("!prefix".Length, eventArgs.Message.Content.Length));
+
+            if (msgCmd.Equals("!prefix", StringComparison.InvariantCultureIgnoreCase))
             {
                 using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
                 var prefix = db.GuildConfig.GetGuild(eventArgs.Guild?.Id ?? 0)?.Prefix
                     ?? db.BotConfig.Cache.BotPrefix;
 
                 if (eventArgs.Guild is not null && prefix.Equals("!"))
-                    return;
+                    return Task.CompletedTask;
 
                 // Get client, command handler and prefix command
                 var client = sender as DiscordClient;
                 var cmdHandler = client.GetExtension<CommandsNextExtension>();
-                var cmd = cmdHandler.FindCommand("prefix", out _);
+                var cmd = cmdHandler.FindCommand(eventArgs.Message.Content.Remove(0, prefix.Length), out var cmdArgs);
 
                 // Create the context and execute the command
-                var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd);
-                await cmd.ExecuteAndLogAsync(context).ConfigureAwait(false);
+                if (string.IsNullOrWhiteSpace(cmdArgs) || eventArgs.Guild is not null)
+                {
+                    var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd, cmdArgs);
+                    _ = cmd.ExecuteAndLogAsync(context);
+                }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

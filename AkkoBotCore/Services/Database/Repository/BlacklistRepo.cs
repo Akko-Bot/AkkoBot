@@ -22,7 +22,7 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Checks if the provided ID is backlisted.
+        /// Checks if the provided ID is blacklisted.
         /// </summary>
         /// <param name="id">ID of a user, channel or guild.</param>
         /// <returns><see langword="true"/> if the ID is blacklisted, <see langword="false"/> otherwise.</returns>
@@ -30,7 +30,7 @@ namespace AkkoBot.Services.Database.Repository
             => _cache.Contains(id);
 
         /// <summary>
-        /// Checks if the command comes from a backlisted context.
+        /// Checks if the command comes from a blacklisted context.
         /// </summary>
         /// <param name="id">Context of the command.</param>
         /// <returns><see langword="true"/> if it's blacklisted, <see langword="false"/> otherwise.</returns>

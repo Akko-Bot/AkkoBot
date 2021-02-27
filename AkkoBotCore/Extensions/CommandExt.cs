@@ -13,7 +13,7 @@ namespace AkkoBot.Extensions
         /// <param name="context">The command context.</param>
         public static async Task ExecuteAndLogAsync(this DSharpPlus.CommandsNext.Command command, CommandContext context)
         {
-            var execution = await command.ExecuteAsync(context);
+            var execution = await command.ExecuteAsync(context).ConfigureAwait(false);
             var level = (execution.IsSuccessful) ? LogLevel.Information : LogLevel.Error;
 
             context.Client.Logger.LogCommand(level, context, execution.Exception);

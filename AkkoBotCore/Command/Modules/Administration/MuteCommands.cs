@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Administration
 {
+    [RequireGuild]
     public class MuteCommands : AkkoCommandModule
     {
         private readonly RoleService _roleService;

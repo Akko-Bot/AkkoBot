@@ -12,6 +12,7 @@ using AkkoBot.Command.Attributes;
 
 namespace AkkoBot.Command.Modules.Administration
 {
+    [RequireGuild]
     public class UserPunishment : AkkoCommandModule
     {
         private readonly RoleService _roleService;

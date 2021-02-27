@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 namespace AkkoBot.Command.Modules.Administration
 {
     [RequireGuild]
-    [RequireUserPermissions(Permissions.ManageGuild)]
     public class BaseGuildCommands : AkkoCommandModule
     {
         private readonly GuildConfigService _guildService;
@@ -25,9 +24,10 @@ namespace AkkoBot.Command.Modules.Administration
 
         [Command("prefix")]
         [Description("cmd_guild_prefix")]
+        [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ChangePrefix(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
         {
-            if (newPrefix is null)
+            if (string.IsNullOrWhiteSpace(newPrefix))
             {
                 await CheckPrefix(context);
                 return;
