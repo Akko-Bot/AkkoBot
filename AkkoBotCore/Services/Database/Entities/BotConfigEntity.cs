@@ -61,6 +61,8 @@ namespace AkkoBot.Services.Database.Entities
 
         public bool EnableHelp { get; set; } = true;
 
+        public bool RotateStatus { get; set; } = false;
+
         public bool CaseSensitiveCommands { get; set; } = true;
 
         public int MessageSizeCache { get; set; } = 200;

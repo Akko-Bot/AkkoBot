@@ -69,16 +69,20 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Creates bot settings on startup, if there isn't one already.
         /// </summary>
-        private Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
+        private async Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // If there is no BotConfig entry in the database, create one.
             db.LogConfig.TryCreate();
             db.BotConfig.TryCreate();
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
-            return Task.CompletedTask;
+            // Initialize the default status, if there is one
+            var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+            
+            if (pStatus is not null)
+                await client.UpdateStatusAsync(pStatus.GetActivity());
         }
 
         /// <summary>

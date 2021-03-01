@@ -130,7 +130,7 @@ enabled: enabled
 error_hierarchy: This command can only be used on users with a role lower to yours and mine in the role hierarchy.
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
-guild_embed_change: Embed usage on this server has been {0}.
+guild_embed_change: Embed usage has been {0} on this server.
 guild_errorcolor: ErrorColor has been changed to {0}.
 guild_locale_changed: The language for this server has been changed to {0}.
 guild_locale_unavailable: This language is not available. Use {0} to see the list of available languages.
@@ -253,3 +253,7 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 
 pages: Page {0}/{1}
+pstatus_title: Rotating Statuses
+message: Message
+pstatus_rotation: Status rotation is currently {0}.
+pstatus_error: There is no status set up.

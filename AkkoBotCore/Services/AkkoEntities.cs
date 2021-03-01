@@ -8,7 +8,7 @@ namespace AkkoBot.Services
     public static class AkkoEntities
     {
         /// <summary>
-        /// Represents an emoji for successfull operations.
+        /// Represents an emoji for successful operations.
         /// </summary>
         public static DiscordEmoji SuccessEmoji { get; } = DiscordEmoji.FromUnicode("✅");
 

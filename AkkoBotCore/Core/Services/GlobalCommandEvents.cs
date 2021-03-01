@@ -75,9 +75,7 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task DefaultPrefix(object sender, MessageCreateEventArgs eventArgs)
         {
-            var msgCmd = eventArgs.Message.Content.Substring(0, Math.Min("!prefix".Length, eventArgs.Message.Content.Length));
-
-            if (msgCmd.Equals("!prefix", StringComparison.InvariantCultureIgnoreCase))
+            if (eventArgs.Message.Content.StartsWith("!prefix", StringComparison.InvariantCultureIgnoreCase))
             {
                 using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
                 var prefix = db.GuildConfig.GetGuild(eventArgs.Guild?.Id ?? 0)?.Prefix

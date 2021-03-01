@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns>The first playing status that meets the criteria, <see langword="null"/> if none is found.</returns>
         public async Task<PlayingStatusEntity> GetStatusAsync(Func<PlayingStatusEntity, bool> comparer)
         {
-            var result = Cache.Where(s => comparer(s)).FirstOrDefault();
+            var result = Cache.FirstOrDefault(s => comparer(s));
 
             if (result is null)
             {
@@ -60,23 +60,39 @@ namespace AkkoBot.Services.Database.Repository
         /// <summary>
         /// Creates a tracking entry for adding a playing status to the database.
         /// </summary>
-        /// <param name="pStatus">Playing status to be added.</param>
+        /// <param name="newEntry">Playing status to be added.</param>
         /// <returns></returns>
-        public void Add(PlayingStatusEntity pStatus)
+        public bool Add(PlayingStatusEntity newEntry)
         {
-            base.Create(pStatus);
-            Cache.Add(pStatus);
+            var entry = Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+
+            if (entry is null)
+            {
+                base.Create(newEntry);
+                Cache.Add(newEntry);
+            }
+            else
+            {
+                entry.Message = newEntry.Message;
+                entry.Type = newEntry.Type;
+                
+                var oldEntry = Cache.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+                Cache.Remove(oldEntry);
+                Cache.Add(entry);
+            }
+
+            return entry is null;
         }
 
         /// <summary>
         /// Creates a tracking entry for removing a playing status from the database
         /// </summary>
-        /// <param name="pStatus"></param>
+        /// <param name="newEntry"></param>
         /// <returns><see langword="true"/> if the entry got removed from the database, <see langword="false"/> otherwise.</returns>
-        public bool Remove(PlayingStatusEntity pStatus)
+        public bool Remove(PlayingStatusEntity newEntry)
         {
-            base.Delete(pStatus);
-            return Cache.Remove(pStatus);
+            base.Delete(newEntry);
+            return Cache.Remove(newEntry);
         }
 
         /// <summary>
@@ -85,7 +101,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns>The amount of entries removed.</returns>
         public async Task<int> ClearAsync()
         {
-            int rows = await _db.Database.ExecuteSqlRawAsync("DELETE FROM playing_statuses;");
+            var rows = await _db.Database.ExecuteSqlRawAsync("DELETE FROM playing_statuses;");
             Cache.Clear();
 
             return rows;

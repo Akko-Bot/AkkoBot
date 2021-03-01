@@ -25,6 +25,19 @@ namespace AkkoBot.Extensions
             => text?.Substring(0, Math.Min(text.Length, maxLength));
 
         /// <summary>
+        /// Truncates the string to the maximum specified length.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="maxLength">The maximum length the string should have.</param>
+        /// <param name="append">The string to be appended to the end of the truncated string.</param>
+        /// <remarks>The <paramref name="append"/> only gets added to the truncated string if this string exceeds <paramref name="maxLength"/> in length.</remarks>
+        /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
+        public static string MaxLength(this string text, int maxLength, string append)
+            => (text.Length <= maxLength)
+                ? text
+                : text.MaxLength(maxLength - append.Length) + append;
+
+        /// <summary>
         /// Returns a string whose first character is uppercase and all others are lowercase.
         /// </summary>
         /// <param name="text">This string.</param>
