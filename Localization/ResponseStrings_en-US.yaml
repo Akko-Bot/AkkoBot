@@ -257,3 +257,9 @@ pstatus_title: Rotating Statuses
 message: Message
 pstatus_rotation: Status rotation is currently {0}.
 pstatus_error: There is no status set up.
+cmd_setstatus: Sets a static status for the bot. Provide no parameter to remove it.
+cmd_liststatus: Lists all statuses and their corresponding ID.
+pstatus_time: Rotation Time
+cmd_removestatus: Removes the status with the specified ID.
+timedban_notification: You have been banned from the {0} server for {0}.
+cmd_clearstatus: Removes all statuses from the bot.

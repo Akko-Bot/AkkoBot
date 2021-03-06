@@ -36,7 +36,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmMsg = _punishService.SendPunishmentDm(context, user, "kick_notification", reason);
+            var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "kick_notification", reason);
 
             // Kick the user
             await _punishService.KickUser(context.Guild, user, context.Member.GetFullname() + " | " + reason);
@@ -71,7 +71,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmMsg = _punishService.SendPunishmentDm(context, user, "sban_notification", reason);
+            var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "sban_notification", reason);
 
             // Softban the user
             await _punishService.SoftbanUser(context.Guild, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
@@ -105,7 +105,7 @@ namespace AkkoBot.Command.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmMsg = _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
+            var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "ban_notification", reason);
 
             // Ban the user
             await _punishService.BanUser(context.Guild, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
@@ -191,10 +191,10 @@ namespace AkkoBot.Command.Modules.Administration
             }
 
             // Execute ban and send confirmation message
-            await _punishService.SendPunishmentDm(context, user, "ban_notification", reason);
+            await _punishService.SendPunishmentDmAsync(context, user, "timedban_notification", reason, time);
 
             // Perform the timed ban
-            await _punishService.TimedBan(context, time, user.Id, reason);
+            await _punishService.TimedBanAsync(context, time, user.Id, reason);
 
             // Send ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "timedban_title")
@@ -210,7 +210,7 @@ namespace AkkoBot.Command.Modules.Administration
         public async Task TimedHackBan(CommandContext context, DiscordUser user, TimeSpan time, [RemainingText] string reason = null)
         {
             // Perform the timed ban
-            await _punishService.TimedBan(context, time, user.Id, reason);
+            await _punishService.TimedBanAsync(context, time, user.Id, reason);
 
             // Send ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "timedban_title")

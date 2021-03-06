@@ -36,8 +36,9 @@ namespace AkkoBot.Services.Timers
             var settings = db.GuildConfig.GetGuild(server.Id);
             var localizedReason = _localizer.GetResponseString(settings.Locale, "timedban_title");
 
-            // Perform the action
-            await server.UnbanMemberAsync(userId, localizedReason);
+            // Unban the user - they might have been unbanned in the meantime
+            if ((await server.GetBansAsync()).FirstOrDefault(x => x.User.Id == userId) is not null)
+                await server.UnbanMemberAsync(userId, localizedReason);
 
             // Remove the entry
             var dbEntity = await db.Timers.GetAsync(entryId);
@@ -61,7 +62,7 @@ namespace AkkoBot.Services.Timers
 
             try
             {
-                // *User may not be in the guild when this method runs
+                // User may not be in the guild when this method runs
                 // Or role may not exist anymore
                 // Or bot may not have role permissions anymore
                 server.Roles.TryGetValue(guildSettings.MuteRoleId, out var muteRole);

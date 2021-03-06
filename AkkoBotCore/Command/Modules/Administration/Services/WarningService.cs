@@ -400,7 +400,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
 
                 case WarnPunishType.Ban:
                     if (punishment.Interval.HasValue)
-                        await _punishService.TimedBan(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
+                        await _punishService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
                     else
                         await _punishService.BanUser(context.Guild, user.Id, 1, warnString + " | " + reason);
 

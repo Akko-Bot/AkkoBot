@@ -159,7 +159,7 @@ namespace AkkoBot.Extensions
 
             try
             {
-                return settings.UseEmbed
+                return (settings.UseEmbed)
                     ? await user.SendMessageAsync(responseString, localizedEmbed)
                     : await user.SendMessageAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
             }
@@ -189,6 +189,8 @@ namespace AkkoBot.Extensions
             {
                 if (args[index] is string)
                     args[index] = GeneralService.GetLocalizedResponse(localizer, locale, args[index] as string);
+                else if (args[index] is null)
+                    args[index] = string.Empty;
             }
 
             key = GeneralService.GetLocalizedResponse(localizer, locale, key);

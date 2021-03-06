@@ -29,12 +29,13 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <param name="user">The user that's being punished.</param>
         /// <param name="message">The localized message to be sent.</param>
         /// <param name="reason">The reason of the punishment.</param>
+        /// <param name="time">If the punishment is temporary, for how long will it last.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
-        public async Task<DiscordMessage> SendPunishmentDm(CommandContext context, DiscordMember user, string message, string reason)
+        public async Task<DiscordMessage> SendPunishmentDmAsync(CommandContext context, DiscordMember user, string message, string reason, TimeSpan? time = null)
         {
             // Create the notification dm
             var dm = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized(message, Formatter.Bold(context.Guild.Name)));
+                .WithDescription(context.FormatLocalized(message, Formatter.Bold(context.Guild.Name), time?.ToString(@"%d\d\ %h\h\ %m\m")));
 
             if (reason is not null)
                 dm.AddField(context.FormatLocalized("reason"), reason);
@@ -171,7 +172,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
         /// <param name="time">When the user should be unbanned.</param>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="reason">The reason for the ban.</param>
-        public async Task TimedBan(CommandContext context, TimeSpan time, ulong userId, string reason = null)
+        public async Task TimedBanAsync(CommandContext context, TimeSpan time, ulong userId, string reason = null)
         {
             using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 

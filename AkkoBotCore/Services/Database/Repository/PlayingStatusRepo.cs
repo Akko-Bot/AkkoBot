@@ -20,68 +20,28 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Gets a playing status that meets the <paramref name="comparer"/> criteria.
-        /// </summary>
-        /// <param name="comparer">A method that returns <see langword="true"/> when the criteria is met.</param>
-        /// <returns>The first playing status that meets the criteria, <see langword="null"/> if none is found.</returns>
-        public async Task<PlayingStatusEntity> GetStatusAsync(Func<PlayingStatusEntity, bool> comparer)
-        {
-            var result = Cache.FirstOrDefault(s => comparer(s));
-
-            if (result is null)
-            {
-                result = await base.GetAsync(comparer);
-                Cache.Add(result);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Gets playing statuses that meet the <paramref name="comparer"/> criteria.
-        /// </summary>
-        /// <param name="comparer">A method that returns <see langword="true"/> when the criteria is met.</param>
-        /// <returns>A collection of playing statuses. It will be empty if none is found.</returns>
-        public async Task<IEnumerable<PlayingStatusEntity>> GetStatusesAsync(Func<PlayingStatusEntity, bool> comparer)
-        {
-            var result = Cache.Where(s => comparer(s));
-
-            if (result is null || !result.Any())
-            {
-                result = (await base.GetAllAsync()).Where(s => comparer(s));
-
-                foreach (var status in result)
-                    Cache.Add(status);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a tracking entry for adding a playing status to the database.
+        /// Creates a tracking entry for adding or updating a static playing status to the database.
         /// </summary>
         /// <param name="newEntry">Playing status to be added.</param>
-        /// <returns></returns>
-        public bool Add(PlayingStatusEntity newEntry)
+        /// <param name="dbEntry">The tracked entity.</param>
+        /// <returns><see langword="true"/> if the entry is going to be added to the database, <see langword="false"/> if it is going to be updated.</returns>
+        public bool AddOrUpdateStatic(PlayingStatusEntity newEntry, out PlayingStatusEntity dbEntry)
         {
-            var entry = Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+            dbEntry = Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+            var success = dbEntry is not null;
 
-            if (entry is null)
+            if (success)
             {
-                base.Create(newEntry);
-                Cache.Add(newEntry);
+                dbEntry.Message = newEntry.Message;
+                dbEntry.Type = newEntry.Type;
             }
             else
             {
-                entry.Message = newEntry.Message;
-                entry.Type = newEntry.Type;
-                
-                var oldEntry = Cache.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
-                Cache.Remove(oldEntry);
-                Cache.Add(entry);
+                base.Create(newEntry);
+                dbEntry = newEntry;
             }
 
-            return entry is null;
+            return success;
         }
 
         /// <summary>
@@ -96,15 +56,16 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Removes all playing statuses stored in the database and the cache.
+        /// Tracks all playing statuses stored in the database for removal and clears the cache.
         /// </summary>
-        /// <returns>The amount of entries removed.</returns>
+        /// <returns>The amount of entries tracked for removal.</returns>
         public async Task<int> ClearAsync()
         {
-            var rows = await _db.Database.ExecuteSqlRawAsync("DELETE FROM playing_statuses;");
+            var entries = (await base.GetAllAsync()).ToArray();
+            base.DeleteRange(entries);
             Cache.Clear();
 
-            return rows;
+            return entries.Length;
         }
     }
 }
