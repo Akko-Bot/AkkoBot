@@ -4,20 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Repository
 {
     public class PlayingStatusRepo : DbRepository<PlayingStatusEntity>
     {
-        private readonly AkkoDbContext _db;
+        /// <summary>
+        /// Caches all rotating statuses. Static statuses are excluded.
+        /// </summary>
         public List<PlayingStatusEntity> Cache { get; }
 
         public PlayingStatusRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
-        {
-            _db = db;
-            Cache = dbCacher.PlayingStatuses;
-        }
+            => Cache = dbCacher.PlayingStatuses;
 
         /// <summary>
         /// Creates a tracking entry for adding or updating a static playing status to the database.
@@ -42,17 +40,6 @@ namespace AkkoBot.Services.Database.Repository
             }
 
             return success;
-        }
-
-        /// <summary>
-        /// Creates a tracking entry for removing a playing status from the database
-        /// </summary>
-        /// <param name="newEntry"></param>
-        /// <returns><see langword="true"/> if the entry got removed from the database, <see langword="false"/> otherwise.</returns>
-        public bool Remove(PlayingStatusEntity newEntry)
-        {
-            base.Delete(newEntry);
-            return Cache.Remove(newEntry);
         }
 
         /// <summary>

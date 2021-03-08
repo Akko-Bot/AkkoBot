@@ -11,15 +11,20 @@ arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_user: ID or mention to a Discord user.
 arg_double: A real number.
 arg_infraction: The infraction to be added to the user's modlog.
+arg_int: An integer number.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
 arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_notice: The notice to be added to this user's modlog.
 arg_prefix: The new prefix.
+arg_pstatus: The message to be displayed in the status.
+arg_pstatus_type: The type of the status.
 arg_punishment_reason: The reason for the punishment.
+arg_stream_url: The URL of the stream.
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
+arg_timed_pstatus: For how long the status should be displayed.
 arg_timed_warn: How long the warnings should last for.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_uint: An integer number higher or equal to zero.
@@ -50,6 +55,7 @@ bot_settings_title: Global Settings
 channel: Channel
 chatmute_success: User {0} can no longer message on text channels.
 chatunmute_success: User {0} can now message on text channels.
+cmd_addstatus: Adds a status to the list of rotating statuses. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status.
 cmd_ban: Bans a user.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
@@ -58,6 +64,7 @@ cmd_blacklist_list: Shows the blacklist. Provide no parameter to show all entry 
 cmd_blacklist_rem: Removes an entry from the blacklist.
 cmd_chatmute: Server mutes a user, preventing them from messaging on text channels.
 cmd_chatunmute: Server unmutes a user, allowing them to message on text channels.
+cmd_clearstatus: Removes all statuses from the bot.
 cmd_config: Groups settings that define how the bot should behave globally.
 cmd_config_cache: Sets how many messages should be cached per channel. Requires a restart to take effect.
 cmd_config_case: Sets whether commands should be case sensitive or not. Requires a restart to take effect.
@@ -95,6 +102,7 @@ cmd_guild_timeout: Sets how long the bot should wait for user response on intera
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
 cmd_kick: Kicks a user from the server.
+cmd_liststatus: Lists all rotating statuses and their corresponding ID.
 cmd_massban: Bans multiple users from the server.
 cmd_massunban: Unbans multiple users from the server.
 cmd_modlog: Shows notices and infractions of a user.
@@ -102,7 +110,10 @@ cmd_modules: Lists the currently available modules. Specify a module name to see
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
+cmd_removestatus: Removes the status with the specified ID.
+cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_sban: Kicks a user from the server and deletes their messages.
+cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
 cmd_sudo: Executes a command as the specified user.
 cmd_timedban: Temporarily bans a user from the server.
 cmd_unban: Unbans a user from the server.
@@ -189,6 +200,7 @@ massban_success: '{0} users were banned from the server.'
 massunban: Massunban
 massunban_failed: There was no user to unban.
 massunban_succeded: '{0} users were unbanned from the server.'
+message: Message
 minutes: Minutes
 modlog_description: '{0} notices, {1} infractions, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
@@ -201,6 +213,11 @@ name: Name
 notice_success: Notice added successfully.
 online_since: Online since
 owners: Owners
+pages: Page {0}/{1}
+pstatus_error: There are no rotating statuses set up.
+pstatus_rotation: Status rotation is currently {0}.
+pstatus_time: Rotation Time
+pstatus_title: Rotating Statuses
 punishment_dm_failed: Failed to deliver the punishment notification.
 q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
 q_blclear: remove all blacklist entries
@@ -218,6 +235,7 @@ settings: Settings
 shutdown: Shutting down.
 softban: Soft-ban
 softban_enum: soft-banned
+timedban_notification: You have been banned from the {0} server for {0}.
 timedban_title: Temporary Ban
 timedmute: Expired Mute
 timedrole: Punishment Role
@@ -251,15 +269,3 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
-
-pages: Page {0}/{1}
-pstatus_title: Rotating Statuses
-message: Message
-pstatus_rotation: Status rotation is currently {0}.
-pstatus_error: There is no status set up.
-cmd_setstatus: Sets a static status for the bot. Provide no parameter to remove it.
-cmd_liststatus: Lists all statuses and their corresponding ID.
-pstatus_time: Rotation Time
-cmd_removestatus: Removes the status with the specified ID.
-timedban_notification: You have been banned from the {0} server for {0}.
-cmd_clearstatus: Removes all statuses from the bot.

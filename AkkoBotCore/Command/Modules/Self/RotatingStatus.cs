@@ -38,28 +38,56 @@ namespace AkkoBot.Command.Modules.Self
         [Description("cmd_setstatus")]
         public async Task SetStatus(CommandContext context,
             [Description("arg_pstatus_type")] ActivityType type,
-            [RemainingText, Description("arg_pstatus")] string status)
+            [RemainingText, Description("arg_pstatus")] string message)
         {
-            var activity = new DiscordActivity(status, type);
+            var activity = new DiscordActivity(message, type);
 
             await context.Client.UpdateStatusAsync(activity);
             await _statusService.CreateStatusAsync(activity, TimeSpan.Zero);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
-        [Command("addstatus")]
+        [Command("setstatus")]
+        [Description("cmd_setstatus")]
+        public async Task SetStreamStatus(CommandContext context,
+            [Description("arg_stream_url")] string streamUrl,
+            [RemainingText, Description("arg_pstatus")] string message)
+        {
+            var activity = new DiscordActivity(message, ActivityType.Streaming) { StreamUrl = streamUrl };
+            var isValid = await _statusService.CreateStatusAsync(activity, TimeSpan.Zero);
+
+            if (isValid)
+                await context.Client.UpdateStatusAsync(activity);
+            
+            await context.Message.CreateReactionAsync((isValid) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("addstatus"), Aliases("adpl")]
+        [Description("cmd_addstatus")]
         public async Task AddStatus(CommandContext context,
             [Description("arg_timed_pstatus")] TimeSpan time,
             [Description("arg_pstatus_type")] ActivityType type,
-            [RemainingText, Description("arg_pstatus")] string status)
+            [RemainingText, Description("arg_pstatus")] string message)
         {
-            var activity = new DiscordActivity(status, type);
+            var activity = new DiscordActivity(message, type);
 
             await _statusService.CreateStatusAsync(activity, (time == TimeSpan.Zero) ? TimeSpan.FromSeconds(30) : time);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
-        [Command("liststatus")]
+        [Command("addstatus")]
+        public async Task AddStreamStatus(CommandContext context,
+            [Description("arg_timed_pstatus")] TimeSpan time,
+            [Description("arg_stream_url")] string streamUrl,
+            [RemainingText, Description("arg_pstatus")] string message)
+        {
+            var activity = new DiscordActivity(message, ActivityType.Streaming) { StreamUrl = streamUrl };
+            var isValid = await _statusService.CreateStatusAsync(activity, (time == TimeSpan.Zero) ? TimeSpan.FromSeconds(30) : time);
+
+            await context.Message.CreateReactionAsync((isValid) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("liststatus"), Aliases("lipl")]
         [Description("cmd_liststatus")]
         public async Task ListStatus(CommandContext context)
         {
@@ -112,6 +140,14 @@ namespace AkkoBot.Command.Modules.Self
 
             await context.Client.UpdateStatusAsync();
             await context.Message.CreateReactionAsync((amount is not 0) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("rotatestatus"), Aliases("ropl")]
+        [Description("cmd_rotatestatus")]
+        public async Task RotateStatus(CommandContext context)
+        {
+            var success = await _statusService.RotateStatusesAsync();
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
     }
 }

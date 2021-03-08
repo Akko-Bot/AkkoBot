@@ -34,7 +34,7 @@ namespace AkkoBot.Services.Database
             BotConfig = dbContext.BotConfig.FirstOrDefault();
             LogConfig = dbContext.LogConfig.FirstOrDefault();
             Guilds = new(); // Guild configs will be loaded into the cache as needed.
-            PlayingStatuses = dbContext.PlayingStatuses.ToList();
+            PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
         }
 
         /// <summary>

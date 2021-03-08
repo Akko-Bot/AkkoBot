@@ -12,6 +12,7 @@ using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext.Exceptions;
 using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Command.Modules.Self.Services;
 
 namespace AkkoBot.Core.Services
 {
@@ -78,11 +79,16 @@ namespace AkkoBot.Core.Services
             db.BotConfig.TryCreate();
             await db.SaveChangesAsync();
 
-            // Initialize the default status, if there is one
+            // Initialize the custom status, if there is one
             var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
             
             if (pStatus is not null)
                 await client.UpdateStatusAsync(pStatus.GetActivity());
+            else if (db.BotConfig.Cache.RotateStatus && db.PlayingStatuses.Cache.Count != 0)
+            {
+                db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;
+                await _services.GetService<StatusService>().RotateStatusesAsync();
+            }
         }
 
         /// <summary>

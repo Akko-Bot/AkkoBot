@@ -14,11 +14,12 @@ namespace AkkoBot.Command.ArgumentConverters
             return input?.ToLowerInvariant() switch
             {
                 "debug" => Task.FromResult(Optional.FromValue(LogLevel.Debug)),
+                "info" or "information" => Task.FromResult(Optional.FromValue(LogLevel.Information)),
                 "warn" or "warning" => Task.FromResult(Optional.FromValue(LogLevel.Warning)),
                 "error" => Task.FromResult(Optional.FromValue(LogLevel.Error)),
                 "crit" or "critical" => Task.FromResult(Optional.FromValue(LogLevel.Critical)),
                 "nothing" or "none" => Task.FromResult(Optional.FromValue(LogLevel.None)),
-                _ => Task.FromResult(Optional.FromValue(LogLevel.Information))
+                _ => Task.FromResult(Optional.FromNoValue<LogLevel>())
             };
         }
     }

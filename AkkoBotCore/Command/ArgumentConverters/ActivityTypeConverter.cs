@@ -18,7 +18,7 @@ namespace AkkoBot.Command.ArgumentConverters
                 "listen" or "listening" => Task.FromResult(Optional.FromValue(ActivityType.ListeningTo)),
                 "watch" or "watching" => Task.FromResult(Optional.FromValue(ActivityType.Watching)),
                 "compete" or "competing" => Task.FromResult(Optional.FromValue(ActivityType.Competing)),
-                _ => throw new System.NotImplementedException($"Activity of type {input} does not exist.")
+                _ => Task.FromResult(Optional.FromNoValue<ActivityType>())
             };
         }
     }

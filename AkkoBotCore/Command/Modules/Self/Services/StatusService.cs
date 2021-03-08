@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Timers;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using DSharpPlus;
 using DSharpPlus.Entities;
 
 namespace AkkoBot.Command.Modules.Self.Services
@@ -16,20 +18,32 @@ namespace AkkoBot.Command.Modules.Self.Services
     /// </summary>
     public class StatusService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly Timer _rotationTimer = new();
+        private int _currentStatusIndex = 0;
 
-        public StatusService(IServiceProvider services)
-            => _services = services;
+        private readonly IServiceProvider _services;
+        private readonly IDbCacher _dbCache;
+        private readonly DiscordShardedClient _clients;
+
+        public StatusService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients)
+        {
+            _services = services;
+            _dbCache = dbCache;
+            _clients = clients;
+        }
 
         /// <summary>
         /// Saves a playing status to the database.
         /// </summary>
         /// <param name="activity">The Discord status.</param>
         /// <param name="time">How long should the status last before it's replaced by another one.</param>
-        /// <param name="streamUrl">Stream URL, if applicable.</param>
         /// <remarks><paramref name="time"/> should be <see cref="TimeSpan.Zero"/> for static statuses.</remarks>
-        public async Task CreateStatusAsync(DiscordActivity activity, TimeSpan time, string streamUrl = null)
+        /// <returns><see langword="true"/> if the status has been successfuly saved to the database, <see langword="false"/> otherwise.</returns>
+        public async Task<bool> CreateStatusAsync(DiscordActivity activity, TimeSpan time)
         {
+            if (string.IsNullOrWhiteSpace(activity.Name))
+                return false;
+
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var newEntry = new PlayingStatusEntity()
@@ -37,28 +51,20 @@ namespace AkkoBot.Command.Modules.Self.Services
                 Message = activity.Name,
                 Type = activity.ActivityType,
                 RotationTime = time,
-                StreamUrl = (activity.ActivityType == ActivityType.Streaming) ? streamUrl : null
+                StreamUrl = activity.StreamUrl
             };
 
             if (time == TimeSpan.Zero)
-            {
-                db.PlayingStatuses.AddOrUpdateStatic(newEntry, out var dbEntry);
-                await db.SaveChangesAsync();
-
-                // Update the cache accordingly
-                var oldEntry = db.PlayingStatuses.Cache.FirstOrDefault(x => x.Id == dbEntry.Id);
-                if (oldEntry is not null)
-                    db.PlayingStatuses.Cache.Remove(oldEntry);
-
-                db.PlayingStatuses.Cache.Add(dbEntry);
-            }
+                db.PlayingStatuses.AddOrUpdateStatic(newEntry, out _);
             else
             {
                 db.PlayingStatuses.Create(newEntry);
-                await db.SaveChangesAsync();
-
                 db.PlayingStatuses.Cache.Add(newEntry);
             }
+
+            await db.SaveChangesAsync();
+
+            return true;
         }
 
         /// <summary>
@@ -69,16 +75,18 @@ namespace AkkoBot.Command.Modules.Self.Services
         public async Task<bool> RemoveStatusesAsync(Expression<Func<PlayingStatusEntity, bool>> selector)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            var entries = await db.PlayingStatuses.GetAsync(selector);
-            
+            var entries = (await db.PlayingStatuses.GetAsync(selector)).ToArray();
+
+            db.PlayingStatuses.DeleteRange(entries);
+
             foreach (var entry in entries)
-                db.PlayingStatuses.Remove(entry);
+                db.PlayingStatuses.Cache.Remove(entry);
 
             return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>
-        /// Gets all cached statuses.
+        /// Gets all cached rotating statuses.
         /// </summary>
         /// <returns>A collection of statuses.</returns>
         public List<PlayingStatusEntity> GetStatuses()
@@ -99,6 +107,70 @@ namespace AkkoBot.Command.Modules.Self.Services
             await db.SaveChangesAsync();
 
             return amount;
+        }
+
+        /// <summary>
+        /// Toggles rotation of the statuses currently saved in the database.
+        /// </summary>
+        /// <returns><see langword="true"/> if rotation has been toggled, <see langword="false"/> if there was no status to rotate.</returns>
+        public async Task<bool> RotateStatusesAsync()
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            // Update the database entry
+            db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;
+            db.BotConfig.Update(db.BotConfig.Cache);
+
+            if (db.BotConfig.Cache.RotateStatus)
+            {
+                // Start rotation
+                var firstStatus = db.PlayingStatuses.Cache.FirstOrDefault();
+
+                if (firstStatus is null)
+                    return false;
+
+                foreach (var client in _clients.ShardClients.Values)
+                    await client.UpdateStatusAsync(firstStatus.GetActivity());          
+
+                _rotationTimer.Interval = firstStatus.RotationTime.TotalMilliseconds;
+                _rotationTimer.Elapsed += async (x, y) => await SetNextStatusAsync();
+                _rotationTimer.Start();
+            }
+            else
+            {
+                // Stop rotation
+                _currentStatusIndex = 0;
+
+                _rotationTimer.Elapsed -= async (x, y) => await SetNextStatusAsync();
+                _rotationTimer.Stop();
+
+                var staticStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+
+                if (staticStatus is not null)
+                {
+                    foreach (var client in _clients.ShardClients.Values)
+                        await client.UpdateStatusAsync(staticStatus.GetActivity());
+                }
+            }
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Advances the bot's status to the next in the rotation list.
+        /// </summary>
+        private async Task SetNextStatusAsync()
+        {
+            if (++_currentStatusIndex >= _dbCache.PlayingStatuses.Count)
+                _currentStatusIndex = 0;
+
+            var nextStatus = _dbCache.PlayingStatuses[_currentStatusIndex];
+            _rotationTimer.Interval = nextStatus.RotationTime.TotalMilliseconds;
+
+            foreach (var client in _clients.ShardClients.Values)
+                await client.UpdateStatusAsync(nextStatus.GetActivity());
         }
     }
 }

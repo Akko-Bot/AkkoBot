@@ -19,7 +19,7 @@ namespace AkkoBot.Command.ArgumentConverters
                 "b" or "ban" => Task.FromResult(Optional.FromValue(WarnPunishType.Ban)),
                 "ar" or "addrole" => Task.FromResult(Optional.FromValue(WarnPunishType.AddRole)),
                 "rr" or "remrole" or "removerole" => Task.FromResult(Optional.FromValue(WarnPunishType.RemoveRole)),
-                _ => throw new System.NotImplementedException("This type of punishment is not implemented.")
+                _ => Task.FromResult(Optional.FromNoValue<WarnPunishType>())
             };
         }
     }

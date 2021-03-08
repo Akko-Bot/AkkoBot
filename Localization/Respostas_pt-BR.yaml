@@ -11,15 +11,20 @@ arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_double: Um número real.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
+arg_int: Um número inteiro.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
 arg_mention: Um ID ou menção válido do Discord.
 arg_module: Um módulo válido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
 arg_prefix: O novo prefixo.
+arg_pstatus: A mensagem a ser exibida no status.
+arg_pstatus_type: O tipo do status.
 arg_punishment_reason: O motivo da punição.
+arg_stream_url: A URL do stream.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
 arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
+arg_timed_pstatus: Por quanto tempo o status deve ser exibido.
 arg_timed_warn: Quanto tempo as advertências devem durar.
 arg_timeout: Um número inteiro maior que 10 e menor que 120.
 arg_uint: Um número inteiro maior ou igual a zero.
@@ -50,6 +55,7 @@ bot_settings_title: Configurações Globais
 channel: Canal
 chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
 chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
+cmd_addstatus: Adiciona um status à lista de rotação. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ and __Competing__. Forneça uma URL para definir um status do tipo __Streaming__.
 cmd_ban: Bane um usuário.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
@@ -58,6 +64,7 @@ cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâ
 cmd_blacklist_rem: Remove um registro da lista negra.
 cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
 cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
+cmd_clearstatus: Remove todos os status do bot.
 cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
 cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
 cmd_config_case: Define se o bot deve diferenciar letras maiúsculas de minúsculas nos comandos. Requer reinicialização para tomar efeito.
@@ -95,6 +102,7 @@ cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela 
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_kick: Expulsa um usuário do servidor.
+cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
 cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_modlog: Exibe anotações e infrações de um usuário.
@@ -102,7 +110,10 @@ cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualme
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
 cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
+cmd_removestatus: Remove o status com o ID especificado.
+cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
+cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_timedban: Bane um usuário temporariamente do servidor.
 cmd_unban: Desbane um usuário do servidor.
@@ -189,6 +200,7 @@ massban_success: '{0} usuários foram banidos do servidor.'
 massunban: Desbanimento em Massa
 massunban_failed: Não há usuário a desbanir.
 massunban_succeded: '{0} usuários foram desbanidos do servidor.'
+message: Mensagem
 minutes: Minutos
 modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} expulsões, {4} expulsões com deleção, {5} banimentos.'
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
@@ -201,6 +213,11 @@ name: Nome
 notice_success: Anotação adicionada com sucesso.
 online_since: Online desde
 owners: Donos
+pages: Página {0}/{1}
+pstatus_error: Não há status de rotação definido.
+pstatus_rotation: A rotação de status está {0}.
+pstatus_time: Tempo de Rotação
+pstatus_title: Status em Rotação
 punishment_dm_failed: Falha ao enviar a notificação de punição.
 q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
 q_blclear: remover todos os registros da lista negra
@@ -218,6 +235,7 @@ settings: Configuração
 shutdown: Desligando.
 softban: Expulsar e Excluir
 softban_enum: expulso
+timedban_notification: Você foi banido do servidor {0} por {0}.
 timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
@@ -251,5 +269,3 @@ warnpl_empty: Não há punições nesse servidor.
 warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
-
-pages: Página {0}/{1}

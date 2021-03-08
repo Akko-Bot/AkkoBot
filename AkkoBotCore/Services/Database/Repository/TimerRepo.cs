@@ -14,7 +14,7 @@ namespace AkkoBot.Services.Database.Repository
             => Cache = dbCacher.Timers;
 
         /// <summary>
-        /// Gets a database entry from the reference entity object.
+        /// Gets a database entry from the referenced entity object.
         /// </summary>
         /// <param name="referenceEntity">The model to look for in the database.</param>
         /// <remarks>The entry is filtered by TimerType, GuildId, UserId and ChannelId.</remarks>
@@ -31,7 +31,7 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
-        /// Upserts the specified <paramref name="newEntry"/> do the database.
+        /// Upserts the specified <paramref name="newEntry"/> to the database.
         /// </summary>
         /// <param name="newEntry">The entry to be added or updated.</param>
         /// <param name="dbEntry">The tracked resulting entity to be upserted.</param>
@@ -49,7 +49,7 @@ namespace AkkoBot.Services.Database.Repository
             else
             {
                 base.Delete(dbEntry);       // This is needed to change the tracking internal state. TODO: investigate further
-                newEntry.Id = dbEntry.Id;   // Seems to be caused by the fact that the tracked entity is an out var (??)
+                newEntry.Id = dbEntry.Id;
                 dbEntry = newEntry;
                 base.Update(dbEntry);
 
