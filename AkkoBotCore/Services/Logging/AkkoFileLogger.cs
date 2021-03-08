@@ -1,7 +1,7 @@
-﻿using System;
+﻿using AkkoBot.Services.Logging.Abstractions;
+using System;
 using System.IO;
 using System.Text;
-using AkkoBot.Services.Logging.Abstractions;
 
 namespace AkkoBot.Services.Logging
 {

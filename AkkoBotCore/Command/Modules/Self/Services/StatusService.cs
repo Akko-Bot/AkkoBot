@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using System.Timers;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace AkkoBot.Command.Modules.Self.Services
 {
@@ -102,7 +102,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         public async Task<int> ClearStatusesAsync()
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            
+
             var amount = await db.PlayingStatuses.ClearAsync();
             await db.SaveChangesAsync();
 
@@ -130,7 +130,7 @@ namespace AkkoBot.Command.Modules.Self.Services
                     return false;
 
                 foreach (var client in _clients.ShardClients.Values)
-                    await client.UpdateStatusAsync(firstStatus.GetActivity());          
+                    await client.UpdateStatusAsync(firstStatus.GetActivity());
 
                 _rotationTimer.Interval = firstStatus.RotationTime.TotalMilliseconds;
                 _rotationTimer.Elapsed += async (x, y) => await SetNextStatusAsync();

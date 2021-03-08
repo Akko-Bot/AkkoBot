@@ -1,6 +1,3 @@
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Self.Services;
@@ -10,6 +7,9 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Self
 {
@@ -58,7 +58,7 @@ namespace AkkoBot.Command.Modules.Self
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(
                     context.FormatLocalized(
-                        (success) ? "bl_added" : "bl_exist",                // <- Key | Args ↓ 
+                        (success) ? "bl_added" : "bl_exist",                // <- Key | Args ↓
                         entry.Type.ToString().ToSnakeCase(),                // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),                          // Name or Unknown
                         Formatter.InlineCode(entry.ContextId.ToString())    // ID
@@ -95,7 +95,7 @@ namespace AkkoBot.Command.Modules.Self
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(
                     context.FormatLocalized(
-                        (success) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓ 
+                        (success) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓
                         entry?.Type.ToString().ToSnakeCase(),        // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),                  // Name or Unknown
                         Formatter.InlineCode(id.ToString())    // ID

@@ -1,6 +1,6 @@
-using System;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
+using System;
 
 namespace AkkoBot.Services.Timers.Abstractions
 {
@@ -16,7 +16,7 @@ namespace AkkoBot.Services.Timers.Abstractions
         /// <param name="client">The Discord client that fetched the database entry.</param>
         /// <param name="entity">The database entry.</param>
         /// <remarks>
-        /// This method ensures that only timers triggering within the next 
+        /// This method ensures that only timers triggering within the next
         /// few days get initialized and added to the cache.
         /// </remarks>
         /// <returns><see langword="true"/> if the timer was generated and added, <see langword="false"/> otherwise.</returns>

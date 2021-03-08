@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using AkkoBot.Command.Attributes;
+﻿using AkkoBot.Command.Attributes;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Abstractions
 {

@@ -1,14 +1,14 @@
-using System.Collections.Generic;
+using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Timers.Abstractions;
+using DSharpPlus;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
-using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Entities;
-using DSharpPlus;
-using AkkoBot.Services.Timers.Abstractions;
-using AkkoBot.Services.Database.Abstractions;
 using System.Timers;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoBot.Services.Timers
 {
@@ -119,7 +119,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="client">The Discord client that fetched the database entry.</param>
         /// <param name="entity">The database entry.</param>
         /// <remarks>
-        /// This method ensures that only timers triggering within the next 
+        /// This method ensures that only timers triggering within the next
         /// few days get initialized and added to the cache.
         /// </remarks>
         /// <returns><see langword="true"/> if the timer was generated and added, <see langword="false"/> otherwise.</returns>
@@ -200,7 +200,7 @@ namespace AkkoBot.Services.Timers
         }
 
         /// <summary>
-        /// Reads the next timers from the database to be elapsed, initializes and caches them. 
+        /// Reads the next timers from the database to be elapsed, initializes and caches them.
         /// </summary>
         private void UpdateFromDb(object obj, ElapsedEventArgs args)
         {

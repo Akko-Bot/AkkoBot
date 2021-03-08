@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text;
-using AkkoBot.Services.Logging.Abstractions;
+﻿using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Text;
 
 namespace AkkoBot.Services.Logging.Loggers
 {

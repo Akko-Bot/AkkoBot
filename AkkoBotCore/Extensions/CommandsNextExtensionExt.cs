@@ -1,8 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
-using Microsoft.Extensions.Logging;
+using System;
 
 namespace AkkoBot.Extensions
 {

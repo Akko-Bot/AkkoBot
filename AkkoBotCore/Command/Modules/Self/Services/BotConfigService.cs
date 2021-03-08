@@ -1,14 +1,13 @@
-using System.Linq;
-using System;
-using System.Collections.Generic;
 using AkkoBot.Command.Abstractions;
+using AkkoBot.Credential;
+using AkkoBot.Extensions;
+using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using AkkoBot.Credential;
-using AkkoBot.Services;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using YamlDotNet.Serialization;
 

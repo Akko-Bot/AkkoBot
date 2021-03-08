@@ -1,8 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using System;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Core.Services
 {

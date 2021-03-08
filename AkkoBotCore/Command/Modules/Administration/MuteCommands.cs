@@ -92,7 +92,7 @@ namespace AkkoBot.Command.Modules.Administration
         [RequirePermissions(Permissions.MuteMembers)]
         public async Task VoiceMute(
             CommandContext context,
-            [Description("arg_discord_user")] DiscordMember user, 
+            [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
             if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))

@@ -1,6 +1,6 @@
-using System;
 using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -30,7 +30,9 @@ namespace AkkoBot.Services.Database.Entities
         public TimerType Type { get; init; }
         public DateTimeOffset ElapseAt { get; init; }
 
-        public TimerEntity() { }
+        public TimerEntity()
+        {
+        }
 
         public TimerEntity(MutedUserEntity muteUser, TimeSpan time)
         {

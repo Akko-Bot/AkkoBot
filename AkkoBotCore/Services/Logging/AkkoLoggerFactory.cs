@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using AkkoBot.Services.Logging.Abstractions;
+﻿using AkkoBot.Services.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 
 namespace AkkoBot.Services.Logging
 {

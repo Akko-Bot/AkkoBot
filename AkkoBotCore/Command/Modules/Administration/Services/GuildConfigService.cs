@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
@@ -8,6 +5,9 @@ using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AkkoBot.Command.Modules.Administration.Services
 {

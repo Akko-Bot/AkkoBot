@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Self.Services
 {
@@ -100,7 +100,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// </summary>
         /// <param name="id">The ID of the entry, provided by the user.</param>
         /// <returns>
-        /// The entry and <see langword="true"/>, if the removal was successful, 
+        /// The entry and <see langword="true"/>, if the removal was successful,
         /// <see langword="null"/> and <see langword="false"/> otherwise.
         /// </returns>
         public async Task<(BlacklistEntity, bool)> TryRemoveAsync(ulong id)

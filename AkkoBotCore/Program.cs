@@ -9,7 +9,7 @@ namespace AkkoBot
         private static void Main()
         {
             Console.WriteLine($"Pid: {Environment.ProcessId}");
-            
+
             // Start the bot.
             new Bot().MainAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }

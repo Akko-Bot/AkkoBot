@@ -22,7 +22,6 @@ namespace AkkoBot.Command.Modules.Help
         public async Task HelpCommand(CommandContext context)
             => await HelpCommand(context, Array.Empty<string>());
 
-
         [Command("help")]
         public async Task HelpCommand(CommandContext context, [Description("arg_command")] params string[] command)
         {
@@ -130,7 +129,7 @@ namespace AkkoBot.Command.Modules.Help
                             " <" + context.FormatLocalized("command").ToLowerInvariant() + ">"
                         )
                     );
-                
+
                 await context.RespondLocalizedAsync(embed, false);
             }
         }

@@ -10,6 +10,7 @@ namespace AkkoBot.Credential
     {
         public HashSet<ulong> OwnerIds { get; init; } = new() { 0 };
         public string Token { get; init; } = "paste_your_token_here";
+
         public Dictionary<string, string> Database { get; init; } = new(2)
         {
             { "Role", Environment.UserName },

@@ -1,7 +1,3 @@
-using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Self.Services;
@@ -14,6 +10,10 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Self
 {

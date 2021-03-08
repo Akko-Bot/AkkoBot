@@ -1,17 +1,17 @@
-using System.Globalization;
-using System;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Administration.Services;
+using AkkoBot.Command.Modules.Self.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using AkkoBot.Command.Modules.Self.Services;
 
 namespace AkkoBot.Command.Modules.Administration
 {
@@ -73,7 +73,7 @@ namespace AkkoBot.Command.Modules.Administration
             // Dm the user about the warn
             var dm = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("warn_dm", Formatter.Bold(context.Guild.Name)));
-            
+
             if (reason is not null)
                 dm.AddField("reason", reason);
 

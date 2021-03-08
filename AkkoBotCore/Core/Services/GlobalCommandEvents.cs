@@ -1,13 +1,12 @@
-using System.Linq;
-using System;
 using AkkoBot.Core.Common;
-using AkkoBot.Services.Database.Abstractions;
-using DSharpPlus.EventArgs;
-using System.Threading.Tasks;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using Microsoft.Extensions.Logging;
+using DSharpPlus.EventArgs;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Core.Services
 {
@@ -33,7 +32,6 @@ namespace AkkoBot.Core.Services
             // Show prefix regardless of current config
             _botCore.BotShardedClient.MessageCreated += DefaultPrefix;
         }
-
 
         /* Event Methods */
 

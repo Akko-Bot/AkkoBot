@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AkkoBot.Command.Abstractions;
-using AkkoBot.Command.Formatters;
+﻿using AkkoBot.Command.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AkkoBot.Core.Common
 {

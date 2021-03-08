@@ -1,10 +1,8 @@
 ﻿using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Timers;
 using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
-using DSharpPlus;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -20,7 +20,9 @@ namespace AkkoBot.Services.Database.Entities
         [Column(TypeName = "varchar(4)")]
         public string Discriminator { get; set; }
 
-        public DiscordUserEntity() { }
+        public DiscordUserEntity()
+        {
+        }
 
         public DiscordUserEntity(DiscordUser user)
         {
@@ -28,7 +30,6 @@ namespace AkkoBot.Services.Database.Entities
             Username = user.Username;
             Discriminator = user.Discriminator;
         }
-
 
         // Global xp, maybe?
         // Xp gain tick

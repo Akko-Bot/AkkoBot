@@ -1,10 +1,10 @@
-using System.Linq;
-using System;
-using System.Threading.Tasks;
 using AkkoBot.Credential;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Attributes
 {

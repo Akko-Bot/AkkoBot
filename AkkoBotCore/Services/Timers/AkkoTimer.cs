@@ -15,6 +15,7 @@ namespace AkkoBot.Services.Timers
         private readonly Timer _internalTimer;
         private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
         private bool _isDisposed;
+
         private event ElapsedEventHandler ActionHandler;
 
         /// <summary>

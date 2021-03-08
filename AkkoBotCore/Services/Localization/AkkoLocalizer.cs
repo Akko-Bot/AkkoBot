@@ -1,8 +1,8 @@
+using AkkoBot.Services.Localization.Abstractions;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using AkkoBot.Services.Localization.Abstractions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -19,7 +19,7 @@ namespace AkkoBot.Services.Localization
         public const string DefaultLanguage = "en-US";
 
         /// <summary>
-        /// The cache of response strings. First key is the locale. Second key is the response 
+        /// The cache of response strings. First key is the locale. Second key is the response
         /// string's key. The value is the response string itself.
         /// </summary>
         private readonly Dictionary<string, IReadOnlyDictionary<string, string>> _localizedStrings = new();

@@ -1,13 +1,13 @@
-using System.Linq;
-using System;
 using AkkoBot.Command.Abstractions;
-using DSharpPlus.Entities;
-using System.Threading.Tasks;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using System.Collections.Generic;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Administration.Services
 {

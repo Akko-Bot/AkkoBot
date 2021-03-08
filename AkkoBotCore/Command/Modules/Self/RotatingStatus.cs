@@ -1,15 +1,15 @@
-using System;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Self.Services;
+using AkkoBot.Extensions;
 using AkkoBot.Services;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using System.Threading.Tasks;
+using System;
 using System.Linq;
-using AkkoBot.Extensions;
-using DSharpPlus;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Self
 {
@@ -58,7 +58,7 @@ namespace AkkoBot.Command.Modules.Self
 
             if (isValid)
                 await context.Client.UpdateStatusAsync(activity);
-            
+
             await context.Message.CreateReactionAsync((isValid) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 

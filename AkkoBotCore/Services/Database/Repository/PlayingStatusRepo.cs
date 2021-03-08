@@ -1,9 +1,9 @@
+using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
 
 namespace AkkoBot.Services.Database.Repository
 {

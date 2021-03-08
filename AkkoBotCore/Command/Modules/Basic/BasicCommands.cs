@@ -1,16 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using AkkoBot.Command.Abstractions;
+﻿using AkkoBot.Command.Abstractions;
+using AkkoBot.Command.Attributes;
+using AkkoBot.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using AkkoBot.Extensions;
 using Microsoft.Extensions.Logging;
-using AkkoBot.Command.Attributes;
-using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Interactivity;
+using System;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Basic
 {

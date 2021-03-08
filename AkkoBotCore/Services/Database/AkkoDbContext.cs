@@ -36,7 +36,7 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<PlayingStatusEntity>()
                 .HasKey(x => x.Id); // Make this dependent on BotConfigEntity?
 
-            #endregion
+            #endregion Bot Configuration
 
             #region Guild Configuration
 
@@ -71,7 +71,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            #endregion
+            #endregion Guild Configuration
 
             modelBuilder.Entity<DiscordUserEntity>()
                 .HasAlternateKey(x => x.UserId);

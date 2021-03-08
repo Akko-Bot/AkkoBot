@@ -1,13 +1,13 @@
-﻿using System;
+﻿using AkkoBot.Core.Common;
+using AkkoBot.Credential;
+using AkkoBot.Services;
+using DSharpPlus;
+using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using DSharpPlus;
-using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
-using AkkoBot.Credential;
-using AkkoBot.Core.Common;
-using AkkoBot.Services;
 
 namespace AkkoBot.Core
 {
@@ -54,7 +54,7 @@ namespace AkkoBot.Core
         /// <returns>A valid <see cref="Credentials"/> object.</returns>
         private Credentials PrepareCredentials(string filePath)
         {
-            while (!IsValidCredential(filePath));
+            while (!IsValidCredential(filePath)) ;
 
             return LoadCredentials(filePath);
         }

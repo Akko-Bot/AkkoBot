@@ -1,6 +1,6 @@
-using System.Linq;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using System.Linq;
 
 namespace AkkoBot.Services.Database.Repository
 {

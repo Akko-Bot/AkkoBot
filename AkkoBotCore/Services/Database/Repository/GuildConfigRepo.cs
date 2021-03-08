@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
-using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Repository
@@ -157,7 +157,7 @@ namespace AkkoBot.Services.Database.Repository
             if (!Cache.ContainsKey(guild.Id))
             {
                 var dGuild = new GuildConfigEntity(_botConfig) { GuildId = guild.Id };
-    
+
                 base.Create(dGuild);                    // Add to the database
                 Cache.TryAdd(dGuild.GuildId, dGuild);   // Add to the cache
 

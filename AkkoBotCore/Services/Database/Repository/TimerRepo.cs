@@ -1,7 +1,6 @@
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
-using System;
 using System.Linq;
 
 namespace AkkoBot.Services.Database.Repository

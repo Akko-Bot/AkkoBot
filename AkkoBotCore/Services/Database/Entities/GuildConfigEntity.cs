@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using AkkoBot.Extensions;
+﻿using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -76,7 +76,9 @@ namespace AkkoBot.Services.Database.Entities
         // Xp notification
         // .rero messages and reactions
 
-        public GuildConfigEntity() { }
+        public GuildConfigEntity()
+        {
+        }
 
         public GuildConfigEntity(BotConfigEntity config)
         {

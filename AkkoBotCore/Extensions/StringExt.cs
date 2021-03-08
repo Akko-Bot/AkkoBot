@@ -101,7 +101,7 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Returns a new string that has a space character inserted at its begining and that 
+        /// Returns a new string that has a space character inserted at its begining and that
         /// left-aligns the characters in this string by padding them with spaces on the right,
         /// for a specified total length.
         /// </summary>

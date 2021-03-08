@@ -1,6 +1,6 @@
-using System;
 using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace AkkoBot.Services.Database.Entities
 {

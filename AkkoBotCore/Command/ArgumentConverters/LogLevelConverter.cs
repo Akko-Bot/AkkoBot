@@ -1,8 +1,8 @@
-using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.ArgumentConverters
 {

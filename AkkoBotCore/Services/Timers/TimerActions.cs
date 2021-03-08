@@ -1,11 +1,11 @@
-using System.Linq;
-using System;
 using AkkoBot.Command.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
-using AkkoBot.Extensions;
 
 namespace AkkoBot.Services.Timers
 {
@@ -32,7 +32,7 @@ namespace AkkoBot.Services.Timers
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            
+
             var settings = db.GuildConfig.GetGuild(server.Id);
             var localizedReason = _localizer.GetResponseString(settings.Locale, "timedban_title");
 

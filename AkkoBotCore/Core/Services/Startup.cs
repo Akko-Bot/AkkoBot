@@ -1,18 +1,18 @@
+using AkkoBot.Command.Modules.Self.Services;
+using AkkoBot.Core.Common;
+using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Timers.Abstractions;
+using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Exceptions;
+using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
-using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.EventArgs;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using AkkoBot.Services.Timers.Abstractions;
-using DSharpPlus.CommandsNext.Exceptions;
-using AkkoBot.Core.Common;
-using AkkoBot.Extensions;
-using AkkoBot.Command.Modules.Self.Services;
 
 namespace AkkoBot.Core.Services
 {
@@ -64,7 +64,6 @@ namespace AkkoBot.Core.Services
             }
         }
 
-
         /* Event Methods */
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace AkkoBot.Core.Services
 
             // Initialize the custom status, if there is one
             var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
-            
+
             if (pStatus is not null)
                 await client.UpdateStatusAsync(pStatus.GetActivity());
             else if (db.BotConfig.Cache.RotateStatus && db.PlayingStatuses.Cache.Count != 0)

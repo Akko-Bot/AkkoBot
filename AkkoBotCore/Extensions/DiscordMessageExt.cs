@@ -1,12 +1,12 @@
+using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
-using DSharpPlus;
-using AkkoBot.Services;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
 {

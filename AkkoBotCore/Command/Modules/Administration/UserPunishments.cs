@@ -1,14 +1,14 @@
-using System;
 using AkkoBot.Command.Abstractions;
+using AkkoBot.Command.Attributes;
+using AkkoBot.Command.Modules.Administration.Services;
 using AkkoBot.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using System.Threading.Tasks;
-using AkkoBot.Command.Modules.Administration.Services;
+using System;
 using System.Linq;
-using AkkoBot.Command.Attributes;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Administration
 {
@@ -265,7 +265,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (toUnban.Length != 0)
             {
                 await context.TriggerTypingAsync();
-                
+
                 foreach (var userId in toUnban)
                 {
                     try { await context.Guild.UnbanMemberAsync(userId, context.Member.GetFullname() + " | " + context.FormatLocalized("massunban")); }

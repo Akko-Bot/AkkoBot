@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AkkoBot.Command.Abstractions;
+﻿using AkkoBot.Command.Abstractions;
 using AkkoBot.Core.Services;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
@@ -23,6 +19,10 @@ using DSharpPlus.Interactivity.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Core.Common
 {
@@ -232,7 +232,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Adds the default <see cref="AkkoDbContext"/> as a service to this <see cref="BotCore"/>. 
+        /// Adds the default <see cref="AkkoDbContext"/> as a service to this <see cref="BotCore"/>.
         /// </summary>
         /// <remarks>This database context depends directly on EF Core and Npgsql.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>

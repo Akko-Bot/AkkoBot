@@ -1,7 +1,3 @@
-using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Modules.Administration.Services;
 using AkkoBot.Extensions;
@@ -9,6 +5,10 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Command.Modules.Administration
 {

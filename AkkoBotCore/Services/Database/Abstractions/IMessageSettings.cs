@@ -13,6 +13,7 @@ namespace AkkoBot.Services.Database.Abstractions
         string ErrorColor { get; }
         bool UseEmbed { get; }
         TimeSpan? InteractiveTimeout { get; }
+
         IReadOnlyDictionary<string, string> GetSettings();
     }
 }

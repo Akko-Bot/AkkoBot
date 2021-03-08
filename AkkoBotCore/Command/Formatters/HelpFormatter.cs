@@ -1,9 +1,3 @@
-using System.Reflection.Metadata;
-using System.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
@@ -11,6 +5,11 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace AkkoBot.Command.Formatters
 {
@@ -138,7 +137,7 @@ namespace AkkoBot.Command.Formatters
             // }
 
             foreach (var command in subcommands)
-                    _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
+                _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
 
             _helpCommandsField.Remove(_helpCommandsField.Length - 2, 2);
 
@@ -192,10 +191,10 @@ namespace AkkoBot.Command.Formatters
                             .Replace("  ", " ")
                         );
                 }
-                    
+
                 if (_helpExamplesField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
-                
+
                 return (null, msg);
             }
             else
