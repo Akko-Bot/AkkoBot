@@ -17,17 +17,6 @@ namespace AkkoBot.Extensions
     public static class CommandContextExt
     {
         /// <summary>
-        /// Sends a localized Discord message to the context that triggered the command.
-        /// </summary>
-        /// <param name="context">This command context.</param>
-        /// <param name="embed">The embed to be sent.</param>
-        /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
-        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
-        /// <returns>The <see cref="DiscordMessage"/> that has been sent.</returns>
-        public static async Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
-            => await RespondLocalizedAsync(context, null, embed, isMarked, isError);
-
-        /// <summary>
         /// Sends a localized interactive message to the context that triggered the command and executes a follow-up task.
         /// </summary>
         /// <param name="context">This command context.</param>
@@ -36,6 +25,7 @@ namespace AkkoBot.Extensions
         /// <param name="action">The task to be performed if the user comfirms the interaction.</param>
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <remarks>The question message gets deleted, regardless of user input.</remarks>
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
             => await RespondInteractiveAsync(context, null, embed, expectedResponse, action, isMarked, isError);
@@ -50,13 +40,14 @@ namespace AkkoBot.Extensions
         /// <param name="action">The operations to be performed if the user comfirms the interaction.</param>
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <remarks>The question message gets deleted, regardless of user input.</remarks>
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
         {
             using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
 
             // Get the timeout
-            var timeout = (await db.GuildConfig.GetAsync(context.Guild.Id)).InteractiveTimeout;
+            var timeout = db.GuildConfig.Table.FirstOrDefault(x => x.GuildId == context.Guild.Id).InteractiveTimeout;
             var globalTimeout = (await db.BotConfig.GetAllAsync()).FirstOrDefault().InteractiveTimeout;
 
             // Send the question
@@ -82,6 +73,17 @@ namespace AkkoBot.Extensions
         /// Sends a localized Discord message to the context that triggered the command.
         /// </summary>
         /// <param name="context">This command context.</param>
+        /// <param name="embed">The embed to be sent.</param>
+        /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <returns>The <see cref="DiscordMessage"/> that has been sent.</returns>
+        public static async Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
+            => await RespondLocalizedAsync(context, null, embed, isMarked, isError);
+
+        /// <summary>
+        /// Sends a localized Discord message to the context that triggered the command.
+        /// </summary>
+        /// <param name="context">This command context.</param>
         /// <param name="message">The message content.</param>
         /// <param name="embed">The embed to be sent.</param>
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
@@ -97,7 +99,7 @@ namespace AkkoBot.Extensions
 
             return settings.UseEmbed
                 ? await context.RespondAsync(responseString, localizedEmbed)
-                : await context.RespondAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
+                : await context.RespondAsync(responseString + ((embed is null) ? string.Empty : "\n\n" + GeneralService.DeconstructEmbed(embed)));
         }
 
         /// <summary>
@@ -160,7 +162,7 @@ namespace AkkoBot.Extensions
             {
                 return (settings.UseEmbed)
                     ? await user.SendMessageAsync(responseString, localizedEmbed)
-                    : await user.SendMessageAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
+                    : await user.SendMessageAsync(responseString + ((embed is null) ? string.Empty : "\n\n" + GeneralService.DeconstructEmbed(embed)));
             }
             catch
             {

@@ -65,7 +65,7 @@ namespace AkkoBot.Services.Timers
                 // User may not be in the guild when this method runs
                 // Or role may not exist anymore
                 // Or bot may not have role permissions anymore
-                server.Roles.TryGetValue(guildSettings.MuteRoleId, out var muteRole);
+                server.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole);
                 var user = await server.GetMemberAsync(userId);
 
                 if (user.VoiceState is not null)

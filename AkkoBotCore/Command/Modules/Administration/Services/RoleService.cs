@@ -75,7 +75,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             var guildSettings = db.GuildConfig.GetGuild(server.Id);
 
-            if (!server.Roles.TryGetValue(guildSettings.MuteRoleId, out var muteRole))
+            if (!server.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole))
             {
                 // Create a new mute role
                 muteRole = await server.CreateRoleAsync("AkkoMute", MutePermsAllow);

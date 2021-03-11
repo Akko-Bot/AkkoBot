@@ -4,11 +4,17 @@ app_owners: Donos da Aplicação
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
 arg_bool: __true__ para ativar, __false__ para desativar.
+arg_channel_name: Nome do canal.
+arg_channel_newname: O novo nome do canal.
+arg_channel_topic: O novo tópico do canal.
 arg_color: Um código de cor hexadecimal de seis dígitos.
 arg_command: Um comando válido.
 arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos. Mínimo de __10s__.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
+arg_discord_color: O valor hexadecimal de uma cor.
+arg_discord_role: ID ou menção a um cargo do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
+arg_discord_voicechannel: ID ou nome de um canal de voz.
 arg_double: Um número real.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_int: Um número inteiro.
@@ -16,11 +22,14 @@ arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
 arg_mention: Um ID ou menção válido do Discord.
 arg_module: Um módulo válido.
+arg_nickname: O novo apelido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
 arg_prefix: O novo prefixo.
 arg_pstatus: A mensagem a ser exibida no status.
 arg_pstatus_type: O tipo do status.
 arg_punishment_reason: O motivo da punição.
+arg_role_name: O nome do cargo.
+arg_role_newname: O novo nome do cargo.
 arg_stream_url: A URL do stream.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
 arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
@@ -90,7 +99,14 @@ cmd_config_owner_list: Lista os donos do bot.
 cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
+cmd_createcategorychannel: Cria uma categoria.
+cmd_createrole: Cria um cargo do Discord.
+cmd_createtextchannel: Cria um canal de texto.
+cmd_createvoicechannel: Cria um canal de voz.
 cmd_deafen: Ensurdece um usuário.
+cmd_deleteallroles: Exclui todos os cargos desse servidor que estão abaixo do bot e do usuário que usou o comando.
+cmd_deletechannel: Exclui um canal do Discord.
+cmd_deleterole: Exclui um cargo do Discord.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
@@ -101,19 +117,35 @@ cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor.
 cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela resposta do usuário, em segundos. Forneça nenhum parâmetro para redefini-lo para o valor padrão.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
+cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especificado.
 cmd_kick: Expulsa um usuário do servidor.
+cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
 cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
 cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_modlog: Exibe anotações e infrações de um usuário.
 cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
+cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal para forçá-lo a se desconectar.
 cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
+cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
+cmd_recreatechannel: Recria um canal do Discord.
+cmd_recreaterole: Recria um cargo do Discord.
+cmd_removeallroles: Remove todos os cargos do usuário especificado que estejam abaixo do bot e do usuário que usou o comando.
+cmd_removerole: Remove um cargo do usuário especificado.
 cmd_removestatus: Remove o status com o ID especificado.
+cmd_renamechannel: Renomeia um canal do Discord.
+cmd_renamerole: Renomeia um cargo do Discord.
+cmd_rolecolor: Define a cor de um cargo. Forneça nenhuma cor para exibir a cor atual do cargo especificado.
+cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do servidor.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
+cmd_setnickname: Define o apelido de um usuário. Forneça nenhum usuário para definit o apelido do bot. Forneça nenhum apelido para removê-lo.
+cmd_setrole: Adiciona um cargo ao usuário especificado.
 cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
+cmd_settopic: Define o tópico do canal de texto atual.
+cmd_slowmode: Define com que frequência usuários podem enviar mensagens nesse canal de texto. Forneça nenhum parâmetro para desabilitar.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_timedban: Bane um usuário temporariamente do servidor.
 cmd_unban: Desbane um usuário do servidor.
@@ -136,6 +168,8 @@ days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
 deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de voz.
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
+deleteallroles: '{0} cargos foram excluídos com sucesso.'
+deleteallroles_error: Não há cargos a serem excluídos.
 disabled: desativado
 enabled: ativado
 error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o meu e o seu na hierarquia de cargos.
@@ -187,6 +221,7 @@ infraction: Infração
 infractions_empty: Esse usuário não possui infrações.
 infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
+inrole_title: Lista de usuários com o cargo {0}
 kick: Expulsar
 kick_enum: expulso
 kick_notification: Você foi expulso do servidor {0}.
@@ -194,7 +229,7 @@ kick_title: Usuário Expulso
 language: Idioma
 locales_title: Idiomas Disponíveis
 massban: Banimento em Massa
-massban_description: Banindo {0} usuários. Essa operação pode lovar até {1} segundos.
+massban_description: Banindo {0} usuários.
 massban_failure: Ninguém foi banido porque nenhum dos IDs são válidos ou os usuários já foram banidos.
 massban_success: '{0} usuários foram banidos do servidor.'
 massunban: Desbanimento em Massa
@@ -211,6 +246,7 @@ mute_enum: silenciado
 mute_success: Usuário {0} foi silenciado.
 name: Nome
 notice_success: Anotação adicionada com sucesso.
+nsfw_toggle: NSFW foi {0} nesse canal.
 online_since: Online desde
 owners: Donos
 pages: Página {0}/{1}
@@ -221,12 +257,16 @@ pstatus_title: Status em Rotação
 punishment_dm_failed: Falha ao enviar a notificação de punição.
 q_are_you_sure: Tem certeza de que deseja {0}? Esta ação é irreversível. ({1}/{2})
 q_blclear: remover todos os registros da lista negra
+q_deleteallroles: excluir {0} cargos
 q_no: 'não'
+q_operation_length_seconds: Essa operação levará pelo menos {0} segundos.
 q_yes: 'sim'
 reason: Motivo
+removeallroles: '{0} cargos foram removidos do {1} com sucesso.'
 removerole: Remover Cargo
 removerole_enum: teve um cargo removido
 requires: Requer
+roles_title: Cargos nesse servidor
 sban_notification: Você foi expulso do servidor {0}.
 sban_title: Usuário Expulso
 seconds: Segundos
@@ -240,6 +280,7 @@ timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
+total: 'Total de {0}'
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.
@@ -252,6 +293,7 @@ unwarn_success: A advertência número {0} do usuário {1} foi removida.
 uptime: Tempo Online
 usage: Uso
 user: Usuário
+userroles_title: 'Cargos do {0}'
 value: Valor
 voice_failure: O usuário precisa estar conectado a um canal de voz para este comando funcionar.
 voicemute_success: Usuário {0} foi silenciado nos canais de voz.

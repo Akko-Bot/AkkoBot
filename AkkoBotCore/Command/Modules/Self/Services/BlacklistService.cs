@@ -77,7 +77,7 @@ namespace AkkoBot.Command.Modules.Self.Services
         /// Removes multiple blacklist entries from the database.
         /// </summary>
         /// <param name="ids">IDs to be removed.</param>
-        /// <returns>The amount of entries that have been removed to the database.</returns>
+        /// <returns>The amount of entries that have been removed from the database.</returns>
         public int RemoveRange(ulong[] ids)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);

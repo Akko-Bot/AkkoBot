@@ -11,6 +11,7 @@ namespace AkkoBot.Services.Database.Entities
     public class PlayingStatusEntity : DbEntity
     {
         private string _message;
+        private string _streamUrl;
 
         [Required]
         [MaxLength(128)]
@@ -20,7 +21,12 @@ namespace AkkoBot.Services.Database.Entities
             set => _message = value.MaxLength(128);
         }
 
-        public string StreamUrl { get; set; }
+        [MaxLength(500)]
+        public string StreamUrl
+        {
+            get => _streamUrl;
+            set => _streamUrl = value.MaxLength(500);
+        }
 
         public ActivityType Type { get; set; }
 

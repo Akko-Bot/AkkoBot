@@ -51,10 +51,10 @@ namespace AkkoBot.Core.Services
 
             if (mutedUser is not null && botPerms.HasFlag(Permissions.ManageRoles))
             {
-                if (eventArgs.Guild.Roles.TryGetValue(guildSettings.MuteRoleId, out var muteRole))
+                if (eventArgs.Guild.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole))
                 {
                     // If mute role exists, apply to the user
-                    muteRole = eventArgs.Guild.GetRole(guildSettings.MuteRoleId);
+                    muteRole = eventArgs.Guild.GetRole(guildSettings.MuteRoleId.Value);
                     await eventArgs.Member.GrantRoleAsync(muteRole).ConfigureAwait(false);
                 }
                 else

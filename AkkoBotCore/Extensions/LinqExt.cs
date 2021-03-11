@@ -215,7 +215,7 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Splits the elements of this <paramref name="collection"/> into several subcollections by the specified <paramref name="amount"/>.
+        /// Splits the elements of this <paramref name="collection"/> into several subcollections with maximum length specified by <paramref name="amount"/>.
         /// </summary>
         /// <param name="collection">This collection.</param>
         /// <param name="amount">The maximum amount of elements per subcollection.</param>
@@ -223,18 +223,16 @@ namespace AkkoBot.Extensions
         /// <returns>A collection of <see cref="IEnumerable{T}"/>.</returns>
         public static IEnumerable<IEnumerable<T>> SplitInto<T>(this IEnumerable<T> collection, int amount)
         {
-            var result = new List<List<T>>() { new List<T>(amount) };
             var index = 0;
-
+            var collectionCount = collection.Count();
+            var result = new List<List<T>>() { new List<T>(Math.Min(amount, collectionCount)) };
+            
             foreach (var element in collection)
             {
                 result[index].Add(element);
 
-                if (result[index].Count >= amount)
-                {
-                    result.Add(new List<T>(amount));
-                    index++;
-                }
+                if (result[index].Count >= amount && ++index <= collectionCount - 1)
+                    result.Add(new List<T>(Math.Min(amount, collectionCount - (amount * index))));
             }
 
             return result;

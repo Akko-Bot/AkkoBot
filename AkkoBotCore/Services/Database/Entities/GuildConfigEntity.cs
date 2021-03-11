@@ -61,7 +61,7 @@ namespace AkkoBot.Services.Database.Entities
             set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
-        public ulong MuteRoleId { get; set; }
+        public ulong? MuteRoleId { get; set; }
 
         public TimeSpan WarnExpire { get; set; } = TimeSpan.FromDays(30 * 6);
 

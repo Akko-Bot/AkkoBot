@@ -46,9 +46,17 @@ namespace AkkoBot.Extensions
             => char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
 
         /// <summary>
+        /// Converts a string to the format used by Discord's text channel names.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns>This <see cref="string"/> converted to a text-channel-name.</returns>
+        public static string ToTextChannelName(this string text)
+            => text.ToLowerInvariant().Replace(' ', '-');
+
+        /// <summary>
         /// Converts a string to the snake_case format.
         /// </summary>
-        /// <param name="text">This <see cref="string"/> to be converted.</param>
+        /// <param name="text">This string.</param>
         /// <returns>This <see cref="string"/> converted to snake_case.</returns>
         public static string ToSnakeCase(this string text)
         {

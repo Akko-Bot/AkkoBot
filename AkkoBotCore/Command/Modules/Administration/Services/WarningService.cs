@@ -102,7 +102,7 @@ namespace AkkoBot.Command.Modules.Administration.Services
             if (punishment?.PunishRoleId is not null)
             {
                 // If punishment role doesn't exist anymore, delete the punishment from the database
-                if (!context.Guild.Roles.TryGetValue(punishment.PunishRoleId.Value, out var punishRole))
+                if (!context.Guild.Roles.TryGetValue(punishment.PunishRoleId.Value, out _))
                 {
                     await RemoveWarnPunishmentAsync(punishment);
                     return (false, null);

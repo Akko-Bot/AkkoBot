@@ -4,11 +4,17 @@ app_owners: Application Owners
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
 arg_bool: __true__ to enable, __false__ to disable.
+arg_channel_name: Name of the channel.
+arg_channel_newname: The new name of the channel.
+arg_channel_topic: The new channel topic.
 arg_color: A 6-digit, hexadecimal code of a color.
 arg_command: A valid command.
 arg_config_timeout: How long the bot should wait on interactive commands. Minimum of __10s__.
 arg_discord_channel: ID or mention to a Discord channel.
+arg_discord_color: The hexadecimal value of a color.
+arg_discord_role: ID or mention to a Discord role.
 arg_discord_user: ID or mention to a Discord user.
+arg_discord_voicechannel: ID or name of a voice channel.
 arg_double: A real number.
 arg_infraction: The infraction to be added to the user's modlog.
 arg_int: An integer number.
@@ -16,11 +22,14 @@ arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
 arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
+arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
 arg_prefix: The new prefix.
 arg_pstatus: The message to be displayed in the status.
 arg_pstatus_type: The type of the status.
 arg_punishment_reason: The reason for the punishment.
+arg_role_name: The name of the role.
+arg_role_newname: The new name of the role.
 arg_stream_url: The URL of the stream.
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
@@ -90,7 +99,14 @@ cmd_config_owner_list: Lists the bot owners.
 cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
+cmd_createcategorychannel: Creates a category.
+cmd_createrole: Creates a Discord role.
+cmd_createtextchannel: Creates a text channel.
+cmd_createvoicechannel: Creates a voice channel.
 cmd_deafen: Applies server deafening to a user.
+cmd_deleteallroles: Deletes all roles on this server that are below the bot and the user who used the command.
+cmd_deletechannel: Deletes a Discord channel.
+cmd_deleterole: Deletes a Discord role.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
@@ -101,19 +117,35 @@ cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide n
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
+cmd_inrole: Lists all users on this server with the specified role.
 cmd_kick: Kicks a user from the server.
+cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
 cmd_liststatus: Lists all rotating statuses and their corresponding ID.
 cmd_massban: Bans multiple users from the server.
 cmd_massunban: Unbans multiple users from the server.
 cmd_modlog: Shows notices and infractions of a user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
+cmd_moveuser: Moves a user to another voice channel. Provide no channel to force them to disconnect.
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
+cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
+cmd_recreatechannel: Recreates a Discord channel.
+cmd_recreaterole: Recreates a Discord role.
+cmd_removeallroles: Removes all roles from the specified user that are below the bot and the user who used the command.
+cmd_removerole: Removes a role from the specified user.
 cmd_removestatus: Removes the status with the specified ID.
+cmd_renamechannel: Renames a Discord channel.
+cmd_renamerole: Renames a Discord role.
+cmd_rolecolor: Sets the color of a role. Provide no color to see the current color of the specified role.
+cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_sban: Kicks a user from the server and deletes their messages.
+cmd_setnickname: Sets the nickname of a user. Provide no user to set the bot's nickname. Provide no nickname to remove it.
+cmd_setrole: Adds a role to the specified user.
 cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
+cmd_settopic: Sets the topic for the current text channel.
+cmd_slowmode: Sets how frequently users are allowed to send messages in this text channel. Provide no parameter to disable.
 cmd_sudo: Executes a command as the specified user.
 cmd_timedban: Temporarily bans a user from the server.
 cmd_unban: Unbans a user from the server.
@@ -136,6 +168,8 @@ days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'
 deafen_success: User {0} can no longer hear other users speaking in voice channels.
 deafen_success: User {0} can now hear other users speaking in voice channels.
+deleteallroles: '{0} roles were successfully deleted.'
+deleteallroles_error: There are no eligible roles to be deleted.
 disabled: disabled
 enabled: enabled
 error_hierarchy: This command can only be used on users with a role lower to yours and mine in the role hierarchy.
@@ -187,6 +221,7 @@ infraction: Infraction
 infractions_empty: There are no infractions to show.
 infractions_field: '{0} at {1} by {2}'
 infractions_title: Infractions for {0}
+inrole_title: List of users with {0} role
 kick: Kick
 kick_enum: kicked
 kick_notification: You have been kicked from the {0} server.
@@ -194,7 +229,7 @@ kick_title: User Kicked
 language: Language
 locales_title: Available Languages
 massban: Massban
-massban_description: Banning {0} users. This operation might take up to {1} seconds.
+massban_description: Banning {0} users.
 massban_failure: No user was banned either because none of the IDs were valid or the users are already banned.
 massban_success: '{0} users were banned from the server.'
 massunban: Massunban
@@ -211,6 +246,7 @@ mute_enum: muted
 mute_success: User {0} has been muted.
 name: Name
 notice_success: Notice added successfully.
+nsfw_toggle: NSFW has been {0} on this channel.
 online_since: Online since
 owners: Owners
 pages: Page {0}/{1}
@@ -221,12 +257,16 @@ pstatus_title: Rotating Statuses
 punishment_dm_failed: Failed to deliver the punishment notification.
 q_are_you_sure: Are you sure you want to {0}? This action is irreversible. ({1}/{2})
 q_blclear: remove all blacklist entries
+q_deleteallroles: delete {0} roles
 q_no: 'no'
+q_operation_length_seconds: This operation will take at least {0} seconds.
 q_yes: 'yes'
 reason: Reason
+removeallroles: '{0} roles were successfully removed from {1}.'
 removerole: Remove Role
 removerole_enum: had a role removed
 requires: Requires
+roles_title: Roles on this server
 sban_notification: You have been soft-banned from the {0} server.
 sban_title: User Soft-banned
 seconds: Seconds
@@ -240,6 +280,7 @@ timedban_title: Temporary Ban
 timedmute: Expired Mute
 timedrole: Punishment Role
 timedunrole: Punishment Role Removal
+total: '{0} total'
 type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.
@@ -252,6 +293,7 @@ unwarn_success: Removed warning {0} from {1}.
 uptime: Uptime
 usage: Usage
 user: User
+userroles_title: "{0}'s roles"
 value: Value
 voice_failure: The user needs to be connected to a voice channel for this command to work.
 voicemute_success: User {0} has been muted from voice channels.

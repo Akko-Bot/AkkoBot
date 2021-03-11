@@ -2,6 +2,7 @@ using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
 using AkkoBot.Command.Modules.Administration.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -144,7 +145,8 @@ namespace AkkoBot.Command.Modules.Administration
             // Send the confirmation message
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(":radioactive: " + context.FormatLocalized("massban"))
-                .WithDescription(context.FormatLocalized("massban_description", nonBanned.Length, nonBanned.Length * 0.5));
+                .WithDescription(context.FormatLocalized("massban_description", nonBanned.Length))
+                .WithFooter(context.FormatLocalized("q_operation_length_seconds", nonBanned.Length * AkkoEntities.SafetyDelay.TotalSeconds));
 
             var result = await context.RespondLocalizedAsync(embed, false);
 
@@ -159,7 +161,7 @@ namespace AkkoBot.Command.Modules.Administration
                 catch { fails += 1; }
 
                 // Safety delay
-                await Task.Delay(TimeSpan.FromSeconds(0.5));
+                await Task.Delay(AkkoEntities.SafetyDelay);
             }
 
             // Check if no user got banned
@@ -271,7 +273,7 @@ namespace AkkoBot.Command.Modules.Administration
                     try { await context.Guild.UnbanMemberAsync(userId, context.Member.GetFullname() + " | " + context.FormatLocalized("massunban")); }
                     catch { failed += 1; }
 
-                    await Task.Delay(TimeSpan.FromSeconds(0.5));
+                    await Task.Delay(AkkoEntities.SafetyDelay);
                 }
             }
 
