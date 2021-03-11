@@ -1,11 +1,12 @@
 ﻿using AkkoBot.Command.Abstractions;
 using AkkoBot.Command.Attributes;
+using AkkoBot.Core;
 using AkkoBot.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -15,11 +16,6 @@ namespace AkkoBot.Command.Modules.Basic
     public class BasicCommands : AkkoCommandModule
     {
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
-
-        public BasicCommands()
-        {
-            //
-        }
 
         [Command("ping")]
         [Description("Gets the websocket latency for this bot.")]
@@ -36,19 +32,19 @@ namespace AkkoBot.Command.Modules.Basic
         [Description("Shuts the bot down.")]
         public async Task Die(CommandContext context)
         {
-            // There is probably a better way to do this
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("shutdown");
 
             await context.RespondLocalizedAsync(embed);
 
-            // Log to the console
-            context.Client.Logger.LogCommand(LogLevel.Information, context);
-
             // Clean-up
-            await context.Client.DisconnectAsync();
-            context.Client.Dispose();
-            Environment.Exit(Environment.ExitCode);
+            foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
+            {
+                await client.DisconnectAsync();
+                client.Dispose();
+            }
+
+            Bot.ShutdownToken.Cancel();
         }
 
         [Command("uptime")]

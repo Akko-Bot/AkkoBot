@@ -13,6 +13,8 @@ namespace AkkoBot.Core
 {
     public class Bot
     {
+        public static CancellationTokenSource ShutdownToken { get; } = new();
+
         public async Task MainAsync()
         {
             // Load up credentials
@@ -25,11 +27,18 @@ namespace AkkoBot.Core
                 .WithDefaultServices()
                 .WithDefaultDbContext()
                 .BuildDefaultAsync();
-
-            // Connect to Discord
+                        
             try
             {
+                // Connect to Discord
                 await botCore.BotShardedClient.StartAsync();
+
+                // Block the program until it is closed.
+                await Task.Delay(Timeout.Infinite, ShutdownToken.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
@@ -42,9 +51,6 @@ namespace AkkoBot.Core
 
                 TerminateProgram(Environment.NewLine);
             }
-
-            // Block the program until it is closed.
-            await Task.Delay(Timeout.Infinite);
         }
 
         /// <summary>

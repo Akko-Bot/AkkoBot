@@ -63,7 +63,7 @@ namespace AkkoBot.Command.Modules.Administration
         {
             if (string.IsNullOrWhiteSpace(newPrefix))
             {
-                await CheckPrefix(context);
+                await CheckPrefixAsync(context);
                 return;
             }
 
@@ -82,7 +82,7 @@ namespace AkkoBot.Command.Modules.Administration
         /// Sends a message with the guild prefix to the context that triggered it.
         /// </summary>
         /// <param name="context">The command context.</param>
-        private async Task CheckPrefix(CommandContext context)
+        private async Task CheckPrefixAsync(CommandContext context)
         {
             var prefix = _guildService.GetOrSetProperty(context, x => x?.Prefix)
                 ?? _botService.GetOrSetProperty(x => x.BotPrefix);
