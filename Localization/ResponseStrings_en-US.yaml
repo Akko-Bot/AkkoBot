@@ -121,6 +121,7 @@ cmd_inrole: Lists all users on this server with the specified role.
 cmd_kick: Kicks a user from the server.
 cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
 cmd_liststatus: Lists all rotating statuses and their corresponding ID.
+cmd_lockchannel: Locks the current channel so users can't send messages to it. Users with permission to Kick Members, Ban Members or Manage Channels are immune.
 cmd_massban: Bans multiple users from the server.
 cmd_massunban: Unbans multiple users from the server.
 cmd_modlog: Shows notices and infractions of a user.
@@ -130,6 +131,7 @@ cmd_moveuser: Moves a user to another voice channel. Provide no channel to force
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
+cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their last messages from this channel. Defaults to 50.
 cmd_recreatechannel: Recreates a Discord channel.
 cmd_recreaterole: Recreates a Discord role.
 cmd_removeallroles: Removes all roles from the specified user that are below the bot and the user who used the command.
@@ -150,6 +152,7 @@ cmd_sudo: Executes a command as the specified user.
 cmd_timedban: Temporarily bans a user from the server.
 cmd_unban: Unbans a user from the server.
 cmd_undeafen: Removes server deafening from a user.
+cmd_unlockchannel: Unlocks the current channel so users can send messages again.
 cmd_unmute: Unmutes a user from text and voice channels.
 cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
@@ -228,6 +231,7 @@ kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
 language: Language
 locales_title: Available Languages
+lockchannel_reason: Channel Lockdown
 massban: Massban
 massban_description: Banning {0} users.
 massban_failure: No user was banned either because none of the IDs were valid or the users are already banned.
@@ -250,6 +254,7 @@ nsfw_toggle: NSFW has been {0} on this channel.
 online_since: Online since
 owners: Owners
 pages: Page {0}/{1}
+prune_error: There are no messages to be deleted or you're trying to delete messages older than 14 days.
 pstatus_error: There are no rotating statuses set up.
 pstatus_rotation: Status rotation is currently {0}.
 pstatus_time: Rotation Time
@@ -285,6 +290,7 @@ type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.
 unknown: Unknown
+unlockchannel_reason: Lockdown Lifted
 unmute_success: User {0} has been unmuted.
 unspecified: Unspecified
 unwarn_all: Removed all warnings from {0}.

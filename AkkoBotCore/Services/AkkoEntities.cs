@@ -29,6 +29,11 @@ namespace AkkoBot.Services
         public static TimeSpan SafetyDelay { get; } = TimeSpan.FromSeconds(0.5);
 
         /// <summary>
+        /// Defines the maximum age a message needs in order to be elegible for deletion.
+        /// </summary>
+        public static TimeSpan MaxMessageDeletionAge { get; } = TimeSpan.FromDays(14);
+
+        /// <summary>
         /// Represents the maximum message length allowed by Discord.
         /// </summary>
         public const int MessageMaxLength = 2000;

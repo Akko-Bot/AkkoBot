@@ -121,6 +121,7 @@ cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especifi
 cmd_kick: Expulsa um usuário do servidor.
 cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
 cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
+cmd_lockchannel: Tranca o canal atual para impedir que usuários enviem mensagens. Usuários com permissão para Expulsar Membros, Banir Membros ou Gerenciar Canais possuem imunidade.
 cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_modlog: Exibe anotações e infrações de um usuário.
@@ -130,6 +131,7 @@ cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal pa
 cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
+cmd_prune: Exclui as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
 cmd_recreatechannel: Recria um canal do Discord.
 cmd_recreaterole: Recria um cargo do Discord.
 cmd_removeallroles: Remove todos os cargos do usuário especificado que estejam abaixo do bot e do usuário que usou o comando.
@@ -150,6 +152,7 @@ cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_timedban: Bane um usuário temporariamente do servidor.
 cmd_unban: Desbane um usuário do servidor.
 cmd_undeafen: Remove o ensurdecimento de um usuário.
+cmd_unlockchannel: Destranca o canal atual, permitindo que os usuários voltem a enviar mensagens.
 cmd_unmute: Remove o silenciamento de um usuário nos canais de voz e texto.
 cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
 cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
@@ -228,6 +231,7 @@ kick_notification: Você foi expulso do servidor {0}.
 kick_title: Usuário Expulso
 language: Idioma
 locales_title: Idiomas Disponíveis
+lockchannel_reason: Lockdown de Canal
 massban: Banimento em Massa
 massban_description: Banindo {0} usuários.
 massban_failure: Ninguém foi banido porque nenhum dos IDs são válidos ou os usuários já foram banidos.
@@ -250,6 +254,7 @@ nsfw_toggle: NSFW foi {0} nesse canal.
 online_since: Online desde
 owners: Donos
 pages: Página {0}/{1}
+prune_error: Não há mensagens a serem excluídas ou você está tentando excluir mensagens criadas há mais de 14 dias.
 pstatus_error: Não há status de rotação definido.
 pstatus_rotation: A rotação de status está {0}.
 pstatus_time: Tempo de Rotação
@@ -285,6 +290,7 @@ type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.
 unknown: Desconhecido
+unlockchannel_reason: Lockdown Suspenso
 unmute_success: Usuário {0} pode falar novamente.
 unspecified: Não especificado
 unwarn_all: Todas as advertências do usuário {0} foram removidas.

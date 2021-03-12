@@ -44,7 +44,7 @@ namespace AkkoBot.Command.Modules.Administration
 
             // Get the mute role
             var role = await _roleService.FetchMuteRoleAsync(context.Guild);
-            await _channelServices.SetMuteOverwritesAsync(context.Guild, role, reason);
+            await _channelServices.SetMuteOverwritesAsync(context.Guild, role, reason, false);
 
             // Apply it to the user
             await _roleService.MuteUserAsync(context, role, user, time ?? TimeSpan.FromHours(1), reason);
@@ -167,7 +167,8 @@ namespace AkkoBot.Command.Modules.Administration
             if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
-            await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason);
+            await context.TriggerTypingAsync();
+            await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason, true);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("chatmute_success", Formatter.Bold(user.GetFullname())));
@@ -187,6 +188,7 @@ namespace AkkoBot.Command.Modules.Administration
             if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
                 return;
 
+            await context.TriggerTypingAsync();
             await _channelServices.RemoveOverwritesAsync(context.Guild, reason, x => x.Id == user.Id);
 
             var embed = new DiscordEmbedBuilder()

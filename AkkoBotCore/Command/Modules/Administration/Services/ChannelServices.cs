@@ -13,27 +13,37 @@ namespace AkkoBot.Command.Modules.Administration.Services
     public class ChannelService : ICommandService
     {
         /// <summary>
-        /// Sets the channel overrides for the mute role on all channels visible to the bot.
+        /// Sets the channel overrides for the mute role on all text channels visible to the bot.
         /// </summary>
         /// <param name="server">The Discord server.</param>
         /// <param name="muteRole">The mute role.</param>
         /// <param name="reason">The reason for the mute.</param>
-        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordRole muteRole, string reason)
+        /// <param name="textOnly"><see langword="true"/> to only apply the overwrites to text channels, <see langword="false"/> to apply to all channels.</param>
+        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordRole muteRole, string reason, bool textOnly)
         {
+            var denyPerms = (textOnly) ? RoleService.MuteTextPermsDeny : RoleService.MutePermsDeny;
             foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
-                await channel.AddOverwriteAsync(muteRole, Permissions.None, RoleService.MutePermsDeny, reason);
+            {
+                if (denyPerms is RoleService.MutePermsDeny || !channel.PermissionOverwrites.Any(x => x.Id == muteRole.Id && x.Denied == denyPerms))
+                    await channel.AddOverwriteAsync(muteRole, Permissions.None, denyPerms, reason);
+            }
         }
 
         /// <summary>
-        /// Sets the channel overrides for the muted user on all channels visible to the bot.
+        /// Sets the channel overrides for the muted user on all text channels visible to the bot.
         /// </summary>
         /// <param name="server">The Discord server.</param>
         /// <param name="user">The muted user.</param>
         /// <param name="reason">The reason for the mute.</param>
-        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordMember user, string reason)
+        /// <param name="textOnly"><see langword="true"/> to only apply the overwrites to text channels, <see langword="false"/> to apply to all channels.</param>
+        public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordMember user, string reason, bool textOnly)
         {
+            var denyPerms = (textOnly) ? RoleService.MuteTextPermsDeny : RoleService.MutePermsDeny;
             foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
-                await channel.AddOverwriteAsync(user, Permissions.None, RoleService.MutePermsDeny, reason);
+            {
+                if (denyPerms is RoleService.MutePermsDeny || !channel.PermissionOverwrites.Any(x => x.Id == user.Id && x.Denied == denyPerms))
+                    await channel.AddOverwriteAsync(user, Permissions.None, denyPerms, reason);
+            }
         }
 
         /// <summary>
@@ -46,10 +56,11 @@ namespace AkkoBot.Command.Modules.Administration.Services
         {
             var overwrites = server.Channels.Values
                 .Where(x => x.Users.Contains(server.CurrentMember))
-                .SelectMany(x => x.PermissionOverwrites.Where(selector));
+                .SelectMany(x => x.PermissionOverwrites.Where(selector))
+                .ToArray();
 
-            foreach (var overwrite in overwrites)
-                await overwrite.DeleteAsync(reason);
+            for (var index = 0; index < overwrites.Length; index++)
+                await overwrites[index].DeleteAsync(reason);
         }
     }
 }

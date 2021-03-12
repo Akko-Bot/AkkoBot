@@ -24,6 +24,11 @@ namespace AkkoBot.Command.Modules.Administration.Services
         public const Permissions MutePermsDeny = Permissions.SendMessages | Permissions.AddReactions | Permissions.AttachFiles | Permissions.Speak | Permissions.Stream;
 
         /// <summary>
+        /// Defines the set of denied permissions to be applied to a text muted user.
+        /// </summary>
+        public const Permissions MuteTextPermsDeny = Permissions.SendMessages | Permissions.AddReactions | Permissions.AttachFiles;
+
+        /// <summary>
         /// Defines the set of allowed permissions to be applied to a muted user.
         /// </summary>
         public const Permissions MutePermsAllow = Permissions.AccessChannels;
