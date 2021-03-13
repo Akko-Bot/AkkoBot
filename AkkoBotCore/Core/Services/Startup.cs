@@ -1,4 +1,4 @@
-using AkkoBot.Command.Modules.Self.Services;
+using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;

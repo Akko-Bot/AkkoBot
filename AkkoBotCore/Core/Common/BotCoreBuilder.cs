@@ -1,4 +1,4 @@
-﻿using AkkoBot.Command.Abstractions;
+﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Core.Services;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;

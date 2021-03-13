@@ -1,4 +1,4 @@
-using AkkoBot.Command.Abstractions;
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
