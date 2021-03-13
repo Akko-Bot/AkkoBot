@@ -317,3 +317,6 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
+
+cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
+arg_say: The message to be sent.
