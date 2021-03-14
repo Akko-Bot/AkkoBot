@@ -320,3 +320,4 @@ warnpl_title: Punições do Servidor
 
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 arg_say: A mensagem a ser enviada.
+arg_prune_options: '`-s` ou `--safe` para evitar a exclusão de mensagens fixadas.'

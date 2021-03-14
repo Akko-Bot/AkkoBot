@@ -38,6 +38,19 @@ namespace AkkoBot.Extensions
                 : text.MaxLength(maxLength - append.Length) + append;
 
         /// <summary>
+        /// Returns a new string that has a space character inserted at its begining and that
+        /// left-aligns the characters in this string by padding them with spaces on the right,
+        /// for a specified total length.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="totalLength">The length of the resulting string.</param>
+        /// <returns>This string padded to the right.</returns>
+        public static string HardPad(this string text, int totalLength)
+            => (string.IsNullOrWhiteSpace(text))
+                ? text?.PadRight(totalLength)
+                : text.Insert(0, " ").PadRight(totalLength);
+
+        /// <summary>
         /// Returns a string whose first character is uppercase and all others are lowercase.
         /// </summary>
         /// <param name="text">This string.</param>
@@ -109,16 +122,21 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Returns a new string that has a space character inserted at its begining and that
-        /// left-aligns the characters in this string by padding them with spaces on the right,
-        /// for a specified total length.
+        /// Checks whether this string is equal to any of the strings provided in <paramref name="samples"/>.
         /// </summary>
         /// <param name="text">This string.</param>
-        /// <param name="totalLength">The length of the resulting string.</param>
-        /// <returns>This string padded to the right.</returns>
-        public static string HardPad(this string text, int totalLength)
-            => (string.IsNullOrWhiteSpace(text))
-                ? text?.PadRight(totalLength)
-                : text.Insert(0, " ").PadRight(totalLength);
+        /// <param name="comparisonType">The type of string comparison to be used.</param>
+        /// <param name="samples">The strings to compare to.</param>
+        /// <returns><see langword="true"/> if this string equals one of the strings in <paramref name="samples"/>, <see langword="false"/> otherwise.</returns>
+        public static bool Equals(this string text, StringComparison comparisonType, params string[] samples)
+        {
+            foreach (var sample in samples)
+            {
+                if (sample.Equals(text, comparisonType))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

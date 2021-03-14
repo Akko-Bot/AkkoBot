@@ -29,7 +29,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         }
 
         /// <summary>
-        /// Deserializes user input in Yaml into a Discord message.
+        /// Deserializes user input in Yaml to a Discord message.
         /// </summary>
         /// <param name="input">The user's input.</param>
         /// <param name="result">The deserialized input, <see langword="null"/> if deserialization fails.</param>

@@ -131,7 +131,7 @@ cmd_moveuser: Moves a user to another voice channel. Provide no channel to force
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
-cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their last messages from this channel. Defaults to 50.
+cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
 cmd_recreatechannel: Recreates a Discord channel.
 cmd_recreaterole: Recreates a Discord role.
 cmd_removeallroles: Removes all roles from the specified user that are below the bot and the user who used the command.
@@ -320,3 +320,4 @@ warnpl_title: Server Punishments
 
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 arg_say: The message to be sent.
+arg_prune_options: '`-s` or `--safe` to prevent deletion of pinned messages.'
