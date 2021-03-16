@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Utilities
 {
     [RequireGuild]
-    [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
     public class ServerUtilities : AkkoCommandModule
     {
         private readonly UtilitiesService _service;

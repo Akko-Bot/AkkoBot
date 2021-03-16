@@ -1,6 +1,13 @@
 addrole: Adicionar Cargo
 addrole_enum: recebeu um cargo de punição
+alias: Atalho
+alias_error: Nenhum atalho de comando foi encontrado.
+alias_list_title_global: Atalhos de Comando Globais
+alias_list_title_server: Atalhod de Comando do Servidor
 app_owners: Donos da Aplicação
+arg_alias_add_alias: O atalho de comando.
+arg_alias_add_command: O comando a ser executado quando o atalho for utilizado.
+arg_alias_remove: O atalho de comando a ser removido.
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
 arg_bool: __true__ para ativar, __false__ para desativar.
@@ -25,11 +32,13 @@ arg_module: Um módulo válido.
 arg_nickname: O novo apelido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
 arg_prefix: O novo prefixo.
+arg_prune_options: '`-s` ou `--safe` para evitar a exclusão de mensagens fixadas.'
 arg_pstatus: A mensagem a ser exibida no status.
 arg_pstatus_type: O tipo do status.
 arg_punishment_reason: O motivo da punição.
 arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
+arg_say: A mensagem a ser enviada.
 arg_stream_url: A URL do stream.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
 arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
@@ -60,11 +69,17 @@ bl_not_exist: '{0} {1} {2} não se encontra na lista negra.'
 bl_removed: '{0} {1} {2} foi removido da lista negra.'
 bl_removed_range: '{0} IDs foram removidos da lista negra.'
 bl_title: Lista Negra
+bot_prefix_check: O prefixo global é {0}
 bot_settings_title: Configurações Globais
 channel: Canal
 chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
 chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
 cmd_addstatus: Adiciona um status à lista de rotação. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ and __Competing__. Forneça uma URL para definir um status do tipo __Streaming__.
+cmd_alias: Agrupa commands para adicionar, remover e listar atalhos de comandos.
+cmd_alias_add: Adiciona um atalho de comando. Se o atalho tiver um espaço, coloque-o dentro de aspas.
+cmd_alias_clear: Remove todos os atalhos de comando desse servidor. Se for executado em mensagem direta com o bot, remove todos os atalhos de comando globais.
+cmd_alias_list: Exibe todos os atalhos de comando disponíveis nesse servidor. Se for executado em mensagem direta com o bot, exibe todos os atalhos de comand blobais.
+cmd_alias_remove: Remove um atalho de comando.
 cmd_ban: Bane um usuário.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
@@ -142,6 +157,7 @@ cmd_renamerole: Renomeia um cargo do Discord.
 cmd_rolecolor: Define a cor de um cargo. Forneça nenhuma cor para exibir a cor atual do cargo especificado.
 cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do servidor.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
+cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
 cmd_setnickname: Define o apelido de um usuário. Forneça nenhum usuário para definit o apelido do bot. Forneça nenhum apelido para removê-lo.
 cmd_setrole: Adiciona um cargo ao usuário especificado.
@@ -317,7 +333,3 @@ warnpl_empty: Não há punições nesse servidor.
 warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
-
-cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
-arg_say: A mensagem a ser enviada.
-arg_prune_options: '`-s` ou `--safe` para evitar a exclusão de mensagens fixadas.'

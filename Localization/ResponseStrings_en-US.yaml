@@ -1,6 +1,13 @@
 addrole: Add Role
 addrole_enum: received a punishment role
+alias: Alias
+alias_error: No alias was found.
+alias_list_title_global: Global Aliases
+alias_list_title_server: Server Aliases
 app_owners: Application Owners
+arg_alias_add_alias: Text the bot should treat as a command.
+arg_alias_add_command: The command that should be mapped to this alias.
+arg_alias_remove: The alias to be removed.
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
 arg_bool: __true__ to enable, __false__ to disable.
@@ -25,11 +32,13 @@ arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
 arg_prefix: The new prefix.
+arg_prune_options: '`-s` or `--safe` to prevent deletion of pinned messages.'
 arg_pstatus: The message to be displayed in the status.
 arg_pstatus_type: The type of the status.
 arg_punishment_reason: The reason for the punishment.
 arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
+arg_say: The message to be sent.
 arg_stream_url: The URL of the stream.
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
@@ -60,11 +69,17 @@ bl_not_exist: '{0} {1} {2} is not blacklisted.'
 bl_removed: Successfully removed {0} {1} {2} from the blacklist.
 bl_removed_range: '{0} IDs were removed from the blacklist.'
 bl_title: Blacklist
+bot_prefix_check: The global prefix is {0}
 bot_settings_title: Global Settings
 channel: Channel
 chatmute_success: User {0} can no longer message on text channels.
 chatunmute_success: User {0} can now message on text channels.
 cmd_addstatus: Adds a status to the list of rotating statuses. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status.
+cmd_alias: Groups commands for adding, removing and listing command aliases.
+cmd_alias_add: Adds an alias for the specified command. If the alias has space in it, wrap it around quotation marks.
+cmd_alias_clear: Removes all aliases from this server. If used in direct message with the bot, removes all global aliases.
+cmd_alias_list: Lists all aliases available in this server. Use it in direct message with the bot to list all global aliases.
+cmd_alias_remove: Removes an alias.
 cmd_ban: Bans a user.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
@@ -142,6 +157,7 @@ cmd_renamerole: Renames a Discord role.
 cmd_rolecolor: Sets the color of a role. Provide no color to see the current color of the specified role.
 cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
+cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_setnickname: Sets the nickname of a user. Provide no user to set the bot's nickname. Provide no nickname to remove it.
 cmd_setrole: Adds a role to the specified user.
@@ -317,7 +333,3 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
-
-cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
-arg_say: The message to be sent.
-arg_prune_options: '`-s` or `--safe` to prevent deletion of pinned messages.'

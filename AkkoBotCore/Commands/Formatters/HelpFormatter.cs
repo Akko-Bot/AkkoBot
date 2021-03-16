@@ -168,9 +168,10 @@ namespace AkkoBot.Commands.Formatters
         public (string, DiscordEmbedBuilder) Build()
         {
             using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var guildSettings = db.GuildConfig.GetGuild(_cmdContext.Guild.Id);
+            var useEmbed = db.GuildConfig.GetGuild(_cmdContext.Guild?.Id ?? 0)?.UseEmbed
+                ?? db.BotConfig.Cache.UseEmbed;
 
-            if (guildSettings.UseEmbed)
+            if (useEmbed)
             {
                 var msg = new DiscordEmbedBuilder()
                     .WithTitle(_helpTitle)

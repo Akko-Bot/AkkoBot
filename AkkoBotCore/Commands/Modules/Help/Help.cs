@@ -48,7 +48,7 @@ namespace AkkoBot.Commands.Modules.Help
             }
 
             var (content, embed) = helpBuilder.Build();
-            var botPerms = context.Guild.CurrentMember.PermissionsIn(context.Channel);
+            var botPerms = context.Guild?.CurrentMember.PermissionsIn(context.Channel) ?? Permissions.SendMessages;
 
             // Try to send: channel message, channel reaction, direct message
             if (botPerms.HasPermission(Permissions.SendMessages))
@@ -69,7 +69,6 @@ namespace AkkoBot.Commands.Modules.Help
 
         [Command("module"), Aliases("modules", "cmds")]
         [Description("cmd_modules")]
-        [RequireBotPermissions(Permissions.SendMessages)]
         public async Task Modules(CommandContext context)
         {
             var namespaces = context.CommandsNext.RegisteredCommands.Values

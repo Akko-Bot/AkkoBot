@@ -22,6 +22,7 @@ namespace AkkoBot.Services.Database
         public LogConfigEntity LogConfig { get; set; }
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
 
         // Lazily instantiated
         public ITimerManager Timers { get; set; }
@@ -33,6 +34,11 @@ namespace AkkoBot.Services.Database
             LogConfig = dbContext.LogConfig.FirstOrDefault();
             Guilds = new(); // Guild configs will be loaded into the cache as needed.
             PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
+
+            Aliases = dbContext.Aliases
+                .SplitBy(x => x.GuildId ?? default)
+                .Select(x => x.ToConcurrentHashSet())
+                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
         }
 
         /// <summary>
@@ -68,6 +74,11 @@ namespace AkkoBot.Services.Database
                     Timers.Dispose();
                     PlayingStatuses.Clear();
                     PlayingStatuses.TrimExcess();
+
+                    foreach (var group in Aliases.Values)
+                        group.Clear();
+
+                    Aliases.Clear();
                 }
 
                 Blacklist = null;
@@ -76,6 +87,7 @@ namespace AkkoBot.Services.Database
                 Guilds = null;
                 Timers = null;
                 PlayingStatuses = null;
+                Aliases = null;
 
                 _isDisposed = true;
             }

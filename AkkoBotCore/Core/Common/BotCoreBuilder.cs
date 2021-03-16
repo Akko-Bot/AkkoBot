@@ -308,7 +308,7 @@ namespace AkkoBot.Core.Common
             var startup = new Startup(bot, services);
             startup.RegisterEvents();
 
-            var globalEvents = new GlobalCommandEvents(bot, services);
+            var globalEvents = new GlobalEvents(bot, services);
             globalEvents.RegisterEvents();
 
             return bot;

@@ -1,12 +1,14 @@
 ﻿using AkkoBot.Commands.Attributes;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Abstractions
 {
-    [IsNotBlacklisted]
+    [IsNotBlacklisted, RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
     public abstract class AkkoCommandModule : BaseCommandModule
     {
         public override async Task BeforeExecutionAsync(CommandContext context)

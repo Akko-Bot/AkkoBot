@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Self
 {
     [BotOwner]
-    [RequireBotPermissions(Permissions.AddReactions | Permissions.SendMessages)]
     [Group("botconfig"), Aliases("self", "botcfg")]
     [Description("cmd_config")]
     public class BotConfig : AkkoCommandModule

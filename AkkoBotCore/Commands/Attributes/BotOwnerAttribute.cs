@@ -20,10 +20,9 @@ namespace AkkoBot.Commands.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var creds = context.Services.GetService<Credentials>();
             return Task.FromResult(
-                creds.OwnerIds.Contains(context.User.Id)
-                || context.Client.CurrentApplication.Owners.Any(x => x.Id == context.Member.Id)
+                context.Services.GetService<Credentials>().OwnerIds.Contains(context.User.Id)
+                || context.Client.CurrentApplication.Owners.Any(x => x.Id == context.User.Id)
             );
         }
     }

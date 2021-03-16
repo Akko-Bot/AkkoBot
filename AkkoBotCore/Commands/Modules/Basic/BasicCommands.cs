@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Basic
 {
-    [RequireBotPermissions(Permissions.SendMessages)]
     public class BasicCommands : AkkoCommandModule
     {
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;

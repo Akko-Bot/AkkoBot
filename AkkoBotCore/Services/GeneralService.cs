@@ -1,4 +1,5 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Credential;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -16,6 +17,15 @@ namespace AkkoBot.Services
 {
     public class GeneralService
     {
+        /// <summary>
+        /// Checks if the specified <paramref name="id"/> is registered as a bot owner.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="id">The user ID to be checked.</param>
+        /// <returns><see langword="true"/> if the user is a bot owner, <see langword="false"/> otherwise.</returns>
+        public static bool IsOwner(CommandContext context, ulong id)
+            => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetService<Credentials>().OwnerIds.Contains(id);
+
         /// <summary>
         /// Gets a collection of all classes of the specified type in the AkkoBot namespace.
         /// </summary>

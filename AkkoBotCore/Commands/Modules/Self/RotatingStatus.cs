@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Self
 {
     [BotOwner]
-    [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
     public class RotatingStatus : AkkoCommandModule
     {
         private readonly StatusService _statusService;

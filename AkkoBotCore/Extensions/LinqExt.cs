@@ -237,5 +237,31 @@ namespace AkkoBot.Extensions
 
             return result;
         }
+
+        /// <summary>
+        /// Splits the elements of this <paramref name="collection"/> into several subcollections according to the value of the property defined by <paramref name="selector"/>.
+        /// </summary>
+        /// <typeparam name="T1">Type of the elements.</typeparam>
+        /// <typeparam name="T2">Type of the selected property.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="selector">A method that defines the property to filter the elements.</param>
+        /// <returns>A collection of <see cref="IEnumerable{T1}"/> where all the elements have the same value for the property defined by <paramref name="selector"/>.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when the predicate returns a null value.</exception>
+        public static IEnumerable<IEnumerable<T1>> SplitBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector)
+        {
+            var result = new Dictionary<T2, HashSet<T1>>();
+
+            foreach (var element in collection)
+            {
+                var key = selector(element);
+
+                if (result.ContainsKey(key))
+                    result[key].Add(element);
+                else
+                    result.TryAdd(key, new HashSet<T1>() { element });
+            }
+
+            return result.Values;
+        }
     }
 }

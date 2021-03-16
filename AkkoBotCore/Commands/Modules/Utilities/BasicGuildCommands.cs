@@ -104,7 +104,6 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [RequireGuild]
         [RequirePermissions(Permissions.ManageChannels)]
-        [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
         public class BasicChannelCommands : AkkoCommandModule
         {
             [Command("createtextchannel"), Aliases("ctch")]
@@ -231,7 +230,6 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [RequireGuild]
         [RequirePermissions(Permissions.ManageRoles)]
-        [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
         public class BasicRoleCommands : AkkoCommandModule
         {
             #region Role Management

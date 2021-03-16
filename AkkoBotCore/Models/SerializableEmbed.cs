@@ -52,16 +52,20 @@ namespace AkkoBot.Models
         /// <summary>
         /// Constructs the Discord embed represented by this model.
         /// </summary>
-        /// <returns>A <see cref="DiscordEmbedBuilder"/>.</returns>
+        /// <returns>A <see cref="DiscordEmbedBuilder"/>, <see langword="null"/> if the embed is invalid.</returns>
+        /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordEmbedBuilder BuildEmbed()
         {
+            if (!IsValidEmbed())
+                return null;
+
             var embed = new DiscordEmbedBuilder
             {
                 Author = new EmbedAuthor() 
                 { 
-                    Name = this.Header.Author?.Name,
-                    Url = this.Header.Author?.Url,
-                    IconUrl = this.Header.Author?.ImageUrl 
+                    Name = this.Header?.Author?.Name,
+                    Url = this.Header?.Author?.Url,
+                    IconUrl = this.Header?.Author?.ImageUrl 
                 },
 
                 Thumbnail = new EmbedThumbnail() { Url = this.Header?.ThumbnailUrl },
@@ -76,7 +80,7 @@ namespace AkkoBot.Models
                     IconUrl = this.Footer?.ImageUrl 
                 },
 
-                Color = new DiscordColor(Color ?? "000000"),
+                Color = (string.IsNullOrWhiteSpace(this.Color)) ? Optional.FromNoValue<DiscordColor>() : new DiscordColor(Color),
                 Timestamp = this.Timestamp
             };
 
@@ -97,6 +101,7 @@ namespace AkkoBot.Models
         /// Constructs the Discord message represented by this model.
         /// </summary>
         /// <returns>A <see cref="DiscordMessageBuilder"/> with the message content and the embed.</returns>
+        /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordMessageBuilder BuildMessage()
         {
             return new DiscordMessageBuilder()
@@ -105,6 +110,13 @@ namespace AkkoBot.Models
                 Embed = BuildEmbed()
             };
         }
+
+        /// <summary>
+        /// Checks if the embed to be serialized is valid.
+        /// </summary>
+        /// <returns><see langword="true"/> if the embed is valid, <see langword="false"/> otherwise.</returns>
+        private bool IsValidEmbed() 
+            => !string.IsNullOrWhiteSpace(Header?.ThumbnailUrl) || Body is not null || Fields is not null || Footer is not null;
     }
 
     /// <summary>

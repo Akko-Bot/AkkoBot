@@ -16,6 +16,7 @@ namespace AkkoBot.Services.Database
         public DbSet<OccurrenceEntity> Occurrencies { get; set; }
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
+        public DbSet<AliasEntity> Aliases { get; set; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
             => base.Database.Migrate(); // Ensure that the database exists
@@ -34,7 +35,10 @@ namespace AkkoBot.Services.Database
                 .HasAlternateKey(g => g.ContextId);
 
             modelBuilder.Entity<PlayingStatusEntity>()
-                .HasKey(x => x.Id); // Make this dependent on BotConfigEntity?
+                .HasKey(x => x.Id);
+
+            modelBuilder.Entity<AliasEntity>()
+                .HasKey(x => x.Id);
 
             #endregion Bot Configuration
 

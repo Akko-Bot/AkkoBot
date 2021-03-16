@@ -16,6 +16,7 @@ namespace AkkoBot.Services.Database.Abstractions
         public GuildConfigRepo GuildConfig { get; }
         public TimerRepo Timers { get; }
         public PlayingStatusRepo PlayingStatuses { get; }
+        public AliasRepo Aliases { get; }
 
         /// <summary>
         /// Saves all changes made in this context to the database.

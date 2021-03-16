@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace AkkoBot.Services.Database.Abstractions
 {
     /// <summary>
-    /// Represents a database table that holds information about how a message should be sent.
+    /// Contains information about how a message should be sent.
     /// </summary>
     public interface IMessageSettings
     {

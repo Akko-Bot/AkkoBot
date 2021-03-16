@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration
 {
-    [RequireGuild]
     public class Administration : AkkoCommandModule
     {
         private readonly GuildConfigService _guildService;
@@ -36,7 +35,7 @@ namespace AkkoBot.Commands.Modules.Administration
             _botService = botService;
         }
 
-        [BotOwner, Hidden]
+        [BotOwner, RequireGuild, Hidden]
         [Command("sudo")]
         [Description("cmd_sudo")]
         public async Task Sudo(
@@ -72,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_prefix")]
         public async Task ChangePrefix(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
         {
-            if (string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.ManageGuild))
+            if (context.Guild is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.ManageGuild))
             {
                 await CheckPrefixAsync(context);
                 return;
@@ -95,7 +94,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("prune"), Aliases("clear")]
         [Description("cmd_prune")]
-        [RequirePermissions(Permissions.ManageMessages)]
+        [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
         public async Task Prune(CommandContext context, 
             [Description("arg_discord_user")] DiscordUser user = null, 
             [Description("arg_int")] int amount = 50, 
@@ -124,7 +123,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("lockchannel"), Aliases("lockdown", "lock")]
         [Description("cmd_lockchannel")]
-        [RequirePermissions(Permissions.ManageChannels)]
+        [RequireGuild, RequirePermissions(Permissions.ManageChannels)]
         public async Task LockChannel(CommandContext context)
         {
             // Get the roles from the server mods
@@ -153,7 +152,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("unlockchannel"), Aliases("release", "unlock")]
         [Description("cmd_unlockchannel")]
-        [RequirePermissions(Permissions.ManageChannels)]
+        [RequireGuild, RequirePermissions(Permissions.ManageChannels)]
         public async Task UnlockChannel(CommandContext context)
         {
             // Get the roles from the server mods
@@ -184,7 +183,7 @@ namespace AkkoBot.Commands.Modules.Administration
             }
 
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
-        }
+        }       
 
         /// <summary>
         /// Sends a message with the guild prefix to the context that triggered it.
@@ -195,8 +194,9 @@ namespace AkkoBot.Commands.Modules.Administration
             var prefix = _guildService.GetOrSetProperty(context, x => x?.Prefix)
                 ?? _botService.GetOrSetProperty(x => x.BotPrefix);
 
+            var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_prefix_check", Formatter.InlineCode(prefix)));
+                .WithDescription(context.FormatLocalized(response, Formatter.InlineCode(prefix)));
 
             await context.RespondLocalizedAsync(embed);
         }

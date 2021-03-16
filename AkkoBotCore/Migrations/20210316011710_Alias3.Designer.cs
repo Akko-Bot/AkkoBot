@@ -3,15 +3,17 @@ using System;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210316011710_Alias3")]
+    partial class Alias3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,14 +36,15 @@ namespace AkkoBot.Migrations
                         .HasColumnName("alias");
 
                     b.Property<string>("Arguments")
+                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)")
                         .HasColumnName("arguments");
 
                     b.Property<string>("Command")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("command");
 
                     b.Property<DateTimeOffset>("DateAdded")
