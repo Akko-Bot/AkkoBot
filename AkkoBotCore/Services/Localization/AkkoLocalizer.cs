@@ -1,10 +1,10 @@
+using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using System.Text.RegularExpressions;
 
 namespace AkkoBot.Services.Localization
 {
@@ -23,6 +23,11 @@ namespace AkkoBot.Services.Localization
         /// string's key. The value is the response string itself.
         /// </summary>
         private readonly Dictionary<string, IReadOnlyDictionary<string, string>> _localizedStrings = new();
+
+        /// <summary>
+        /// Regex to get the locale of the response files. Matches anything enclosed between "_" and "."
+        /// </summary>
+        private readonly Regex _localeRegex = new(@"_(.*?)\.");
 
         public AkkoLocalizer()
             => LoadLocalizedStrings();
@@ -132,9 +137,12 @@ namespace AkkoBot.Services.Localization
         /// Gets the locale of the response string file, assuming it follows the "*_{locale}.yaml" format.
         /// </summary>
         /// <param name="filePath">Path to the file with the response strings.</param>
-        /// <returns>The locale of the response string's file.</returns>
+        /// <returns>The locale of the response string's file, <see langword="null"/> if no match occured.</returns>
         private string GetFileLocale(string filePath)
-            => filePath[(filePath.LastIndexOf('_') + 1)..filePath.LastIndexOf('.')];
+        {
+            var match = _localeRegex.Match(filePath).Groups.Values.LastOrDefault();
+            return match?.Value;
+        }
 
         /// <summary>
         /// Loads all response strings into the cache.
@@ -153,17 +161,13 @@ namespace AkkoBot.Services.Localization
                 throw new FileNotFoundException("No localization file has been found.");
 
             // Start deserialization
-            var yaml = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .IgnoreUnmatchedProperties()
-                .Build();
-
             foreach (var file in fileNames)
             {
-                using var reader = new StreamReader(File.OpenRead(file));
-                var lStrings = yaml.Deserialize<Dictionary<string, string>>(reader);
+                var reader = new StreamReader(File.OpenRead(file));
+                var lStrings = reader.FromYaml<Dictionary<string, string>>();
 
                 _localizedStrings.TryAdd(GetFileLocale(file), lStrings);
+                reader.Dispose();
             }
         }
     }

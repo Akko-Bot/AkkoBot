@@ -2,8 +2,6 @@
 using AkkoBot.Extensions;
 using AkkoBot.Models;
 using DSharpPlus.Entities;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace AkkoBot.Commands.Modules.Utilities.Services
 {
@@ -13,22 +11,6 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     public class UtilitiesService : ICommandService
     {
         /// <summary>
-        /// Serializes a Discord embed to Yaml.
-        /// </summary>
-        /// <param name="embed">The Discord embed.</param>
-        /// <returns>The serialized embed.</returns>
-        public string SerializeEmbed(DiscordEmbedBuilder embed)
-        {
-            var yaml = new SerializerBuilder()
-                .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull)
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .IgnoreFields()
-                .Build();
-
-            return yaml.Serialize(embed.BuildSerializableEmbed());
-        }
-
-        /// <summary>
         /// Deserializes user input in Yaml to a Discord message.
         /// </summary>
         /// <param name="input">The user's input.</param>
@@ -36,14 +18,9 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if deserialization was successful, <see langword="false"/> otherwise.</returns>
         public bool DeserializeEmbed(string input, out DiscordMessageBuilder result)
         {
-            var yaml = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .IgnoreUnmatchedProperties()
-                .Build();
-
             try
             {
-                result = yaml.Deserialize<SerializableEmbed>(input).BuildMessage();
+                result = input.FromYaml<SerializableEmbed>().BuildMessage();
                 return result.Content is not null && result.Embed is not null;
             }
             catch

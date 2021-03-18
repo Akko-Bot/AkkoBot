@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Core.Common;
 using AkkoBot.Credential;
+using AkkoBot.Extensions;
 using AkkoBot.Services;
 using DSharpPlus;
 using Microsoft.Extensions.Logging;
@@ -77,7 +78,7 @@ namespace AkkoBot.Core
 
             // Serialize the default credentials into a new file.
             using var writer = File.CreateText(filePath);
-            new Serializer().Serialize(writer, new Credentials());
+            new Credentials().ToYaml(writer, new Serializer());
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace AkkoBot.Core
 
             // Open the file and deserialize it.
             using var reader = new StreamReader(File.OpenRead(filePath));
-            return new Deserializer().Deserialize<Credentials>(reader);
+            return reader.FromYaml<Credentials>(new Deserializer());
         }
 
         /// <summary>
@@ -144,7 +145,7 @@ namespace AkkoBot.Core
         private void PauseProgram(string message)
         {
             Console.WriteLine(message + " press Enter when you are ready.");
-            Console.Read();
+            Console.ReadLine();
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace AkkoBot.Core
         private void TerminateProgram(string message)
         {
             Console.WriteLine(message + Environment.NewLine + "Press Enter to exit...");
-            Console.Read();
+            Console.ReadLine();
             Environment.Exit(Environment.ExitCode);
         }
     }

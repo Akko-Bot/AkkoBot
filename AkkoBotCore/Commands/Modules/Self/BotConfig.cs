@@ -183,7 +183,7 @@ namespace AkkoBot.Commands.Modules.Self
             {
                 if (_creds.OwnerIds.Add(user.Id))
                 {
-                    _service.SerializeCredentials(_creds);
+                    using var writer = _service.SerializeCredentials(_creds);
                     await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
                 }
                 else
@@ -196,7 +196,7 @@ namespace AkkoBot.Commands.Modules.Self
             {
                 if (_creds.OwnerIds.Remove(user.Id))
                 {
-                    _service.SerializeCredentials(_creds);
+                    using var writer = _service.SerializeCredentials(_creds);
                     await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
                 }
                 else

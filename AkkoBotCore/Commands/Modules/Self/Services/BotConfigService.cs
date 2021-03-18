@@ -99,10 +99,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Serializes a credentials file.
         /// </summary>
         /// <param name="creds">The data to be serialized.</param>
-        public void SerializeCredentials(Credentials creds)
-        {
-            using var writer = File.CreateText(AkkoEnvironment.CredsPath);
-            new Serializer().Serialize(writer, creds);
-        }
+        /// <returns>The text stream.</returns>
+        public TextWriter SerializeCredentials(Credentials creds) 
+            => creds.ToYaml(File.CreateText(AkkoEnvironment.CredsPath), new Serializer());
     }
 }
