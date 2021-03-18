@@ -44,7 +44,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             try
             {
                 result = yaml.Deserialize<SerializableEmbed>(input).BuildMessage();
-                return true;
+                return result.Content is not null && result.Embed is not null;
             }
             catch
             {

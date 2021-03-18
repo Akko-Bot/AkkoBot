@@ -185,9 +185,9 @@ namespace AkkoBot.Commands.Formatters
                     msg.AddField(_cmdContext.FormatLocalized("commands"), _helpCommandsField.ToString())
                         .WithFooter(
                             _cmdContext.FormatLocalized(
-                            "help_footer",
-                            _cmdContext.Prefix + _cmdContext.Command.QualifiedName + " " + _cmdContext.RawArgumentString +
-                           " <" + _cmdContext.FormatLocalized("name").ToLowerInvariant() + ">"
+                                "help_footer",
+                                _cmdContext.Prefix + _cmdContext.Command.QualifiedName + " " + _cmdContext.RawArgumentString +
+                               " <" + _cmdContext.FormatLocalized("name").ToLowerInvariant() + ">"
                             )
                             .Replace("  ", " ")
                         );
