@@ -3,7 +3,6 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;

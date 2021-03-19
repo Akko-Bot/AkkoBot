@@ -5,7 +5,6 @@ using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
 using AkkoBot.Services.Database.Entities;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;

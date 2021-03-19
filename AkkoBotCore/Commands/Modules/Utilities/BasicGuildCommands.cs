@@ -305,10 +305,10 @@ namespace AkkoBot.Commands.Modules.Utilities
 
                 if (success)
                     await role.ModifyAsync(x => x.Hoist = !role.IsHoisted);
-                
+
                 await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
             }
-                      
+
             [Command("deleteallroles"), Aliases("dar")]
             [Description("cmd_deleteallroles")]
             public async Task RemoveAllRoles(CommandContext context)
@@ -356,7 +356,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             #endregion Role Management
 
             #region Role Assignment
-            
+
             [Command("setrole"), Aliases("sr")]
             [Description("cmd_setrole")]
             public async Task SetRole(CommandContext context,

@@ -16,7 +16,7 @@ namespace AkkoBot.Commands.Modules.Utilities
     {
         private readonly UtilitiesService _service;
 
-        public ServerUtilities(UtilitiesService service) 
+        public ServerUtilities(UtilitiesService service)
             => _service = service;
 
         [Command("say"), HiddenOverload]

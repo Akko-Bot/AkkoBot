@@ -61,11 +61,11 @@ namespace AkkoBot.Models
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new EmbedAuthor() 
-                { 
+                Author = new EmbedAuthor()
+                {
                     Name = this.Header?.Author?.Name,
                     Url = this.Header?.Author?.Url,
-                    IconUrl = this.Header?.Author?.ImageUrl 
+                    IconUrl = this.Header?.Author?.ImageUrl
                 },
 
                 Thumbnail = new EmbedThumbnail() { Url = this.Header?.ThumbnailUrl },
@@ -74,10 +74,10 @@ namespace AkkoBot.Models
                 Description = this.Body?.Description,
                 ImageUrl = this.Body?.ImageUrl,
 
-                Footer = new EmbedFooter() 
-                { 
-                    Text = this.Footer?.Text, 
-                    IconUrl = this.Footer?.ImageUrl 
+                Footer = new EmbedFooter()
+                {
+                    Text = this.Footer?.Text,
+                    IconUrl = this.Footer?.ImageUrl
                 },
 
                 Color = (string.IsNullOrWhiteSpace(this.Color)) ? Optional.FromNoValue<DiscordColor>() : new DiscordColor(Color),
@@ -93,7 +93,7 @@ namespace AkkoBot.Models
                 foreach (var field in Fields)
                     embed.AddField(field.Title, field.Text, field.Inline);
             }
-            
+
             return embed;
         }
 
@@ -115,7 +115,7 @@ namespace AkkoBot.Models
         /// Checks if the embed to be serialized is valid.
         /// </summary>
         /// <returns><see langword="true"/> if the embed is valid, <see langword="false"/> otherwise.</returns>
-        private bool IsValidEmbed() 
+        private bool IsValidEmbed()
             => !string.IsNullOrWhiteSpace(Header?.ThumbnailUrl) || Body is not null || Fields is not null || Footer is not null;
     }
 
@@ -126,15 +126,18 @@ namespace AkkoBot.Models
     {
         private string _author;
 
-        public string Name 
+        public string Name
         {
             get => _author;
             set => _author = value?.MaxLength(AkkoEntities.EmbedTitleMaxLength);
         }
+
         public string Url { get; set; }
         public string ImageUrl { get; set; }
 
-        public SerializableEmbedAuthor() { }
+        public SerializableEmbedAuthor()
+        {
+        }
 
         public SerializableEmbedAuthor(string name, string url, string imageUrl)
         {
@@ -152,7 +155,9 @@ namespace AkkoBot.Models
         public SerializableEmbedAuthor Author { get; set; }
         public string ThumbnailUrl { get; set; }
 
-        public SerializableEmbedHeader() { }
+        public SerializableEmbedHeader()
+        {
+        }
 
         public SerializableEmbedHeader(SerializableEmbedAuthor author, string thumbnailUrl)
         {
@@ -169,7 +174,9 @@ namespace AkkoBot.Models
         public string Text { get; set; }
         public string Url { get; set; }
 
-        public SerializableEmbedTitle() { }
+        public SerializableEmbedTitle()
+        {
+        }
 
         public SerializableEmbedTitle(string text, string url)
         {
@@ -186,16 +193,18 @@ namespace AkkoBot.Models
         private string _description;
 
         public SerializableEmbedTitle Title { get; set; }
-        
-        public string Description 
+
+        public string Description
         {
-            get => _description; 
+            get => _description;
             set => _description = value?.MaxLength(AkkoEntities.EmbedPropMaxLength, "[...]");
         }
 
         public string ImageUrl { get; set; }
 
-        public SerializableEmbedBody() { }
+        public SerializableEmbedBody()
+        {
+        }
 
         public SerializableEmbedBody(SerializableEmbedTitle title, string description, string imageUrl)
         {
@@ -213,11 +222,12 @@ namespace AkkoBot.Models
         private string _title;
         private string _text;
 
-        public string Title 
-        { 
+        public string Title
+        {
             get => _title;
             set => _title = value?.MaxLength(AkkoEntities.EmbedTitleMaxLength);
         }
+
         public string Text
         {
             get => _text;
@@ -226,7 +236,9 @@ namespace AkkoBot.Models
 
         public bool Inline { get; set; }
 
-        public SerializableEmbedField() { }
+        public SerializableEmbedField()
+        {
+        }
 
         public SerializableEmbedField(string name, string value, bool inline = false)
         {
@@ -243,15 +255,17 @@ namespace AkkoBot.Models
     {
         private string _text;
 
-        public string Text 
-        { 
-            get => _text; 
+        public string Text
+        {
+            get => _text;
             set => _text = value?.MaxLength(AkkoEntities.EmbedPropMaxLength);
         }
 
         public string ImageUrl { get; set; }
 
-        public SerializableEmbedFooter() { }
+        public SerializableEmbedFooter()
+        {
+        }
 
         public SerializableEmbedFooter(string text, string imageUrl)
         {

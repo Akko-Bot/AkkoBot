@@ -100,7 +100,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="creds">The data to be serialized.</param>
         /// <returns>The text stream.</returns>
-        public TextWriter SerializeCredentials(Credentials creds) 
+        public TextWriter SerializeCredentials(Credentials creds)
             => creds.ToYaml(File.CreateText(AkkoEnvironment.CredsPath), new Serializer());
     }
 }

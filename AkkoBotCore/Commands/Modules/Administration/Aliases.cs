@@ -17,14 +17,14 @@ namespace AkkoBot.Commands.Modules.Administration
     {
         private readonly AliasService _service;
 
-        public Aliases(AliasService service) 
+        public Aliases(AliasService service)
             => _service = service;
 
         [Command("add")]
         [Description("cmd_alias_add")]
         [RequirePermissions(Permissions.ManageGuild)]
-        public async Task AddAlias(CommandContext context, 
-            [Description("arg_alias_add_alias")] string alias, 
+        public async Task AddAlias(CommandContext context,
+            [Description("arg_alias_add_alias")] string alias,
             [RemainingText, Description("arg_alias_add_command")] string command)
         {
             if (await _service.SaveAliasAsync(context, alias, command))

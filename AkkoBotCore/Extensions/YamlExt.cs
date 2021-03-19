@@ -18,7 +18,6 @@ namespace AkkoBot.Extensions
             .IgnoreUnmatchedProperties()
             .Build();
 
-
         /// <summary>
         /// Serializes this object to Yaml.
         /// </summary>

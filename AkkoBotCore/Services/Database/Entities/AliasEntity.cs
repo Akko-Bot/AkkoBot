@@ -40,7 +40,7 @@ namespace AkkoBot.Services.Database.Entities
         /// Gets the full command string mapped to this alias.
         /// </summary>
         [NotMapped]
-        public string FullCommand => (string.IsNullOrWhiteSpace(Arguments))? Command : $"{Command} {Arguments}";
+        public string FullCommand => (string.IsNullOrWhiteSpace(Arguments)) ? Command : $"{Command} {Arguments}";
 
         /// <summary>
         /// Gets the command associated with this alias.

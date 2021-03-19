@@ -118,7 +118,7 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task HandleCommandAlias(object sender, MessageCreateEventArgs eventArgs)
         {
-            // If message is from a bot or there aren't any global or server aliases, quit. 
+            // If message is from a bot or there aren't any global or server aliases, quit.
             if (eventArgs.Author.IsBot
                 || !_dbCache.Aliases.TryGetValue(eventArgs.Guild?.Id ?? default, out var aliases)
                 || !_dbCache.Aliases.TryGetValue(default, out var globalAliases))

@@ -226,7 +226,7 @@ namespace AkkoBot.Extensions
             var index = 0;
             var collectionCount = collection.Count();
             var result = new List<List<T>>() { new List<T>(Math.Min(amount, collectionCount)) };
-            
+
             foreach (var element in collection)
             {
                 result[index].Add(element);

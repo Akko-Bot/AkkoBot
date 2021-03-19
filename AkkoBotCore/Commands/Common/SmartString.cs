@@ -13,7 +13,7 @@ namespace AkkoBot.Commands.Common
         private readonly StringBuilder _parsedContent;
         private readonly CommandContext _context;
         private readonly IPlaceholderFormatter _formatter;
-        
+
         /// <summary>
         /// Defines the regex to match the placeholders.
         /// </summary>
@@ -69,7 +69,7 @@ namespace AkkoBot.Commands.Common
         /// <param name="text">The string to compare to this instance.</param>
         /// <param name="comparisonType">One of the enumeration values that specifies how the strings will be compared.</param>
         /// <returns><see langword="true"/> if the value of the value parameter is the same as this <see cref="SmartString"/>, <see langword="false"/> otherwise.</returns>
-        public bool Equals(string text, StringComparison comparisonType) 
+        public bool Equals(string text, StringComparison comparisonType)
             => Content.Equals(text, comparisonType);
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace AkkoBot.Commands.Common
         private bool ParseUserInput()
         {
             var matches = ParseRegex.Matches(_parsedContent.ToString());
-            
+
             if (matches.Count == 0)
                 return false;
 
@@ -113,9 +113,13 @@ namespace AkkoBot.Commands.Common
         }
 
         public static string operator +(SmartString x, SmartString y) => x.Content + y.Content;
+
         public static string operator +(SmartString x, string y) => x.Content + y;
+
         public static string operator +(string x, SmartString y) => x + y.Content;
+
         public static bool operator ==(SmartString x, SmartString y) => x.Content == y.Content;
+
         public static bool operator !=(SmartString x, SmartString y) => x.Content != y.Content;
 
         /* Overrides */
@@ -123,10 +127,10 @@ namespace AkkoBot.Commands.Common
         public override string ToString()
             => Content;
 
-        public override bool Equals(object obj) 
+        public override bool Equals(object obj)
             => (ReferenceEquals(this, obj) || obj is not null) && Content == obj.ToString();
 
-        public override int GetHashCode() 
+        public override int GetHashCode()
             => base.GetHashCode();
     }
 }

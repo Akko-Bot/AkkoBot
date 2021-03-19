@@ -95,9 +95,9 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("prune"), Aliases("clear")]
         [Description("cmd_prune")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task Prune(CommandContext context, 
-            [Description("arg_discord_user")] DiscordUser user = null, 
-            [Description("arg_int")] int amount = 50, 
+        public async Task Prune(CommandContext context,
+            [Description("arg_discord_user")] DiscordUser user = null,
+            [Description("arg_int")] int amount = 50,
             [Description("arg_prune_options")] string options = "")
         {
             amount = Math.Abs(amount) + 1;
@@ -173,7 +173,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 await toUnlock[index].UpdateAsync(null, Permissions.None, context.FormatLocalized("unlockchannel_reason"));
 
             // Remove the overwrites for the mod roles
-            foreach(var role in modRoles)
+            foreach (var role in modRoles)
             {
                 var modOverwrite = context.Channel.PermissionOverwrites
                     .FirstOrDefault(overwrite => overwrite.Id == role.Id && overwrite.Allowed.HasFlag(_lockPerms));
@@ -183,7 +183,7 @@ namespace AkkoBot.Commands.Modules.Administration
             }
 
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
-        }       
+        }
 
         /// <summary>
         /// Sends a message with the guild prefix to the context that triggered it.
