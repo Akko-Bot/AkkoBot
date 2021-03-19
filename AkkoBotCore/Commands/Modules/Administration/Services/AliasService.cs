@@ -92,7 +92,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             var prefix = db.GuildConfig.GetGuild(context.Guild?.Id ?? 0)?.Prefix
                 ?? db.BotConfig.Cache.BotPrefix;
 
-            var dbEntry = aliases.FirstOrDefault(x => x.Alias.Equals((x.IsDynamic) ? alias.Replace(prefix, "{p}") : alias, StringComparison.InvariantCultureIgnoreCase));
+            var dbEntry = aliases.FirstOrDefault(x => x.Alias.Equals(alias, StringComparison.InvariantCultureIgnoreCase));
 
             if (dbEntry is null)
                 return false;

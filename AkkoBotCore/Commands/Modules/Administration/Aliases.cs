@@ -68,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Administration
             else
             {
                 embed.WithTitle((context.Guild is null) ? "alias_list_title_global" : "alias_list_title_server")
-                    .AddField("alias", string.Join('\n', dbAliases.Select(x => x.Alias.Replace("{p}", context.Prefix)).ToArray()), true)
+                    .AddField("alias", string.Join('\n', dbAliases.Select(x => x.Alias).ToArray()), true)
                     .AddField("command", string.Join('\n', dbAliases.Select(x => (context.Prefix + x.FullCommand).MaxLength(50, "[...]")).ToArray()), true);
             }
 

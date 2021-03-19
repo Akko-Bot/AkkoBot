@@ -1,3 +1,4 @@
+using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
@@ -58,7 +59,7 @@ namespace AkkoBot.Core.Services
                 var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasFlag(Permissions.ManageRoles));
 
                 // Check if user is in the database
-                var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id).ConfigureAwait(false);
+                var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
                 var mutedUser = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == eventArgs.Member.Id);
 
                 if (mutedUser is not null && botHasManageRoles)
@@ -67,7 +68,7 @@ namespace AkkoBot.Core.Services
                     {
                         // If mute role exists, apply to the user
                         muteRole = eventArgs.Guild.GetRole(guildSettings.MuteRoleId.Value);
-                        await eventArgs.Member.GrantRoleAsync(muteRole).ConfigureAwait(false);
+                        await eventArgs.Member.GrantRoleAsync(muteRole);
                     }
                     else
                     {
@@ -75,7 +76,7 @@ namespace AkkoBot.Core.Services
                         guildSettings.MutedUserRel.Remove(mutedUser);
 
                         db.GuildConfig.Update(guildSettings);
-                        await db.SaveChangesAsync().ConfigureAwait(false);
+                        await db.SaveChangesAsync();
                     }
                 }
             });
@@ -107,7 +108,7 @@ namespace AkkoBot.Core.Services
                 if (string.IsNullOrWhiteSpace(cmdArgs) || eventArgs.Guild is not null)
                 {
                     var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd, cmdArgs);
-                    await cmd.ExecuteAndLogAsync(context).ConfigureAwait(false);
+                    await cmd.ExecuteAndLogAsync(context);
                 }
             });
         }
@@ -130,15 +131,23 @@ namespace AkkoBot.Core.Services
                     ? _dbCache.BotConfig.BotPrefix
                     : _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
+                // Get a string that parses its placeholders automatically
+                var cmdHandler = (sender as DiscordClient).GetExtension<CommandsNextExtension>();
+                var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, prefix, null);
+                var parsedMsg = new SmartString(dummyCtx, string.Empty);
+
                 // Local function to determine the correct alias from the user input
-                bool AliasSelector(AliasEntity alias) 
-                    => (alias.IsDynamic && eventArgs.Message.Content.StartsWith(alias.Alias.Replace("{p}", prefix), StringComparison.InvariantCultureIgnoreCase))
-                        || (!alias.IsDynamic && eventArgs.Message.Content.Equals(alias.Alias.Replace("{p}", prefix), StringComparison.InvariantCultureIgnoreCase));
+                bool AliasSelector(AliasEntity alias)
+                {
+                    parsedMsg.Content = alias.Alias;
+
+                    return (alias.IsDynamic && eventArgs.Message.Content.StartsWith(parsedMsg.Content, StringComparison.InvariantCultureIgnoreCase))
+                        || (!alias.IsDynamic && eventArgs.Message.Content.Equals(parsedMsg.Content, StringComparison.InvariantCultureIgnoreCase));
+                }
 
                 // Find the command represented by the alias
                 var alias = aliases?.FirstOrDefault(x => AliasSelector(x)) ?? globalAliases?.FirstOrDefault(x => AliasSelector(x));
-                var cmdHandler = (sender as DiscordClient).GetExtension<CommandsNextExtension>();
-                var cmd = cmdHandler.FindCommand(alias?.ParseAliasInput(prefix, eventArgs.Message.Content) ?? string.Empty, out var args);
+                var cmd = cmdHandler.FindCommand(((parsedMsg.IsParsed) ? alias?.FullCommand : alias?.ParseAliasInput(prefix, eventArgs.Message.Content)) ?? string.Empty, out var args);
 
                 if (cmd is null)
                     return;
@@ -146,8 +155,8 @@ namespace AkkoBot.Core.Services
                 // Execute the command
                 var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd, args);
 
-                if (!(await cmd.RunChecksAsync(context, false).ConfigureAwait(false)).Any())
-                    await cmd.ExecuteAndLogAsync(context).ConfigureAwait(false);
+                if (!(await cmd.RunChecksAsync(context, false)).Any())
+                    await cmd.ExecuteAndLogAsync(context);
             });
         }
     }

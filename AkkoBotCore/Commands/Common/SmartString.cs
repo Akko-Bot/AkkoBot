@@ -32,7 +32,10 @@ namespace AkkoBot.Commands.Common
             get
             {
                 if (!IsParsed)
-                    IsParsed = ParseUserInput();
+                {
+                    ParseUserInput();
+                    IsParsed = true;
+                }
 
                 return _parsedContent.ToString();
             }
