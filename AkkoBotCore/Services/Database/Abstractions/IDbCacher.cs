@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace AkkoBot.Services.Database.Abstractions
 {
     /// <summary>
-    /// Represents a default database cacher for an <see cref="IUnitOfWork"/>.
+    /// Represents a default database cache for an <see cref="IUnitOfWork"/>.
     /// </summary>
     public interface IDbCacher : IDisposable
     {
@@ -19,11 +19,6 @@ namespace AkkoBot.Services.Database.Abstractions
         ITimerManager Timers { get; set; }
         List<PlayingStatusEntity> PlayingStatuses { get; }
         ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; }
-
-        /// <summary>
-        /// Reinitializes the database cache.
-        /// </summary>
-        /// <param name="botId">Discord ID of the bot.</param>
-        void Reset(ulong botId);
+        ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; }
     }
 }

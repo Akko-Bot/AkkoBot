@@ -23,6 +23,10 @@ arg_discord_role: ID ou menção a um cargo do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_discord_voicechannel: ID ou nome de um canal de voz.
 arg_double: Um número real.
+arg_fw_ids: IDs de usuários, canais e/ou cargos, separados por espaço.
+arg_fw_message: A mensagem a ser enviada.
+arg_fw_word: Uma palavra.
+arg_fw_words: Múltiplas palavras, separadas por espaço.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_int: Um número inteiro.
 arg_locale: O idioma a ser utilizado nas respostas.
@@ -122,6 +126,19 @@ cmd_deafen: Ensurdece um usuário.
 cmd_deleteallroles: Exclui todos os cargos desse servidor que estão abaixo do bot e do usuário que usou o comando.
 cmd_deletechannel: Exclui um canal do Discord.
 cmd_deleterole: Exclui um cargo do Discord.
+cmd_fw: Agrupa comandos que filtram palavras indesejáveis do servidor.
+cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
+cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando o filtro de palavras para eles.
+cmd_fw_addmany: Adiciona múltiplas palavras ao filtro de palavras. Separe-as com espaço. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
+cmd_fw_clear: Remove todas a palavras do filtro de palavras.
+cmd_fw_enable: Ativa ou desativa a exclusão de mensagens que contém palavras proibidas no servidor.
+cmd_fw_list: Exibe todas a palavras proibidas no servidor e os usuários, canais e cargos ignorados pelo filtro de palavras.
+cmd_fw_message: Define a mensagem a ser automaticamente enviada quando uma mensagem for excluída por conter uma palavra proibida.
+cmd_fw_notify: Ativa ou desativa o envio de uma notificação quando uma mensagem filtrada for excluída.
+cmd_fw_remove: Remove uma palavra do filtro de palavras.
+cmd_fw_removeignore: Remove IDs de usuários, canais e/ou cargos da lista de IDs ignorados.
+cmd_fw_removemany: Remove múltiplas palavras do filtro de palavras. Separe-as com espaço.
+cmd_fw_warn: Ativa ou desativa a advertência automática a usuários que enviarem mensagens com palavras proibidas.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
@@ -194,6 +211,17 @@ enabled: ativado
 error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o meu e o seu na hierarquia de cargos.
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
+fw_default_notification: Sua mensagem foi removida por conter uma palavra proibida. Cuidado com o palavreado.
+fw_default_warn: Usou uma palavra proibida.
+fw_ignored_channels: Canais Ignorados
+fw_ignored_roles: Cargos Ignorados
+fw_ignored_users: Usuários Ignorados
+fw_list_empty: Não há palavras proibidas.
+fw_list_title: Lista de Palavras Proibidas
+fw_notify: A notificação para mensagens filtradas foi {0}.
+fw_toggle: A filtragem de palavras foi {0} nesse servidor.
+fw_warn: A advertência automática para mensagens filtradas foi {0}.
+fw_warn_footer: Esse incidente foi registrado na sua lista de infrações.
 guild_embed_change: O uso de embeds nesse servidor foi {0}.
 guild_errorcolor: ErrorColor foi alterada para {0}.
 guild_locale_changed: O idioma desse servidor foi alterado para {0}.
@@ -257,7 +285,7 @@ massunban_failed: Não há usuário a desbanir.
 massunban_succeded: '{0} usuários foram desbanidos do servidor.'
 message: Mensagem
 minutes: Minutos
-modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} expulsões, {4} expulsões com deleção, {5} banimentos.'
+modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis

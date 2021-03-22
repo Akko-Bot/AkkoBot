@@ -37,15 +37,15 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             => _services = services;
 
         /// <summary>
-        /// A more permissive version of <see cref="HierarchyCheckAsync(CommandContext, DiscordMember, string)"/>
-        /// that does not check for the bot's position in the role hierarchy.
+        /// A more permissive version of <see cref="CheckHierarchyAsync(CommandContext, DiscordMember, string)"/>
+        /// that does not check for the bot's position in the role hierarchy and sends an error message if the check fails.
         /// </summary>
         /// <param name="context">This command context.</param>
         /// <param name="user">The targeted user.</param>
         /// <param name="errorMessage">The error message to be sent if the check fails.</param>
         /// <returns><see langword="true"/> if the context user is higher than the target user, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> SoftHierarchyCheckAsync(CommandContext context, DiscordMember user, string errorMessage)
-            => context.Member.Hierarchy >= user.Hierarchy || await HierarchyCheckAsync(context, user, errorMessage);
+        public async Task<bool> SoftCheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
+            => context.Member.Hierarchy >= user.Hierarchy || await CheckHierarchyAsync(context, user, errorMessage);
 
         /// <summary>
         /// Checks if the <paramref name="context"/> user can perform actions on the specified <paramref name="user"/> and sends an error message if the check fails.
@@ -54,11 +54,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="user">The targeted user.</param>
         /// <param name="errorMessage">The error message to be sent if the check fails.</param>
         /// <returns><see langword="true"/> if the context user is above in the hierarchy, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> HierarchyCheckAsync(CommandContext context, DiscordMember user, string errorMessage)
+        public async Task<bool> CheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
         {
-            if ((context.Member.Hierarchy <= user.Hierarchy
-            && context.Guild.CurrentMember.Hierarchy <= user.Hierarchy)
-            || user.Equals(context.Guild.CurrentMember))
+            if (!CheckHierarchyAsync(context.Member, user))
             {
                 var embed = new DiscordEmbedBuilder().WithDescription(errorMessage);
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -67,6 +65,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Checks if the <paramref name="userA"/> can perform actions on <paramref name="userB"/>.
+        /// </summary>
+        /// <param name="userA">The user that is performing the action.</param>
+        /// <param name="userB">The user that is being acted upon.</param>
+        /// <returns><see langword="true"/> if the <paramref name="userA"/> is above in the hierarchy, <see langword="false"/> otherwise.</returns>
+        public bool CheckHierarchyAsync(DiscordMember userA, DiscordMember userB)
+        {
+            return (userA.Hierarchy > userB.Hierarchy || userA.Guild.CurrentMember.Hierarchy > userB.Hierarchy)
+            && !userB.Equals(userA.Guild.CurrentMember);
         }
 
         /// <summary>

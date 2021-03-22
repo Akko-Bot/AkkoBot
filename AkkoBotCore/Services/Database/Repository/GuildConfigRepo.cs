@@ -1,5 +1,7 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using ConcurrentCollections;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -12,11 +14,13 @@ namespace AkkoBot.Services.Database.Repository
     {
         private readonly BotConfigEntity _botConfig;
         public ConcurrentDictionary<ulong, GuildConfigEntity> Cache { get; }
+        public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWordsCache { get; }
 
         public GuildConfigRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
         {
             _botConfig = dbCacher.BotConfig;
             Cache = dbCacher.Guilds;
+            FilteredWordsCache = dbCacher.FilteredWords;
         }
 
         /// <summary>
@@ -40,6 +44,23 @@ namespace AkkoBot.Services.Database.Repository
 
                 return guild;
             }
+        }
+
+        /// <summary>
+        /// Gets the settings of the specified Discord guild with its filtered words.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
+        public async Task<GuildConfigEntity> GetGuildWithFilteredWordsAsync(ulong sid)
+        {
+            var entry = await base.Table
+                .Include(x => x.FilteredWordsRel)
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+
+            if (entry.FilteredWordsRel is null)
+                entry.FilteredWordsRel = new() { GuildIdFK = sid };
+
+            return entry;
         }
 
         /// <summary>
@@ -154,17 +175,20 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns><see langword="true"/> if the entry got added to EF Core's tracker or to the cache, <see langword="false"/> otherwise.</returns>
         public bool TryCreate(DiscordGuild guild)
         {
-            if (!Cache.ContainsKey(guild.Id))
+            if (Cache.ContainsKey(guild.Id))
+                return false;
+
+            var dbEntry = base.Table.FirstOrDefault(x => x.GuildId == guild.Id);
+
+            if (dbEntry is null)
             {
-                var dGuild = new GuildConfigEntity(_botConfig) { GuildId = guild.Id };
-
-                base.Create(dGuild);                    // Add to the database
-                Cache.TryAdd(dGuild.GuildId, dGuild);   // Add to the cache
-
-                return true;
+                dbEntry = new GuildConfigEntity(_botConfig) { GuildId = guild.Id };
+                base.Create(dbEntry);   // Add to the database
             }
 
-            return false;
+            Cache.TryAdd(dbEntry.GuildId, dbEntry);   // Add to the cache
+
+            return true;
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace AkkoBot.Services.Database.Entities
     [Comment("Stores how many times a user got punished in a server.")]
     public class OccurrenceEntity : DbEntity
     {
-        public GuildConfigEntity GuildConfigRel { get; set; }
+        public GuildConfigEntity GuildConfigRel { get; init; }
 
         public ulong GuildIdFK { get; init; }
         public ulong UserId { get; init; }
@@ -19,26 +19,28 @@ namespace AkkoBot.Services.Database.Entities
 
         public static OccurrenceEntity operator +(OccurrenceEntity x, OccurrenceEntity y)
         {
-            x.Notices += y.Notices;
-            x.Warnings += y.Warnings;
-            x.Mutes += y.Mutes;
-            x.Kicks += y.Kicks;
-            x.Softbans += y.Softbans;
-            x.Bans += y.Bans;
-
-            return x;
+            return new OccurrenceEntity()
+            {
+                Notices = x.Notices + y.Notices,
+                Warnings = x.Warnings + y.Warnings,
+                Mutes = x.Mutes + y.Mutes,
+                Kicks = x.Kicks + y.Kicks,
+                Softbans = x.Softbans + y.Softbans,
+                Bans = x.Bans + y.Bans
+            };
         }
 
         public static OccurrenceEntity operator -(OccurrenceEntity x, OccurrenceEntity y)
         {
-            x.Notices -= y.Notices;
-            x.Warnings -= y.Warnings;
-            x.Mutes -= y.Mutes;
-            x.Kicks -= y.Kicks;
-            x.Softbans -= y.Softbans;
-            x.Bans -= y.Bans;
-
-            return x;
+            return new OccurrenceEntity()
+            {
+                Notices = x.Notices - y.Notices,
+                Warnings = x.Warnings - y.Warnings,
+                Mutes = x.Mutes - y.Mutes,
+                Kicks = x.Kicks - y.Kicks,
+                Softbans = x.Softbans - y.Softbans,
+                Bans = x.Bans - y.Bans
+            };
         }
     }
 }

@@ -17,6 +17,7 @@ namespace AkkoBot.Services.Database
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
         public DbSet<AliasEntity> Aliases { get; set; }
+        public DbSet<FilteredWordsEntity> FilteredWords { get; set; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
             => base.Database.Migrate(); // Ensure that the database exists
@@ -73,6 +74,13 @@ namespace AkkoBot.Services.Database
                 .WithMany(x => x.OccurrenceRel)
                 .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FilteredWordsEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithOne(x => x.FilteredWordsRel)
+                .HasForeignKey<FilteredWordsEntity>(x => x.GuildIdFK)
+                .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion Guild Configuration

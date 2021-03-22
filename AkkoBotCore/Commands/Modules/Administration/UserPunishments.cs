@@ -33,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // This returns null if it fails
@@ -68,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_ban_deletion")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // This returns null if it fails
@@ -102,7 +102,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_ban_deletion")] TimeSpan? time = null,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
         {
-            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // This returns null if it fails

@@ -23,6 +23,7 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
+        public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
 
         // Lazily instantiated
         public ITimerManager Timers { get; set; }
@@ -39,19 +40,8 @@ namespace AkkoBot.Services.Database
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
-        }
 
-        /// <summary>
-        /// Reinitializes the database cache.
-        /// </summary>
-        /// <param name="botId">Discord ID of the bot.</param>
-        public void Reset(ulong botId)
-        {
-            Blacklist.Clear();
-            BotConfig = new();
-            LogConfig = new();
-            Guilds.Clear();
-            PlayingStatuses.Clear();
+            FilteredWords = new(); // Filtered words will be loaded into the cache as needed
         }
 
         /// <summary>
@@ -79,6 +69,7 @@ namespace AkkoBot.Services.Database
                         group.Clear();
 
                     Aliases.Clear();
+                    FilteredWords.Clear();
                 }
 
                 Blacklist = null;
@@ -88,6 +79,7 @@ namespace AkkoBot.Services.Database
                 Timers = null;
                 PlayingStatuses = null;
                 Aliases = null;
+                FilteredWords = null;
 
                 _isDisposed = true;
             }

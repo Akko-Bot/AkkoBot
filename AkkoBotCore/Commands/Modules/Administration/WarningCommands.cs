@@ -37,7 +37,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_notice")] string notice)
         {
-            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             await Notice(context, user as DiscordUser, notice);
@@ -67,7 +67,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("arg_discord_user")] DiscordMember user,
         [RemainingText, Description("arg_infraction")] string reason = null)
         {
-            if (!await _roleService.HierarchyCheckAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // Dm the user about the warn
@@ -114,7 +114,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_uint")] int? id = null)
         {
-            if (!await _roleService.SoftHierarchyCheckAsync(context, user, "error_hierarchy"))
+            if (!await _roleService.SoftCheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             // Remove from the database

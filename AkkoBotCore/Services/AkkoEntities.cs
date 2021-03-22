@@ -44,6 +44,11 @@ namespace AkkoBot.Services
         public const int EmbedPropMaxLength = 2048;
 
         /// <summary>
+        /// Represents the maximum string length allowed in a Discord embed field property.
+        /// </summary>
+        public const int EmbedFieldMaxLength = 1024;
+
+        /// <summary>
         /// Represents the maximum string length allowed in a Discord embed title.
         /// </summary>
         public const int EmbedTitleMaxLength = 256;

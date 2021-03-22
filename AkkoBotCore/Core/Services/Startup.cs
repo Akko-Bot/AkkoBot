@@ -8,6 +8,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.EventArgs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -49,6 +50,9 @@ namespace AkkoBot.Core.Services
 
             // Save visible guilds on ready
             _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuildsAsync;
+
+            // Caches guild filtered words
+            _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredWordsAsync;
 
             // Save guild on join
             _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
@@ -127,6 +131,19 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
+        /// Caches the filtered words of all guilds available to this client.
+        /// </summary>
+        private Task CacheFilteredWordsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            foreach (var entry in db.GuildConfig.Table.Include(x => x.FilteredWordsRel).Where(x => x.FilteredWordsRel != null && x.FilteredWordsRel.Words.Count != 0))
+                db.GuildConfig.FilteredWordsCache.TryAdd(entry.GuildId, entry.FilteredWordsRel);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Saves default guild settings to the database and caches when the bot joins a guild.
         /// </summary>
         private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
@@ -146,6 +163,7 @@ namespace AkkoBot.Core.Services
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             db.GuildConfig.Cache.TryRemove(eventArgs.Guild.Id, out _);
+            db.GuildConfig.FilteredWordsCache.TryRemove(eventArgs.Guild.Id, out _);
 
             return Task.CompletedTask;
         }

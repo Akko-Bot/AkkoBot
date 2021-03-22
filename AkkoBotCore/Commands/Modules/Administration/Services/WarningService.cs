@@ -32,12 +32,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="note">The note to be added.</param>
         /// <param name="type">The type of note to be added.</param>
         /// <returns>The saved guild settings.</returns>
-        public async Task<GuildConfigEntity> SaveInfractionAsync(CommandContext context, DiscordUser user, string note, WarnType? type = null)
+        public async Task<GuildConfigEntity> SaveInfractionAsync(CommandContext context, DiscordUser user, string note, WarnType type = WarnType.Notice)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-
-            if (!type.HasValue)
-                type = WarnType.Notice;
 
             // Create the entry
             var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(context.Guild.Id, user.Id);
@@ -52,7 +49,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 GuildIdFK = context.Guild.Id,
                 UserId = user.Id,
                 AuthorId = context.Member.Id,
-                Type = type.Value,
+                Type = type,
                 WarningText = note
             };
 

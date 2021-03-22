@@ -231,7 +231,7 @@ namespace AkkoBot.Models
         public string Text
         {
             get => _text;
-            set => _text = value?.MaxLength(1024, "[...]");
+            set => _text = value?.MaxLength(AkkoEntities.EmbedFieldMaxLength, "[...]");
         }
 
         public bool Inline { get; set; }

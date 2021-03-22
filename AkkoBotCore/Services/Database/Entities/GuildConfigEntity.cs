@@ -21,6 +21,7 @@ namespace AkkoBot.Services.Database.Entities
         public List<WarnEntity> WarnRel { get; set; }
         public List<WarnPunishEntity> WarnPunishRel { get; set; }
         public List<OccurrenceEntity> OccurrenceRel { get; set; }
+        public FilteredWordsEntity FilteredWordsRel { get; set; }
 
         public ulong GuildId { get; set; }
 

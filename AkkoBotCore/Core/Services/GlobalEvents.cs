@@ -6,11 +6,13 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using static DSharpPlus.Entities.DiscordEmbedBuilder;
 
 namespace AkkoBot.Core.Services
 {
@@ -19,6 +21,8 @@ namespace AkkoBot.Core.Services
         private readonly IServiceProvider _services;
         private readonly IDbCacher _dbCache;
         private readonly AliasService _aliasService;
+        private readonly WarningService _warningService;
+        private readonly RoleService _roleService;
         private readonly BotCore _botCore;
 
         internal GlobalEvents(BotCore botCore, IServiceProvider services)
@@ -26,6 +30,8 @@ namespace AkkoBot.Core.Services
             _services = services;
             _dbCache = services.GetService<IDbCacher>();
             _aliasService = services.GetService<AliasService>();
+            _warningService = services.GetService<WarningService>();
+            _roleService = services.GetService<RoleService>();
             _botCore = botCore;
         }
 
@@ -42,6 +48,9 @@ namespace AkkoBot.Core.Services
 
             // Catch aliased commands and execute them
             _botCore.BotShardedClient.MessageCreated += HandleCommandAlias;
+
+            // Delete filtered words
+            _botCore.BotShardedClient.MessageCreated += FilterWord;
         }
 
         /* Event Methods */
@@ -49,7 +58,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Mutes a user that has been previously muted.
         /// </summary>
-        private Task Remute(object sender, GuildMemberAddEventArgs eventArgs)
+        private Task Remute(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
             return Task.Run(async () =>
             {
@@ -85,7 +94,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
         /// </summary>
-        private Task DefaultPrefix(object sender, MessageCreateEventArgs eventArgs)
+        private Task DefaultPrefix(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (!eventArgs.Message.Content.StartsWith("!prefix", StringComparison.InvariantCultureIgnoreCase))
                 return Task.CompletedTask;
@@ -100,7 +109,7 @@ namespace AkkoBot.Core.Services
                     return;
 
                 // Get command handler and prefix command
-                var cmdHandler = (sender as DiscordClient).GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetExtension<CommandsNextExtension>();
                 var cmd = cmdHandler.FindCommand(eventArgs.Message.Content.Remove(0, prefix.Length), out var cmdArgs)
                     ?? cmdHandler.FindCommand(eventArgs.Message.Content[1..], out cmdArgs);
 
@@ -116,7 +125,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Executes commands mapped to aliases.
         /// </summary>
-        private Task HandleCommandAlias(object sender, MessageCreateEventArgs eventArgs)
+        private Task HandleCommandAlias(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             // If message is from a bot or there aren't any global or server aliases, quit.
             if (eventArgs.Author.IsBot
@@ -132,7 +141,7 @@ namespace AkkoBot.Core.Services
                     : _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
                 // Get a string that parses its placeholders automatically
-                var cmdHandler = (sender as DiscordClient).GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetExtension<CommandsNextExtension>();
                 var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, prefix, null);
                 var parsedMsg = new SmartString(dummyCtx, string.Empty);
 
@@ -147,7 +156,11 @@ namespace AkkoBot.Core.Services
 
                 // Find the command represented by the alias
                 var alias = aliases?.FirstOrDefault(x => AliasSelector(x)) ?? globalAliases?.FirstOrDefault(x => AliasSelector(x));
-                var cmd = cmdHandler.FindCommand(((parsedMsg.IsParsed) ? alias?.FullCommand : alias?.ParseAliasInput(prefix, eventArgs.Message.Content)) ?? string.Empty, out var args);
+
+                if (alias is null)
+                    return;
+
+                var cmd = cmdHandler.FindCommand(((parsedMsg.IsParsed && !alias.IsDynamic) ? alias.FullCommand : alias.ParseAliasInput(prefix, eventArgs.Message.Content)), out var args);
 
                 if (cmd is null)
                     return;
@@ -158,6 +171,133 @@ namespace AkkoBot.Core.Services
                 if (!(await cmd.RunChecksAsync(context, false)).Any())
                     await cmd.ExecuteAndLogAsync(context);
             });
+        }
+
+        /// <summary>
+        /// Deletes a user message if it contains a filtered word.
+        /// </summary>
+        private Task FilterWord(DiscordClient client, MessageCreateEventArgs eventArgs)
+        {
+            // If message starts with the server prefix or bot has no permission to delete messages or server has no filtered words, quit
+            if (eventArgs.Author.IsBot
+                || !_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
+                || filteredWords.Words.Count == 0
+                || !filteredWords.Enabled
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasFlag(Permissions.ManageMessages))
+                return Task.CompletedTask;
+
+            return Task.Run(async () =>
+            {
+                // Do not delete from ignored users, channels and roles
+                if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id) 
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id) 
+                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                    return;
+
+                var match = filteredWords.Words.FirstOrDefault(word => eventArgs.Message.Content.Contains(word.Trim('*'), StringComparison.InvariantCultureIgnoreCase));
+
+                // If message doesn't contain any of the filtered words, quit
+                if (match is null)
+                    return;
+
+                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+
+                // Do not delete legitimate commands
+                if (cmdHandler.FindCommand(eventArgs.Message.Content[_dbCache.Guilds[eventArgs.Guild.Id].Prefix.Length..], out _) is not null)
+                    return;
+
+                // Delete the message
+                if (!await DeleteFilteredMessageAsync(eventArgs.Message, match))
+                    return;
+
+                // Send notification message, if enabled
+                if (!filteredWords.NotifyOnDelete && !filteredWords.WarnOnDelete)
+                    return;
+
+                var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
+                var toWarn = filteredWords.WarnOnDelete && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
+
+                var embed = new DiscordEmbedBuilder
+                {
+                    Description = (string.IsNullOrWhiteSpace(filteredWords.NotificationMessage))
+                        ? "fw_default_notification"
+                        : filteredWords.NotificationMessage,
+
+                    Footer = (toWarn)
+                        ? new EmbedFooter() { Text = "fw_warn_footer" }
+                        : null
+                };
+
+                var notification = await dummyCtx.RespondLocalizedAsync(eventArgs.Author.Mention, embed, false, true);
+
+                // Apply warning, if enabled
+                if (toWarn)
+                    await _warningService.SaveWarnAsync(dummyCtx, eventArgs.Guild.CurrentMember, dummyCtx.FormatLocalized("fw_default_warn"));
+
+                // Delete the notification message after some time
+                _ = DeleteWithDelayAsync(notification, TimeSpan.FromSeconds(30));
+            });
+        }
+
+        /* Utility Methods */
+
+        /// <summary>
+        /// Deletes a <see cref="DiscordMessage"/> if its content match the specified filtered word.
+        /// </summary>
+        /// <param name="message">The message to be deleted.</param>
+        /// <param name="match">The filtered word from the database cache.</param>
+        /// <returns><see langword="true"/> if the message got deleted, <see langword="false"/> otherwise.</returns>
+        private async Task<bool> DeleteFilteredMessageAsync(DiscordMessage message, string match)
+        {
+            var left = match.StartsWith('*');
+            var right = match.EndsWith('*');
+
+            if (left && right)
+            {
+                // Match already occurred, just delete the message
+                await message.DeleteAsync();
+                return true;
+            }
+            else if (left)
+            {
+                // Check if any word ends with "match"
+                if (message.Content.Split(' ').Any(x => x.EndsWith(match.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    await message.DeleteAsync();
+                    return true;
+                }
+            }
+            else if (right)
+            {
+                // Check if any word starts with "match"
+                if (message.Content.Split(' ').Any(x => x.StartsWith(match.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    await message.DeleteAsync();
+                    return true;
+                }
+            }
+            else
+            {
+                // One of the words must be an exact match
+                if (message.Content.Split(' ').Any(x => x.Equals(match, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    await message.DeleteAsync();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Deletes a <see cref="DiscordMessage"/> after the specified time.
+        /// </summary>
+        /// <param name="message">The message to be deleted.</param>
+        /// <param name="delay">How long to wait before the message is deleted.</param>
+        private async Task DeleteWithDelayAsync(DiscordMessage message, TimeSpan delay)
+        {
+            await Task.Delay(delay).ConfigureAwait(false);
+            try { await message.DeleteAsync(); } catch { }  // Message might get deleted by someone else in the meantime
         }
     }
 }

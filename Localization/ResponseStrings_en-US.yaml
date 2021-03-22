@@ -23,6 +23,10 @@ arg_discord_role: ID or mention to a Discord role.
 arg_discord_user: ID or mention to a Discord user.
 arg_discord_voicechannel: ID or name of a voice channel.
 arg_double: A real number.
+arg_fw_ids: User, channel and/or role IDs, separated by space.
+arg_fw_message: The message to be sent.
+arg_fw_word: A word.
+arg_fw_words: Multiple words, separated by space.
 arg_infraction: The infraction to be added to the user's modlog.
 arg_int: An integer number.
 arg_locale: The language to be used in the responses.
@@ -122,6 +126,19 @@ cmd_deafen: Applies server deafening to a user.
 cmd_deleteallroles: Deletes all roles on this server that are below the bot and the user who used the command.
 cmd_deletechannel: Deletes a Discord channel.
 cmd_deleterole: Deletes a Discord role.
+cmd_fw: Groups commands to filter out undesirable words from the server.
+cmd_fw_add: Adds a word to the word filter. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the beginning to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
+cmd_fw_addignore: Adds a user, channel and/or role IDs to the list of ignored IDs, disabling the word filter for them.
+cmd_fw_addmany: Adds multiple words to the list of filtered words. Separate them with space. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the end to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
+cmd_fw_clear: Removes all words from the list of filtered words.
+cmd_fw_enable: Toggles the automatic deletion of messages containing filtered words on the server.
+cmd_fw_list: Lists all filtered words in the server and the users, channels, and roles ignored by the word filter.
+cmd_fw_message: Sets the notification message to be automatically sent when a filtered message gets deleted.
+cmd_fw_notify: Toggles whether the notification message should be sent when a filtered message gets deleted.
+cmd_fw_remove: Removes a word from the list of filtered words.
+cmd_fw_removeignore: Removes a user, channel and/or role IDs from the list of ignored IDs.
+cmd_fw_removemany: Removes multiple words from the list of filtered words. Separate them with space.
+cmd_fw_warn: Toggles whether filtered messages should automatically issue a warning to the offending user.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
@@ -191,9 +208,20 @@ deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
 disabled: disabled
 enabled: enabled
-error_hierarchy: This command can only be used on users with a role lower to yours and mine in the role hierarchy.
+error_hierarchy: This command can only be used on users with a role lower to mine and yours in the role hierarchy.
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
+fw_default_notification: Your message contains a banned word and has been removed. Watch your language.
+fw_default_warn: Used a banned word.
+fw_ignored_channels: Ignored Channels
+fw_ignored_roles: Ignored Roles
+fw_ignored_users: Ignored Users
+fw_list_empty: There are no filtered words.
+fw_list_title: List of Filtered Words
+fw_notify: The notification for filtered messages has been {0}.
+fw_toggle: The word filter has been {0} on this server.
+fw_warn: Automatic warnings for filtered messages has been {0}.
+fw_warn_footer: This incident has been counted towards your infraction list.
 guild_embed_change: Embed usage has been {0} on this server.
 guild_errorcolor: ErrorColor has been changed to {0}.
 guild_locale_changed: The language for this server has been changed to {0}.
