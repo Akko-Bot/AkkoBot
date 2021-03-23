@@ -86,9 +86,6 @@ namespace AkkoBot.Services
             if (embed.Description is not null)
                 embed.Description = GetLocalizedResponse(localizer, settings.Locale, embed.Description);
 
-            if (embed.Url is not null)
-                embed.Url = GetLocalizedResponse(localizer, settings.Locale, embed.Url);
-
             if (!embed.Color.HasValue)
                 embed.Color = new DiscordColor((isError) ? settings.ErrorColor : settings.OkColor);
 
