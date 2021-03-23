@@ -7,27 +7,30 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class DiscordUserRepo : DbRepository<DiscordUserEntity>
     {
-        private readonly AkkoDbContext _db;
-
-        public DiscordUserRepo(AkkoDbContext db) : base(db)
-            => _db = db;
+        public DiscordUserRepo(AkkoDbContext db) : base(db) { }
 
         /// <summary>
-        /// Upserts a user into the database.
+        /// Tracks a user to be upserted to the database.
         /// </summary>
         /// <param name="user">User to be added or updated.</param>
-        /// <returns></returns>
-        public async Task CreateOrUpdateAsync(DiscordUser user)
+        /// <returns><see langword="true"/> if the entry is being tracked for creation or updating, <see langword="false"/> if no action was performed.</returns>
+        public async Task<bool> CreateOrUpdateAsync(DiscordUser user)
         {
-            var eUser = new DiscordUserEntity(user);
+            var dbEntry = await base.Table.FirstOrDefaultAsync(x => x.UserId == user.Id);
 
-            await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO discord_users(user_id, username, discriminator, date_added) " +
-                $"VALUES({eUser.UserId}, '{eUser.Username}', '{eUser.Discriminator}', '{eUser.DateAdded:O}') " +
-                @"ON CONFLICT (user_id) " +
-                @"DO UPDATE " +
-                $"SET username = '{user.Username}', discriminator = '{user.Discriminator}';"
-            );
+            if (dbEntry is null)
+                base.Create(new DiscordUserEntity(user));
+            else
+            {
+                if (dbEntry.UserId == user.Id && dbEntry.Username.Equals(user.Username) && dbEntry.Discriminator.Equals(user.Discriminator))
+                    return false;
+
+                dbEntry.Username = user.Username;
+                dbEntry.Discriminator = user.Discriminator;
+                base.Update(dbEntry);
+            }
+
+            return true;
         }
     }
 }

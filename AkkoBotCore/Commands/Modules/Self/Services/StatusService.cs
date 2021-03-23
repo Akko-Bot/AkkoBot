@@ -4,6 +4,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="PlayingStatusEntity"/> objects.
     /// </summary>
-    public class StatusService : ICommandService
+    public class StatusService : AkkoCommandService
     {
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;
@@ -25,7 +26,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         private readonly IDbCacher _dbCache;
         private readonly DiscordShardedClient _clients;
 
-        public StatusService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients)
+        public StatusService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients) : base(services)
         {
             _services = services;
             _dbCache = dbCache;
@@ -44,7 +45,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (string.IsNullOrWhiteSpace(activity.Name))
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var newEntry = new PlayingStatusEntity()
             {
@@ -74,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if at least one status has been removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveStatusesAsync(Expression<Func<PlayingStatusEntity, bool>> selector)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
             var entries = (await db.PlayingStatuses.GetAsync(selector)).ToArray();
 
             db.PlayingStatuses.DeleteRange(entries);
@@ -90,10 +91,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <returns>A collection of statuses.</returns>
         public List<PlayingStatusEntity> GetStatuses()
-        {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            return db.PlayingStatuses.Cache;
-        }
+            => base.Scope.ServiceProvider.GetService<IDbCacher>().PlayingStatuses;
 
         /// <summary>
         /// Removes all playing statuses from the database.
@@ -101,7 +99,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of removed entries.</returns>
         public async Task<int> ClearStatusesAsync()
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var amount = await db.PlayingStatuses.ClearAsync();
             await db.SaveChangesAsync();
@@ -115,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if rotation has been toggled, <see langword="false"/> if there was no status to rotate.</returns>
         public async Task<bool> RotateStatusesAsync()
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             // Update the database entry
             db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;

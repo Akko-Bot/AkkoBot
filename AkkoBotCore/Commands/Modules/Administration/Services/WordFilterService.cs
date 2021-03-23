@@ -11,11 +11,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="FilteredWordsEntity"/> objects.
     /// </summary>
-    public class WordFilterService : ICommandService
+    public class WordFilterService : AkkoCommandService
     {
         private readonly IServiceProvider _services;
 
-        public WordFilterService(IServiceProvider services)
+        public WordFilterService(IServiceProvider services) : base(services)
             => _services = services;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="words">The words to be added.</param>
         public async Task AddFilteredWordsAsync(ulong sid, params string[] words)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
 
@@ -52,7 +52,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one ID was added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddIgnoredIdsAsync(ulong sid, params ulong[] ids)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
             var amount = dbEntry.FilteredWordsRel.IgnoredIds.Count;
@@ -82,7 +82,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The setting returned by <paramref name="action"/>.</returns>
         public async Task<T> SetWordFilterSettingsAsync<T>(ulong sid, Func<FilteredWordsEntity, T> action)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
             var result = action(dbEntry.FilteredWordsRel);
@@ -104,9 +104,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one word got added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveFilteredWordsAsync(ulong sid, params string[] words)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            if (!db.GuildConfig.FilteredWordsCache.TryGetValue(sid, out var cachedWords))
+            if (!db.GuildConfig.FilteredWordsCache.TryGetValue(sid, out _))
                 return false;
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
@@ -131,9 +131,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one word got removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> ClearFilteredWordsAsync(ulong sid)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            if (!db.GuildConfig.FilteredWordsCache.TryGetValue(sid, out var cachedWords))
+            if (!db.GuildConfig.FilteredWordsCache.TryGetValue(sid, out _))
                 return false;
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);

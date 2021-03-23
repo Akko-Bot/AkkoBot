@@ -34,13 +34,13 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Defines the core behavior the bot should have for specific Discord events.
         /// </summary>
-        /// <exception cref="NullReferenceException"/>
+        /// <exception cref="ArgumentNullException"/>
         internal void RegisterEvents()
         {
             if (_services is null)
-                throw new NullReferenceException("No IoC container was found.");
+                throw new ArgumentNullException(nameof(_services), "No IoC container was found.");
             else if (_botCore is null)
-                throw new NullReferenceException("Bot core cannot be null.");
+                throw new ArgumentNullException(nameof(_botCore), "Bot core cannot be null.");
 
             // Create bot configs on ready, if there isn't one already
             _botCore.BotShardedClient.Ready += LoadBotConfig;
@@ -146,14 +146,12 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Saves default guild settings to the database and caches when the bot joins a guild.
         /// </summary>
-        private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
+        private async Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             db.GuildConfig.TryCreate(eventArgs.Guild);
-            db.SaveChanges();
-
-            return Task.CompletedTask;
+            await db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -161,9 +159,9 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            db.GuildConfig.Cache.TryRemove(eventArgs.Guild.Id, out _);
-            db.GuildConfig.FilteredWordsCache.TryRemove(eventArgs.Guild.Id, out _);
+            var dbCache = _services.GetService<IDbCacher>();
+            dbCache.Guilds.TryRemove(eventArgs.Guild.Id, out _);
+            dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
 
             return Task.CompletedTask;
         }

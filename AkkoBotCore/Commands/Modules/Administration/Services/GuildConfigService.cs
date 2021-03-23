@@ -3,6 +3,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System;
@@ -14,12 +15,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="GuildConfigEntity"/> objects.
     /// </summary>
-    public class GuildConfigService : ICommandService
+    public class GuildConfigService : AkkoCommandService
     {
         private readonly IServiceProvider _services;
         private readonly ILocalizer _localizer;
 
-        public GuildConfigService(IServiceProvider services, ILocalizer localizer)
+        public GuildConfigService(IServiceProvider services, ILocalizer localizer) : base(services)
         {
             _services = services;
             _localizer = localizer;
@@ -50,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The requested setting, <see langword="null"/> if the context is from a private context.</returns>
         public T GetOrSetProperty<T>(CommandContext context, Func<GuildConfigEntity, T> selector)
         {
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
             var guild = db.GuildConfig.GetGuild(context.Guild?.Id ?? 0);
             var result = selector(guild);
 
@@ -70,8 +71,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>A collection of settings.</returns>
         public IReadOnlyDictionary<string, string> GetGuildSettings(DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            return db.GuildConfig.GetGuild(server.Id).GetSettings();
+            _services.GetService<IDbCacher>().Guilds.TryGetValue(server.Id, out var dbGuild);
+            return dbGuild.GetSettings();
         }
     }
 }

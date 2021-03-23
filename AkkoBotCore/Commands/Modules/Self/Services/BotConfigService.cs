@@ -16,11 +16,11 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="BotConfigEntity"/> objects.
     /// </summary>
-    public class BotConfigService : ICommandService
+    public class BotConfigService : AkkoCommandService
     {
         private readonly IServiceProvider _services;
 
-        public BotConfigService(IServiceProvider services)
+        public BotConfigService(IServiceProvider services) : base(services)
             => _services = services;
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <param name="selector">A method to get or set the property.</param>
         public T GetOrSetProperty<T>(Func<BotConfigEntity, T> selector)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             // Change the cached settings
             var result = selector(db.BotConfig.Cache);
@@ -54,7 +54,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <param name="selector">A method to get or set the property.</param>
         public T GetOrSetProperty<T>(Func<LogConfigEntity, T> selector)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             // Change the cached settings
             var result = selector(db.LogConfig.Cache);
@@ -71,10 +71,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <returns>The bot settings.</returns>
         public BotConfigEntity GetConfig()
-        {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            return db.BotConfig.Cache;
-        }
+            => _services.GetService<IDbCacher>().BotConfig;
 
         /// <summary>
         /// Gets a collection of all bot settings.
@@ -82,7 +79,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of setting name/value pairs.</returns>
         public IReadOnlyDictionary<string, string> GetConfigs()
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var botConfig = db.BotConfig.Cache;
             var logConfig = db.LogConfig.Cache;

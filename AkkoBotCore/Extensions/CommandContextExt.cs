@@ -147,16 +147,8 @@ namespace AkkoBot.Extensions
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
         public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, string message, DiscordEmbedBuilder embed, bool isError = false)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
-
-            // Get the message settings (guild or dm)
-            IMessageSettings settings = (context.Guild is null)
-                ? db.BotConfig.GetAllSync().FirstOrDefault()
-                : db.GuildConfig.GetGuild(context.Guild.Id);
-
-            var responseString = GeneralService.GetLocalizedResponse(localizer, settings.Locale, message); // Localize the content message, if there is one
-            var localizedEmbed = GeneralService.LocalizeEmbed(localizer, settings, embed, isError);    // Localize the embed message
+            // Get the localized message
+            var (responseString, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, message, embed, isError);
 
             try
             {
@@ -179,12 +171,12 @@ namespace AkkoBot.Extensions
         /// <returns>A formatted and localized response string.</returns>
         public static string FormatLocalized(this CommandContext context, string key, params object[] args)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
+            var dbCache = context.Services.GetService<IDbCacher>();
+            var localizer = context.Services.GetService<ILocalizer>();
 
-            var locale = (context.Guild is null)
-                ? db.BotConfig.GetAllSync().FirstOrDefault().Locale
-                : db.GuildConfig.GetGuild(context.Guild.Id).Locale;
+            var locale = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+                ? dbGuild.Locale
+                : dbCache.BotConfig.Locale;
 
             for (var index = 0; index < args.Length; index++)
             {
@@ -222,12 +214,12 @@ namespace AkkoBot.Extensions
                 return;
             }
 
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
+            var dbCache = context.Services.GetService<IDbCacher>();
 
             // Get the message settings (guild or dm)
-            IMessageSettings settings = (context.Guild is null)
-                ? db.BotConfig.Cache
-                : db.GuildConfig.GetGuild(context.Guild.Id);
+            IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+                ? dbGuild
+                : dbCache.BotConfig;
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPages(input, embed, maxLength, content)
@@ -293,12 +285,12 @@ namespace AkkoBot.Extensions
                 return;
             }
 
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
+            var dbCache = context.Services.GetService<IDbCacher>();
 
             // Get the message settings (guild or dm)
-            IMessageSettings settings = (context.Guild is null)
-                ? db.BotConfig.Cache
-                : db.GuildConfig.GetGuild(context.Guild.Id);
+            IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+                ? dbGuild
+                : dbCache.BotConfig;
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPagesByFields(embed, maxFields, message)

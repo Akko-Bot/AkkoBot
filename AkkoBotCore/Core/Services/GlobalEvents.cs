@@ -51,9 +51,35 @@ namespace AkkoBot.Core.Services
 
             // Delete filtered words
             _botCore.BotShardedClient.MessageCreated += FilterWord;
+
+            // On command
+            foreach (var cmdHandler in _botCore.CommandExt.Values)
+                cmdHandler.CommandExecuted += SaveUserOnUpdate;
         }
 
         /* Event Methods */
+
+        /// <summary>
+        /// Saves a user to the database on command execution.
+        /// </summary>
+        private Task SaveUserOnUpdate(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
+        {
+            return Task.Run(async () =>
+            {
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+                // Track the user who triggered the command
+                var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);
+
+                // Track the mentioned users in the message, if any
+                foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
+                    isTracking = isTracking || await db.DiscordUsers.CreateOrUpdateAsync(mentionedUser);
+
+                // Save if there is at least one user being tracked
+                if (isTracking)
+                    await db.SaveChangesAsync();
+            });
+        }
 
         /// <summary>
         /// Mutes a user that has been previously muted.
@@ -101,9 +127,10 @@ namespace AkkoBot.Core.Services
 
             return Task.Run(async () =>
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-                var prefix = db.GuildConfig.GetGuild(eventArgs.Guild?.Id ?? 0)?.Prefix
-                    ?? db.BotConfig.Cache.BotPrefix;
+                var dbCache = _services.GetService<IDbCacher>();
+                var prefix = dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
+                    ? dbGuild.Prefix
+                    : dbCache.BotConfig.BotPrefix;
 
                 if (eventArgs.Guild is not null && prefix.Equals("!"))
                     return;
@@ -127,10 +154,11 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task HandleCommandAlias(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
+            var aliasExists = _dbCache.Aliases.TryGetValue(eventArgs.Guild?.Id ?? default, out var aliases);
+            aliasExists = _dbCache.Aliases.TryGetValue(default, out var globalAliases) && aliasExists;
+
             // If message is from a bot or there aren't any global or server aliases, quit.
-            if (eventArgs.Author.IsBot
-                || !_dbCache.Aliases.TryGetValue(eventArgs.Guild?.Id ?? default, out var aliases)
-                || !_dbCache.Aliases.TryGetValue(default, out var globalAliases))
+            if (eventArgs.Author.IsBot && !aliasExists)
                 return Task.CompletedTask;
 
             return Task.Run(async () =>

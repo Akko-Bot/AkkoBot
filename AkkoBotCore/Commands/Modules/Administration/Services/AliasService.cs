@@ -1,10 +1,10 @@
 ﻿using AkkoBot.Commands.Abstractions;
-using AkkoBot.Extensions;
 using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,12 +14,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="AliasEntity"/> objects.
     /// </summary>
-    public class AliasService : ICommandService
+    public class AliasService : AkkoCommandService
     {
         private readonly IServiceProvider _services;
         private readonly IDbCacher _dbCache;
 
-        public AliasService(IServiceProvider services, IDbCacher dbCache)
+        public AliasService(IServiceProvider services, IDbCacher dbCache) : base(services)
         {
             _services = services;
             _dbCache = dbCache;
@@ -46,7 +46,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (cmd is null)
                 return false;
 
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             // Save the new entry to the database
             var newEntry = new AliasEntity()
@@ -84,7 +84,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             if (!db.Aliases.Cache.TryGetValue(context.Guild?.Id ?? default, out var aliases))
                 return false;
@@ -113,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             if (!db.Aliases.Cache.TryGetValue(context.Guild?.Id ?? default, out var aliases))
                 return false;

@@ -5,6 +5,7 @@ using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,10 +15,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordRole"/> objects.
     /// </summary>
-    public class RoleService : ICommandService
+    public class RoleService : AkkoCommandService
     {
-        private readonly IServiceProvider _services;
-
         /// <summary>
         /// Defines the set of denied permissions to be applied to a muted user.
         /// </summary>
@@ -33,8 +32,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         public const Permissions MutePermsAllow = Permissions.AccessChannels;
 
-        public RoleService(IServiceProvider services)
-            => _services = services;
+        public RoleService(IServiceProvider services) : base(services) { }
 
         /// <summary>
         /// A more permissive version of <see cref="CheckHierarchyAsync(CommandContext, DiscordMember, string)"/>
@@ -87,7 +85,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The server mute role.</returns>
         public async Task<DiscordRole> FetchMuteRoleAsync(DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
             var guildSettings = db.GuildConfig.GetGuild(server.Id);
 
             if (!server.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole))
@@ -120,7 +118,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if a timer was created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> MuteUserAsync(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             // Mute the user
             await user.GrantRoleAsync(muteRole, reason);
@@ -177,7 +175,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the unmute.</param>
         public async Task UnmuteUserAsync(DiscordGuild server, DiscordRole muteRole, DiscordMember user, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             // Unmute the user
             await user.RevokeRoleAsync(muteRole, reason);
