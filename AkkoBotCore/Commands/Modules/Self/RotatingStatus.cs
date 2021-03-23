@@ -100,10 +100,6 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            var enabledDisabled = (_botService.GetConfig().RotateStatus)
-                ? context.FormatLocalized("enabled")
-                : context.FormatLocalized("disabled");
-
             var ids = string.Join('\n', statuses.Select(x => x.Id).ToArray());
             var messages = string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, "[...]")).ToArray());
             var time = string.Join('\n', statuses.Select(x => x.RotationTime).ToArray());
@@ -113,7 +109,7 @@ namespace AkkoBot.Commands.Modules.Self
                 .AddField("id", ids, true)
                 .AddField("message", messages, true)
                 .AddField("pstatus_time", time, true)
-                .WithFooter(context.FormatLocalized("pstatus_rotation", enabledDisabled));
+                .WithFooter(context.FormatLocalized("pstatus_rotation", (_botService.GetConfig().RotateStatus) ? "enabled" : "disabled"));
 
             await context.RespondPaginatedByFieldsAsync(embed);
         }

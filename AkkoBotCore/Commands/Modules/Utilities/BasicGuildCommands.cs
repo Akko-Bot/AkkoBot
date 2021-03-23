@@ -187,7 +187,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 await context.Channel.ModifyAsync(x => x.Nsfw = !context.Channel.IsNSFW);
 
                 var embed = new DiscordEmbedBuilder()
-                    .WithDescription(context.FormatLocalized("nsfw_toggle", (context.Channel.IsNSFW) ? context.FormatLocalized("enabled") : context.FormatLocalized("disabled")));
+                    .WithDescription(context.FormatLocalized("nsfw_toggle", (context.Channel.IsNSFW) ? "enabled" : "disabled"));
 
                 await context.RespondLocalizedAsync(embed);
             }

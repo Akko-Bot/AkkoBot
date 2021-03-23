@@ -123,7 +123,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.Enabled = !x.Enabled);
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("fw_toggle", context.FormatLocalized((success) ? "enabled" : "disabled")));
+                .WithDescription(context.FormatLocalized("fw_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }

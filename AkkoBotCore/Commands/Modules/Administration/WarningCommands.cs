@@ -89,7 +89,7 @@ namespace AkkoBot.Commands.Modules.Administration
                     context.FormatLocalized(
                         "warn_and_punish",
                         Formatter.Bold(user.GetFullname()),
-                        context.FormatLocalized(punishment.ToString().ToLowerInvariant() + "_enum")
+                        punishment.ToString().ToLowerInvariant() + "_enum"
                     )
                 );
             }

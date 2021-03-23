@@ -13,6 +13,8 @@ using System.Text;
 
 namespace AkkoBot.Commands.Formatters
 {
+    // To increase performance: instead of using FormatLocalized,
+    // perhaps it would be better to fetch the strings directly from the ILocalizer?
     public class HelpFormatter
     {
         private string _helpTitle;
