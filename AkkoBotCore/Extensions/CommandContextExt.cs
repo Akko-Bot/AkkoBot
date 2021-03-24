@@ -44,17 +44,17 @@ namespace AkkoBot.Extensions
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
+            var dbCache = context.Services.GetService<IDbCacher>();
 
             // Get the timeout
-            var timeout = db.GuildConfig.Table.FirstOrDefault(x => x.GuildId == context.Guild.Id).InteractiveTimeout;
-            var globalTimeout = (await db.BotConfig.GetAllAsync()).FirstOrDefault().InteractiveTimeout;
+            dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild);
+            var timeout = dbGuild?.InteractiveTimeout ?? dbCache.BotConfig.InteractiveTimeout;
 
             // Send the question
             var question = await context.RespondLocalizedAsync(message, embed, isMarked, isError);
 
             // Await interaction, proceed after any message no matter its content
-            var result = await context.Message.GetNextMessageAsync(x => true, timeout ?? globalTimeout);
+            var result = await context.Message.GetNextMessageAsync(x => true, timeout);
 
             // Delete the confirmation message
             await context.Channel.DeleteMessageAsync(question);

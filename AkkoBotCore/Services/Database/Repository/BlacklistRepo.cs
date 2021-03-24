@@ -12,22 +12,10 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class BlacklistRepo : DbRepository<BlacklistEntity>
     {
-        private readonly AkkoDbContext _db;
-        private readonly ConcurrentHashSet<ulong> _cache;
+        public ConcurrentHashSet<ulong> Cache { get; }
 
         public BlacklistRepo(AkkoDbContext db, IDbCacher dbCacher) : base(db)
-        {
-            _db = db;
-            _cache = dbCacher.Blacklist;
-        }
-
-        /// <summary>
-        /// Checks if the provided ID is blacklisted.
-        /// </summary>
-        /// <param name="id">ID of a user, channel or guild.</param>
-        /// <returns><see langword="true"/> if the ID is blacklisted, <see langword="false"/> otherwise.</returns>
-        public bool IsBlacklisted(ulong id)
-            => _cache.Contains(id);
+            => Cache = dbCacher.Blacklist;
 
         /// <summary>
         /// Checks if the command comes from a blacklisted context.
@@ -36,9 +24,9 @@ namespace AkkoBot.Services.Database.Repository
         /// <returns><see langword="true"/> if it's blacklisted, <see langword="false"/> otherwise.</returns>
         public bool IsBlacklisted(CommandContext context)
         {
-            return _cache.Contains(context.User.Id)
-                || _cache.Contains(context.Channel.Id)
-                || _cache.Contains(context.Guild?.Id ?? default); // This will cause dms to always fail if 0 is in the blacklist.
+            return Cache.Contains(context.User.Id)
+                || Cache.Contains(context.Channel.Id)
+                || Cache.Contains(context.Guild?.Id ?? context.User.Id);
         }
 
         /// <summary>
@@ -46,12 +34,12 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="entries">A collection of blacklist entries.</param>
         /// <returns>The amount of entries that have been added.</returns>
-        public int TryCreateRange(IEnumerable<BlacklistEntity> entries)
+        public async Task<int> TryCreateRangeAsync(IEnumerable<BlacklistEntity> entries)
         {
             foreach (var entry in entries)
-                _cache.Add(entry.ContextId);
+                Cache.Add(entry.ContextId);
 
-            var uniqueEntries = base.GetAllSync()
+            var uniqueEntries = (await base.GetAllAsync())
                 .ExceptBy(entries, x => x.ContextId)
                 .ToArray();
 
@@ -65,12 +53,12 @@ namespace AkkoBot.Services.Database.Repository
         /// </summary>
         /// <param name="entries">A collection of blacklist entries.</param>
         /// <returns>The amount of entries that have been removed.</returns>
-        public int TryRemoveRange(IEnumerable<BlacklistEntity> entries)
+        public async Task<int> TryRemoveRangeAsync(IEnumerable<BlacklistEntity> entries)
         {
             foreach (var entry in entries)
-                _cache.TryRemove(entry.ContextId);
+                Cache.TryRemove(entry.ContextId);
 
-            var presentEntries = base.GetAllSync()
+            var presentEntries = (await base.GetAllAsync())
                 .IntersectBy(entries, x => x.ContextId)
                 .ToArray();
 
@@ -82,44 +70,58 @@ namespace AkkoBot.Services.Database.Repository
         /// <summary>
         /// Adds a blacklist entry to the database.
         /// </summary>
-        /// <param name="value">The specified blacklist entry.</param>
-        /// <returns><see langword="true"/> if the entry got added to the database or to the cache, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> TryCreateAsync(BlacklistEntity value)
+        /// <param name="newEntry">The specified blacklist entry.</param>
+        /// <returns><see langword="true"/> if the entry is tracked to be added to the database, <see langword="false"/> if it's tracked for updating.</returns>
+        public async Task<bool> CreateOrUpdateAsync(BlacklistEntity newEntry)
         {
-            await _db.Database.ExecuteSqlRawAsync(
-                @"INSERT INTO blacklist(context_id, type, name, date_added, reason) " +
-                $"VALUES({value.ContextId}, {(int)value.Type}, '{value.Name}', '{value.DateAdded:O}', '{value.Reason}') " +
-                @"ON CONFLICT (context_id) " +
-                @"DO NOTHING;"
-            );
+            var dbEntry = await base.Table.FirstOrDefaultAsync(x => x.ContextId == newEntry.ContextId);
 
-            return _cache.Add(value.ContextId);
+            if (dbEntry is null)
+            {
+                base.Create(newEntry);
+                Cache.Add(newEntry.ContextId);
+
+                return true;
+            }
+            else
+            {
+                dbEntry.Name = newEntry.Name;
+                dbEntry.Reason = newEntry.Reason;
+                dbEntry.Type = newEntry.Type;
+
+                base.Update(dbEntry);
+                return false;
+            }
         }
 
         /// <summary>
         /// Removes a blacklist entry from the database.
         /// </summary>
         /// <param name="id">The specified blacklist ID.</param>
-        /// <returns><see langword="true"/> if the entry got removed from the database or from the cache, <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if the entry is tracked for removal from the database, <see langword="false"/> otherwise.</returns>
         public async Task<bool> TryRemoveAsync(ulong id)
         {
-            if (!_cache.Contains(id))
-                return false;
+            var dbEntry = await base.Table.FirstOrDefaultAsync(x => x.ContextId == id);
 
-            await _db.Database.ExecuteSqlRawAsync($"DELETE FROM blacklist WHERE context_id = {id};");
-            return _cache.TryRemove(id);
+            if (dbEntry is not null)
+                base.Delete(dbEntry);
+
+            return Cache.TryRemove(id);
         }
 
         /// <summary>
         /// Removes all blacklist entries from the database.
         /// </summary>
-        /// <returns>The amount of rows removed from the database.</returns>
+        /// <returns>The amount of entries tracked for removal from the database.</returns>
         public async Task<int> ClearAsync()
         {
-            var rows = await _db.Database.ExecuteSqlRawAsync("DELETE FROM blacklist;");
-            _cache.Clear();
+            var allEntries = await base.GetAllAsync();
+            base.DeleteRange(allEntries.ToArray());
 
-            return rows;
+            var amount = Cache.Count;
+            Cache.Clear();
+
+            return amount;
         }
     }
 }

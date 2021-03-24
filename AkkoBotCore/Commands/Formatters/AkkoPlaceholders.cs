@@ -90,7 +90,7 @@ namespace AkkoBot.Commands.Formatters
             if (_placeholderActions.TryGetValue(placeholder, out var action))
             {
                 obj = action(context);
-                result = obj.ToString();
+                result = obj?.ToString();
             }
 
             return obj;

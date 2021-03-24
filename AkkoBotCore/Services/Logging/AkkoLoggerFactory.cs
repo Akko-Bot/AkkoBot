@@ -41,13 +41,11 @@ namespace AkkoBot.Services.Logging
         /// </summary>
         /// <param name="categoryName">The name of the <see cref="ILogger"/> to be created.</param>
         /// <returns>An <see cref="ILogger"/> object.</returns>
-        /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="InvalidOperationException">Occurs when the specified logger is not found.</exception>
         public ILogger CreateLogger(string categoryName)
         {
             if (_providers.Count == 0)
                 RegisterProviders();
-
-            int index = 0;
 
             foreach (var provider in _providers)
             {
@@ -55,18 +53,12 @@ namespace AkkoBot.Services.Logging
 
                 if (logger is not null)
                     return logger;
-
-                if (++index == _providers.Count)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"No logger of name \"{LogFormat}\" was found. Falling back to \"Default\".");
-                    Console.ResetColor();
-
-                    return provider.CreateLogger("Default");
-                }
             }
 
-            throw new InvalidOperationException("An issue occurred while initializing a logger object.");
+            throw new InvalidOperationException(
+                @"An issue occurred while initializing a logger object. " +
+                $"No logger of type {categoryName} was found."
+            );
         }
 
         /// <summary>

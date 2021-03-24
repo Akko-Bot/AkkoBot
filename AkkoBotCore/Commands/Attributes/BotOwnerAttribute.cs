@@ -14,8 +14,8 @@ namespace AkkoBot.Commands.Attributes
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
-    AllowMultiple = true,
-    Inherited = false)]
+    AllowMultiple = false,
+    Inherited = true)]
     public sealed class BotOwnerAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)

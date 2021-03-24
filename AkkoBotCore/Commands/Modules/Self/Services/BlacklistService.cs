@@ -20,17 +20,17 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public BlacklistService(IServiceProvider services) : base(services) { }
 
         /// <summary>
-        /// Tries to add a blacklist entry to the database.
+        /// Saves a blacklist entry to the database.
         /// </summary>
         /// <param name="context">The command context</param>
         /// <param name="type">Type of blacklist entry provided by the user.</param>
         /// <param name="id">ID of the entry, provided by the user.</param>
         /// <param name="reason">The reason for the blacklist.</param>
         /// <returns>
-        /// A tuple with the database entry and a boolean indicating whether the operation
-        /// was successful or not.
+        /// A tuple with the database entry and a boolean indicating whether the entry was
+        /// added (<see langword="true"/>) or updated (<see langword="false"/>).
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> TryAddAsync(CommandContext context, BlacklistType type, ulong id, string reason)
+        public async Task<(BlacklistEntity, bool)> AddOrUpdateAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
@@ -43,7 +43,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Reason = reason
             };
 
-            var success = await db.Blacklist.TryCreateAsync(entry);
+            var success = await db.Blacklist.CreateOrUpdateAsync(entry);
+            await db.SaveChangesAsync();
 
             return (entry, success);
         }
@@ -54,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <param name="ids">IDs to be added.</param>
         /// <remarks>The entries will be added as <see cref="BlacklistType.Unspecified"/>.</remarks>
         /// <returns>The amount of entries that have been added to the database.</returns>
-        public int AddRange(ulong[] ids)
+        public async Task<int> AddRangeAsync(ulong[] ids)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
@@ -65,8 +66,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Name = null
             });
 
-            var result = db.Blacklist.TryCreateRange(entries);
-            db.SaveChanges();
+            var result = await db.Blacklist.TryCreateRangeAsync(entries);
+            await db.SaveChangesAsync();
 
             return result;
         }
@@ -76,7 +77,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="ids">IDs to be removed.</param>
         /// <returns>The amount of entries that have been removed from the database.</returns>
-        public int RemoveRange(ulong[] ids)
+        public async Task<int> RemoveRangeAsync(ulong[] ids)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
@@ -87,8 +88,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Name = null
             });
 
-            var result = db.Blacklist.TryRemoveRange(entries);
-            db.SaveChanges();
+            var result = await db.Blacklist.TryRemoveRangeAsync(entries);
+            await db.SaveChangesAsync();
 
             return result;
         }
@@ -105,11 +106,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            if (!db.Blacklist.IsBlacklisted(id))
+            if (!db.Blacklist.Cache.Contains(id))
                 return (null, false);
 
             var entry = await db.Blacklist.GetAsync(id);
             var success = await db.Blacklist.TryRemoveAsync(id);
+            await db.SaveChangesAsync();
 
             return (entry, success);
         }
@@ -142,7 +144,10 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public async Task<int> ClearAsync()
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            return await db.Blacklist.ClearAsync();
+            var amount = await db.Blacklist.ClearAsync();
+            await db.SaveChangesAsync();
+
+            return amount;
         }
 
         /// <summary>
@@ -158,13 +163,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
             {
                 case BlacklistType.User:
                     return context.Client.Guilds.Values
-                        .Select(x => x.Members.Values.FirstOrDefault(u => u.Id == id))
-                        .FirstOrDefault()?.GetFullname();
+                        .FirstOrDefault(x => x.Members.Values.Any(u => u.Id == id))
+                        .Members.Values.FirstOrDefault(u => u.Id == id)
+                        ?.GetFullname();
 
                 case BlacklistType.Channel:
                     return context.Client.Guilds.Values
-                        .Select(x => x.Channels.Values.FirstOrDefault(c => c.Id == id))
-                        .FirstOrDefault()?.Name;
+                        .FirstOrDefault(x => x.Channels.Values.Any(c => c.Id == id))
+                        ?.Channels.Values.FirstOrDefault(c => c.Id == id)?.Name;
 
                 case BlacklistType.Server:
                     return context.Client.Guilds.Values.FirstOrDefault(s => s.Id == id)?.Name;

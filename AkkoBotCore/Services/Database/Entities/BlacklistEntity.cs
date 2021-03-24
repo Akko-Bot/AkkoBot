@@ -18,20 +18,20 @@ namespace AkkoBot.Services.Database.Entities
 
         public ulong ContextId { get; init; }
 
-        public BlacklistType Type { get; init; }
+        public BlacklistType Type { get; set; }
 
         [MaxLength(37)]
         public string Name
         {
             get => _name;
-            init => _name = value?.MaxLength(37);
+            set => _name = value?.MaxLength(37);
         }
 
         [MaxLength(200)]
         public string Reason
         {
             get => _reason;
-            init => _reason = value?.MaxLength(200);
+            set => _reason = value?.MaxLength(200);
         }
     }
 }

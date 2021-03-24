@@ -36,13 +36,13 @@ namespace AkkoBot.Extensions
         /// <returns>The newly edited Discord message.</returns>
         public static async Task<DiscordMessage> ModifyLocalizedAsync(this DiscordMessage msg, CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
-            using var scope = context.CommandsNext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var localizer = context.CommandsNext.Services.GetService<ILocalizer>();
+            var dbCache = context.Services.GetService<IDbCacher>();
+            var localizer = context.Services.GetService<ILocalizer>();
 
             // Get the message settings (guild or dm)
-            IMessageSettings settings = (context.Guild is null)
-                ? db.BotConfig.GetAllSync().FirstOrDefault()
-                : db.GuildConfig.GetGuild(context.Guild.Id);
+            IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+                ? dbGuild
+                : dbCache.BotConfig;
 
             // Reset the embed's current color
             if (isError)

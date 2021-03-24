@@ -2,6 +2,7 @@
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -13,14 +14,19 @@ namespace AkkoBot.Commands.Attributes
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
-    AllowMultiple = true,
-    Inherited = false)]
+    AllowMultiple = false,
+    Inherited = true)]
     public sealed class IsNotBlacklistedAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            return Task.FromResult(!db.Blacklist.IsBlacklisted(context));
+            var dbCache = context.Services.GetService<IDbCacher>();
+
+            return Task.FromResult(
+                !dbCache.Blacklist.Contains(context.Channel.Id)
+                && !dbCache.Blacklist.Contains(context.User.Id)
+                && !dbCache.Blacklist.Contains(context.Guild?.Id ?? context.User.Id)
+            );
         }
     }
 }

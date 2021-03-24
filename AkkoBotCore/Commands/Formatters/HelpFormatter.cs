@@ -5,6 +5,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -169,9 +170,10 @@ namespace AkkoBot.Commands.Formatters
         /// <returns>The result help message.</returns>
         public (string, DiscordEmbedBuilder) Build()
         {
-            using var scope = _cmdContext.Services.GetScopedService<IUnitOfWork>(out var db);
-            var useEmbed = db.GuildConfig.GetGuild(_cmdContext.Guild?.Id ?? 0)?.UseEmbed
-                ?? db.BotConfig.Cache.UseEmbed;
+            var dbCache = _cmdContext.Services.GetService<IDbCacher>();
+            var useEmbed = (dbCache.Guilds.TryGetValue(_cmdContext.Guild?.Id ?? 0, out var dbGuild))
+                ? dbGuild.UseEmbed
+                : dbCache.BotConfig.UseEmbed;
 
             if (useEmbed)
             {

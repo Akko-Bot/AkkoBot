@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Attributes
 {
     /// <summary>
-    /// Checks if the command was issued in DM with the bot and cancels execution if it was.
+    /// Checks if the command was issued in DM with the bot and cancels execution if it wasn't.
     /// </summary>
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
-    AllowMultiple = true,
-    Inherited = false)]
-    public sealed class IsNotPrivateAttribute : CheckBaseAttribute
+    AllowMultiple = false,
+    Inherited = true)]
+    public sealed class IsPrivateAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
-            => Task.FromResult(!context.Channel.IsPrivate);
+            => Task.FromResult(context.Channel.IsPrivate);
     }
 }

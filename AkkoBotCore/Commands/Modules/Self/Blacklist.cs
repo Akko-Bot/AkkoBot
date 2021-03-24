@@ -47,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Self
             [Description("arg_ulong_id")] ulong id,
             [RemainingText] string reason = null)
         {
-            var (entry, success) = await _service.TryAddAsync(context, type, id, reason);
+            var (entry, success) = await _service.AddOrUpdateAsync(context, type, id, reason);
 
             var entryName = (string.IsNullOrEmpty(entry.Name))
                 ? context.FormatLocalized("unknown")
@@ -71,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Self
         [Command("add")]
         public async Task MassBlacklist(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
-            var amount = _service.AddRange(ids);
+            var amount = await _service.AddRangeAsync(ids);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("bl_added_range", amount));
@@ -108,7 +108,7 @@ namespace AkkoBot.Commands.Modules.Self
         [Command("remove")]
         public async Task MassRemove(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
-            var amount = _service.RemoveRange(ids);
+            var amount = await _service.RemoveRangeAsync(ids);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("bl_removed_range", amount));

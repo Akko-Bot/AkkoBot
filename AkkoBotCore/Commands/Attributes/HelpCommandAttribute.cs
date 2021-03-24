@@ -2,6 +2,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -13,14 +14,14 @@ namespace AkkoBot.Commands.Attributes
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
-    AllowMultiple = true,
-    Inherited = false)]
+    AllowMultiple = false,
+    Inherited = true)]
     public sealed class HelpCommandAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            using var scope = context.Services.GetScopedService<IUnitOfWork>(out var db);
-            return Task.FromResult(db.BotConfig.Cache.EnableHelp);
+            var dbCache = context.Services.GetService<IDbCacher>();
+            return Task.FromResult(dbCache.BotConfig.EnableHelp);
         }
     }
 }
