@@ -123,7 +123,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>A collection of server punishments.</returns>
         public async Task<List<WarnPunishEntity>> GetServerPunishmentsAsync(DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
             var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
 
             return guildSettings.WarnPunishRel;

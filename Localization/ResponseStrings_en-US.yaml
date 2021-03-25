@@ -361,3 +361,5 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
+
+help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.

@@ -57,7 +57,7 @@ namespace AkkoBot.Services.Logging
 
             throw new InvalidOperationException(
                 @"An issue occurred while initializing a logger object. " +
-                $"No logger of type {categoryName} was found."
+                $"No logger of type \"{categoryName}\" was found."
             );
         }
 

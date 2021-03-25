@@ -8,17 +8,18 @@ namespace AkkoBot.Commands.Abstractions
     /// </summary>
     public abstract class AkkoCommandService : ICommandService, IDisposable
     {
+        private bool _isDisposed;
+
         /// <summary>
         /// Scope to fetch scoped services.
         /// </summary>
-        protected IServiceScope Scope;
-        private bool _isDisposed;
+        protected IServiceScope Scope { get; private set; }
 
         /// <summary>
         /// Initializes a command service with a local scope.
         /// </summary>
         /// <param name="services">The IoC container.</param>
-        protected AkkoCommandService(IServiceProvider services) 
+        protected AkkoCommandService(IServiceProvider services)
             => Scope = services.CreateScope();
 
         /// <summary>

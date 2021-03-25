@@ -42,7 +42,7 @@ namespace AkkoBot.Core.Common
         /// </summary>
         private void RegisterCommandModules()
         {
-            var modules = GeneralService.GetImplementables(typeof(AkkoCommandModule)).ToArray();
+            var modules = GeneralService.GetImplementables(typeof(BaseCommandModule)).ToArray();
             var converters = GeneralService.GetImplementables(typeof(IArgumentConverter));
             var cogs = GeneralService.GetCogs().ToArray();
 

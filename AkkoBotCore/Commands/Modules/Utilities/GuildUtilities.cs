@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Utilities
 {
     [RequireGuild]
-    public class ServerUtilities : AkkoCommandModule
+    public class GuildUtilities : AkkoCommandModule
     {
         private readonly UtilitiesService _service;
 
-        public ServerUtilities(UtilitiesService service)
+        public GuildUtilities(UtilitiesService service)
             => _service = service;
 
         [Command("say"), HiddenOverload]
@@ -30,10 +30,8 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Priority(1)]
         public async Task Say(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
         {
-            if (!context.Guild.CurrentMember.PermissionsIn(channel).HasFlag(Permissions.SendMessages)) // If bot has no permission to talk in the target channel
-                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
-            else if (string.IsNullOrWhiteSpace(message.Content))    // If command only contains a channel name
-                await context.RespondAsync(channel.Mention);
+            if (string.IsNullOrWhiteSpace(message?.Content))    // If command only contains a channel name
+                await context.RespondAsync(channel.Name);
             else if (_service.DeserializeEmbed(message.Content, out var parsedMessage)) // If command contains an embed in yaml format
                 await channel.SendMessageAsync(parsedMessage);
             else    // If command is just plain text

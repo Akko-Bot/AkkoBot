@@ -361,3 +361,5 @@ warnpl_empty: Não há punições nesse servidor.
 warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
+
+help_cant_dm: Eu não tenho permissão para Enviar Mensagens e Adicionar Reações no servidor {0}.

@@ -1,4 +1,3 @@
-using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Formatters;
 using AkkoBot.Extensions;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Help
 {
     [HelpCommand]
-    public class Help : AkkoCommandModule
+    public class Help : BaseCommandModule
     {
         [HiddenOverload]
         [Command("help"), Aliases("h")]
@@ -60,7 +59,7 @@ namespace AkkoBot.Commands.Modules.Help
                 // Might consider placing a global ratelimit on !help because of this
                 await context.SendLocalizedDmAsync(
                     context.Member,
-                    "⚠️" + Formatter.Bold(context.FormatLocalized("help_cant_dm")) + "\n\n" + content,
+                    "⚠️ " + Formatter.Bold(context.FormatLocalized("help_cant_dm", context.Guild.Name)) + "\n\n" + content,
                     embed,
                     true
                 );
@@ -69,6 +68,7 @@ namespace AkkoBot.Commands.Modules.Help
 
         [Command("module"), Aliases("modules", "cmds")]
         [Description("cmd_modules")]
+        [RequireBotPermissions(Permissions.SendMessages)]
         public async Task Modules(CommandContext context)
         {
             var namespaces = context.CommandsNext.RegisteredCommands.Values
