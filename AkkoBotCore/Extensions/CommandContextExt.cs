@@ -1,3 +1,4 @@
+using AkkoBot.Common;
 using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
@@ -313,7 +314,7 @@ namespace AkkoBot.Extensions
             var localizer = context.Services.GetService<ILocalizer>();
 
             var result = new List<Page>();
-            var sanitizedContent = content.MaxLength(AkkoEntities.MessageMaxLength);
+            var sanitizedContent = content.MaxLength(AkkoConstants.MessageMaxLength);
             var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
 
             var (localizedMessage, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, sanitizedContent, embed, false);
@@ -344,7 +345,7 @@ namespace AkkoBot.Extensions
         {
             foreach (var page in pages)
             {
-                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(AkkoEntities.MessageMaxLength);
+                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(AkkoConstants.MessageMaxLength);
                 page.Embed = null;
             }
 

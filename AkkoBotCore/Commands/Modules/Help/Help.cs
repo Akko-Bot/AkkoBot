@@ -1,7 +1,7 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Formatters;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Help
 {
-    [HelpCommand]
+    [HelpCommand, IsNotBlacklisted]
     public class Help : BaseCommandModule
     {
         [HiddenOverload]

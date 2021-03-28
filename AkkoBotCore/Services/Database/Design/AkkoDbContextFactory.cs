@@ -1,4 +1,5 @@
-﻿using AkkoBot.Credential;
+﻿using AkkoBot.Common;
+using AkkoBot.Credential;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;

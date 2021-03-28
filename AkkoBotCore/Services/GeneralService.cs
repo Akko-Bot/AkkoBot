@@ -1,4 +1,5 @@
-﻿using AkkoBot.Credential;
+﻿using AkkoBot.Common;
+using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;

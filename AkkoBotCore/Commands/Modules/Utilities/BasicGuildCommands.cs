@@ -1,7 +1,7 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -16,8 +16,6 @@ namespace AkkoBot.Commands.Modules.Utilities
     [RequireGuild]
     public class BasicGuildCommands : AkkoCommandModule
     {
-        private const int _linesPerPage = 20;
-
         [Command("rolecolor"), Aliases("rcolor")]
         [Description("cmd_rolecolor")]
         public async Task RoleColor(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_color")] DiscordColor? newColor = null)
@@ -57,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             var success = context.Guild.CurrentMember.Hierarchy >= user.Hierarchy && context.Member.Hierarchy > user.Hierarchy;
 
             if (success)
-                await user.ModifyAsync(x => x.Nickname = nickname.MaxLength(AkkoEntities.MaxUsernameLength));
+                await user.ModifyAsync(x => x.Nickname = nickname.MaxLength(AkkoConstants.MaxUsernameLength));
 
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
@@ -68,8 +66,8 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var roles = (user?.Roles ?? context.Guild.Roles.Values)
                 .OrderByDescending(x => x.Position)
-                .Select(x => $"• {x.Name}")
-                .SplitInto(_linesPerPage);     // x roles per page
+                .Select(x => $"ï¿½ {x.Name}")
+                .SplitInto(AkkoConstants.LinesPerPage);     // x roles per page
 
             var title = (user is null)
                 ? "roles_title"
@@ -89,12 +87,12 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var users = context.Guild.Members.Values.Where(x => x.Roles.Contains(role))
                 .OrderByDescending(x => x.Hierarchy)
-                .Select(x => $"• {x.GetFullname()}")
-                .SplitInto(_linesPerPage);     // x users per page
+                .Select(x => $"ï¿½ {x.GetFullname()}")
+                .SplitInto(AkkoConstants.LinesPerPage);     // x users per page
 
             var title = context.FormatLocalized("inrole_title", role.Name);
             var embed = new DiscordEmbedBuilder()
-                .WithFooter(context.FormatLocalized("total", ((users.Count() - 1) * _linesPerPage) + users.LastOrDefault().Count()));
+                .WithFooter(context.FormatLocalized("total", ((users.Count() - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault().Count()));
 
             foreach (var userGroup in users)
                 embed.AddField(title, string.Join('\n', userGroup.ToArray()));

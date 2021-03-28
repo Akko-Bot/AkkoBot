@@ -1,8 +1,8 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Self.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;

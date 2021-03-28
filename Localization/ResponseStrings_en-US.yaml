@@ -363,3 +363,18 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 
 help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.
+cmd_emoji_list: Lists all emojis in this server.
+cmd_emoji: Groups commands for managing server emojis.
+cmd_emoji_add: Adds server emojis. Emojis must be in `.png` or `.gif` format and be under 256Kb in size.
+arg_emojis: One or more Discord emojis.
+arg_emoji_url: A direct link to an image.
+arg_emoji_name: The name of the new emoji.
+arg_emoji: A Discord emoji.
+emojis: Emojis
+cmd_emoji_remove: Removes server emojis.
+cmd_emoji_rename: Renames a server emoji.
+arg_emoji_newname: The new name of the emoji.
+cmd_emoji_setrole: Defines the roles for which the specified emoji will be available to. This only works if the bot is whitelisted as an integration in your server.
+arg_discord_roles: ID or mention to one or multiple Discord roles.
+cmd_emoji_removerole: Makes the specified emoji available to all users in the server. This only works if the bot is whitelisted as an integration in your server.
+exclusive: Exclusive

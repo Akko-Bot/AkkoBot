@@ -19,11 +19,11 @@ namespace AkkoBot.Services.Database.Entities
         public ulong AuthorId { get; init; }
         public WarnType Type { get; init; }
 
-        [MaxLength(AkkoEntities.MessageMaxLength)]
+        [MaxLength(2000)]
         public string WarningText
         {
             get => _note;
-            init => _note = value.MaxLength(AkkoEntities.MessageMaxLength) ?? "-";
+            init => _note = value.MaxLength(2000) ?? "-";
         }
     }
 }

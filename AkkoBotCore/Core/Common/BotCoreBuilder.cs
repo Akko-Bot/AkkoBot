@@ -1,4 +1,5 @@
-﻿using AkkoBot.Commands.Abstractions;
+﻿using System.Net.Http;
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Core.Services;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
@@ -335,8 +336,11 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<ILocalizer, AkkoLocalizer>(),
 
                 // > Timers
-                ServiceDescriptor.Singleton<ITimerManager, TimerManager>()
+                ServiceDescriptor.Singleton<ITimerManager, TimerManager>(),
                 //ServiceDescriptor.Singleton(typeof(TimerActions))
+
+                // > Utilities
+                ServiceDescriptor.Singleton(new HttpClient())
             };
 
             foreach (var service in servicesList)

@@ -1,5 +1,5 @@
-﻿using AkkoBot.Extensions;
-using AkkoBot.Services;
+﻿using AkkoBot.Common;
+using AkkoBot.Extensions;
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
@@ -129,7 +129,7 @@ namespace AkkoBot.Models
         public string Name
         {
             get => _author;
-            set => _author = value?.MaxLength(AkkoEntities.EmbedTitleMaxLength);
+            set => _author = value?.MaxLength(AkkoConstants.EmbedTitleMaxLength);
         }
 
         public string Url { get; set; }
@@ -197,7 +197,7 @@ namespace AkkoBot.Models
         public string Description
         {
             get => _description;
-            set => _description = value?.MaxLength(AkkoEntities.EmbedPropMaxLength, "[...]");
+            set => _description = value?.MaxLength(AkkoConstants.EmbedPropMaxLength, "[...]");
         }
 
         public string ImageUrl { get; set; }
@@ -225,13 +225,13 @@ namespace AkkoBot.Models
         public string Title
         {
             get => _title;
-            set => _title = value?.MaxLength(AkkoEntities.EmbedTitleMaxLength);
+            set => _title = value?.MaxLength(AkkoConstants.EmbedTitleMaxLength);
         }
 
         public string Text
         {
             get => _text;
-            set => _text = value?.MaxLength(AkkoEntities.EmbedFieldMaxLength, "[...]");
+            set => _text = value?.MaxLength(AkkoConstants.EmbedFieldMaxLength, "[...]");
         }
 
         public bool Inline { get; set; }
@@ -258,7 +258,7 @@ namespace AkkoBot.Models
         public string Text
         {
             get => _text;
-            set => _text = value?.MaxLength(AkkoEntities.EmbedPropMaxLength);
+            set => _text = value?.MaxLength(AkkoConstants.EmbedPropMaxLength);
         }
 
         public string ImageUrl { get; set; }

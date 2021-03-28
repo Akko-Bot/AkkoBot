@@ -138,5 +138,49 @@ namespace AkkoBot.Extensions
 
             return false;
         }
+
+        public static bool EndsWith(this string text, IEnumerable<string> collection, StringComparison comparisonType = StringComparison.Ordinal)
+        {
+            foreach (var element in collection)
+            {
+                if (text.EndsWith(element, comparisonType))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool StartsWith(this string text, IEnumerable<string> collection, StringComparison comparisonType = StringComparison.Ordinal)
+        {
+            foreach (var element in collection)
+            {
+                if (text.StartsWith(element, comparisonType))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static string SanitizeEmojiName(this string text)
+        {
+            var result = new StringBuilder(text.Trim(':'));
+
+            foreach (var character in result.ToString())
+            {
+                if (char.IsPunctuation(character))
+                    result.Replace(character.ToString(), string.Empty);
+            }
+
+            if (result.Length < 2)
+            {
+                result.Clear();
+                result.Append("emoji");
+            }
+
+            return result.ToString().MaxLength(50);
+        }
+
+        public static string RemoveExtension(this string text)
+            => (text.Contains('.')) ? text[..text.LastIndexOf('.')] : text;
     }
 }

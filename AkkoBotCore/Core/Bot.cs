@@ -1,7 +1,7 @@
-﻿using AkkoBot.Core.Common;
+﻿using AkkoBot.Common;
+using AkkoBot.Core.Common;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
-using AkkoBot.Services;
 using DSharpPlus;
 using Microsoft.Extensions.Logging;
 using System;

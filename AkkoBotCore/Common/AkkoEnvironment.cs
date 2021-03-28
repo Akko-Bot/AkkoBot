@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace AkkoBot.Services
+namespace AkkoBot.Common
 {
     public static class AkkoEnvironment
     {

@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -141,7 +141,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var isEmpty = dbEntry is null || words.Length == 0;
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoEntities.EmbedPropMaxLength, "[...]"));
+                .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoConstants.EmbedPropMaxLength, "[...]"));
 
             if (!isEmpty)
             {
@@ -166,13 +166,13 @@ namespace AkkoBot.Commands.Modules.Administration
                     .ToArray();
 
                 if (channels.Length != 0)
-                    embed.AddField("fw_ignored_channels", string.Join(", ", channels).MaxLength(AkkoEntities.EmbedFieldMaxLength, "[...]"));
+                    embed.AddField("fw_ignored_channels", string.Join(", ", channels).MaxLength(AkkoConstants.EmbedFieldMaxLength, "[...]"));
 
                 if (roles.Length != 0)
-                    embed.AddField("fw_ignored_roles", string.Join(", ", roles).MaxLength(AkkoEntities.EmbedFieldMaxLength, "[...]"));
+                    embed.AddField("fw_ignored_roles", string.Join(", ", roles).MaxLength(AkkoConstants.EmbedFieldMaxLength, "[...]"));
 
                 if (members.Length != 0)
-                    embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoEntities.EmbedFieldMaxLength, "[...]"));
+                    embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoConstants.EmbedFieldMaxLength, "[...]"));
             }
 
             await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);

@@ -1,4 +1,5 @@
-﻿using AkkoBot.Services.Logging.Abstractions;
+﻿using AkkoBot.Common;
+using AkkoBot.Services.Logging.Abstractions;
 using System;
 using System.IO;
 using System.Text;
