@@ -128,7 +128,10 @@ namespace AkkoBot.Core.Services
             if (_dbCache.Blacklist.Contains(eventArgs.Author.Id)
                 || _dbCache.Blacklist.Contains(eventArgs.Channel.Id)
                 || _dbCache.Blacklist.Contains(eventArgs.Guild?.Id ?? default))
+            {
                 eventArgs.Handled = true;
+                return FilterWord(client, eventArgs);
+            }
 
             return Task.CompletedTask;
         }
