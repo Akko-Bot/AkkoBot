@@ -32,13 +32,13 @@ namespace AkkoBot.Commands.Modules.Utilities
             var emojis = context.Guild.Emojis.Values
                 .Where(emoji => emoji.IsAvailable)
                 .OrderBy(x => x.Name)
-                .ThenBy(x => x.IsAnimated)
+                .OrderBy(x => x.IsAnimated) // ThenBy() doesn't do anything here, for some reason
                 .SplitInto(AkkoConstants.LinesPerPage);
 
             foreach (var emojiGroup in emojis)
             {
                 embed.AddField("emojis", string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {Formatter.InlineCode(emoji.GetDiscordName())}").ToArray()), true);
-                embed.AddField("exclusive", string.Join('\n', emojiGroup.Select(x => (x.Roles.Count == 0) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name).ToArray()), true);
+                embed.AddField("exclusive", string.Join('\n', emojiGroup.Select(x => (x.Roles.Count != 0) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name).ToArray()), true);
             }
 
             await context.RespondPaginatedByFieldsAsync(embed, 2);

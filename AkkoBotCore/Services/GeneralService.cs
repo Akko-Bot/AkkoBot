@@ -190,15 +190,16 @@ namespace AkkoBot.Services
         {
             // Redistribute the fields into groups based on their inline property
             var sisterFields = new List<List<DiscordEmbedField>> { new List<DiscordEmbedField>() };
-            var sisterGroup = 0;
+            int sisterGroup = 0, inlinedEmbeds = 0;
 
             // Build the groups
             foreach (var field in originalFields)
             {
-                if (!field.Inline)
+                if (!field.Inline || ++inlinedEmbeds > 3)
                 {
                     sisterFields.Add(new List<DiscordEmbedField>());
                     sisterGroup++;
+                    inlinedEmbeds = 0; // Don't have more than 3 fields
                 }
 
                 sisterFields[sisterGroup].Add(field);

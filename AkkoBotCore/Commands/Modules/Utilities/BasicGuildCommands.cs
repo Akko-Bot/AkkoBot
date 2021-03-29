@@ -16,6 +16,40 @@ namespace AkkoBot.Commands.Modules.Utilities
     [RequireGuild]
     public class BasicGuildCommands : AkkoCommandModule
     {
+        [Command("userid"), Aliases("uid")]
+        [Description("cmd_userid")]
+        public async Task UserId(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        {
+            user ??= context.Member;
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("xid", "user", Formatter.Bold(user.GetFullname()), Formatter.InlineCode(user.Id.ToString())));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("channelid"), Aliases("cid")]
+        [Description("cmd_channelid")]
+        public async Task ChannelId(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        {
+            channel ??= context.Channel;
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("xid", "channel", Formatter.Bold(channel.Mention), Formatter.InlineCode(channel.Id.ToString())));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("serverid"), Aliases("sid")]
+        [Description("cmd_serverid")]
+        public async Task ServerId(CommandContext context)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("xid", "server", Formatter.Bold(context.Guild.Name), Formatter.InlineCode(context.Guild.Id.ToString())));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [Command("rolecolor"), Aliases("rcolor")]
         [Description("cmd_rolecolor")]
         public async Task RoleColor(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_color")] DiscordColor? newColor = null)

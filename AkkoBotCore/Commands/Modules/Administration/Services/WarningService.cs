@@ -14,13 +14,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 {
     public class WarningService : AkkoCommandService
     {
-        private readonly IServiceProvider _services;
         private readonly RoleService _roleService;
         private readonly UserPunishmentService _punishService;
 
         public WarningService(IServiceProvider services, RoleService roleService, UserPunishmentService punishService) : base(services)
         {
-            _services = services;
             _roleService = roleService;
             _punishService = punishService;
         }

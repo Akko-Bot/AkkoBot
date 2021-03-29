@@ -12,6 +12,7 @@ using AkkoBot.Common;
 using System;
 using DSharpPlus.CommandsNext;
 using System.Collections.Generic;
+using DSharpPlus;
 
 namespace AkkoBot.Commands.Modules.Utilities.Services
 {
@@ -86,7 +87,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         public async Task<bool> AddGuildEmojiAsync(CommandContext context, Uri url, string name = null)
         {
             // Check if file extension is supported
-            if (!url.AbsoluteUri.Contains('.') || !url.AbsoluteUri[url.AbsoluteUri.LastIndexOf('.')..].StartsWith(AkkoEntities.SupportedEmojiFormats, StringComparison.InvariantCultureIgnoreCase))
+            if (!url.AbsoluteUri.Contains('.') || !url.AbsoluteUri[(url.AbsoluteUri.LastIndexOf('.') + 1)..].StartsWith(AkkoEntities.SupportedEmojiFormats, StringComparison.InvariantCultureIgnoreCase))
                 return false;
 
             var urlLeftPart = url.AbsoluteUri.RemoveExtension();
@@ -128,6 +129,68 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         }
 
         /// <summary>
+        /// Gets an embed with information about the context guild.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <returns>An embed.</returns>
+        public DiscordEmbedBuilder GetServerInfo(CommandContext context)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle(context.Guild.Name)
+                .WithThumbnail(context.Guild.IconUrl)
+                .AddField("id", context.Guild.Id.ToString(), true)
+                .AddField("owner", context.Guild.Owner.GetFullname(), true)
+                .AddField("members", context.Guild.MemberCount.ToString(), true)
+                .AddField(
+                    context.FormatLocalized("{0} ({1})", "channels", context.Guild.Channels.Count),
+                    context.FormatLocalized(
+                        "{0}: {1}\n" +
+                        "{2}: {3}\n" +
+                        "{4}: {5}",
+                        "category", context.Guild.Channels.Values.Count(x => x.IsCategory),
+                        "text", context.Guild.Channels.Values.Count(x => x.Type is not ChannelType.Voice and not ChannelType.Category),
+                        "voice", context.Guild.Channels.Values.Count(x => x.Type is ChannelType.Voice)
+                    ),
+                    true
+                )
+                .AddField(
+                    "info",
+                    context.FormatLocalized(
+                        "{0}: {1}\n" +
+                        "{2}: {3}\n" +
+                        "{4}: {5}",
+                        "region", context.Guild.VoiceRegion.Name,
+                        "verification_level", context.Guild.VerificationLevel.ToString().ToLowerInvariant(),
+                        "created_at", context.Guild.CreationTimestamp.ToString("d")
+                    ),
+                    true
+                )
+                .AddField("roles", context.Guild.Roles.Count.ToString(), true);
+
+            var modroles = context.Guild.Roles.Values
+                .Where(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers))
+                .Select(x => x.Name)
+                .ToArray();
+
+            if (modroles.Length is not 0)
+                embed.AddField(context.FormatLocalized("{0} ({1})", "modroles", modroles.Length), string.Join(", ", modroles));
+
+            if (!string.IsNullOrWhiteSpace(context.Guild.Description))
+                embed.WithDescription(context.Guild.Description);
+
+            if (context.Guild.Features.Count is not 0)
+                embed.AddField("features", string.Join(", ", context.Guild.Features));
+
+            if (!string.IsNullOrWhiteSpace(context.Guild.BannerUrl))
+                embed.WithImageUrl(context.Guild.BannerUrl);
+
+            if (!string.IsNullOrWhiteSpace(context.Guild.VanityUrlCode))
+                embed.WithFooter(context.FormatLocalized("{0}: {1}", "vanity_url", context.Guild.VanityUrlCode));
+
+            return embed;
+        }
+
+        /// <summary>
         /// Adds an emoji to the context guild.
         /// </summary>
         /// <param name="context">The command context.</param>
@@ -141,7 +204,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             if (isStreamValid)
             {
-                try { await context.Guild.CreateEmojiAsync(name.SanitizeEmojiName(), imageStream, context.Message.MentionedRoles); }
+                try { await context.Guild.CreateEmojiAsync(name.SanitizeEmojiName(), imageStream); }
                 catch { isStreamValid = false; }
             }
 
@@ -149,6 +212,43 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 await imageStream.DisposeAsync();
 
             return isStreamValid;
+        }
+
+        /// <summary>
+        /// Gets basic information about the specified Discord channel.
+        /// </summary>
+        /// <param name="embed">Embed to add the information to.</param>
+        /// <param name="channel">Channel to get the information from.</param>
+        /// <returns>An embed with information about the Discord <paramref name="channel"/>.</returns>
+        public DiscordEmbedBuilder GetChannelInfo(DiscordEmbedBuilder embed, DiscordChannel channel)
+        {
+            embed.WithTitle(channel.Name)
+                .AddField("type", channel.Type.ToString().ToLowerInvariant(), true)
+                .AddField("position", channel.Position.ToString(), true);
+
+            switch (channel.Type)
+            {
+                case ChannelType.Voice:
+                    embed.AddField("category", channel.Parent?.Name ?? "-", true)
+                        .AddField("bitrate", $"{channel.Bitrate / 1000} kbps", true)
+                        .AddField("user_limit", channel.UserLimit.ToString(), true)
+                        .AddField("connected_users", channel.Users.Count().ToString(), true);
+                    break;
+
+                case ChannelType.Category:
+                    embed.AddField("contains", string.Join(", ", channel.Children.Select(x => x.Name).ToArray()), false);
+                    break;
+
+                default:
+                    embed.WithDescription(channel.Topic)
+                        .AddField("category", channel.Parent?.Name ?? "-", true)
+                        .AddField("nsfw", (channel.IsNSFW) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
+                        .AddField("slowmode", channel.PerUserRateLimit?.ToString() ?? "-", true)
+                        .AddField("visible_to", channel.Users.Count().ToString(), true);
+                    break;
+            }
+
+            return embed;
         }
     }
 }

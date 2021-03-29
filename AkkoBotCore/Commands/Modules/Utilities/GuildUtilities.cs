@@ -1,12 +1,16 @@
-﻿using AkkoBot.Commands.Abstractions;
+﻿using System.Linq;
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
+using AkkoBot.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
+using AkkoBot.Services;
+using AkkoBot.Common;
 
 namespace AkkoBot.Commands.Modules.Utilities
 {
@@ -14,9 +18,13 @@ namespace AkkoBot.Commands.Modules.Utilities
     public class GuildUtilities : AkkoCommandModule
     {
         private readonly UtilitiesService _service;
+        private readonly DiscordShardedClient _clients;
 
-        public GuildUtilities(UtilitiesService service)
-            => _service = service;
+        public GuildUtilities(UtilitiesService service, DiscordShardedClient clients)
+        {
+            _service = service;
+            _clients = clients;
+        }
 
         [Command("say"), HiddenOverload]
         [Priority(0)]
@@ -35,6 +43,67 @@ namespace AkkoBot.Commands.Modules.Utilities
                 await channel.SendMessageAsync(parsedMessage);
             else    // If command is just plain text
                 await channel.SendMessageAsync(message.Content);
+        }
+
+        [Command("serverinfo"), Aliases("sinfo")]
+        [Description("cmd_serverinfo")]
+        public async Task ServerInfo(CommandContext context)
+            => await context.RespondLocalizedAsync(_service.GetServerInfo(context));
+
+        [Command("serverinfo"), HiddenOverload]
+        public async Task ServerInfo(CommandContext context, DiscordGuild server)
+        {
+            if (!GeneralService.IsOwner(context, context.Member.Id) || server.Channels.Count == 0)
+                return;
+
+            // This causes hybrid localization
+            var fakeContext = context.CommandsNext.CreateFakeContext(context.Guild.CurrentMember, server.Channels.Values.FirstOrDefault(), context.RawArgumentString, context.Prefix, null);
+            await context.RespondLocalizedAsync(_service.GetServerInfo(fakeContext), false);
+        }
+
+        [Command("channelinfo"), Aliases("cinfo")]
+        [Description("cmd_channelinfo")]
+        public async Task ChannelInfo(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        {
+            channel ??= context.Channel;
+
+            var embed = _service.GetChannelInfo(new DiscordEmbedBuilder(), channel)
+                .WithFooter(context.FormatLocalized("{0}: {1}", "created_at", channel.CreationTimestamp.ToString("d")));
+
+            await context.RespondLocalizedAsync(embed, false);
+        }
+
+        [Command("userinfo"), Aliases("uinfo")]
+        [Description("cmd_userinfo")]
+        public async Task UserInfo(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        {
+            user ??= context.Member;
+            var isMod = user.Hierarchy is int.MaxValue || user.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers));
+
+            var embed = new DiscordEmbedBuilder()
+                .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
+                .AddField("name", user.GetFullname(), true)
+                .AddField("nickname", user.Nickname ?? "-", true)
+                .AddField("id", user.Id.ToString(), true)
+                .AddField("is_mod", (isMod) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
+                .AddField("roles", user.Roles.Count().ToString(), true)
+                .AddField("position", user.Hierarchy.ToString(), true)
+                .AddField("created_at", user.CreationTimestamp.DateTime.ToString(), true)
+                .AddField("joined_at", user.JoinedAt.DateTime.ToString(), true);
+
+            await context.RespondLocalizedAsync(embed, false);
+        }
+
+        [Command("userinfo"), HiddenOverload]
+        public async Task UserInfo(CommandContext context, DiscordUser user)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
+                .AddField("name", user.GetFullname(), true)
+                .AddField("id", user.Id.ToString(), true)
+                .AddField("created_at", user.CreationTimestamp.DateTime.ToString(), false);
+
+            await context.RespondLocalizedAsync(embed, false);
         }
     }
 }

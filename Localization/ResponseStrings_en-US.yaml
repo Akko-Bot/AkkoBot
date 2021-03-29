@@ -365,7 +365,7 @@ warnpl_title: Server Punishments
 help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.
 cmd_emoji_list: Lists all emojis in this server.
 cmd_emoji: Groups commands for managing server emojis.
-cmd_emoji_add: Adds server emojis. Emojis must be in `.png` or `.gif` format and be under 256Kb in size.
+cmd_emoji_add: Adds server emojis. Emojis must be in `.png` or `.gif` format and be under 256Kb in size. Provide no parameter to add emojis from the attachment.
 arg_emojis: One or more Discord emojis.
 arg_emoji_url: A direct link to an image.
 arg_emoji_name: The name of the new emoji.
@@ -374,7 +374,51 @@ emojis: Emojis
 cmd_emoji_remove: Removes server emojis.
 cmd_emoji_rename: Renames a server emoji.
 arg_emoji_newname: The new name of the emoji.
-cmd_emoji_setrole: Defines the roles for which the specified emoji will be available to. This only works if the bot is whitelisted as an integration in your server.
+cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
 arg_discord_roles: ID or mention to one or multiple Discord roles.
-cmd_emoji_removerole: Makes the specified emoji available to all users in the server. This only works if the bot is whitelisted as an integration in your server.
+cmd_emoji_removerole: Makes the specified emoji available to all users in the server. This only works if the bot is listed as an integration in your server.
 exclusive: Exclusive
+owner: Owner
+members: Members
+channels: Channels
+category: Category
+text: Text
+voice: Voice
+info: Info
+region: Region
+none: None
+low: Low
+medium: Medium
+high: High
+highest: Highest
+verification_level: Verification Level
+created_at: Created at
+roles: Roles
+modroles: Moderator Roles
+features: Features
+vanity_url: Vanity URL
+cmd_serverinfo: Shows basic information about the current Discord server.
+cmd_userid: Shows the ID of the specified user. Provide no parameter to show the ID of the current user.
+xid: ID of {0} {1} is {2}.
+cmd_channelid: Shows the ID of the specified channel. Provide no parameter to show the ID of the current channel.
+cmd_serverid: Shows the ID of the current Discord server.
+private: Private
+group: Group
+news: News
+store: Store
+position: Position
+bitrate: Bitrate
+user_limit: User Limit
+connected_users: Connected Users
+contains: Contains
+nsfw: NSFW
+slowmode: Slowmode
+visible_to: Visible To
+cmd_channelinfo: Shows basic information about the specified Discord channel. Provide no parameter to show information about the current channel.
+
+cmd_userinfo: Shows basic information about the specified Discord user. Provide no parameter to show information about yourself.
+nickname: Nickname
+is_mod: Is a Moderator
+has_nitro: Has Nitro
+booster_since: Booster Since
+joined_at: Joined At

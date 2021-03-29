@@ -363,3 +363,62 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 
 help_cant_dm: Eu não tenho permissão para Enviar Mensagens e Adicionar Reações no servidor {0}.
+cmd_emoji_list: Exibe todos os emojis do servidor.
+cmd_emoji: Agrupa comandos para gerenciar emojis do servidor.
+cmd_emoji_add: Adiciona emojis ao servidor. Emojis precisam ser do formato `.png` ou `.gif` e ter menos de 256Kb em tamanho. Forneça nenhum parâmetro para adicionar emojis anexados.
+arg_emojis: Um ou mais emojis.
+arg_emoji_url: Um link direto a uma imagem.
+arg_emoji_name: O nome of novo emoji.
+arg_emoji: Um emoji.
+emojis: Emojis
+cmd_emoji_remove: Remove emojis do servidor.
+cmd_emoji_rename: Renomeia um emoji do servidor.
+arg_emoji_newname: O novo nome do emoji.
+cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
+arg_discord_roles: ID ou menção a um ou mais cargos do Discord.
+cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos no servidor. Só funciona se o bot estiver listado como uma integração no servidor.
+exclusive: Exclusivo
+owner: Dono
+members: Membros
+channels: Canais
+category: Categoria
+text: Texto
+voice: Voz
+info: Info
+region: Região
+none: Nenhum
+low: Baixo
+medium: Médio
+high: Alto
+highest: Máximo
+verification_level: Nível de Verificação
+created_at: Criado em
+roles: Cargos
+modroles: Cargos de Moderador
+features: Recursos
+vanity_url: Vanity URL
+cmd_serverinfo: Exibe informações básicas sobre o servidor atual.
+cmd_userid: Exibe of ID do usuário especificado. Forneça nenhum parâmetro para exibir o ID do usuário atual.
+xid: ID do {0} {1} é {2}.
+cmd_channelid: Exibe of ID do canal especificado. Forneça nenhum parâmetro para exibir o ID do canal atual.
+cmd_serverid: Exibe of ID do servidor atual.
+private: Privado
+group: Grupo
+news: Anúncios
+store: Loja
+position: Posição
+bitrate: Bitrate
+user_limit: Limite de Usuários
+connected_users: Usuários Conectados
+contains: Contém
+nsfw: NSFW
+slowmode: Modo Lento
+visible_to: Visível Para
+cmd_channelinfo: Exibe informações básicas sobre o canal especificado. Forneça nenhum parâmetro para exibir informações sobre o canal atual.
+
+cmd_userinfo: Exibe informações básicas sobre o usuário especificado. Forneça nenhum parâmetro para exibir informações de si mesmo.
+nickname: Apelido
+is_mod: É Moderador
+has_nitro: Tem Nitro
+booster_since: Booster Desde
+joined_at: Entrou Em

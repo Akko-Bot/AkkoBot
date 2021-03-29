@@ -33,6 +33,10 @@ namespace AkkoBot.Common
         /// </summary>
         public static TimeSpan MaxMessageDeletionAge { get; } = TimeSpan.FromDays(14);
 
+        /// <summary>
+        /// Defines the image formats supported for emojis.
+        /// </summary>
+        /// <value>"png", "gif".</value>
         public static string[] SupportedEmojiFormats { get; } = { "png", "gif" };
     }
 }
