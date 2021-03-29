@@ -43,6 +43,9 @@ namespace AkkoBot.Core.Services
             // Prevent mute evasion
             _botCore.BotShardedClient.GuildMemberAdded += Remute;
 
+            // Prevent events from running for blacklisted users, channels and servers
+            _botCore.BotShardedClient.MessageCreated += BlockBlacklisted;
+
             // Show prefix regardless of current config
             _botCore.BotShardedClient.MessageCreated += DefaultPrefix;
 
@@ -54,7 +57,7 @@ namespace AkkoBot.Core.Services
 
             // On command
             foreach (var cmdHandler in _botCore.CommandExt.Values)
-                cmdHandler.CommandExecuted += SaveUserOnUpdate;
+                cmdHandler.CommandExecuted += SaveUserOnCmd;
         }
 
         /* Event Methods */
@@ -62,7 +65,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Saves a user to the database on command execution.
         /// </summary>
-        private Task SaveUserOnUpdate(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
+        private Task SaveUserOnCmd(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
         {
             return Task.Run(async () =>
             {
@@ -118,6 +121,19 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
+        /// Stops the callback chain if the message comes from a blacklisted context.
+        /// </summary>
+        private Task BlockBlacklisted(DiscordClient client, MessageCreateEventArgs eventArgs)
+        {
+            if (_dbCache.Blacklist.Contains(eventArgs.Author.Id)
+                || _dbCache.Blacklist.Contains(eventArgs.Channel.Id)
+                || _dbCache.Blacklist.Contains(eventArgs.Guild?.Id ?? default))
+                eventArgs.Handled = true;
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
         /// </summary>
         private Task DefaultPrefix(DiscordClient client, MessageCreateEventArgs eventArgs)
@@ -127,17 +143,16 @@ namespace AkkoBot.Core.Services
 
             return Task.Run(async () =>
             {
-                var dbCache = _services.GetService<IDbCacher>();
-                var prefix = dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
+                var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
                     ? dbGuild.Prefix
-                    : dbCache.BotConfig.BotPrefix;
+                    : _dbCache.BotConfig.BotPrefix;
 
                 if (eventArgs.Guild is not null && prefix.Equals("!"))
                     return;
 
                 // Get command handler and prefix command
                 var cmdHandler = client.GetExtension<CommandsNextExtension>();
-                var cmd = cmdHandler.FindCommand(eventArgs.Message.Content.Remove(0, prefix.Length), out var cmdArgs)
+                var cmd = cmdHandler.FindCommand(eventArgs.Message.Content[prefix.Length..], out var cmdArgs)
                     ?? cmdHandler.FindCommand(eventArgs.Message.Content[1..], out cmdArgs);
 
                 // Create the context and execute the command
@@ -145,6 +160,7 @@ namespace AkkoBot.Core.Services
                 {
                     var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd, cmdArgs);
                     await cmd.ExecuteAndLogAsync(context);
+                    eventArgs.Handled = true;
                 }
             });
         }
@@ -270,7 +286,7 @@ namespace AkkoBot.Core.Services
         /* Utility Methods */
 
         /// <summary>
-        /// Deletes a <see cref="DiscordMessage"/> if its content match the specified filtered word.
+        /// Deletes a <see cref="DiscordMessage"/> if its content matches the specified filtered word.
         /// </summary>
         /// <param name="message">The message to be deleted.</param>
         /// <param name="match">The filtered word from the database cache.</param>
