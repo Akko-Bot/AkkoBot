@@ -105,7 +105,10 @@ namespace AkkoBot.Commands.Modules.Help
                 .OrderBy(x => x.Name)
                 .Select(async cmd =>
                 {
-                    var emote = (await cmd.RunChecksAsync(context, false)).Any() ? "❌" : "✅";
+                    var emote = (await cmd.RunChecksAsync(context, false)).Any() 
+                        ? AkkoEntities.FailureEmoji.Name
+                        : AkkoEntities.SuccessEmoji.Name;
+
                     return emote + context.Prefix + cmd.QualifiedName;
                 })
                 .ToListAsync();

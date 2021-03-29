@@ -129,27 +129,28 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         }
 
         /// <summary>
-        /// Gets an embed with information about the context guild.
+        /// Gets an embed with information about the specified guild.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <returns>An embed.</returns>
-        public DiscordEmbedBuilder GetServerInfo(CommandContext context)
+        /// <param name="server">The Discord guild to get information from</param>
+        /// <returns>An embed with information about the <paramref name="server"/>.</returns>
+        public DiscordEmbedBuilder GetServerInfo(CommandContext context, DiscordGuild server)
         {
             var embed = new DiscordEmbedBuilder()
-                .WithTitle(context.Guild.Name)
-                .WithThumbnail(context.Guild.IconUrl)
-                .AddField("id", context.Guild.Id.ToString(), true)
-                .AddField("owner", context.Guild.Owner.GetFullname(), true)
-                .AddField("members", context.Guild.MemberCount.ToString(), true)
+                .WithTitle(server.Name)
+                .WithThumbnail(server.IconUrl)
+                .AddField("id", server.Id.ToString(), true)
+                .AddField("owner", server.Owner.GetFullname(), true)
+                .AddField("members", server.MemberCount.ToString(), true)
                 .AddField(
-                    context.FormatLocalized("{0} ({1})", "channels", context.Guild.Channels.Count),
+                    context.FormatLocalized("{0} ({1})", "channels", server.Channels.Count),
                     context.FormatLocalized(
                         "{0}: {1}\n" +
                         "{2}: {3}\n" +
                         "{4}: {5}",
-                        "category", context.Guild.Channels.Values.Count(x => x.IsCategory),
-                        "text", context.Guild.Channels.Values.Count(x => x.Type is not ChannelType.Voice and not ChannelType.Category),
-                        "voice", context.Guild.Channels.Values.Count(x => x.Type is ChannelType.Voice)
+                        "category", server.Channels.Values.Count(x => x.IsCategory),
+                        "text", server.Channels.Values.Count(x => x.Type is not ChannelType.Voice and not ChannelType.Category),
+                        "voice", server.Channels.Values.Count(x => x.Type is ChannelType.Voice)
                     ),
                     true
                 )
@@ -159,15 +160,15 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                         "{0}: {1}\n" +
                         "{2}: {3}\n" +
                         "{4}: {5}",
-                        "region", context.Guild.VoiceRegion.Name,
-                        "verification_level", context.Guild.VerificationLevel.ToString().ToLowerInvariant(),
-                        "created_at", context.Guild.CreationTimestamp.ToString("d")
+                        "region", server.VoiceRegion.Name,
+                        "verification_level", server.VerificationLevel.ToString().ToLowerInvariant(),
+                        "created_at", server.CreationTimestamp.ToString("d")
                     ),
                     true
                 )
-                .AddField("roles", context.Guild.Roles.Count.ToString(), true);
+                .AddField("roles", server.Roles.Count.ToString(), true);
 
-            var modroles = context.Guild.Roles.Values
+            var modroles = server.Roles.Values
                 .Where(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers))
                 .Select(x => x.Name)
                 .ToArray();
@@ -175,17 +176,17 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (modroles.Length is not 0)
                 embed.AddField(context.FormatLocalized("{0} ({1})", "modroles", modroles.Length), string.Join(", ", modroles));
 
-            if (!string.IsNullOrWhiteSpace(context.Guild.Description))
-                embed.WithDescription(context.Guild.Description);
+            if (!string.IsNullOrWhiteSpace(server.Description))
+                embed.WithDescription(server.Description);
 
-            if (context.Guild.Features.Count is not 0)
-                embed.AddField("features", string.Join(", ", context.Guild.Features));
+            if (server.Features.Count is not 0)
+                embed.AddField("features", string.Join(", ", server.Features));
 
-            if (!string.IsNullOrWhiteSpace(context.Guild.BannerUrl))
-                embed.WithImageUrl(context.Guild.BannerUrl);
+            if (!string.IsNullOrWhiteSpace(server.BannerUrl))
+                embed.WithImageUrl(server.BannerUrl);
 
-            if (!string.IsNullOrWhiteSpace(context.Guild.VanityUrlCode))
-                embed.WithFooter(context.FormatLocalized("{0}: {1}", "vanity_url", context.Guild.VanityUrlCode));
+            if (!string.IsNullOrWhiteSpace(server.VanityUrlCode))
+                embed.WithFooter(context.FormatLocalized("{0}: {1}", "vanity_url", server.VanityUrlCode));
 
             return embed;
         }

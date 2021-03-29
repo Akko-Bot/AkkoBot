@@ -48,7 +48,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("serverinfo"), Aliases("sinfo")]
         [Description("cmd_serverinfo")]
         public async Task ServerInfo(CommandContext context)
-            => await context.RespondLocalizedAsync(_service.GetServerInfo(context));
+            => await context.RespondLocalizedAsync(_service.GetServerInfo(context, context.Guild), false);
 
         [Command("serverinfo"), HiddenOverload]
         public async Task ServerInfo(CommandContext context, DiscordGuild server)
@@ -56,9 +56,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             if (!GeneralService.IsOwner(context, context.Member.Id) || server.Channels.Count == 0)
                 return;
 
-            // This causes hybrid localization
-            var fakeContext = context.CommandsNext.CreateFakeContext(context.Guild.CurrentMember, server.Channels.Values.FirstOrDefault(), context.RawArgumentString, context.Prefix, null);
-            await context.RespondLocalizedAsync(_service.GetServerInfo(fakeContext), false);
+            await context.RespondLocalizedAsync(_service.GetServerInfo(context, server), false);
         }
 
         [Command("channelinfo"), Aliases("cinfo")]
