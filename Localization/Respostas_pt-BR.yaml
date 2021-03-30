@@ -20,9 +20,15 @@ arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_color: O valor hexadecimal de uma cor.
 arg_discord_role: ID ou menção a um cargo do Discord.
+arg_discord_roles: ID ou menção a um ou mais cargos do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_discord_voicechannel: ID ou nome de um canal de voz.
 arg_double: Um número real.
+arg_emoji: Um emoji.
+arg_emoji_name: O nome of novo emoji.
+arg_emoji_newname: O novo nome do emoji.
+arg_emoji_url: Um link direto a uma imagem.
+arg_emojis: Um ou mais emojis.
 arg_fw_ids: IDs de usuários, canais e/ou cargos, separados por espaço.
 arg_fw_message: A mensagem a ser enviada.
 arg_fw_word: Uma palavra.
@@ -64,6 +70,7 @@ ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
 ban_title: Usuário Banido
 banned_for: Banido por
+bitrate: Bitrate
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
 bl_added_range: '{0} IDs foram adicionados à lista negra.'
 bl_clear: '{0} registros foram removidos da lista negra.'
@@ -75,7 +82,9 @@ bl_removed_range: '{0} IDs foram removidos da lista negra.'
 bl_title: Lista Negra
 bot_prefix_check: O prefixo global é {0}
 bot_settings_title: Configurações Globais
+category: Categoria
 channel: Canal
+channels: Canais
 chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
 chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
 cmd_addstatus: Adiciona um status à lista de rotação. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ and __Competing__. Forneça uma URL para definir um status do tipo __Streaming__.
@@ -90,6 +99,8 @@ cmd_blacklist_add: Adiciona um registro à lista negra.
 cmd_blacklist_clear: Limpa a lista negra.
 cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâmetro for fornecido.
 cmd_blacklist_rem: Remove um registro da lista negra.
+cmd_channelid: Exibe of ID do canal especificado. Forneça nenhum parâmetro para exibir o ID do canal atual.
+cmd_channelinfo: Exibe informações básicas sobre o canal especificado. Forneça nenhum parâmetro para exibir informações sobre o canal atual.
 cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
 cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
 cmd_clearstatus: Remove todos os status do bot.
@@ -126,6 +137,13 @@ cmd_deafen: Ensurdece um usuário.
 cmd_deleteallroles: Exclui todos os cargos desse servidor que estão abaixo do bot e do usuário que usou o comando.
 cmd_deletechannel: Exclui um canal do Discord.
 cmd_deleterole: Exclui um cargo do Discord.
+cmd_emoji: Agrupa comandos para gerenciar emojis do servidor.
+cmd_emoji_add: Adiciona emojis ao servidor. Emojis precisam ser do formato `.png` ou `.gif` e ter menos de 256Kb em tamanho. Forneça nenhum parâmetro para adicionar emojis anexados.
+cmd_emoji_list: Exibe todos os emojis do servidor.
+cmd_emoji_remove: Remove emojis do servidor.
+cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos no servidor. Só funciona se o bot estiver listado como uma integração no servidor.
+cmd_emoji_rename: Renomeia um emoji do servidor.
+cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
 cmd_fw: Agrupa comandos que filtram palavras indesejáveis do servidor.
 cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando o filtro de palavras para eles.
@@ -139,6 +157,8 @@ cmd_fw_remove: Remove uma palavra do filtro de palavras.
 cmd_fw_removeignore: Remove IDs de usuários, canais e/ou cargos da lista de IDs ignorados.
 cmd_fw_removemany: Remove múltiplas palavras do filtro de palavras. Separe-as com espaço.
 cmd_fw_warn: Ativa ou desativa a advertência automática a usuários que enviarem mensagens com palavras proibidas.
+cmd_globalcmd: Ativa ou desativa um comando.
+cmd_globalmodule: Ativa ou desativa todos os comandos do módulo especificado.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
@@ -151,6 +171,7 @@ cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum c
 cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especificado.
 cmd_kick: Expulsa um usuário do servidor.
+cmd_ldc: Exibe todos os comandos desativados.
 cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
 cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
 cmd_lockchannel: Tranca o canal atual para impedir que usuários enviem mensagens. Usuários com permissão para Expulsar Membros, Banir Membros ou Gerenciar Canais possuem imunidade.
@@ -176,6 +197,8 @@ cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do se
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
+cmd_serverid: Exibe of ID do servidor atual.
+cmd_serverinfo: Exibe informações básicas sobre o servidor atual.
 cmd_setnickname: Define o apelido de um usuário. Forneça nenhum usuário para definit o apelido do bot. Forneça nenhum apelido para removê-lo.
 cmd_setrole: Adiciona um cargo ao usuário especificado.
 cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
@@ -187,6 +210,8 @@ cmd_unban: Desbane um usuário do servidor.
 cmd_undeafen: Remove o ensurdecimento de um usuário.
 cmd_unlockchannel: Destranca o canal atual, permitindo que os usuários voltem a enviar mensagens.
 cmd_unmute: Remove o silenciamento de um usuário nos canais de voz e texto.
+cmd_userid: Exibe of ID do usuário especificado. Forneça nenhum parâmetro para exibir o ID do usuário atual.
+cmd_userinfo: Exibe informações básicas sobre o usuário especificado. Forneça nenhum parâmetro para exibir informações de si mesmo.
 cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
 cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
 cmd_warn: Adverte um usuário.
@@ -200,6 +225,9 @@ command_check_failed: O usuário não possui permissões suficientes para execut
 command_modules_footer: Utilize {0} para visualizar o uso de um comando específico.
 command_not_found: Comando não encontrado.
 commands: Comandos
+connected_users: Usuários Conectados
+contains: Contém
+created_at: Criado em
 days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
 deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de voz.
@@ -207,10 +235,13 @@ deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novam
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
 disabled: desativado
+emojis: Emojis
 enabled: ativado
 error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o meu e o seu na hierarquia de cargos.
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
+exclusive: Exclusivo
+features: Recursos
 fw_default_notification: Sua mensagem foi removida por conter uma palavra proibida. Cuidado com o palavreado.
 fw_default_warn: Usou uma palavra proibida.
 fw_ignored_channels: Canais Ignorados
@@ -222,6 +253,11 @@ fw_notify: A notificação para mensagens filtradas foi {0}.
 fw_toggle: A filtragem de palavras foi {0} nesse servidor.
 fw_warn: A advertência automática para mensagens filtradas foi {0}.
 fw_warn_footer: Esse incidente foi registrado na sua lista de infrações.
+gcmd_error: O comando {0} não foi encontrado.
+gcmd_toggle: O comando {0} foi {1} com sucesso.
+gmod_error: O módulo {0} não foi encontrado.
+gmod_toggle: Comandos do módulo {0} foram {1}s com sucesso.
+group: Grupo
 guild_embed_change: O uso de embeds nesse servidor foi {0}.
 guild_errorcolor: ErrorColor foi alterada para {0}.
 guild_locale_changed: O idioma desse servidor foi alterado para {0}.
@@ -238,6 +274,7 @@ help_administrator: Administrador
 help_attach_files: Anexar Arquivos
 help_ban_members: Banir Membros
 help_bot_owner: Autoria do Bot
+help_cant_dm: Eu não tenho permissão para Enviar Mensagens e Adicionar Reações no servidor {0}.
 help_change_nickname: Alterar Apelido
 help_cmd_not_found: Comando não encontrado. Utilize {0} e/ou {1} para encontrar o comando que você procura.
 help_create_invite: Criar Convite
@@ -262,20 +299,28 @@ help_stream: Vídeo
 help_use_external_emojis: Usar Emojis Externos
 help_use_voice: Conectar
 help_view_audit_log: Ver o Registro de Auditoria
+high: Alto
+highest: Máximo
 hours: Horas
 id: ID
+info: Info
 infraction: Infração
 infractions_empty: Esse usuário não possui infrações.
 infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
+is_mod: É Moderador
+joined_at: Entrou Em
 kick: Expulsar
 kick_enum: expulso
 kick_notification: Você foi expulso do servidor {0}.
 kick_title: Usuário Expulso
 language: Idioma
+ldc_empty: Nenhum comando foi desativado.
+ldc_title: Comandos Desativados
 locales_title: Idiomas Disponíveis
 lockchannel_reason: Lockdown de Canal
+low: Baixo
 massban: Banimento em Massa
 massban_description: Banindo {0} usuários.
 massban_failure: Ninguém foi banido porque nenhum dos IDs são válidos ou os usuários já foram banidos.
@@ -283,9 +328,12 @@ massban_success: '{0} usuários foram banidos do servidor.'
 massunban: Desbanimento em Massa
 massunban_failed: Não há usuário a desbanir.
 massunban_succeded: '{0} usuários foram desbanidos do servidor.'
+medium: Médio
+members: Membros
 message: Mensagem
 minutes: Minutos
 modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
+modroles: Cargos de Moderador
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis
@@ -293,11 +341,18 @@ mute: Silenciar
 mute_enum: silenciado
 mute_success: Usuário {0} foi silenciado.
 name: Nome
+news: Anúncios
+nickname: Apelido
+none: Nenhum
 notice_success: Anotação adicionada com sucesso.
+nsfw: NSFW
 nsfw_toggle: NSFW foi {0} nesse canal.
 online_since: Online desde
+owner: Dono
 owners: Donos
 pages: Página {0}/{1}
+position: Posição
+private: Privado
 prune_error: Não há mensagens a serem excluídas ou você está tentando excluir mensagens criadas há mais de 14 dias.
 pstatus_error: Não há status de rotação definido.
 pstatus_rotation: A rotação de status está {0}.
@@ -311,10 +366,12 @@ q_no: 'não'
 q_operation_length_seconds: Essa operação levará pelo menos {0} segundos.
 q_yes: 'sim'
 reason: Motivo
+region: Região
 removeallroles: '{0} cargos foram removidos do {1} com sucesso.'
 removerole: Remover Cargo
 removerole_enum: teve um cargo removido
 requires: Requer
+roles: Cargos
 roles_title: Cargos nesse servidor
 sban_notification: Você foi expulso do servidor {0}.
 sban_title: Usuário Expulso
@@ -322,8 +379,11 @@ seconds: Segundos
 server: Servidor
 settings: Configuração
 shutdown: Desligando.
+slowmode: Modo Lento
 softban: Expulsar e Excluir
 softban_enum: expulso
+store: Loja
+text: Texto
 timedban_notification: Você foi banido do servidor {0} por {0}.
 timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
@@ -343,8 +403,13 @@ unwarn_success: A advertência número {0} do usuário {1} foi removida.
 uptime: Tempo Online
 usage: Uso
 user: Usuário
+user_limit: Limite de Usuários
 userroles_title: 'Cargos do {0}'
 value: Valor
+vanity_url: Vanity URL
+verification_level: Nível de Verificação
+visible_to: Visível Para
+voice: Voz
 voice_failure: O usuário precisa estar conectado a um canal de voz para este comando funcionar.
 voicemute_success: Usuário {0} foi silenciado nos canais de voz.
 voiceunmute_success: Usuário {0} pode voltar a falar nos canais de voz.
@@ -361,64 +426,4 @@ warnpl_empty: Não há punições nesse servidor.
 warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
-
-help_cant_dm: Eu não tenho permissão para Enviar Mensagens e Adicionar Reações no servidor {0}.
-cmd_emoji_list: Exibe todos os emojis do servidor.
-cmd_emoji: Agrupa comandos para gerenciar emojis do servidor.
-cmd_emoji_add: Adiciona emojis ao servidor. Emojis precisam ser do formato `.png` ou `.gif` e ter menos de 256Kb em tamanho. Forneça nenhum parâmetro para adicionar emojis anexados.
-arg_emojis: Um ou mais emojis.
-arg_emoji_url: Um link direto a uma imagem.
-arg_emoji_name: O nome of novo emoji.
-arg_emoji: Um emoji.
-emojis: Emojis
-cmd_emoji_remove: Remove emojis do servidor.
-cmd_emoji_rename: Renomeia um emoji do servidor.
-arg_emoji_newname: O novo nome do emoji.
-cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
-arg_discord_roles: ID ou menção a um ou mais cargos do Discord.
-cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos no servidor. Só funciona se o bot estiver listado como uma integração no servidor.
-exclusive: Exclusivo
-owner: Dono
-members: Membros
-channels: Canais
-category: Categoria
-text: Texto
-voice: Voz
-info: Info
-region: Região
-none: Nenhum
-low: Baixo
-medium: Médio
-high: Alto
-highest: Máximo
-verification_level: Nível de Verificação
-created_at: Criado em
-roles: Cargos
-modroles: Cargos de Moderador
-features: Recursos
-vanity_url: Vanity URL
-cmd_serverinfo: Exibe informações básicas sobre o servidor atual.
-cmd_userid: Exibe of ID do usuário especificado. Forneça nenhum parâmetro para exibir o ID do usuário atual.
 xid: ID do {0} {1} é {2}.
-cmd_channelid: Exibe of ID do canal especificado. Forneça nenhum parâmetro para exibir o ID do canal atual.
-cmd_serverid: Exibe of ID do servidor atual.
-private: Privado
-group: Grupo
-news: Anúncios
-store: Loja
-position: Posição
-bitrate: Bitrate
-user_limit: Limite de Usuários
-connected_users: Usuários Conectados
-contains: Contém
-nsfw: NSFW
-slowmode: Modo Lento
-visible_to: Visível Para
-cmd_channelinfo: Exibe informações básicas sobre o canal especificado. Forneça nenhum parâmetro para exibir informações sobre o canal atual.
-
-cmd_userinfo: Exibe informações básicas sobre o usuário especificado. Forneça nenhum parâmetro para exibir informações de si mesmo.
-nickname: Apelido
-is_mod: É Moderador
-has_nitro: Tem Nitro
-booster_since: Booster Desde
-joined_at: Entrou Em

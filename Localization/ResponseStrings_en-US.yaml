@@ -20,9 +20,15 @@ arg_config_timeout: How long the bot should wait on interactive commands. Minimu
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_color: The hexadecimal value of a color.
 arg_discord_role: ID or mention to a Discord role.
+arg_discord_roles: ID or mention to one or multiple Discord roles.
 arg_discord_user: ID or mention to a Discord user.
 arg_discord_voicechannel: ID or name of a voice channel.
 arg_double: A real number.
+arg_emoji: A Discord emoji.
+arg_emoji_name: The name of the new emoji.
+arg_emoji_newname: The new name of the emoji.
+arg_emoji_url: A direct link to an image.
+arg_emojis: One or more Discord emojis.
 arg_fw_ids: User, channel and/or role IDs, separated by space.
 arg_fw_message: The message to be sent.
 arg_fw_word: A word.
@@ -64,6 +70,7 @@ ban_enum: banned
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
 banned_for: Banned for
+bitrate: Bitrate
 bl_added: Successfully added {0} {1} {2} to the blacklist.
 bl_added_range: '{0} IDs were added to the blacklist.'
 bl_clear: '{0} entries were successfully removed from the blacklist.'
@@ -75,7 +82,9 @@ bl_removed_range: '{0} IDs were removed from the blacklist.'
 bl_title: Blacklist
 bot_prefix_check: The global prefix is {0}
 bot_settings_title: Global Settings
+category: Category
 channel: Channel
+channels: Channels
 chatmute_success: User {0} can no longer message on text channels.
 chatunmute_success: User {0} can now message on text channels.
 cmd_addstatus: Adds a status to the list of rotating statuses. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status.
@@ -90,6 +99,8 @@ cmd_blacklist_add: Adds an entry to the blacklist.
 cmd_blacklist_clear: Clears the blacklist.
 cmd_blacklist_list: Shows the blacklist. Provide no parameter to show all entry types.
 cmd_blacklist_rem: Removes an entry from the blacklist.
+cmd_channelid: Shows the ID of the specified channel. Provide no parameter to show the ID of the current channel.
+cmd_channelinfo: Shows basic information about the specified Discord channel. Provide no parameter to show information about the current channel.
 cmd_chatmute: Server mutes a user, preventing them from messaging on text channels.
 cmd_chatunmute: Server unmutes a user, allowing them to message on text channels.
 cmd_clearstatus: Removes all statuses from the bot.
@@ -126,6 +137,13 @@ cmd_deafen: Applies server deafening to a user.
 cmd_deleteallroles: Deletes all roles on this server that are below the bot and the user who used the command.
 cmd_deletechannel: Deletes a Discord channel.
 cmd_deleterole: Deletes a Discord role.
+cmd_emoji: Groups commands for managing server emojis.
+cmd_emoji_add: Adds server emojis. Emojis must be in `.png` or `.gif` format and be under 256Kb in size. Provide no parameter to add emojis from the attachment.
+cmd_emoji_list: Lists all emojis in this server.
+cmd_emoji_remove: Removes server emojis.
+cmd_emoji_removerole: Makes the specified emoji available to all users in the server. This only works if the bot is listed as an integration in your server.
+cmd_emoji_rename: Renames a server emoji.
+cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
 cmd_fw: Groups commands to filter out undesirable words from the server.
 cmd_fw_add: Adds a word to the word filter. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the beginning to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
 cmd_fw_addignore: Adds a user, channel and/or role IDs to the list of ignored IDs, disabling the word filter for them.
@@ -139,6 +157,8 @@ cmd_fw_remove: Removes a word from the list of filtered words.
 cmd_fw_removeignore: Removes a user, channel and/or role IDs from the list of ignored IDs.
 cmd_fw_removemany: Removes multiple words from the list of filtered words. Separate them with space.
 cmd_fw_warn: Toggles whether filtered messages should automatically issue a warning to the offending user.
+cmd_globalcmd: Toggles activation of a command.
+cmd_globalmodule: Toggles activation of all commands in the specified module.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
@@ -151,6 +171,7 @@ cmd_help: Shows help for the specified command or the default help message if no
 cmd_infractions: Shows the list of infractions of a user.
 cmd_inrole: Lists all users on this server with the specified role.
 cmd_kick: Kicks a user from the server.
+cmd_ldc: Lists all commands that have been disabled globally.
 cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
 cmd_liststatus: Lists all rotating statuses and their corresponding ID.
 cmd_lockchannel: Locks the current channel so users can't send messages to it. Users with permission to Kick Members, Ban Members or Manage Channels are immune.
@@ -176,6 +197,8 @@ cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
+cmd_serverid: Shows the ID of the current Discord server.
+cmd_serverinfo: Shows basic information about the current Discord server.
 cmd_setnickname: Sets the nickname of a user. Provide no user to set the bot's nickname. Provide no nickname to remove it.
 cmd_setrole: Adds a role to the specified user.
 cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
@@ -187,6 +210,8 @@ cmd_unban: Unbans a user from the server.
 cmd_undeafen: Removes server deafening from a user.
 cmd_unlockchannel: Unlocks the current channel so users can send messages again.
 cmd_unmute: Unmutes a user from text and voice channels.
+cmd_userid: Shows the ID of the specified user. Provide no parameter to show the ID of the current user.
+cmd_userinfo: Shows basic information about the specified Discord user. Provide no parameter to show information about yourself.
 cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
 cmd_warn: Warns a user.
@@ -200,6 +225,9 @@ command_check_failed: The user does not have enough permissions to execute this 
 command_modules_footer: Use {0} to see the usage for a specific command.
 command_not_found: Command not found.
 commands: Commands
+connected_users: Connected Users
+contains: Contains
+created_at: Created at
 days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'
 deafen_success: User {0} can no longer hear other users speaking in voice channels.
@@ -207,10 +235,13 @@ deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
 disabled: disabled
+emojis: Emojis
 enabled: enabled
 error_hierarchy: This command can only be used on users with a role lower to mine and yours in the role hierarchy.
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
+exclusive: Exclusive
+features: Features
 fw_default_notification: Your message contains a banned word and has been removed. Watch your language.
 fw_default_warn: Used a banned word.
 fw_ignored_channels: Ignored Channels
@@ -222,6 +253,11 @@ fw_notify: The notification for filtered messages has been {0}.
 fw_toggle: The word filter has been {0} on this server.
 fw_warn: Automatic warnings for filtered messages has been {0}.
 fw_warn_footer: This incident has been counted towards your infraction list.
+gcmd_error: The command {0} could not be found.
+gcmd_toggle: The command {0} has been successfully {1}.
+gmod_error: The module {0} could not be found.
+gmod_toggle: Commands in the {0} module have been successfully {1}.
+group: Group
 guild_embed_change: Embed usage has been {0} on this server.
 guild_errorcolor: ErrorColor has been changed to {0}.
 guild_locale_changed: The language for this server has been changed to {0}.
@@ -238,6 +274,7 @@ help_administrator: Administrator
 help_attach_files: Attach Files
 help_ban_members: Ban Members
 help_bot_owner: Bot Ownership
+help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.
 help_change_nickname: Change Nickname
 help_cmd_not_found: Command not found. Use {0} and/or {1} to find the command you're looking for.
 help_create_invite: Create Invite
@@ -262,20 +299,28 @@ help_stream: Stream
 help_use_external_emojis: Use External Emojis
 help_use_voice: Connect
 help_view_audit_log: View Audit Log
+high: High
+highest: Highest
 hours: Hours
 id: ID
+info: Info
 infraction: Infraction
 infractions_empty: There are no infractions to show.
 infractions_field: '{0} at {1} by {2}'
 infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
+is_mod: Is a Moderator
+joined_at: Joined At
 kick: Kick
 kick_enum: kicked
 kick_notification: You have been kicked from the {0} server.
 kick_title: User Kicked
 language: Language
+ldc_empty: No command has been disabled.
+ldc_title: Disabled Commands
 locales_title: Available Languages
 lockchannel_reason: Channel Lockdown
+low: Low
 massban: Massban
 massban_description: Banning {0} users.
 massban_failure: No user was banned either because none of the IDs were valid or the users are already banned.
@@ -283,9 +328,12 @@ massban_success: '{0} users were banned from the server.'
 massunban: Massunban
 massunban_failed: There was no user to unban.
 massunban_succeded: '{0} users were unbanned from the server.'
+medium: Medium
+members: Members
 message: Message
 minutes: Minutes
 modlog_description: '{0} notices, {1} infractions, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
+modroles: Moderator Roles
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules
@@ -293,11 +341,18 @@ mute: Mute
 mute_enum: muted
 mute_success: User {0} has been muted.
 name: Name
+news: News
+nickname: Nickname
+none: None
 notice_success: Notice added successfully.
+nsfw: NSFW
 nsfw_toggle: NSFW has been {0} on this channel.
 online_since: Online since
+owner: Owner
 owners: Owners
 pages: Page {0}/{1}
+position: Position
+private: Private
 prune_error: There are no messages to be deleted or you're trying to delete messages older than 14 days.
 pstatus_error: There are no rotating statuses set up.
 pstatus_rotation: Status rotation is currently {0}.
@@ -311,10 +366,12 @@ q_no: 'no'
 q_operation_length_seconds: This operation will take at least {0} seconds.
 q_yes: 'yes'
 reason: Reason
+region: Region
 removeallroles: '{0} roles were successfully removed from {1}.'
 removerole: Remove Role
 removerole_enum: had a role removed
 requires: Requires
+roles: Roles
 roles_title: Roles on this server
 sban_notification: You have been soft-banned from the {0} server.
 sban_title: User Soft-banned
@@ -322,8 +379,11 @@ seconds: Seconds
 server: Server
 settings: Settings
 shutdown: Shutting down.
+slowmode: Slowmode
 softban: Soft-ban
 softban_enum: soft-banned
+store: Store
+text: Text
 timedban_notification: You have been banned from the {0} server for {0}.
 timedban_title: Temporary Ban
 timedmute: Expired Mute
@@ -343,8 +403,13 @@ unwarn_success: Removed warning {0} from {1}.
 uptime: Uptime
 usage: Usage
 user: User
+user_limit: User Limit
 userroles_title: "{0}'s roles"
 value: Value
+vanity_url: Vanity URL
+verification_level: Verification Level
+visible_to: Visible To
+voice: Voice
 voice_failure: The user needs to be connected to a voice channel for this command to work.
 voicemute_success: User {0} has been muted from voice channels.
 voiceunmute_success: User {0} has been unmuted from voice channels.
@@ -361,64 +426,4 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
-
-help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.
-cmd_emoji_list: Lists all emojis in this server.
-cmd_emoji: Groups commands for managing server emojis.
-cmd_emoji_add: Adds server emojis. Emojis must be in `.png` or `.gif` format and be under 256Kb in size. Provide no parameter to add emojis from the attachment.
-arg_emojis: One or more Discord emojis.
-arg_emoji_url: A direct link to an image.
-arg_emoji_name: The name of the new emoji.
-arg_emoji: A Discord emoji.
-emojis: Emojis
-cmd_emoji_remove: Removes server emojis.
-cmd_emoji_rename: Renames a server emoji.
-arg_emoji_newname: The new name of the emoji.
-cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
-arg_discord_roles: ID or mention to one or multiple Discord roles.
-cmd_emoji_removerole: Makes the specified emoji available to all users in the server. This only works if the bot is listed as an integration in your server.
-exclusive: Exclusive
-owner: Owner
-members: Members
-channels: Channels
-category: Category
-text: Text
-voice: Voice
-info: Info
-region: Region
-none: None
-low: Low
-medium: Medium
-high: High
-highest: Highest
-verification_level: Verification Level
-created_at: Created at
-roles: Roles
-modroles: Moderator Roles
-features: Features
-vanity_url: Vanity URL
-cmd_serverinfo: Shows basic information about the current Discord server.
-cmd_userid: Shows the ID of the specified user. Provide no parameter to show the ID of the current user.
 xid: ID of {0} {1} is {2}.
-cmd_channelid: Shows the ID of the specified channel. Provide no parameter to show the ID of the current channel.
-cmd_serverid: Shows the ID of the current Discord server.
-private: Private
-group: Group
-news: News
-store: Store
-position: Position
-bitrate: Bitrate
-user_limit: User Limit
-connected_users: Connected Users
-contains: Contains
-nsfw: NSFW
-slowmode: Slowmode
-visible_to: Visible To
-cmd_channelinfo: Shows basic information about the specified Discord channel. Provide no parameter to show information about the current channel.
-
-cmd_userinfo: Shows basic information about the specified Discord user. Provide no parameter to show information about yourself.
-nickname: Nickname
-is_mod: Is a Moderator
-has_nitro: Has Nitro
-booster_since: Booster Since
-joined_at: Joined At

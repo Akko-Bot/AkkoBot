@@ -3,6 +3,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,6 +16,8 @@ namespace AkkoBot.Services.Database.Entities
         private string _botPrefix = "!";
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
+
+        public List<string> DisabledCommands { get; set; } = new();
 
         [Required]
         [MaxLength(10)]
@@ -70,7 +73,14 @@ namespace AkkoBot.Services.Database.Entities
         [Required]
         public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
-        // Implement .gcmd and .gmod?
+        public override IReadOnlyDictionary<string, string> GetSettings()
+        {
+            var result = base.GetSettings() as Dictionary<string, string>;
+            result.Remove("DisabledCommands".ToSnakeCase());
+
+            return result;
+        }
+
         // Implement forward dms to owners?
         // Might be an issue for "message staff" type of features
     }

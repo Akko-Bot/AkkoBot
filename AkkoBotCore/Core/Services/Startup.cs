@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -82,6 +83,7 @@ namespace AkkoBot.Core.Services
             db.BotConfig.TryCreate();
             await db.SaveChangesAsync();
 
+            #region Playing Status Initialization
             // Initialize the custom status, if there is one
             var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
 
@@ -92,6 +94,35 @@ namespace AkkoBot.Core.Services
                 db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;
                 await _services.GetService<StatusService>().RotateStatusesAsync();
             }
+            #endregion
+
+            #region Command Unregistration
+            // Initialize the cache for disabled commands
+            if (_services.GetService<IDbCacher>().DisabledCommandCache is null)
+            {
+                var disabledCommands = new ConcurrentDictionary<string, Command>();     // Initialize the cache
+                var cmdHandlers = (await _services.GetService<DiscordShardedClient>().GetCommandsNextAsync()).Values;   // Get the command handlers
+
+                // Unregister the disabled commands from the command handlers
+                foreach(var dbCmd in db.BotConfig.Table.FirstOrDefault().DisabledCommands)
+                {
+                    var cmd = cmdHandlers.FirstOrDefault().FindCommand(dbCmd, out _);
+
+                    if (cmd is not null)
+                    {
+                        // Add command to the cache of disabled commands
+                        disabledCommands.TryAdd(cmd.QualifiedName, cmd);
+
+                        // Unregister the command from the command handler
+                        foreach (var cmdHandler in cmdHandlers)
+                            cmdHandler.UnregisterCommands(cmd);
+                    }
+                }
+
+                // Add disabled commands to the database cache
+                _services.GetService<IDbCacher>().DisabledCommandCache = disabledCommands;
+            }
+            #endregion
         }
 
         /// <summary>
@@ -100,7 +131,7 @@ namespace AkkoBot.Core.Services
         private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             // May want to remove this method
-            var cmdHandler = _botCore.CommandExt[client.ShardId];
+            var cmdHandler = client.GetExtension<CommandsNextExtension>();
             cmdHandler.Services.GetService<IDbCacher>().Timers = cmdHandler.Services.GetService<ITimerManager>();
 
             return Task.CompletedTask;

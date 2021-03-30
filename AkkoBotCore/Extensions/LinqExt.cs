@@ -44,29 +44,6 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Checks if at least one entry in this collection matches the specified string and returns the match, if it exists.
-        /// </summary>
-        /// <param name="collection">This string collection.</param>
-        /// <param name="target">The string to be compared with.</param>
-        /// <param name="comparison">The comparison rules.</param>
-        /// <param name="match">The resulting match in the collection or <see langword="null"/> if none was found.</param>
-        /// <returns><see langword="true"/> if there was one matching entry, <see langword="false"/> otherwise.</returns>
-        public static bool Contains(this IEnumerable<string> collection, string target, StringComparison comparison, out string match)
-        {
-            foreach (var word in collection)
-            {
-                if (word.Equals(target, comparison))
-                {
-                    match = word;
-                    return true;
-                }
-            }
-
-            match = null;
-            return false;
-        }
-
-        /// <summary>
         /// Checks if the current collection contains all elements of a given collection.
         /// </summary>
         /// <typeparam name="T">Data type contained in the collection.</typeparam>

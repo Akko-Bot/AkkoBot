@@ -21,7 +21,7 @@ namespace AkkoBot.Services.Database.Abstractions
         /// </summary>
         /// <remarks><see cref="Id"/>, <see cref="DateAdded"/> and relationship properties are removed.</remarks>
         /// <returns>A dictionary of setting name/value pairs.</returns>
-        public IReadOnlyDictionary<string, string> GetSettings()
+        public virtual IReadOnlyDictionary<string, string> GetSettings()
         {
             var props = this.GetType().GetProperties()
                 .Where(x => !x.Name.EndsWith("Rel", StringComparison.Ordinal) && x.Name is not (nameof(Id)) and not (nameof(DateAdded)))

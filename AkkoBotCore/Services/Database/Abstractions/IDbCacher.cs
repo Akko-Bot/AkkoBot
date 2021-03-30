@@ -1,6 +1,7 @@
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
+using DSharpPlus.CommandsNext;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,9 +17,10 @@ namespace AkkoBot.Services.Database.Abstractions
         BotConfigEntity BotConfig { get; set; }
         LogConfigEntity LogConfig { get; set; }
         ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; }
-        ITimerManager Timers { get; set; }
         List<PlayingStatusEntity> PlayingStatuses { get; }
         ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; }
         ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; }
+        ITimerManager Timers { get; set; }
+        public ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
     }
 }

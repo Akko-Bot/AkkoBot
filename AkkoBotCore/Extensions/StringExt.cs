@@ -1,3 +1,4 @@
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,13 +17,21 @@ namespace AkkoBot.Extensions
             => msg.Equals(target) || msg.StartsWith(target[..1]);
 
         /// <summary>
+        /// Removes the file extension of this string, if there is one.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns></returns>
+        public static string RemoveExtension(this string text)
+            => (text.Contains('.')) ? text[..text.LastIndexOf('.')] : text;
+
+        /// <summary>
         /// Truncates the string to the maximum specified length.
         /// </summary>
         /// <param name="text">This string.</param>
         /// <param name="maxLength">The maximum length the string should have.</param>
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         public static string MaxLength(this string text, int maxLength)
-            => text?.Substring(0, Math.Min(text.Length, maxLength));
+            => text.Substring(0, Math.Min(text.Length, maxLength));
 
         /// <summary>
         /// Truncates the string to the maximum specified length.
@@ -113,7 +122,7 @@ namespace AkkoBot.Extensions
         /// <returns>The length of the longest element.</returns>
         public static int MaxElementLength(this IEnumerable<string> collection)
         {
-            int max = 0;
+            var max = 0;
 
             foreach (var element in collection)
                 max = Math.Max(max, element.Length);
@@ -139,6 +148,36 @@ namespace AkkoBot.Extensions
             return false;
         }
 
+        /// <summary>
+        /// Checks if at least one entry in this collection matches the specified string and returns the match, if it exists.
+        /// </summary>
+        /// <param name="collection">This string collection.</param>
+        /// <param name="target">The string to be compared with.</param>
+        /// <param name="comparison">The comparison rules.</param>
+        /// <param name="match">The resulting match in the collection or <see langword="null"/> if none was found.</param>
+        /// <returns><see langword="true"/> if there was one matching entry, <see langword="false"/> otherwise.</returns>
+        public static bool Contains(this IEnumerable<string> collection, string target, StringComparison comparison, out string match)
+        {
+            foreach (var word in collection)
+            {
+                if (word.Equals(target, comparison))
+                {
+                    match = word;
+                    return true;
+                }
+            }
+
+            match = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether the end of this string matches any string stored in <paramref name="collection"/> when compared using the specified comparison option.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="collection">The collection to compare to.</param>
+        /// <param name="comparisonType">The type of string comparison to be used.</param>
+        /// <returns><see langword="true"/> if a match occurred, <see langword="false"/> otherwise.</returns>
         public static bool EndsWith(this string text, IEnumerable<string> collection, StringComparison comparisonType = StringComparison.Ordinal)
         {
             foreach (var element in collection)
@@ -150,6 +189,13 @@ namespace AkkoBot.Extensions
             return false;
         }
 
+        /// <summary>
+        /// Checks whether the beginning of this string matches any string stored in <paramref name="collection"/> when compared using the specified comparison option.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="collection">The collection to compare to.</param>
+        /// <param name="comparisonType">The type of string comparison to be used.</param>
+        /// <returns><see langword="true"/> if a match occurred, <see langword="false"/> otherwise.</returns>
         public static bool StartsWith(this string text, IEnumerable<string> collection, StringComparison comparisonType = StringComparison.Ordinal)
         {
             foreach (var element in collection)
@@ -161,6 +207,11 @@ namespace AkkoBot.Extensions
             return false;
         }
 
+        /// <summary>
+        /// Ensures this string is a valid <see cref="DiscordEmoji"/> name.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns>This string sanitized to an emoji name.</returns>
         public static string SanitizeEmojiName(this string text)
         {
             var result = new StringBuilder(text.Trim(':'));
@@ -179,8 +230,5 @@ namespace AkkoBot.Extensions
 
             return result.ToString().MaxLength(50);
         }
-
-        public static string RemoveExtension(this string text)
-            => (text.Contains('.')) ? text[..text.LastIndexOf('.')] : text;
     }
 }
