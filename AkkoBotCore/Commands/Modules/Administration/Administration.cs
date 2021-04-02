@@ -67,6 +67,10 @@ namespace AkkoBot.Commands.Modules.Administration
             }
         }
 
+        [Command("prefix"), HiddenOverload] // Account for dumb users
+        public async Task ChangeDumbPrefix(CommandContext context, string dumb, [RemainingText] string intendedPrefix)
+            => await ChangePrefix(context, (dumb.Equals("set", StringComparison.InvariantCultureIgnoreCase) ? intendedPrefix : context.RawArgumentString));
+
         [Command("prefix")]
         [Description("cmd_guild_prefix")]
         public async Task ChangePrefix(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
@@ -77,13 +81,10 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
             }
 
-            // Account for dumb users - this is not 100% accurate
-            var prefix = newPrefix.Replace("set ", string.Empty);
-
-            _guildService.GetOrSetProperty(context, x => x.Prefix = prefix);
+            _guildService.GetOrSetProperty(context, x => x.Prefix = newPrefix);
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(prefix)));
+                .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(newPrefix)));
 
             await context.RespondLocalizedAsync(embed);
         }
