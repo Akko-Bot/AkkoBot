@@ -50,10 +50,10 @@ namespace AkkoBot.Core.Services
             _botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
 
             // Save visible guilds on ready
-            _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuildsAsync;
+            _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuilds;
 
             // Caches guild filtered words
-            _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredWordsAsync;
+            _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredWords;
 
             // Save guild on join
             _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
@@ -74,55 +74,32 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Creates bot settings on startup, if there isn't one already.
         /// </summary>
-        private async Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
+        private Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-
-            // If there is no BotConfig entry in the database, create one.
-            db.LogConfig.TryCreate();
-            db.BotConfig.TryCreate();
-            await db.SaveChangesAsync();
-
-            #region Playing Status Initialization
-            // Initialize the custom status, if there is one
-            var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
-
-            if (pStatus is not null)
-                await client.UpdateStatusAsync(pStatus.GetActivity());
-            else if (db.BotConfig.Cache.RotateStatus && db.PlayingStatuses.Cache.Count != 0)
+            return Task.Run(async () =>
             {
-                db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;
-                await _services.GetService<StatusService>().RotateStatusesAsync();
-            }
-            #endregion
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
-            #region Command Unregistration
-            // Initialize the cache for disabled commands
-            if (_services.GetService<IDbCacher>().DisabledCommandCache is null)
-            {
-                var disabledCommands = new ConcurrentDictionary<string, Command>();     // Initialize the cache
-                var cmdHandlers = (await _services.GetService<DiscordShardedClient>().GetCommandsNextAsync()).Values;   // Get the command handlers
+                // If there is no BotConfig entry in the database, create one.
+                db.LogConfig.TryCreate();
+                db.BotConfig.TryCreate();
+                await db.SaveChangesAsync();
 
-                // Unregister the disabled commands from the command handlers
-                foreach(var dbCmd in db.BotConfig.Table.FirstOrDefault().DisabledCommands)
+                #region Playing Status Initialization
+                // Initialize the custom status, if there is one
+                var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+
+                if (pStatus is not null)
+                    await client.UpdateStatusAsync(pStatus.GetActivity());
+                else if (db.BotConfig.Cache.RotateStatus && db.PlayingStatuses.Cache.Count != 0)
                 {
-                    var cmd = cmdHandlers.FirstOrDefault().FindCommand(dbCmd, out _);
-
-                    if (cmd is not null)
-                    {
-                        // Add command to the cache of disabled commands
-                        disabledCommands.TryAdd(cmd.QualifiedName, cmd);
-
-                        // Unregister the command from the command handler
-                        foreach (var cmdHandler in cmdHandlers)
-                            cmdHandler.UnregisterCommands(cmd);
-                    }
+                    db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;
+                    await _services.GetService<StatusService>().RotateStatusesAsync();
                 }
+                #endregion
 
-                // Add disabled commands to the database cache
-                _services.GetService<IDbCacher>().DisabledCommandCache = disabledCommands;
-            }
-            #endregion
+                await UnregisterCommands(client);
+            });
         }
 
         /// <summary>
@@ -132,7 +109,7 @@ namespace AkkoBot.Core.Services
         {
             // May want to remove this method
             var cmdHandler = client.GetExtension<CommandsNextExtension>();
-            cmdHandler.Services.GetService<IDbCacher>().Timers = cmdHandler.Services.GetService<ITimerManager>();
+            cmdHandler.Services.GetService<IDbCacher>().Timers ??= cmdHandler.Services.GetService<ITimerManager>();
 
             return Task.CompletedTask;
         }
@@ -140,38 +117,42 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Saves new guilds to the database on startup and caches them.
         /// </summary>
-        private async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        private Task SaveNewGuilds(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            return Task.Run(async () =>
+            {
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
-            var botConfig = db.BotConfig.Cache;
+                var botConfig = db.BotConfig.Cache;
 
-            // Filter out the guilds that are already in the database
-            var newGuilds = client.Guilds.Keys
-                .Except((await db.GuildConfig.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
-                .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
-                .ToArray();
+                // Filter out the guilds that are already in the database
+                var newGuilds = client.Guilds.Keys
+                    .Except((await db.GuildConfig.GetAllAsync()).Select(dbGuild => dbGuild.GuildId))
+                    .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
+                    .ToArray();
 
-            // Save the new guilds to the database
-            db.GuildConfig.CreateRange(newGuilds);
-            await db.SaveChangesAsync();
+                // Save the new guilds to the database
+                db.GuildConfig.CreateRange(newGuilds);
+                await db.SaveChangesAsync();
 
-            // Cache the new guilds
-            foreach (var guild in newGuilds)
-                db.GuildConfig.Cache.TryAdd(guild.GuildId, guild);
+                // Cache the new guilds
+                foreach (var guild in newGuilds)
+                    db.GuildConfig.Cache.TryAdd(guild.GuildId, guild);
+            });
         }
 
         /// <summary>
         /// Caches the filtered words of all guilds available to this client.
         /// </summary>
-        private Task CacheFilteredWordsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        private Task CacheFilteredWords(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            return Task.Run(() =>
+            {
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
-            foreach (var entry in db.GuildConfig.Table.Include(x => x.FilteredWordsRel).Where(x => x.FilteredWordsRel != null && x.FilteredWordsRel.Words.Count != 0))
-                db.GuildConfig.FilteredWordsCache.TryAdd(entry.GuildId, entry.FilteredWordsRel);
-
-            return Task.CompletedTask;
+                foreach (var entry in db.GuildConfig.Table.Include(x => x.FilteredWordsRel).Where(x => x.FilteredWordsRel != null && x.FilteredWordsRel.Words.Count != 0))
+                    db.GuildConfig.FilteredWordsCache.TryAdd(entry.GuildId, entry.FilteredWordsRel);
+            });
         }
 
         /// <summary>
@@ -223,6 +204,41 @@ namespace AkkoBot.Core.Services
                     eventArgs.Exception
                 );
             }
+
+            return Task.CompletedTask;
+        }
+
+        /* Utility Methods */
+
+        /// <summary>
+        /// Unregisters disabled commands from the command handler of the current client,
+        /// then sets up the cache for disabled commands if it hasn't been already.
+        /// </summary>
+        /// <param name="client">The current Discord client.</param>
+        private Task UnregisterCommands(DiscordClient client)
+        {
+            var dbCache = _services.GetService<IDbCacher>();
+
+            var disabledCommands = new ConcurrentDictionary<string, Command>(); // Initialize the cache
+            var cmdHandler = client.GetExtension<CommandsNextExtension>();      // Initialize the command handler
+
+            // Unregister the disabled commands from the command handlers
+            foreach (var dbCmd in dbCache.BotConfig.DisabledCommands)
+            {
+                var cmd = cmdHandler.FindCommand(dbCmd, out _);
+
+                if (cmd is not null)
+                {
+                    // Add command to the cache of disabled commands
+                    disabledCommands.TryAdd(cmd.QualifiedName, cmd);
+
+                    // Unregister the command from the command handler
+                    cmdHandler.UnregisterCommands(cmd);
+                }
+            }
+
+            // Set the cache of disabled commands
+            dbCache.DisabledCommandCache ??= disabledCommands;
 
             return Task.CompletedTask;
         }

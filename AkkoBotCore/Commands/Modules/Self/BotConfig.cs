@@ -206,8 +206,12 @@ namespace AkkoBot.Commands.Modules.Self
             [Description("cmd_config_owner_list")]
             public async Task ListOwners(CommandContext context)
             {
+                var ids = _creds.OwnerIds
+                    .Select(id => $"<@{id}>")
+                    .ToArray();
+
                 var embed = new DiscordEmbedBuilder()
-                    .AddField("owners", string.Join("\n", _creds.OwnerIds.Select(id => $"<@{id}>").DefaultIfEmpty()), true)
+                    .AddField("owners", (ids.Length is 0) ? "-" : string.Join("\n", ids), true)
                     .AddField("app_owners", string.Join("\n", context.Client.CurrentApplication.Owners.Select(user => user.Mention).ToArray()), true);
 
                 await context.RespondLocalizedAsync(embed);

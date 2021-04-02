@@ -18,6 +18,7 @@ namespace AkkoBot.Services.Database
         public TimerRepo Timers { get; private set; }
         public PlayingStatusRepo PlayingStatuses { get; private set; }
         public AliasRepo Aliases { get; private set; }
+        public ReminderRepo Reminders { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)
         {
@@ -31,6 +32,7 @@ namespace AkkoBot.Services.Database
             Timers = new(db, dbCacher);
             PlayingStatuses = new(db, dbCacher);
             Aliases = new(db, dbCacher);
+            Reminders = new(db);
         }
 
         /// <summary>

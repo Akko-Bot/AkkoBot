@@ -1,8 +1,11 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Formatters;
+using AkkoBot.Extensions;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,6 +13,7 @@ namespace AkkoBot.Commands.Common
 {
     public class SmartString
     {
+        private readonly Regex _roleRegex = new("<@&(.*?)>");
         private readonly StringBuilder _parsedContent;
         private readonly CommandContext _context;
         private readonly IPlaceholderFormatter _formatter;
@@ -20,7 +24,7 @@ namespace AkkoBot.Commands.Common
         public Regex ParseRegex { get; set; }
 
         /// <summary>
-        /// Defines whether this <see cref="SmartString"/> had the placeholders in its content parsed.
+        /// Reports whether this <see cref="SmartString"/> had the placeholders in its content parsed.
         /// </summary>
         public bool IsParsed { get; private set; }
 
@@ -33,7 +37,8 @@ namespace AkkoBot.Commands.Common
             {
                 if (!IsParsed)
                 {
-                    ParseUserInput();
+                    ParsePlaceholders();
+                    SanitizeRoleMentions();
                     IsParsed = true;
                 }
 
@@ -58,7 +63,7 @@ namespace AkkoBot.Commands.Common
         public SmartString(CommandContext context, string content, Regex regex = null, IPlaceholderFormatter formatter = null)
         {
             _context = context;
-            _parsedContent = new(content);
+            _parsedContent = new(content ?? context.RawArgumentString);
             ParseRegex = regex ?? new Regex("{(.*?)}");
             _formatter = formatter ?? context.CommandsNext.Services.GetService<AkkoPlaceholders>();
         }
@@ -76,7 +81,7 @@ namespace AkkoBot.Commands.Common
         /// Parses the placeholders from the user input into the string value they represent.
         /// </summary>
         /// <returns><see langword="true"/> if a placeholder was found in the user input, <see langword="false"/> otherwise.</returns>
-        private bool ParseUserInput()
+        private bool ParsePlaceholders()
         {
             var matches = ParseRegex.Matches(_parsedContent.ToString());
 
@@ -87,6 +92,38 @@ namespace AkkoBot.Commands.Common
             {
                 if (_formatter.Parse(_context, match.Groups[1].ToString(), out var parsedPh) is not null)
                     _parsedContent.Replace(match.ToString(), parsedPh);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Removes role mentions for roles that are above the user in the hierarchy.
+        /// </summary>
+        /// <returns><see langword="true"/> if a role mention was found, <see langword="false"/> otherwise.</returns>
+        private bool SanitizeRoleMentions()
+        {
+            var canMentionAll = _context.Member.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.MentionEveryone | Permissions.Administrator));
+
+            // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
+            if (_context.Member.Hierarchy != int.MaxValue && !canMentionAll)
+            {
+                _parsedContent.Replace("@everyone", Formatter.InlineCode("@everyone"));
+                _parsedContent.Replace("@here", Formatter.InlineCode("@here"));
+            }
+
+            var matches = _roleRegex.Matches(_parsedContent.ToString());
+
+            if (_context.Guild is null || matches.Count == 0)
+                return false;
+
+            foreach (Match match in matches)
+            {
+                if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
+                    && _context.Guild.Roles.TryGetValue(rid, out var role)
+                    && !canMentionAll
+                    && !role.IsMentionable)
+                    _parsedContent.Replace(match.Groups[0].ToString(), $"@{role.Name}");
             }
 
             return true;

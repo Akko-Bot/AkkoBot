@@ -46,6 +46,9 @@ arg_prune_options: '`-s` or `--safe` to prevent deletion of pinned messages.'
 arg_pstatus: The message to be displayed in the status.
 arg_pstatus_type: The type of the status.
 arg_punishment_reason: The reason for the punishment.
+arg_remind_id: The ID of the reminder.
+arg_remind_message: The message to be sent in the reminder.
+arg_remind_time: How long until the reminder is triggered. Minimum of __1m__.
 arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
@@ -187,6 +190,12 @@ cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
 cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
 cmd_recreatechannel: Recreates a Discord channel.
 cmd_recreaterole: Recreates a Discord role.
+cmd_remind: Groups commands for managing reminders.
+cmd_remind_channel: Sends a reminder to a text channel after the specified time.
+cmd_remind_here: Sends a reminder in the current channel after the specified time.
+cmd_remind_list: Lists all reminders you have created.
+cmd_remind_me: Sends a reminder in private message after the specified time.
+cmd_remind_remove: Removes the reminder with the specified ID.
 cmd_removeallroles: Removes all roles from the specified user that are below the bot and the user who used the command.
 cmd_removerole: Removes a role from the specified user.
 cmd_removestatus: Removes the status with the specified ID.
@@ -194,6 +203,7 @@ cmd_renamechannel: Renames a Discord channel.
 cmd_renamerole: Renames a Discord role.
 cmd_rolecolor: Sets the color of a role. Provide no color to see the current color of the specified role.
 cmd_rolehoist: Toggles the display of the specified role on the sidebar.
+cmd_roleid: Shows the ID of the specified role.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
@@ -353,6 +363,7 @@ owners: Owners
 pages: Page {0}/{1}
 position: Position
 private: Private
+private: Private
 prune_error: There are no messages to be deleted or you're trying to delete messages older than 14 days.
 pstatus_error: There are no rotating statuses set up.
 pstatus_rotation: Status rotation is currently {0}.
@@ -367,10 +378,13 @@ q_operation_length_seconds: This operation will take at least {0} seconds.
 q_yes: 'yes'
 reason: Reason
 region: Region
+reminder_list_empty: No reminder was found.
+reminder_list_title: List of Reminders
 removeallroles: '{0} roles were successfully removed from {1}.'
 removerole: Remove Role
 removerole_enum: had a role removed
 requires: Requires
+role: Role
 roles: Roles
 roles_title: Roles on this server
 sban_notification: You have been soft-banned from the {0} server.
@@ -390,6 +404,7 @@ timedmute: Expired Mute
 timedrole: Punishment Role
 timedunrole: Punishment Role Removal
 total: '{0} total'
+triggers_in: Triggers In
 type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.

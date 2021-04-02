@@ -46,6 +46,9 @@ arg_prune_options: '`-s` ou `--safe` para evitar a exclusão de mensagens fixada
 arg_pstatus: A mensagem a ser exibida no status.
 arg_pstatus_type: O tipo do status.
 arg_punishment_reason: O motivo da punição.
+arg_remind_id: O ID fo lembrete.
+arg_remind_message: A mensagem a ser enviada no lembrete.
+arg_remind_time: Tempo até o lembrete ser ativado. Mínimo de __1m__.
 arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
 arg_say: A mensagem a ser enviada.
@@ -137,7 +140,7 @@ cmd_deafen: Ensurdece um usuário.
 cmd_deleteallroles: Exclui todos os cargos desse servidor que estão abaixo do bot e do usuário que usou o comando.
 cmd_deletechannel: Exclui um canal do Discord.
 cmd_deleterole: Exclui um cargo do Discord.
-cmd_emoji: Agrupa comandos para gerenciar emojis do servidor.
+cmd_emoji: Agrupa comandos de gerenciamento de emojis do servidor.
 cmd_emoji_add: Adiciona emojis ao servidor. Emojis precisam ser do formato `.png` ou `.gif` e ter menos de 256Kb em tamanho. Forneça nenhum parâmetro para adicionar emojis anexados.
 cmd_emoji_list: Exibe todos os emojis do servidor.
 cmd_emoji_remove: Remove emojis do servidor.
@@ -187,6 +190,12 @@ cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
 cmd_prune: Exclui as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
 cmd_recreatechannel: Recria um canal do Discord.
 cmd_recreaterole: Recria um cargo do Discord.
+cmd_remind: Agrupa comandos de gerenciamento de lembretes.
+cmd_remind_channel: Envia um lembrete a um canal de texto após o período de tempo especificado.
+cmd_remind_here: Envia um lembrete no canal atual após o período de tempo especificado.
+cmd_remind_list: Exibe todos os lembretes criados por você.
+cmd_remind_me: Envia um lembrete em mensagem privada após o período de tempo especificado.
+cmd_remind_remove: Remove o lembrete com o ID especificado.
 cmd_removeallroles: Remove todos os cargos do usuário especificado que estejam abaixo do bot e do usuário que usou o comando.
 cmd_removerole: Remove um cargo do usuário especificado.
 cmd_removestatus: Remove o status com o ID especificado.
@@ -194,6 +203,7 @@ cmd_renamechannel: Renomeia um canal do Discord.
 cmd_renamerole: Renomeia um cargo do Discord.
 cmd_rolecolor: Define a cor de um cargo. Forneça nenhuma cor para exibir a cor atual do cargo especificado.
 cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do servidor.
+cmd_roleid: Exibe od ID do cargo especificado.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
@@ -353,6 +363,7 @@ owners: Donos
 pages: Página {0}/{1}
 position: Posição
 private: Privado
+private: Privado
 prune_error: Não há mensagens a serem excluídas ou você está tentando excluir mensagens criadas há mais de 14 dias.
 pstatus_error: Não há status de rotação definido.
 pstatus_rotation: A rotação de status está {0}.
@@ -367,10 +378,13 @@ q_operation_length_seconds: Essa operação levará pelo menos {0} segundos.
 q_yes: 'sim'
 reason: Motivo
 region: Região
+reminder_list_empty: Nenhum lembrete foi encontrado.
+reminder_list_title: Lista de Lembretes
 removeallroles: '{0} cargos foram removidos do {1} com sucesso.'
 removerole: Remover Cargo
 removerole_enum: teve um cargo removido
 requires: Requer
+role: Cargo
 roles: Cargos
 roles_title: Cargos nesse servidor
 sban_notification: Você foi expulso do servidor {0}.
@@ -390,6 +404,7 @@ timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
 total: 'Total de {0}'
+triggers_in: Ativa Em
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.

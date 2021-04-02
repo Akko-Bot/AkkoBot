@@ -14,7 +14,7 @@ namespace AkkoBot.Services.Database.Entities
 
         public List<string> Words { get; init; } = new();
 
-        public List<long> IgnoredIds { get; init; } = new(); // Postgres does not support unsigned types :(
+        public List<long> IgnoredIds { get; init; } = new(); // Postgres does not support unsigned types for collections :(
 
         [MaxLength(2000)]
         public string NotificationMessage { get; set; }

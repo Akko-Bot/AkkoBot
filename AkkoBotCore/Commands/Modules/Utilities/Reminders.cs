@@ -1,0 +1,92 @@
+﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Commands.Modules.Utilities.Services;
+using AkkoBot.Common;
+using AkkoBot.Extensions;
+using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AkkoBot.Commands.Modules.Utilities
+{
+    [Group("remind"), Aliases("reminder", "reminders")]
+    [Description("cmd_remind")]
+    public class Reminders : AkkoCommandModule
+    {
+        private readonly ReminderService _service;
+
+        public Reminders(ReminderService service)
+            => _service = service;
+
+        [Command("me")]
+        [Description("cmd_remind_me")]
+        public async Task AddPrivateReminder(CommandContext context, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
+        {
+            var success = await _service.AddReminderAsync(context, context.Channel, time, true, message);
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("here")]
+        [Description("cmd_remind_here")]
+        public async Task AddGuildReminder(CommandContext context, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
+        {
+            var success = await _service.AddReminderAsync(context, context.Channel, time, false, message);
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [GroupCommand, Command("channel")]
+        [Description("cmd_remind_channel")]
+        [RequireUserPermissions(Permissions.ManageMessages)] // Shows up on !help, but doesn't perform the check
+        public async Task AddGuildReminder(CommandContext context, 
+            [Description("arg_discord_channel")] DiscordChannel channel, 
+            [Description("arg_remind_time")] TimeSpan time, 
+            [RemainingText, Description("arg_remind_message")] string message)
+        {
+            var success = context.Guild is not null
+                && (context.Member.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.ManageMessages | Permissions.Administrator)))
+                && await _service.AddReminderAsync(context, channel, time, false, message);
+
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("remove"), Aliases("rm")]
+        [Description("cmd_remind_remove")]
+        public async Task RemoveReminder(CommandContext context, [Description("arg_remind_id")] int id)
+        {
+            var success = await _service.RemoveReminderAsync(context.User, id);
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("list"), Aliases("show")]
+        [Description("cmd_remind_list")]
+        public async Task ListReminders(CommandContext context)
+        {
+            var reminders = _service.GetReminders(context.User);
+
+            var embed = new DiscordEmbedBuilder();
+
+            if (reminders.Count == 0)
+            {
+                embed.WithDescription("reminder_list_empty");
+                await context.RespondLocalizedAsync(embed, isError: true);
+            }
+            else
+            {
+                embed.WithTitle("reminder_list_title");
+
+                foreach (var group in reminders.SplitInto(15))
+                {
+                    // Have to use .Bold for the IDs because .InlineCode misaligns the embed fields
+                    embed.AddField("message", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + x.Content.Replace("\n", string.Empty).MaxLength(50, "[...]")).ToArray()), true)
+                        .AddField("channel", string.Join("\n", group.Select(x => (x.IsPrivate) ? "private" : $"<#{x.ChannelId}>").ToArray()), true)
+                        .AddField("triggers_in", string.Join("\n", group.Select(x => x.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m")).ToArray()), true);
+                }
+
+                await context.RespondPaginatedByFieldsAsync(embed, 3);
+            }
+        }
+    }
+}

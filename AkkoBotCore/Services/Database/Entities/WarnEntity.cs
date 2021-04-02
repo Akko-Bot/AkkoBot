@@ -23,7 +23,7 @@ namespace AkkoBot.Services.Database.Entities
         public string WarningText
         {
             get => _note;
-            init => _note = value.MaxLength(2000) ?? "-";
+            init => _note = value?.MaxLength(2000) ?? "-";
         }
     }
 }

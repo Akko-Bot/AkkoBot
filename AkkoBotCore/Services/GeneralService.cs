@@ -13,10 +13,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AkkoBot.Services
 {
-    public class GeneralService
+    public static class GeneralService
     {
         /// <summary>
         /// Checks if the specified <paramref name="id"/> is registered as a bot owner.

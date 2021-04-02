@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ namespace AkkoBot.Commands.Formatters
             ["bot.creationdate"] = (context) => context.Client.CurrentUser.CreationTimestamp,
             ["bot.avatar"] = (context) => context.Client.CurrentUser.AvatarUrl,
             ["bot.status"] = (context) => context.Client.CurrentUser.Presence.Status,
+            ["bot.prefix"] = (context) => context.Services.GetService<IDbCacher>().BotConfig.BotPrefix,
             ["bot.latency"] = (context) => context.Client.Ping,
             ["bot.shard"] = (context) => context.Client.ShardId,
             ["bot.shardcount"] = (context) => context.Client.ShardCount,

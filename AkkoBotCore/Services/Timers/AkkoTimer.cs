@@ -96,12 +96,7 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private TimeSpan TimeFromValidEntry(TimeSpan timeDifference, TimerEntity entity)
         {
-            if (!entity.IsAbsolute)
-            {
-                //Repeater, Reminder
-                timeDifference = entity.Interval;
-            }
-            else if (entity.IsAbsolute && entity.IsRepeatable)
+            if (entity.IsRepeatable)
             {
                 // Daily Repeater
                 // DateTimeOffset.Add() requires a TimeSpan with whole minutes
@@ -119,16 +114,11 @@ namespace AkkoBot.Services.Timers
         {
             TimeSpan result;
 
-            if (entity.IsAbsolute && !entity.IsRepeatable)
+            if (!entity.IsRepeatable)
             {
                 // TimedBan, TimedMute, TimedWarn
                 // Trigger 10 seconds after the bot connects
                 result = TimeSpan.FromSeconds(10);
-            }
-            else if (!entity.IsAbsolute)
-            {
-                // Repeater, Reminder
-                result = Interval;
             }
             else
             {

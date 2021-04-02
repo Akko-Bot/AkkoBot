@@ -63,28 +63,6 @@ namespace AkkoBot.Core.Services
         /* Event Methods */
 
         /// <summary>
-        /// Saves a user to the database on command execution.
-        /// </summary>
-        private Task SaveUserOnCmd(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
-        {
-            return Task.Run(async () =>
-            {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-
-                // Track the user who triggered the command
-                var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);
-
-                // Track the mentioned users in the message, if any
-                foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
-                    isTracking = isTracking || await db.DiscordUsers.CreateOrUpdateAsync(mentionedUser);
-
-                // Save if there is at least one user being tracked
-                if (isTracking)
-                    await db.SaveChangesAsync();
-            });
-        }
-
-        /// <summary>
         /// Mutes a user that has been previously muted.
         /// </summary>
         private Task Remute(DiscordClient client, GuildMemberAddEventArgs eventArgs)
@@ -283,6 +261,28 @@ namespace AkkoBot.Core.Services
 
                 // Delete the notification message after some time
                 _ = DeleteWithDelayAsync(notification, TimeSpan.FromSeconds(30));
+            });
+        }
+
+        /// <summary>
+        /// Saves a user to the database on command execution.
+        /// </summary>
+        private Task SaveUserOnCmd(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
+        {
+            return Task.Run(async () =>
+            {
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+                // Track the user who triggered the command
+                var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);
+
+                // Track the mentioned users in the message, if any
+                foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
+                    isTracking = isTracking || await db.DiscordUsers.CreateOrUpdateAsync(mentionedUser);
+
+                // Save if there is at least one user being tracked
+                if (isTracking)
+                    await db.SaveChangesAsync();
             });
         }
 

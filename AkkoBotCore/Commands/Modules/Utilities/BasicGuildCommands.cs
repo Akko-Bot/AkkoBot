@@ -50,6 +50,16 @@ namespace AkkoBot.Commands.Modules.Utilities
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("roleid"), Aliases("rid")]
+        [Description("cmd_roleid")]
+        public async Task RoleId(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("xid", "role", Formatter.Bold(role.Name), Formatter.InlineCode(role.Id.ToString())));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [Command("rolecolor"), Aliases("rcolor")]
         [Description("cmd_rolecolor")]
         public async Task RoleColor(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_color")] DiscordColor? newColor = null)
@@ -100,7 +110,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var roles = (user?.Roles ?? context.Guild.Roles.Values)
                 .OrderByDescending(x => x.Position)
-                .Select(x => $"� {x.Name}")
+                .Select(x => $"• {x.Name}")
                 .SplitInto(AkkoConstants.LinesPerPage);     // x roles per page
 
             var title = (user is null)

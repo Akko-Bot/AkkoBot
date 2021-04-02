@@ -139,10 +139,15 @@ namespace AkkoBot.Commands.Formatters
             //         _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
             // }
 
-            foreach (var command in subcommands)
-                _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
-
-            _helpCommandsField.Remove(_helpCommandsField.Length - 2, 2);
+            _helpCommandsField.AppendJoin(
+                ", ",
+                subcommands.OrderBy(command => command.Name)
+                    .Select(command => 
+                        (command.CustomAttributes.Any(x => x.GetType() == typeof(GroupCommandAttribute)))
+                            ? Formatter.Underline(Formatter.InlineCode(command.Name))
+                            : Formatter.InlineCode(command.Name)
+                )
+            );
 
             return this;
         }

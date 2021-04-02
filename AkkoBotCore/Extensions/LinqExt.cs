@@ -92,7 +92,7 @@ namespace AkkoBot.Extensions
         /// <param name="predicate"></param>
         /// <typeparam name="T">Data type contained in the collection.</typeparam>
         /// <returns>An awaitable collection of <typeparamref name="T"/>.</returns>
-        public static async Task<IEnumerable<T>> Where<T>(this IEnumerable<T> collection, Func<T, Task<bool>> predicate)
+        public static async Task<IEnumerable<T>> WhereAsync<T>(this IEnumerable<T> collection, Func<T, Task<bool>> predicate)
         {
             var result = new List<T>();
 
@@ -200,7 +200,7 @@ namespace AkkoBot.Extensions
         /// <returns>A collection of <see cref="IEnumerable{T}"/>.</returns>
         public static IEnumerable<IEnumerable<T>> SplitInto<T>(this IEnumerable<T> collection, int amount)
         {
-            var index = 0;
+            int index = 0, count = 0;
             var collectionCount = collection.Count();
             var result = new List<List<T>>() { new List<T>(Math.Min(amount, collectionCount)) };
 
@@ -208,7 +208,7 @@ namespace AkkoBot.Extensions
             {
                 result[index].Add(element);
 
-                if (result[index].Count >= amount && ++index <= collectionCount - 1)
+                if (++count != collectionCount && result[index].Count >= amount && ++index <= collectionCount - 1)
                     result.Add(new List<T>(Math.Min(amount, collectionCount - (amount * index))));
             }
 
