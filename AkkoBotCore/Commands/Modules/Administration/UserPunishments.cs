@@ -46,7 +46,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var embed = _punishService.GetPunishEmbed(context, user, string.Empty, "kick_title");
 
             if (dmMsg is null && !user.IsBot)
-                embed.WithFooter("punishment_dm_failed");
+                embed.WithFooter(AkkoEntities.WarningEmoji.Name + context.FormatLocalized("punishment_dm_failed"));
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -81,7 +81,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
 
             if (dmMsg is null && !user.IsBot)
-                embed.WithFooter("punishment_dm_failed");
+                embed.WithFooter(AkkoEntities.WarningEmoji.Name + context.FormatLocalized("punishment_dm_failed"));
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -115,7 +115,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
 
             if (dmMsg is null && !user.IsBot)
-                embed.WithFooter("punishment_dm_failed");
+                embed.WithFooter(AkkoEntities.WarningEmoji.Name + context.FormatLocalized("punishment_dm_failed"));
 
             await context.RespondLocalizedAsync(embed, false);
         }

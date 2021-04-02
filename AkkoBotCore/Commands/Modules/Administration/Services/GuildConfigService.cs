@@ -46,13 +46,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// Gets or sets the specified guild setting.
         /// </summary>
         /// <typeparam name="T">The type of the setting to be returned.</typeparam>
-        /// <param name="context">The command context.</param>
+        /// <param name="server">The target guild.</param>
         /// <param name="selector">A method to get or set the property.</param>
         /// <returns>The requested setting, <see langword="null"/> if the context is from a private context.</returns>
-        public T GetOrSetProperty<T>(CommandContext context, Func<GuildConfigEntity, T> selector)
+        public T GetOrSetProperty<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            var guild = db.GuildConfig.GetGuild(context.Guild?.Id ?? 0);
+            var guild = db.GuildConfig.GetGuild(server?.Id ?? default);
             var result = selector(guild);
 
             if (guild is not null)

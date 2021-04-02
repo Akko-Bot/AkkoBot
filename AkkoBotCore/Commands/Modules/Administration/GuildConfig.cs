@@ -26,7 +26,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_embed")]
         public async Task ChangeEmbed(CommandContext context)
         {
-            var result = _service.GetOrSetProperty(context, x => x.UseEmbed = !x.UseEmbed);
+            var result = _service.GetOrSetProperty(context.Guild, x => x.UseEmbed = !x.UseEmbed);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_embed_change", (result) ? "enabled" : "disabled"));
@@ -38,7 +38,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_okcolor")]
         public async Task ChangeOkColor(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var result = _service.GetOrSetProperty(context, x => x.OkColor = newColor);
+            var result = _service.GetOrSetProperty(context.Guild, x => x.OkColor = newColor);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_okcolor", Formatter.InlineCode(result)));
@@ -50,7 +50,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_errorcolor")]
         public async Task ChangeErrorColor(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var result = _service.GetOrSetProperty(context, x => x.ErrorColor = newColor);
+            var result = _service.GetOrSetProperty(context.Guild, x => x.ErrorColor = newColor);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_errorcolor", Formatter.InlineCode(result)));
@@ -63,7 +63,7 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task ChangeTimeout(CommandContext context, [Description("arg_timeout")] uint? seconds = null)
         {
             var result = _service.GetOrSetProperty(
-                context,
+                context.Guild,
                 settings => settings.InteractiveTimeout = (seconds is null or < 10 or > 120)
                     ? null
                     : new TimeSpan(0, 0, (int)seconds)
@@ -75,6 +75,18 @@ namespace AkkoBot.Commands.Modules.Administration
                     ? context.FormatLocalized("guild_timeout_reset")
                     : context.FormatLocalized("guild_timeout_changed", Formatter.InlineCode(result.Value.TotalSeconds.ToString()))
             };
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("permissivemention"), Aliases("rolemention")]
+        [Description("cmd_guild_rolemention")]
+        public async Task ChangeRoleMentionability(CommandContext context)
+        {
+            var result = _service.GetOrSetProperty(context.Guild, x => x.PermissiveRoleMention = !x.PermissiveRoleMention);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("guild_role_mention", (result) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -114,7 +126,7 @@ namespace AkkoBot.Commands.Modules.Administration
             }
 
             // Change the locale
-            _service.GetOrSetProperty(context, x => x.Locale = responseKey);
+            _service.GetOrSetProperty(context.Guild, x => x.Locale = responseKey);
 
             // Send the message
             var embed = new DiscordEmbedBuilder()

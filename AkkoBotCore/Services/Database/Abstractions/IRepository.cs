@@ -11,6 +11,12 @@ namespace AkkoBot.Services.Database.Abstractions
     /// <typeparam name="T">A <see cref="DbEntity"/> Type.</typeparam>
     public interface IRepository<T>
     {
+        T GetSync<TValue>(TValue value);
+
+        IEnumerable<T> GetSync(Expression<Func<T, bool>> expression);
+
+        IEnumerable<T> GetAllSync();
+
         Task<T> GetAsync<TValue>(TValue value);
 
         Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> expression);

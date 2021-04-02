@@ -36,7 +36,7 @@ namespace AkkoBot.Services.Database.Repository
         /// <remarks>This method does not use the database cache.</remarks>
         /// <returns>A collection of database entries. The collection will be empty if no entity matches the criterias from <paramref name="expression"/>.</returns>
         public virtual IEnumerable<T> GetSync(Expression<Func<T, bool>> expression)
-            => Table.Where(expression).ToList();
+            => Table.Where(expression);
 
         /// <summary>
         /// Returns all database entries in this table.

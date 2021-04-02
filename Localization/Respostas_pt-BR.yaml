@@ -442,3 +442,6 @@ warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 xid: ID do {0} {1} é {2}.
+
+cmd_guild_rolemention: 'Define se usuários podem mencionar cargos através do bot meramente pela sua posição na hierarquia de cargos. Atenção: dependendo de como as permissões do servidor foram definidas, ativar essa configuração pode levar a comportamento abusivo por parte dos usuários.'
+guild_role_mention: Menções permissivas de cargos foram {0}s.

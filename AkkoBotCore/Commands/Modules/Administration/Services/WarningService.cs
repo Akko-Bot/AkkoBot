@@ -87,8 +87,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="context">The command context.</param>
         /// <param name="user">The user to be warned.</param>
         /// <param name="warn">The warning to be added.</param>
-        /// <returns><see langword="true"/> and the punishment type if a punishment was applied, <see langword="false"/> and <see langword="null"/> otherwise.</returns>
-        public async Task<(bool, WarnPunishType?)> SaveWarnAsync(CommandContext context, DiscordUser user, string warn)
+        /// <returns>The punishment type if a punishment was applied, <see langword="null"/> otherwise.</returns>
+        public async Task<WarnPunishType?> SaveWarnAsync(CommandContext context, DiscordUser user, string warn)
         {
             var guildSettings = await SaveInfractionAsync(context, user, warn, WarnType.Warning);
 
@@ -101,17 +101,17 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 if (!context.Guild.Roles.TryGetValue(punishment.PunishRoleId.Value, out _))
                 {
                     await RemoveWarnPunishmentAsync(punishment);
-                    return (false, null);
+                    return null;
                 }
             }
 
             if (punishment is not null)
             {
                 await ApplyPunishmentAsync(context, user, punishment, warn);
-                return (true, punishment.Type);
+                return punishment.Type;
             }
 
-            return (false, null);
+            return null;
         }
 
         /// <summary>

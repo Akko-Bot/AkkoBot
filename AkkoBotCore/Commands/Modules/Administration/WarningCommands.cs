@@ -2,6 +2,7 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
@@ -71,19 +72,19 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             // Dm the user about the warn
-            var dm = new DiscordEmbedBuilder()
+            var notification = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("warn_dm", Formatter.Bold(context.Guild.Name)));
 
             if (reason is not null)
-                dm.AddField("reason", reason);
+                notification.AddField("reason", reason);
 
-            await context.SendLocalizedDmAsync(user, dm, true);
+            var dm = await context.SendLocalizedDmAsync(user, notification, true);
 
             // Save warning to the database
-            var (wasPunished, punishment) = await _warnService.SaveWarnAsync(context, user, reason);
+            var punishment = await _warnService.SaveWarnAsync(context, user, reason);
             var embed = new DiscordEmbedBuilder();
 
-            if (wasPunished)
+            if (punishment is not null)
             {
                 embed.WithDescription(
                     context.FormatLocalized(
@@ -102,6 +103,9 @@ namespace AkkoBot.Commands.Modules.Administration
                     )
                 );
             }
+
+            if (dm is null)
+                embed.WithFooter(AkkoEntities.WarningEmoji.Name + context.FormatLocalized("punishment_dm_failed"));
 
             await context.RespondLocalizedAsync(embed);
         }

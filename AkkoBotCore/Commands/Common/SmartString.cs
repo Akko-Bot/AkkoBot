@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Formatters;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
@@ -103,6 +104,11 @@ namespace AkkoBot.Commands.Common
         /// <returns><see langword="true"/> if a role mention was found, <see langword="false"/> otherwise.</returns>
         private bool SanitizeRoleMentions()
         {
+            var matches = _roleRegex.Matches(_parsedContent.ToString());
+
+            if (_context.Guild is null || matches.Count == 0)
+                return false;
+
             var canMentionAll = _context.Member.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.MentionEveryone | Permissions.Administrator));
 
             // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
@@ -112,18 +118,29 @@ namespace AkkoBot.Commands.Common
                 _parsedContent.Replace("@here", Formatter.InlineCode("@here"));
             }
 
-            var matches = _roleRegex.Matches(_parsedContent.ToString());
-
-            if (_context.Guild is null || matches.Count == 0)
-                return false;
-
-            foreach (Match match in matches)
+            if (_context.Services.GetService<IDbCacher>().Guilds[_context.Guild.Id].PermissiveRoleMention)
             {
-                if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
-                    && _context.Guild.Roles.TryGetValue(rid, out var role)
-                    && !canMentionAll
-                    && !role.IsMentionable)
-                    _parsedContent.Replace(match.Groups[0].ToString(), $"@{role.Name}");
+                // Sanitize by role hierarchy
+                foreach (Match match in matches)
+                {
+                    if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
+                        && _context.Guild.Roles.TryGetValue(rid, out var role)
+                        && !role.IsMentionable
+                        && _context.Member.Hierarchy <= role.Position)
+                        _parsedContent.Replace(match.Groups[0].ToString(), $"@{role.Name}");
+                }
+            }
+            else
+            {
+                // Sanitize by mention everyone permission
+                foreach (Match match in matches)
+                {
+                    if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
+                        && _context.Guild.Roles.TryGetValue(rid, out var role)
+                        && !role.IsMentionable
+                        && !canMentionAll)
+                        _parsedContent.Replace(match.Groups[0].ToString(), $"@{role.Name}");
+                }
             }
 
             return true;

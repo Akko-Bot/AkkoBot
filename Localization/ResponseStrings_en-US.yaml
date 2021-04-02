@@ -442,3 +442,6 @@ warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
 xid: ID of {0} {1} is {2}.
+
+cmd_guild_rolemention: 'Toggles whether users can ping roles through the bot based solely on their position in the role hierarchy. Caution: depending on how the server permissions are set up, enabling this setting may enable role ping abuse.'
+guild_role_mention: Permissive role mentions have been {0}.

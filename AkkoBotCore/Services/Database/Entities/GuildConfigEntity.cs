@@ -44,6 +44,8 @@ namespace AkkoBot.Services.Database.Entities
 
         public bool UseEmbed { get; set; } = true;
 
+        public bool PermissiveRoleMention { get; set; } = false;
+
         [Required]
         [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
