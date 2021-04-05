@@ -458,3 +458,4 @@ autocommand_title: Lista de Comandos Automáticos
 arg_autocommand_id: O ID do comando automático.
 invalid_color: O código de cor especificado é inválido.
 cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
+cmd_config_reloadlocales: Recarrega os textos de resposta disponíveis ao bot.

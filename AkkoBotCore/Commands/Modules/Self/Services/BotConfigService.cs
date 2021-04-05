@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Commands.Modules.Self.Services
@@ -29,6 +30,25 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of strings of the registered locales.</returns>
         public IEnumerable<string> GetLocales()
             => _services.GetService<ILocalizer>().GetLocales();
+
+        /// <summary>
+        /// Gets the bot's global settings.
+        /// </summary>
+        /// <returns>The bot settings.</returns>
+        public BotConfigEntity GetConfig()
+            => _services.GetService<IDbCacher>().BotConfig;
+
+        /// <summary>
+        /// Reloads the response strings from the original files.
+        /// </summary>
+        /// <returns>The amount of locales stored in memory.</returns>
+        public int ReloadLocales()
+        {
+            var localizer = _services.GetService<ILocalizer>();
+            localizer.ReloadLocalizedStrings();
+
+            return localizer.GetLocales().Count();
+        }
 
         /// <summary>
         /// Gets or sets the specified bot configuration.
@@ -65,13 +85,6 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
             return result;
         }
-
-        /// <summary>
-        /// Gets the bot global settings.
-        /// </summary>
-        /// <returns>The bot settings.</returns>
-        public BotConfigEntity GetConfig()
-            => _services.GetService<IDbCacher>().BotConfig;
 
         /// <summary>
         /// Gets a collection of all bot settings.

@@ -12,7 +12,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -131,6 +130,11 @@ namespace AkkoBot.Commands.Modules.Self
         public async Task SetMinWarnExpire(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
             => await ChangeProperty(context, x => x.MinWarnExpire = time);
 
+        [Command("reloadlocales"), Aliases("reloadresponses")]
+        [Description("cmd_config_reloadlocales")]
+        public async Task ReloadResponseStrings(CommandContext context)
+                => await context.Message.CreateReactionAsync((_botService.ReloadLocales() is not 0) ? AkkoEntities.SuccessEmoji : AkkoEntities.WarningEmoji);
+
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_config_list")]
         public async Task ListBotSettings(CommandContext context)
@@ -231,7 +235,7 @@ namespace AkkoBot.Commands.Modules.Self
                     await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
             }
 
-            [GroupCommand, Command("list")]
+            [GroupCommand, Command("list"), Aliases("show")]
             [Description("cmd_config_owner_list")]
             public async Task ListOwners(CommandContext context)
             {
