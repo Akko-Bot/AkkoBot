@@ -19,6 +19,7 @@ namespace AkkoBot.Services.Database
         public DbSet<AliasEntity> Aliases { get; set; }
         public DbSet<FilteredWordsEntity> FilteredWords { get; set; }
         public DbSet<ReminderEntity> Reminders { get; set; }
+        public DbSet<CommandEntity> AutoCommands { get; set; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
             => base.Database.Migrate(); // Ensure that the database exists
@@ -93,6 +94,9 @@ namespace AkkoBot.Services.Database
                 .HasIndex(x => x.Id);
 
             modelBuilder.Entity<ReminderEntity>()
+                .HasIndex(x => x.Id);
+
+            modelBuilder.Entity<CommandEntity>()
                 .HasIndex(x => x.Id);
         }
     }

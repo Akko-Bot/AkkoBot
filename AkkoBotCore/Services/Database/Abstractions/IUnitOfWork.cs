@@ -18,6 +18,7 @@ namespace AkkoBot.Services.Database.Abstractions
         public PlayingStatusRepo PlayingStatuses { get; }
         public AliasRepo Aliases { get; }
         public ReminderRepo Reminders { get; }
+        public CommandRepo AutoCommands { get; }
 
         /// <summary>
         /// Saves all changes made in this context to the database.

@@ -13,6 +13,7 @@ namespace AkkoBot.Services.Database.Entities
 
         public int TimerId { get; init; }
 
+        [Required]
         [MaxLength(2000)]
         public string Content 
         { 

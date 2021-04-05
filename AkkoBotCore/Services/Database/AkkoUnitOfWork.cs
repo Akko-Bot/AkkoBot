@@ -19,6 +19,7 @@ namespace AkkoBot.Services.Database
         public PlayingStatusRepo PlayingStatuses { get; private set; }
         public AliasRepo Aliases { get; private set; }
         public ReminderRepo Reminders { get; private set; }
+        public CommandRepo AutoCommands { get; private set; }
 
         public AkkoUnitOfWork(AkkoDbContext db, IDbCacher dbCacher)
         {
@@ -33,6 +34,7 @@ namespace AkkoBot.Services.Database
             PlayingStatuses = new(db, dbCacher);
             Aliases = new(db, dbCacher);
             Reminders = new(db);
+            AutoCommands = new CommandRepo(db);
         }
 
         /// <summary>
@@ -76,6 +78,8 @@ namespace AkkoBot.Services.Database
                 GuildConfig = null;
                 PlayingStatuses = null;
                 Aliases = null;
+                Reminders = null;
+                AutoCommands = null;
 
                 _isDisposed = true;
             }

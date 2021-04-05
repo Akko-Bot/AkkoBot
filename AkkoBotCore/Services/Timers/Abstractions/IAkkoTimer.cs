@@ -32,7 +32,7 @@ namespace AkkoBot.Services.Timers.Abstractions
         /// <summary>
         /// Gets the time when this timer is going to trigger.
         /// </summary>
-        DateTimeOffset ElapsesAt { get; }
+        DateTimeOffset ElapseAt { get; }
 
         /// <summary>
         /// Fires when this timer gets disposed.

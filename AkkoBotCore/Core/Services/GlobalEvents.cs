@@ -18,7 +18,7 @@ namespace AkkoBot.Core.Services
 {
     internal class GlobalEvents
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScope _scope;
         private readonly IDbCacher _dbCache;
         private readonly AliasService _aliasService;
         private readonly WarningService _warningService;
@@ -27,7 +27,7 @@ namespace AkkoBot.Core.Services
 
         internal GlobalEvents(BotCore botCore, IServiceProvider services)
         {
-            _services = services;
+            _scope = services.CreateScope();
             _dbCache = services.GetService<IDbCacher>();
             _aliasService = services.GetService<AliasService>();
             _warningService = services.GetService<WarningService>();
@@ -69,7 +69,7 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(async () =>
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
 
                 var anyChannel = eventArgs.Guild.Channels.FirstOrDefault().Value;
                 var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasFlag(Permissions.ManageRoles));
@@ -271,7 +271,7 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(async () =>
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
 
                 // Track the user who triggered the command
                 var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);

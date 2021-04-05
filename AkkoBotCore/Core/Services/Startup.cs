@@ -24,12 +24,14 @@ namespace AkkoBot.Core.Services
     internal class Startup
     {
         private readonly IServiceProvider _services;
+        private readonly IServiceScope _scope;
         private readonly BotCore _botCore;
 
         internal Startup(BotCore botCore, IServiceProvider services)
         {
             _botCore = botCore;
             _services = services;
+            _scope = services.CreateScope();
         }
 
         /// <summary>
@@ -55,6 +57,9 @@ namespace AkkoBot.Core.Services
             // Caches guild filtered words
             _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredWords;
 
+            // Executes startup commands
+            _botCore.BotShardedClient.GuildDownloadCompleted += ExecuteStartupCommands;
+
             // Save guild on join
             _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
 
@@ -78,7 +83,7 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(async () =>
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
 
                 // If there is no BotConfig entry in the database, create one.
                 db.LogConfig.TryCreate();
@@ -108,9 +113,7 @@ namespace AkkoBot.Core.Services
         private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             // May want to remove this method
-            var cmdHandler = client.GetExtension<CommandsNextExtension>();
-            cmdHandler.Services.GetService<IDbCacher>().Timers ??= cmdHandler.Services.GetService<ITimerManager>();
-
+            _services.GetService<IDbCacher>().Timers ??= _services.GetService<ITimerManager>();
             return Task.CompletedTask;
         }
 
@@ -121,7 +124,7 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(async () =>
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
 
                 var botConfig = db.BotConfig.Cache;
 
@@ -148,10 +151,40 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(() =>
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
 
                 foreach (var entry in db.GuildConfig.Table.Include(x => x.FilteredWordsRel).Where(x => x.FilteredWordsRel != null && x.FilteredWordsRel.Words.Count != 0))
                     db.GuildConfig.FilteredWordsCache.TryAdd(entry.GuildId, entry.FilteredWordsRel);
+            });
+        }
+
+        /// <summary>
+        /// Executes startup commands.
+        /// </summary>
+        private Task ExecuteStartupCommands(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        {
+            return Task.Run(async () =>
+            {
+                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
+
+                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var startupCmds = (await db.AutoCommands.GetAsync(x => x.Type == CommandType.Startup))
+                    .Where(x => eventArgs.Guilds.ContainsKey(x.GuildId));
+
+                foreach (var dbCmd in startupCmds)
+                {
+                    var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
+
+                    if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
+                        continue;
+
+                    var prefix = db.GuildConfig.GetGuild(server.Id).Prefix;
+
+                    var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
+
+                    if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
+                        _ = cmd.ExecuteAsync(fakeContext);  // Can't await because it takes too long to run
+                }
             });
         }
 
@@ -160,7 +193,7 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private async Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
 
             db.GuildConfig.TryCreate(eventArgs.Guild);
             await db.SaveChangesAsync();

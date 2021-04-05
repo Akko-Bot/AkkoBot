@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Self
 {
     [BotOwner]
-    public class GlobalCommandControl : AkkoCommandModule
+    public class CommandControl : AkkoCommandModule
     {
         private readonly CommandControlService _service;
 
-        public GlobalCommandControl(CommandControlService service)
+        public CommandControl(CommandControlService service)
             => _service = service;
 
         [Command("globalcommand"), Aliases("gcmd")]

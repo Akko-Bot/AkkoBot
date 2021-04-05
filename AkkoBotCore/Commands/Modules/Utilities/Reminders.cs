@@ -33,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_remind_here")]
         public async Task AddGuildReminder(CommandContext context, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
         {
-            var success = await _service.AddReminderAsync(context, context.Channel, time, false, message);
+            var success = await _service.AddReminderAsync(context, context.Channel, time, context.Guild is null, message);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
@@ -64,7 +64,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_remind_list")]
         public async Task ListReminders(CommandContext context)
         {
-            var reminders = _service.GetReminders(context.User);
+            var reminders = await _service.GetRemindersAsync(context.User);
 
             var embed = new DiscordEmbedBuilder();
 

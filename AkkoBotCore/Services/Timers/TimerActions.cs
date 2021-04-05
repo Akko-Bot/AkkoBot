@@ -4,6 +4,7 @@ using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -190,8 +191,8 @@ namespace AkkoBot.Services.Timers
         /// Sends a reminder to the channel specified in the database.
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
+        /// <param name="client">The Discord client that created the reminder.</param>
         /// <param name="server">The Discord server to unmute from.</param>
-        /// <param name="userId">The ID of the user to be unmuted.</param>
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
@@ -210,7 +211,7 @@ namespace AkkoBot.Services.Timers
                 
                 var fakeContext = cmdHandler.CreateFakeContext(
                     user,
-                    user.Guild.Channels.Values.FirstOrDefault(),
+                    user.Guild.Channels.Values.FirstOrDefault(), // If channel is private, this throws
                     dbReminder.Content,
                     (dbReminder.IsPrivate) ? db.BotConfig.Cache.BotPrefix : db.GuildConfig.GetGuild(dbReminder.GuildId.Value).Prefix,
                     null
@@ -242,6 +243,54 @@ namespace AkkoBot.Services.Timers
                 db.Timers.Delete(dbTimer);
 
                 await db.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Executes a command in the context stored in the database.
+        /// </summary>
+        /// <param name="entryId">The ID of the timer in the database.</param>
+        /// <param name="client">The Discord client that created the autocommand.</param>
+        /// <param name="server">The Discord server to unmute from.</param>
+        public async Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server)
+        {
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+
+            var dbCmd = await db.AutoCommands.Table.FirstOrDefaultAsync(x => x.TimerId == entryId);
+            var dbTimer = await db.Timers.GetAsync(entryId);
+            var cmdHandler = client.GetExtension<CommandsNextExtension>();
+
+            try
+            {
+                var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
+                var user = FindMember(dbCmd.AuthorId, server);
+
+                var fakeContext = cmdHandler.CreateFakeContext(
+                    user,
+                    server.GetChannel(dbCmd.ChannelId), // If channel is private, this throws
+                    dbCmd.CommandString,
+                    db.GuildConfig.GetGuild(dbCmd.GuildId).Prefix,
+                    cmd,
+                    args
+                );
+
+                if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
+                    await cmd.ExecuteAsync(fakeContext);
+
+            }
+            catch
+            {
+                return;
+            }
+            finally
+            {
+                if (dbCmd.Type is CommandType.Scheduled)
+                {
+                    db.AutoCommands.Delete(dbCmd);
+                    db.Timers.Delete(dbTimer);
+
+                    await db.SaveChangesAsync();
+                }
             }
         }
 

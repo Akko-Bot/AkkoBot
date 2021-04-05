@@ -4,15 +4,17 @@ using System.Collections.Generic;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210404021855_AutoCommands")]
+    partial class AutoCommands
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,11 +222,19 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
 
-                    b.Property<decimal>("GuildId")
+                    b.Property<DateTimeOffset>("ElapseAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("elapse_at");
+
+                    b.Property<decimal?>("GuildId")
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("guild_id");
 
-                    b.Property<int?>("TimerId")
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_private");
+
+                    b.Property<int>("TimerId")
                         .HasColumnType("integer")
                         .HasColumnName("timer_id");
 

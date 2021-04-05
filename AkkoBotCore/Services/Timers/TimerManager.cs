@@ -179,7 +179,8 @@ namespace AkkoBot.Services.Timers
                 TimerType.TimedUnrole => new AkkoTimer(entity, () => _action.RemovePunishRoleAsync(entity.Id, server, entity.UserId.Value)),
                 TimerType.Reminder => new AkkoTimer(entity, () => _action.SendReminderAsync(entity.Id, client, server)),
                 TimerType.Repeater => throw new NotImplementedException(),
-                _ => throw new NotImplementedException(),
+                TimerType.Command => new AkkoTimer(entity, () => _action.ExecuteCommandAsync(entity.Id, client, server)),
+                _ => throw new NotImplementedException($"Timer of type {entity.Type} has no action implemented."),
             };
 
             timer.OnDispose += AutoRemoval;

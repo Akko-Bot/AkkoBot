@@ -15,7 +15,7 @@ namespace AkkoBot.Services.Database.Entities
      * Daily Repeater: Absolute, Repeatable
      */
 
-    public enum TimerType { TimedMute, TimedBan, TimedWarn, TimedRole, TimedUnrole, Reminder, Repeater }
+    public enum TimerType { TimedMute, TimedBan, TimedWarn, TimedRole, TimedUnrole, Reminder, Repeater, Command }
 
     [Comment("Stores actions that need to be performed at some point in the future.")]
     public class TimerEntity : DbEntity
@@ -28,7 +28,7 @@ namespace AkkoBot.Services.Database.Entities
         public bool IsRepeatable { get; init; }
         public bool IsAbsolute { get; init; } // Might want to remove this
         public TimerType Type { get; init; }
-        public DateTimeOffset ElapseAt { get; init; }
+        public DateTimeOffset ElapseAt { get; set; }
 
         public TimerEntity()
         {

@@ -24,15 +24,15 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <param name="channel">The channel where the reminder should be sent to.</param>
-        /// <param name="time">How long until the reminder activation. Minimum of 1 minute.</param>
+        /// <param name="time">How long until the reminder activation. Minimum of 1 minute, maximum of 365 days.</param>
         /// <param name="isPrivate">Defines whether the target <paramref name="channel"/> is private or not.</param>
         /// <param name="content">The content to be sent in the reminder.</param>
         /// <remarks>A timer for triggering the reminder will also be created.</remarks>
         /// <returns><see langword="true"/> if the reminder got successfully added to the database, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddReminderAsync(CommandContext context, DiscordChannel channel, TimeSpan time, bool isPrivate, string content)
         {
-            if (time < TimeSpan.FromMinutes(1))
-                time = TimeSpan.FromMinutes(1);
+            if (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365))
+                return false;
 
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
@@ -102,12 +102,11 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="user">The user to get the reminders for.</param>
         /// <remarks>The list is ordered by elapse time, in ascending order.</remarks>
         /// <returns>A collection of reminders."/></returns>
-        public List<ReminderEntity> GetReminders(DiscordUser user)
+        public async Task<List<ReminderEntity>> GetRemindersAsync(DiscordUser user)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            return db.Reminders.Table
-                .Where(x => x.AuthorId == user.Id)
+            return (await db.Reminders.GetAsync(x => x.AuthorId == user.Id))
                 .OrderBy(x => x.ElapseAt)
                 .ToList();
         }

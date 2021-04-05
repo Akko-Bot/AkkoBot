@@ -13,7 +13,7 @@ namespace AkkoBot.Services.Timers
     public sealed class AkkoTimer : IAkkoTimer
     {
         private readonly Timer _internalTimer;
-        private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
+        private DateTimeOffset _startedAt = DateTimeOffset.Now;
         private bool _isDisposed;
 
         private event ElapsedEventHandler ActionHandler;
@@ -51,7 +51,7 @@ namespace AkkoBot.Services.Timers
         /// <summary>
         /// Gets the time when this timer is going to trigger.
         /// </summary>
-        public DateTimeOffset ElapsesAt
+        public DateTimeOffset ElapseAt
             => _startedAt.AddMilliseconds(_internalTimer.Interval);
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace AkkoBot.Services.Timers
         }
 
         /// <summary>
-        /// Builds a timer from a database entry that hasn't expired yet.
+        /// Gets the time interval from a database entry that hasn't expired yet.
         /// </summary>
         private TimeSpan TimeFromValidEntry(TimeSpan timeDifference, TimerEntity entity)
         {
@@ -100,15 +100,15 @@ namespace AkkoBot.Services.Timers
             {
                 // Daily Repeater
                 // DateTimeOffset.Add() requires a TimeSpan with whole minutes
-                timeDifference = TimeSpan.FromMinutes(Math.Round(Interval.TotalMinutes));
-                _startedAt.StartOfDay().Add(timeDifference);
+                timeDifference = TimeSpan.FromMinutes(Interval.TotalMinutes);
+                //_startedAt.StartOfDay().Add(timeDifference);
             }
 
             return timeDifference;
         }
 
         /// <summary>
-        /// Builds a timer from a database entry that has expired.
+        /// Gets the time interval from a database entry that has expired.
         /// </summary>
         private TimeSpan TimeFromExpiredEntity(TimerEntity entity)
         {
@@ -124,8 +124,8 @@ namespace AkkoBot.Services.Timers
             {
                 // Daily Repeater
                 // DateTimeOffset.Add() requires a TimeSpan with whole minutes
-                result = TimeSpan.FromMinutes(Math.Round(Interval.TotalMinutes));
-                _startedAt.StartOfDay().Add(result);
+                result = TimeSpan.FromMinutes(Interval.TotalMinutes);
+                //_startedAt.StartOfDay().Add(result);
             }
 
             return result;
@@ -141,7 +141,7 @@ namespace AkkoBot.Services.Timers
 
             // Update the internal clock
             _internalTimer.Interval = Interval.TotalMilliseconds;
-            _startedAt.AddMilliseconds(Interval.TotalMilliseconds);
+            _startedAt = _startedAt.AddMilliseconds(Interval.TotalMilliseconds);
 
             // Execute the operation
             ActionHandler.Invoke(obj, args);
