@@ -1,12 +1,13 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,10 +39,17 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_okcolor")]
         public async Task ChangeOkColor(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var result = _service.GetOrSetProperty(context.Guild, x => x.OkColor = newColor);
+            var color = GeneralService.GetColor(newColor);
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_okcolor", Formatter.InlineCode(result)));
+            {
+                Description = (color.HasValue)
+                    ? context.FormatLocalized("guild_okcolor", Formatter.InlineCode(newColor.ToUpperInvariant()))
+                    : "invalid_color"
+            };
+
+            if (color.HasValue)
+                _service.GetOrSetProperty(context.Guild, x => x.OkColor = newColor);
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -50,10 +58,17 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_errorcolor")]
         public async Task ChangeErrorColor(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var result = _service.GetOrSetProperty(context.Guild, x => x.ErrorColor = newColor);
+            var color = GeneralService.GetColor(newColor);
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_errorcolor", Formatter.InlineCode(result)));
+            {
+                Description = (color.HasValue)
+                    ? context.FormatLocalized("guild_errorcolor", Formatter.InlineCode(newColor.ToUpperInvariant()))
+                    : "invalid_color"
+            };
+
+            if (color.HasValue)
+                _service.GetOrSetProperty(context.Guild, x => x.ErrorColor = newColor);
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -66,7 +81,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 context.Guild,
                 settings => settings.InteractiveTimeout = (seconds is null or < 10 or > 120)
                     ? null
-                    : new TimeSpan(0, 0, (int)seconds)
+                    : TimeSpan.FromSeconds(seconds.Value)
                 );
 
             var embed = new DiscordEmbedBuilder()
@@ -96,13 +111,12 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task ListLocales(CommandContext context)
         {
             var locales = _service.GetLocales()
-                .Select(code => (code, new CultureInfo(code).NativeName))
                 .OrderBy(code => code);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("locales_title")
-                .AddField("code", string.Join('\n', locales.Select(x => x.code).ToArray()), true)
-                .AddField("language", string.Join('\n', locales.Select(x => x.NativeName).ToArray()), true);
+                .AddField("code", string.Join('\n', locales.ToArray()), true)
+                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x).ToArray()), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }

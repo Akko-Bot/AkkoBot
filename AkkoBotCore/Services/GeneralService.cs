@@ -9,6 +9,7 @@ using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -63,6 +64,28 @@ namespace AkkoBot.Services
             return Directory.EnumerateFiles(AkkoEnvironment.CogsDirectory)
                 .Where(filePath => filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                 .Select(filePath => Assembly.LoadFrom(filePath));
+        }
+
+        /// <summary>
+        /// Safely gets the culture info of the specified locale.
+        /// </summary>
+        /// <param name="locale">The locale.</param>
+        /// <returns>A <see cref="CultureInfo"/> object, <see langword="null"/> if the locale is invalid.</returns>
+        public static CultureInfo GetCultureInfo(string locale)
+        {
+            try { return CultureInfo.CreateSpecificCulture(locale); }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Safely gets a color for the specified hexadecimal color code.
+        /// </summary>
+        /// <param name="colorCode">The hexadecimal color code.</param>
+        /// <returns>A <see cref="DiscordColor"/> with the specified color, an empty <see cref="Optional{T}"/> if the code is invalid.</returns>
+        public static Optional<DiscordColor> GetColor(string colorCode)
+        {
+            try { return Optional.FromValue(new DiscordColor(colorCode)); }
+            catch { return Optional.FromNoValue<DiscordColor>(); }
         }
 
         /// <summary>

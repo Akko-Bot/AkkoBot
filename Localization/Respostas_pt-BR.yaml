@@ -445,3 +445,15 @@ xid: ID do {0} {1} é {2}.
 
 cmd_guild_rolemention: 'Define se usuários podem mencionar cargos através do bot meramente pela sua posição na hierarquia de cargos. Atenção: dependendo de como as permissões do servidor foram definidas, ativar essa configuração pode levar a comportamento abusivo por parte dos usuários.'
 guild_role_mention: Menções permissivas de cargos foram {0}s.
+
+cmd_autocommand: Agrupa comandos que gerenciam comandos automáticos.
+cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado.
+arg_autocommand_time: Tempo até a ativação do comando.
+cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado.
+cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
+cmd_autocommand_remove: Remove um comando automático com o ID especificado.
+cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
+autocommand_empty: Nenhum comando automático foi encontrado.
+autocommand_title: Lista de Comandos Automáticos
+arg_autocommand_id: O ID do comando automático.
+invalid_color: O código de cor especificado é inválido.

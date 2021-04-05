@@ -448,10 +448,12 @@ guild_role_mention: Permissive role mentions have been {0}.
 
 cmd_autocommand: Groups commands for managing automatic commands.
 cmd_autocommand_addscheduled: Adds an autocommand that expires after it is triggered.
-arg_autocommand_time: Time until the command should be triggered.
-cmd_autocommand_addrepeated: Adds an autocommand that executes indefinitely at specific intervals.
+arg_autocommand_time: Time until the command activation.
+cmd_autocommand_addrepeated: Adds an autocommand that executes indefinitely at the specified interval.
 cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
 cmd_autocommand_remove: Removes an autocommand with the specified ID.
 cmd_autocommand_list: Lists all autocommands you have created.
-autocommand_empty: No autocommands were created.
+autocommand_empty: No autocommands were found.
 autocommand_title: List of Autocommands
+arg_autocommand_id: The ID of the autocommand.
+invalid_color: The specified color code is invalid.

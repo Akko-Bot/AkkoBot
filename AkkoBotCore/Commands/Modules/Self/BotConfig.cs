@@ -1,9 +1,11 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
+using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -21,10 +23,14 @@ namespace AkkoBot.Commands.Modules.Self
     [Description("cmd_config")]
     public class BotConfig : AkkoCommandModule
     {
-        private readonly BotConfigService _service;
+        private readonly BotConfigService _botService;
+        private readonly GuildConfigService _guildService;
 
-        public BotConfig(BotConfigService service)
-            => _service = service;
+        public BotConfig(BotConfigService botService, GuildConfigService guildService)
+        {
+            _botService = botService;
+            _guildService = guildService;
+        }
 
         [Command("prefix")]
         [Description("cmd_config_prefix")]
@@ -35,14 +41,13 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_config_locale")]
         public async Task ListLocales(CommandContext context)
         {
-            var locales = _service.GetLocales()
-                .Select(code => (code, new CultureInfo(code).NativeName))
+            var locales = _botService.GetLocales()
                 .OrderBy(code => code);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("locales_title")
-                .AddField("code", string.Join('\n', locales.Select(x => x.code).ToArray()), true)
-                .AddField("language", string.Join('\n', locales.Select(x => x.NativeName).ToArray()), true);
+                .AddField("code", string.Join('\n', locales.ToArray()), true)
+                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x).ToArray()), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -50,17 +55,41 @@ namespace AkkoBot.Commands.Modules.Self
         [Command("locale")]
         [Description("cmd_config_locale")]
         public async Task SetBotLocale(CommandContext context, [Description("arg_locale")] string languageCode)
-            => await ChangeProperty(context, x => x.Locale = languageCode);
+        {
+            if (!_guildService.IsLocaleRegistered(languageCode, out var result))
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            await ChangeProperty(context, x => x.Locale = result);
+        }
 
         [Command("okcolor")]
         [Description("cmd_config_okcolor")]
         public async Task SetBotOkColor(CommandContext context, [Description("arg_color")] string newColor)
-            => await ChangeProperty(context, x => x.OkColor = newColor);
+        {
+            if (!GeneralService.GetColor(newColor).HasValue)
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            await ChangeProperty(context, x => x.OkColor = newColor);
+        }
 
         [Command("errorcolor")]
         [Description("cmd_config_errorcolor")]
         public async Task SetBotErrorColor(CommandContext context, [Description("arg_color")] string newColor)
-            => await ChangeProperty(context, x => x.ErrorColor = newColor);
+        {
+            if (!GeneralService.GetColor(newColor).HasValue)
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            await ChangeProperty(context, x => x.ErrorColor = newColor);
+        }
 
         [Command("embed"), Aliases("useembed")]
         [Description("cmd_config_embed")]
@@ -106,7 +135,7 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_config_list")]
         public async Task ListBotSettings(CommandContext context)
         {
-            var settings = _service.GetConfigs();
+            var settings = _botService.GetConfigs();
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("bot_settings_title")
@@ -118,7 +147,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         private async Task ChangeProperty<T>(CommandContext context, Func<BotConfigEntity, T> selector)
         {
-            _service.GetOrSetProperty(selector);
+            _botService.GetOrSetProperty(selector);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 

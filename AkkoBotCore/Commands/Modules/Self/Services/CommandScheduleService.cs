@@ -33,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if the autocommand was successfully created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddAutoCommandAsync(CommandContext context, TimeSpan time, CommandType cmdType, Command cmd, string cmdArgs = null)
         {
-            if (cmd is null || context.Guild is null || cmdType is CommandType.Startup)
+            if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is CommandType.Startup)
                 return false;
 
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
