@@ -6,7 +6,9 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class CommandRepo : DbRepository<CommandEntity>
     {
-        public CommandRepo(AkkoDbContext db) : base(db) { }
+        public CommandRepo(AkkoDbContext db) : base(db)
+        {
+        }
 
         /// <summary>
         /// Gets the amount of automatic commands under the specified Discord user ID.

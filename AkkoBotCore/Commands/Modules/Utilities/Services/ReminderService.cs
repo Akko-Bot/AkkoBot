@@ -3,7 +3,6 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,9 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     /// </summary>
     public class ReminderService : AkkoCommandService
     {
-        public ReminderService(IServiceProvider services) : base(services) { }
+        public ReminderService(IServiceProvider services) : base(services)
+        {
+        }
 
         /// <summary>
         /// Adds a reminder to the database.
@@ -39,7 +40,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             // Limit of 120 reminders per user
             if (await db.Reminders.UserReminderCountAsync(context.User.Id) >= 120)
                 return false;
-            
+
             var newTimer = new TimerEntity()
             {
                 GuildId = context.Guild?.Id,
@@ -69,7 +70,9 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             db.Reminders.Create(newReminder);
             await db.SaveChangesAsync();
 
-            return db.Timers.Cache.AddOrUpdateByEntity(context.Client, newTimer);
+            db.Timers.Cache.AddOrUpdateByEntity(context.Client, newTimer);
+
+            return true;
         }
 
         /// <summary>

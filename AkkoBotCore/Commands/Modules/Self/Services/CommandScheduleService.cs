@@ -152,10 +152,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
             {
                 case CommandType.Startup:
                     return "-";
+
                 case CommandType.Scheduled:
                 case CommandType.Repeated:
                     _services.GetService<IDbCacher>().Timers.TryGetValue(dbEntry.TimerId.Value, out var timer);
                     return timer.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m");
+
                 default:
                     throw new NotImplementedException($"Command of type {dbEntry.Type} has not been implemented.");
             }

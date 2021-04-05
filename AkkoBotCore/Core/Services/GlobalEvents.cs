@@ -214,8 +214,8 @@ namespace AkkoBot.Core.Services
             return Task.Run(async () =>
             {
                 // Do not delete from ignored users, channels and roles
-                if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id) 
-                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id) 
+                if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
                 || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
                     return;
 

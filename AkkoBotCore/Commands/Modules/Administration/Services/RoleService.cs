@@ -32,7 +32,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         public const Permissions MutePermsAllow = Permissions.AccessChannels;
 
-        public RoleService(IServiceProvider services) : base(services) { }
+        public RoleService(IServiceProvider services) : base(services)
+        {
+        }
 
         /// <summary>
         /// A more permissive version of <see cref="CheckHierarchyAsync(CommandContext, DiscordMember, string)"/>

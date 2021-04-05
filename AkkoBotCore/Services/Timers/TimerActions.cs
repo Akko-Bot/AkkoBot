@@ -208,7 +208,7 @@ namespace AkkoBot.Services.Timers
                 var channel = (dbReminder.IsPrivate)
                         ? await user.CreateDmChannelAsync()
                         : server.GetChannel(dbReminder.ChannelId);
-                
+
                 var fakeContext = cmdHandler.CreateFakeContext(
                     user,
                     user.Guild.Channels.Values.FirstOrDefault(), // If channel is private, this throws
@@ -276,7 +276,6 @@ namespace AkkoBot.Services.Timers
 
                 if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
                     await cmd.ExecuteAsync(fakeContext);
-
             }
             catch
             {

@@ -40,9 +40,9 @@ namespace AkkoBot.Commands.Modules.Utilities
         [GroupCommand, Command("channel")]
         [Description("cmd_remind_channel")]
         [RequireUserPermissions(Permissions.ManageMessages)] // Shows up on !help, but doesn't perform the check
-        public async Task AddGuildReminder(CommandContext context, 
-            [Description("arg_discord_channel")] DiscordChannel channel, 
-            [Description("arg_remind_time")] TimeSpan time, 
+        public async Task AddGuildReminder(CommandContext context,
+            [Description("arg_discord_channel")] DiscordChannel channel,
+            [Description("arg_remind_time")] TimeSpan time,
             [RemainingText, Description("arg_remind_message")] string message)
         {
             var success = context.Guild is not null

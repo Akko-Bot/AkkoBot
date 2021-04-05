@@ -25,9 +25,10 @@ namespace AkkoBot.Services.Database
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
-        
+
         // Lazily instantiated
         public ITimerManager Timers { get; set; }
+
         public ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
 
         public AkkoDbCacher(AkkoDbContext dbContext)
@@ -44,7 +45,7 @@ namespace AkkoBot.Services.Database
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
 
             FilteredWords = new(); // Filtered words will be loaded into the cache as needed
-    }
+        }
 
         /// <summary>
         /// Releases the allocated resources for this database cacher.

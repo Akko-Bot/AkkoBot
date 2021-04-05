@@ -16,7 +16,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class UserPunishmentService : AkkoCommandService
     {
-        public UserPunishmentService(IServiceProvider services) : base(services) { }
+        public UserPunishmentService(IServiceProvider services) : base(services)
+        {
+        }
 
         /// <summary>
         /// Sends a direct message to the specified user with a localized message of the punishment they

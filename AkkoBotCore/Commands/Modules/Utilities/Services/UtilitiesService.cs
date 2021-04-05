@@ -1,18 +1,17 @@
-﻿using System.Net.Mail;
-using System.Linq;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AkkoBot.Commands.Abstractions;
+﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models;
+using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
-using AkkoBot.Common;
 using System;
-using DSharpPlus.CommandsNext;
 using System.Collections.Generic;
-using DSharpPlus;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Utilities.Services
 {

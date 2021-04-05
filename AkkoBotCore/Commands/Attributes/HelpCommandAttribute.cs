@@ -1,4 +1,3 @@
-using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

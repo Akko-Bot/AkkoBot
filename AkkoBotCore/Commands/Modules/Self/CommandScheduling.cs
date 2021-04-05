@@ -32,7 +32,7 @@ namespace AkkoBot.Commands.Modules.Self
                 command = command[context.Prefix.Length..];
 
             var cmd = context.CommandsNext.FindCommand(command, out var args);
-            var success = !(await cmd.RunChecksAsync(context, false)).Any() 
+            var success = !(await cmd.RunChecksAsync(context, false)).Any()
                 && await _service.AddAutoCommandAsync(context, time, CommandType.Scheduled, cmd, args);
 
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);

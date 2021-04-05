@@ -1,10 +1,10 @@
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using DSharpPlus;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.ArgumentConverters
 {

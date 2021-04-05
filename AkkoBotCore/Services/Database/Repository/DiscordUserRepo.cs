@@ -7,7 +7,9 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class DiscordUserRepo : DbRepository<DiscordUserEntity>
     {
-        public DiscordUserRepo(AkkoDbContext db) : base(db) { }
+        public DiscordUserRepo(AkkoDbContext db) : base(db)
+        {
+        }
 
         /// <summary>
         /// Tracks a user to be upserted to the database.

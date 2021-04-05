@@ -15,9 +15,9 @@ namespace AkkoBot.Services.Database.Entities
 
         [Required]
         [MaxLength(2000)]
-        public string Content 
-        { 
-            get => _content; 
+        public string Content
+        {
+            get => _content;
             init => _content = value?.MaxLength(2000) ?? "-";
         }
 

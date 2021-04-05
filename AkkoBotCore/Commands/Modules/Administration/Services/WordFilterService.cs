@@ -1,5 +1,4 @@
 ﻿using AkkoBot.Commands.Abstractions;
-using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using Microsoft.Extensions.DependencyInjection;
@@ -137,7 +136,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 return false;
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
-            
+
             // Remove the words from the entry
             dbEntry.FilteredWordsRel.Words.Clear();
 

@@ -142,7 +142,7 @@ namespace AkkoBot.Commands.Formatters
             _helpCommandsField.AppendJoin(
                 ", ",
                 subcommands.OrderBy(command => command.Name)
-                    .Select(command => 
+                    .Select(command =>
                         (command.CustomAttributes.Any(x => x.GetType() == typeof(GroupCommandAttribute)))
                             ? Formatter.Underline(Formatter.InlineCode(command.Name))
                             : Formatter.InlineCode(command.Name)

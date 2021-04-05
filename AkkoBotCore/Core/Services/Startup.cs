@@ -91,6 +91,7 @@ namespace AkkoBot.Core.Services
                 await db.SaveChangesAsync();
 
                 #region Playing Status Initialization
+
                 // Initialize the custom status, if there is one
                 var pStatus = db.PlayingStatuses.Table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
 
@@ -101,7 +102,8 @@ namespace AkkoBot.Core.Services
                     db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;
                     await _services.GetService<StatusService>().RotateStatusesAsync();
                 }
-                #endregion
+
+                #endregion Playing Status Initialization
 
                 await UnregisterCommands(client);
             });

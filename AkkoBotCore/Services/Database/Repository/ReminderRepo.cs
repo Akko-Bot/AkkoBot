@@ -6,7 +6,9 @@ namespace AkkoBot.Services.Database.Repository
 {
     public class ReminderRepo : DbRepository<ReminderEntity>
     {
-        public ReminderRepo(AkkoDbContext db) : base(db) { }
+        public ReminderRepo(AkkoDbContext db) : base(db)
+        {
+        }
 
         /// <summary>
         /// Gets the amount of reminders under the specified Discord user ID.

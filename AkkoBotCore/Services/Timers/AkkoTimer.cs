@@ -1,4 +1,3 @@
-using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using System;

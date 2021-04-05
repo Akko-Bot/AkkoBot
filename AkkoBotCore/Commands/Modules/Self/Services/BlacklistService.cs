@@ -17,7 +17,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class BlacklistService : AkkoCommandService
     {
-        public BlacklistService(IServiceProvider services) : base(services) { }
+        public BlacklistService(IServiceProvider services) : base(services)
+        {
+        }
 
         /// <summary>
         /// Saves a blacklist entry to the database.

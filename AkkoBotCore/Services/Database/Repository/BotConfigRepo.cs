@@ -1,8 +1,8 @@
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
-using System.Linq;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace AkkoBot.Services.Database.Repository
 {
@@ -54,7 +54,7 @@ namespace AkkoBot.Services.Database.Repository
 
             var dbEntry = base.Table.FirstOrDefault();
             dbEntry.DisabledCommands.Add(cmd.QualifiedName);
-            
+
             return true;
         }
 

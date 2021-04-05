@@ -1,16 +1,16 @@
-﻿using System.Linq;
-using AkkoBot.Commands.Abstractions;
+﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System.Linq;
 using System.Threading.Tasks;
-using AkkoBot.Services;
-using AkkoBot.Common;
 
 namespace AkkoBot.Commands.Modules.Utilities
 {

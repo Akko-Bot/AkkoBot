@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using AkkoBot.Commands.Abstractions;
+﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Core.Services;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
@@ -23,6 +22,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Core.Common
