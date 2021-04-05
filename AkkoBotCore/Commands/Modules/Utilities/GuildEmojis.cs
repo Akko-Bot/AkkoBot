@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Utilities
@@ -23,7 +24,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         public GuildEmojis(UtilitiesService service)
             => _service = service;
 
-        [GroupCommand, Command("list"), Aliases("show")]
+        [GroupCommand, Command("list")]
         [Description("cmd_emoji_list")]
         public async Task CheckGuildEmoji(CommandContext context)
         {
@@ -42,6 +43,18 @@ namespace AkkoBot.Commands.Modules.Utilities
             }
 
             await context.RespondPaginatedByFieldsAsync(embed, 2);
+        }
+
+        [Command("show"), Aliases("showemoji", "se")]
+        [Description("cmd_emoji_showemoji")]
+        public async Task ShowEmoji(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
+        {
+            var result = new StringBuilder();
+
+            foreach (var emoji in emojis.Where(emoji => emoji.Id is not 0))
+                result.AppendLine($"{emoji} {Formatter.InlineCode(emoji.GetDiscordName())} {emoji.Url}");
+
+            await context.RespondAsync(result.ToString());
         }
 
         [Command("add")]

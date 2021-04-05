@@ -457,3 +457,4 @@ autocommand_empty: No autocommands were found.
 autocommand_title: List of Autocommands
 arg_autocommand_id: The ID of the autocommand.
 invalid_color: The specified color code is invalid.
+cmd_emoji_showemoji: Shows the name and URL of the specified emojis.
