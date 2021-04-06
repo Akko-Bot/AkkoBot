@@ -14,11 +14,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 {
     public class WarningService : AkkoCommandService
     {
+        private readonly IServiceProvider _services;
         private readonly RoleService _roleService;
         private readonly UserPunishmentService _punishService;
 
         public WarningService(IServiceProvider services, RoleService roleService, UserPunishmentService punishService) : base(services)
         {
+            _services = services;
             _roleService = roleService;
             _punishService = punishService;
         }
@@ -329,7 +331,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="time">The time the warnings should be removed after their creation.</param>
         private async Task CreateWarnTimersAsync(CommandContext context, TimeSpan time)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(context.Guild.Id);
             var toCreate = guildSettings.WarnRel.Select(warning => new TimerEntity(warning, time));
@@ -350,7 +352,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The amount of timers removed from the database.</returns>
         private async Task<int> RemoveWarnTimersAsync(DiscordGuild server)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             //Remove the timers
             var toRemove = db.Timers.Table
