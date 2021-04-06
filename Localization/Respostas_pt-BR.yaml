@@ -460,3 +460,7 @@ warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 xid: ID do {0} {1} é {2}.
+
+cmd_edit: Modifica uma mensagem do bot.
+arg_discord_message: ID ou URL para uma mensagem do Discord.
+arg_edit_message: O conteúdo da nova mensagem.

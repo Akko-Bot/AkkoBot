@@ -99,5 +99,37 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             await context.RespondLocalizedAsync(embed, false);
         }
+
+        [Command("edit")]
+        [Description("cmd_edit")]
+        [RequireUserPermissions(Permissions.ManageMessages)]
+        public async Task EditMessage(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [RemainingText, Description("arg_edit_message")] SmartString newMessage)
+        {
+            if (message.Author.Id != context.Guild.CurrentMember.Id)
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+            if (_service.DeserializeEmbed(newMessage.Content, out var dMsg))
+                await message.ModifyAsync(dMsg);
+            else
+                await message.ModifyAsync(newMessage.Content, null);
+
+            await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
+        }
+
+        [Command("edit"), HiddenOverload]
+        public async Task EditMessage(CommandContext context, ulong messageId, [RemainingText] SmartString newMessage)
+        {
+            try
+            {
+                var message = await context.Channel.GetMessageAsync(messageId);
+                await EditMessage(context, message, newMessage);
+            }
+            catch
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+            }
+        }
     }
 }
