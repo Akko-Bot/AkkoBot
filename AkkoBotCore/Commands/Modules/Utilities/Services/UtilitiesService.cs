@@ -46,6 +46,36 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         }
 
         /// <summary>
+        /// Determines whether the specified emoji can be used by the bot in the context channel.
+        /// </summary>
+        /// <param name="server">The Discord guild.</param>
+        /// <param name="channel">The Discord channel the emoji is going to be used.</param>
+        /// <param name="emoji">The emoji to be used.</param>
+        /// <returns><see langword="true"/> if the bot can use the emoji, <see langword="false"/> otherwise.</returns>
+        public bool CanUseEmoji(DiscordGuild server, DiscordChannel channel, DiscordEmoji emoji)
+        {
+            if (emoji.Id is 0)
+                return true;
+            else if (!server.CurrentMember.PermissionsIn(channel).HasFlag(Permissions.UseExternalEmojis))
+                return false;
+
+            var servers = _services.GetService<DiscordShardedClient>().ShardClients.Values
+                .SelectMany(x => x.Guilds.Values);
+
+            foreach (var guild in servers)
+            {
+                if (guild.Emojis.Values
+                    .Where(x => x.IsAvailable && x.Roles.Count == 0 || x.Roles.ContainsOne(guild.CurrentMember.Roles.Select(x => x.Id)))
+                    .Contains(emoji))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Creates a GET request to the specified URL and returns the result as a stream.
         /// </summary>
         /// <param name="url">The URL to make the GET request.</param>

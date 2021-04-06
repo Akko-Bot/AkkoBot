@@ -48,7 +48,7 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <typeparam name="T">Data type contained in the collection.</typeparam>
         /// <param name="collection">This collection.</param>
-        /// <param name="targetCollection">The collection to be compared to.</param>
+        /// <param name="targetCollection">The collection to compare to.</param>
         /// <returns>
         /// <see langword="true"/> if all elements contained in <paramref name="targetCollection"/> are present
         /// in <paramref name="collection"/>, <see langword="false"/> otherwise.
@@ -64,6 +64,27 @@ namespace AkkoBot.Extensions
             }
 
             return matches == targetCollection.Count();
+        }
+
+        /// <summary>
+        /// Checks if the current collection contains at least one element of a given collection.
+        /// </summary>
+        /// <typeparam name="T">Data type contained in the collection.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="targetCollection">The collection to compare to.</param>
+        /// <returns>
+        /// <see langword="true"/> if at least one element contained in <paramref name="targetCollection"/> is present
+        /// in <paramref name="collection"/>, <see langword="false"/> otherwise.
+        /// </returns>
+        public static bool ContainsOne<T>(this IEnumerable<T> collection, IEnumerable<T> targetCollection)
+        {
+            foreach (var element in targetCollection)
+            {
+                if (collection.Any(x => x.Equals(element)))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>

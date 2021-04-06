@@ -9,6 +9,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -110,21 +111,89 @@ namespace AkkoBot.Commands.Modules.Utilities
                 await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
                 return;
             }
-            if (_service.DeserializeEmbed(newMessage.Content, out var dMsg))
-                await message.ModifyAsync(dMsg);
-            else
-                await message.ModifyAsync(newMessage.Content, null);
+            _ = (_service.DeserializeEmbed(newMessage.Content, out var dMsg))
+                ? await message.ModifyAsync(dMsg)
+                : await message.ModifyAsync(newMessage.Content, null);
 
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
         [Command("edit"), HiddenOverload]
         public async Task EditMessage(CommandContext context, ulong messageId, [RemainingText] SmartString newMessage)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => EditMessage(context, message, newMessage));
+
+        [Command("react")]
+        [Description("cmd_react")]
+        [RequireUserPermissions(Permissions.ManageMessages)]
+        public async Task React(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [Description("arg_emoji")] DiscordEmoji emoji)
+        {
+            var canReact = _service.CanUseEmoji(context.Guild, message.Channel, emoji);
+
+            if (canReact) 
+            {
+                await message.CreateReactionAsync(emoji);
+                await Task.Delay(AkkoEntities.SafetyDelay);   
+            }
+
+            await context.Message.CreateReactionAsync((canReact) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("react"), HiddenOverload]
+        public async Task React(CommandContext context, ulong messageId, DiscordEmoji emoji)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => React(context, message, emoji));
+
+        [Command("reactremove"), Aliases("reactrm")]
+        [Description("cmd_reactremove")]
+        [RequirePermissions(Permissions.ManageMessages)]
+        public async Task DeleteReaction(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [Description("arg_emoji")] DiscordEmoji emoji)
+        {
+            var hasReaction = message.Reactions.Any(x => x.Emoji.Equals(emoji));
+
+            if (hasReaction)
+            {
+                await message.DeleteReactionsEmojiAsync(emoji);
+                await Task.Delay(AkkoEntities.SafetyDelay);
+            }
+
+            await context.Message.CreateReactionAsync((hasReaction) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("reactremove"), HiddenOverload]
+        public async Task DeleteReaction(CommandContext context, ulong messageId, DiscordEmoji emoji)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => DeleteReaction(context, message, emoji));
+
+        [Command("reactclear")]
+        [Description("cmd_reactclear")]
+        [RequirePermissions(Permissions.ManageMessages)]
+        public async Task ClearReactions(CommandContext context, [Description("arg_discord_message")] DiscordMessage message)
+        {
+            var hasReaction = message.Reactions.Count > 0;
+
+            if (hasReaction)
+            {
+                await message.DeleteAllReactionsAsync();
+                await Task.Delay(AkkoEntities.SafetyDelay);
+            }
+
+            await context.Message.CreateReactionAsync((hasReaction) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("reactclear"), HiddenOverload]
+        public async Task ClearReactions(CommandContext context, ulong messageId)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => ClearReactions(context, message));
+
+        /// <summary>
+        /// Safely gets a Discord message with the specified ID in the context channel and executes a follow-up method with it.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="messageId">The message ID.</param>
+        /// <param name="action">The method to be executed.</param>
+        private async Task GetMessageAndExecuteAsync(CommandContext context, ulong messageId, Func<DiscordMessage, Task> action)
         {
             try
             {
                 var message = await context.Channel.GetMessageAsync(messageId);
-                await EditMessage(context, message, newMessage);
+                await action(message);
             }
             catch
             {

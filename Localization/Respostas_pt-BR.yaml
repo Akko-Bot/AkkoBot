@@ -464,3 +464,6 @@ xid: ID do {0} {1} é {2}.
 cmd_edit: Modifica uma mensagem do bot.
 arg_discord_message: ID ou URL para uma mensagem do Discord.
 arg_edit_message: O conteúdo da nova mensagem.
+cmd_react: Reage a uma mensagem com o emoji especificado.
+cmd_reactremove: Remove uma reação da mensagem especificada.
+cmd_reactclear: Remove todas as reações da mensagem especificada.
