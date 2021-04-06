@@ -8,9 +8,12 @@ app_owners: Application Owners
 arg_alias_add_alias: Text the bot should treat as a command.
 arg_alias_add_command: The command that should be mapped to this alias.
 arg_alias_remove: The alias to be removed.
+arg_autocommand_id: The ID of the autocommand.
+arg_autocommand_time: Time until the command activation.
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
 arg_bool: __true__ to enable, __false__ to disable.
+arg_channel_id: The ID of a Discord channel.
 arg_channel_name: Name of the channel.
 arg_channel_newname: The new name of the channel.
 arg_channel_topic: The new channel topic.
@@ -68,6 +71,8 @@ arg_warnp_rem_amount: The amount of warnings of the punishment to be removed.
 arg_warnp_role: A role to be added or removed from the user, if applicable.
 arg_warnp_time: For how long the punishment should last. Leave it empty to make it permanent.
 arg_warnp_type: The type of punishment to be applied.
+autocommand_empty: No autocommands were found.
+autocommand_title: List of Autocommands
 ban: Ban
 ban_enum: banned
 ban_notification: You have been banned from the {0} server.
@@ -96,6 +101,12 @@ cmd_alias_add: Adds an alias for the specified command. If the alias has space i
 cmd_alias_clear: Removes all aliases from this server. If used in direct message with the bot, removes all global aliases.
 cmd_alias_list: Lists all aliases available in this server. Use it in direct message with the bot to list all global aliases.
 cmd_alias_remove: Removes an alias.
+cmd_autocommand: Groups commands for managing automatic commands.
+cmd_autocommand_addrepeated: Adds an autocommand that executes indefinitely at the specified interval.
+cmd_autocommand_addscheduled: Adds an autocommand that expires after it is triggered.
+cmd_autocommand_list: Lists all autocommands you have created.
+cmd_autocommand_remove: Removes an autocommand with the specified ID.
+cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
 cmd_ban: Bans a user.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
@@ -131,6 +142,7 @@ cmd_config_owner_add: Adds a bot owner to the credentials file.
 cmd_config_owner_list: Lists the bot owners.
 cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
+cmd_config_reloadlocales: Reloads the response strings available to the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
 cmd_createcategorychannel: Creates a category.
 cmd_createrole: Creates a Discord role.
@@ -147,6 +159,7 @@ cmd_emoji_remove: Removes server emojis.
 cmd_emoji_removerole: Makes the specified emoji available to all users in the server. This only works if the bot is listed as an integration in your server.
 cmd_emoji_rename: Renames a server emoji.
 cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
+cmd_emoji_showemoji: Shows the name and URL of the specified emojis.
 cmd_fw: Groups commands to filter out undesirable words from the server.
 cmd_fw_add: Adds a word to the word filter. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the beginning to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
 cmd_fw_addignore: Adds a user, channel and/or role IDs to the list of ignored IDs, disabling the word filter for them.
@@ -169,6 +182,7 @@ cmd_guild_list: Shows the server's current settings.
 cmd_guild_locale: Changes the language the bot should use in this server. Provide no parameter to see the list of available languages.
 cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
+cmd_guild_rolemention: 'Toggles whether users can ping roles through the bot based solely on their position in the role hierarchy. Caution: depending on how the server permissions are set up, enabling this setting may enable role ping abuse.'
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
@@ -207,6 +221,8 @@ cmd_roleid: Shows the ID of the specified role.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
+cmd_send: Sends a message to the specified Discord channel.
+cmd_senddm: Sends a direct message to the specified user.
 cmd_serverid: Shows the ID of the current Discord server.
 cmd_serverinfo: Shows basic information about the current Discord server.
 cmd_setnickname: Sets the nickname of a user. Provide no user to set the bot's nickname. Provide no nickname to remove it.
@@ -275,6 +291,7 @@ guild_locale_unavailable: This language is not available. Use {0} to see the lis
 guild_okcolor: OkColor has been changed to {0}.
 guild_prefix_change: The prefix on this server has been changed to {0}
 guild_prefix_check: The prefix on this server is {0}
+guild_role_mention: Permissive role mentions have been {0}.
 guild_settings_title: Server Settings
 guild_timeout_changed: Command timeout on this server has been set to {0} seconds.
 guild_timeout_reset: Command timeout on this server has been reset.
@@ -319,6 +336,7 @@ infractions_empty: There are no infractions to show.
 infractions_field: '{0} at {1} by {2}'
 infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
+invalid_color: The specified color code is invalid.
 is_mod: Is a Moderator
 joined_at: Joined At
 kick: Kick
@@ -442,20 +460,3 @@ warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
 xid: ID of {0} {1} is {2}.
-
-cmd_guild_rolemention: 'Toggles whether users can ping roles through the bot based solely on their position in the role hierarchy. Caution: depending on how the server permissions are set up, enabling this setting may enable role ping abuse.'
-guild_role_mention: Permissive role mentions have been {0}.
-
-cmd_autocommand: Groups commands for managing automatic commands.
-cmd_autocommand_addscheduled: Adds an autocommand that expires after it is triggered.
-arg_autocommand_time: Time until the command activation.
-cmd_autocommand_addrepeated: Adds an autocommand that executes indefinitely at the specified interval.
-cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
-cmd_autocommand_remove: Removes an autocommand with the specified ID.
-cmd_autocommand_list: Lists all autocommands you have created.
-autocommand_empty: No autocommands were found.
-autocommand_title: List of Autocommands
-arg_autocommand_id: The ID of the autocommand.
-invalid_color: The specified color code is invalid.
-cmd_emoji_showemoji: Shows the name and URL of the specified emojis.
-cmd_config_reloadlocales: Reloads the response strings available to the bot.

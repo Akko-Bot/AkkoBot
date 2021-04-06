@@ -8,9 +8,12 @@ app_owners: Donos da Aplicação
 arg_alias_add_alias: O atalho de comando.
 arg_alias_add_command: O comando a ser executado quando o atalho for utilizado.
 arg_alias_remove: O atalho de comando a ser removido.
+arg_autocommand_id: O ID do comando automático.
+arg_autocommand_time: Tempo até a ativação do comando.
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
 arg_bool: __true__ para ativar, __false__ para desativar.
+arg_channel_id: O ID de um canal do Discord.
 arg_channel_name: Nome do canal.
 arg_channel_newname: O novo nome do canal.
 arg_channel_topic: O novo tópico do canal.
@@ -68,6 +71,8 @@ arg_warnp_rem_amount: A quantidade de advertências da punição a ser removida.
 arg_warnp_role: Um cargo a ser adicionado ou removido do usuário, se aplicável.
 arg_warnp_time: Por quanto tempo a punição deve durar. Deixe em branco para torná-la permanente.
 arg_warnp_type: O tipo de punição a ser aplicada.
+autocommand_empty: Nenhum comando automático foi encontrado.
+autocommand_title: Lista de Comandos Automáticos
 ban: Banir
 ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
@@ -96,6 +101,12 @@ cmd_alias_add: Adiciona um atalho de comando. Se o atalho tiver um espaço, colo
 cmd_alias_clear: Remove todos os atalhos de comando desse servidor. Se for executado em mensagem direta com o bot, remove todos os atalhos de comando globais.
 cmd_alias_list: Exibe todos os atalhos de comando disponíveis nesse servidor. Se for executado em mensagem direta com o bot, exibe todos os atalhos de comand blobais.
 cmd_alias_remove: Remove um atalho de comando.
+cmd_autocommand: Agrupa comandos que gerenciam comandos automáticos.
+cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado.
+cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado.
+cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
+cmd_autocommand_remove: Remove um comando automático com o ID especificado.
+cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
 cmd_ban: Bane um usuário.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
@@ -131,6 +142,7 @@ cmd_config_owner_add: Adiciona um dono às credenciais do bot.
 cmd_config_owner_list: Lista os donos do bot.
 cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
+cmd_config_reloadlocales: Recarrega os textos de resposta disponíveis ao bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
 cmd_createcategorychannel: Cria uma categoria.
 cmd_createrole: Cria um cargo do Discord.
@@ -147,6 +159,7 @@ cmd_emoji_remove: Remove emojis do servidor.
 cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos no servidor. Só funciona se o bot estiver listado como uma integração no servidor.
 cmd_emoji_rename: Renomeia um emoji do servidor.
 cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
+cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
 cmd_fw: Agrupa comandos que filtram palavras indesejáveis do servidor.
 cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando o filtro de palavras para eles.
@@ -169,6 +182,7 @@ cmd_guild_list: Exibe as configurações atuais do servidor.
 cmd_guild_locale: Define o idioma a ser utilizado pelo bot nesse servidor. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
 cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor.
 cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
+cmd_guild_rolemention: 'Define se usuários podem mencionar cargos através do bot meramente pela sua posição na hierarquia de cargos. Atenção: dependendo de como as permissões do servidor foram definidas, ativar essa configuração pode levar a comportamento abusivo por parte dos usuários.'
 cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela resposta do usuário, em segundos. Forneça nenhum parâmetro para redefini-lo para o valor padrão.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
@@ -207,6 +221,8 @@ cmd_roleid: Exibe od ID do cargo especificado.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
+cmd_send: Envia uma mensagem ao canal do Discord especificado.
+cmd_senddm: Envia uma mensagem direta ao usuário especificado.
 cmd_serverid: Exibe of ID do servidor atual.
 cmd_serverinfo: Exibe informações básicas sobre o servidor atual.
 cmd_setnickname: Define o apelido de um usuário. Forneça nenhum usuário para definit o apelido do bot. Forneça nenhum apelido para removê-lo.
@@ -275,6 +291,7 @@ guild_locale_unavailable: Esse idioma não está disponível. Use {0} para ver a
 guild_okcolor: OkColor foi alterada para {0}.
 guild_prefix_change: O prefixo nesse servidor foi alterado para {0}
 guild_prefix_check: O prefixo nesse servidor é {0}
+guild_role_mention: Menções permissivas de cargos foram {0}s.
 guild_settings_title: Configurações do Servidor
 guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
 guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
@@ -319,6 +336,7 @@ infractions_empty: Esse usuário não possui infrações.
 infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
+invalid_color: O código de cor especificado é inválido.
 is_mod: É Moderador
 joined_at: Entrou Em
 kick: Expulsar
@@ -442,20 +460,3 @@ warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 xid: ID do {0} {1} é {2}.
-
-cmd_guild_rolemention: 'Define se usuários podem mencionar cargos através do bot meramente pela sua posição na hierarquia de cargos. Atenção: dependendo de como as permissões do servidor foram definidas, ativar essa configuração pode levar a comportamento abusivo por parte dos usuários.'
-guild_role_mention: Menções permissivas de cargos foram {0}s.
-
-cmd_autocommand: Agrupa comandos que gerenciam comandos automáticos.
-cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado.
-arg_autocommand_time: Tempo até a ativação do comando.
-cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado.
-cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
-cmd_autocommand_remove: Remove um comando automático com o ID especificado.
-cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
-autocommand_empty: Nenhum comando automático foi encontrado.
-autocommand_title: Lista de Comandos Automáticos
-arg_autocommand_id: O ID do comando automático.
-invalid_color: O código de cor especificado é inválido.
-cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
-cmd_config_reloadlocales: Recarrega os textos de resposta disponíveis ao bot.

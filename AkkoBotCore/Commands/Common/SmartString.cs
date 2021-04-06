@@ -25,7 +25,7 @@ namespace AkkoBot.Commands.Common
         public Regex ParseRegex { get; set; }
 
         /// <summary>
-        /// Reports whether this <see cref="SmartString"/> had the placeholders in its content parsed.
+        /// Reports whether this <see cref="SmartString"/> had its content processed.
         /// </summary>
         public bool IsParsed { get; private set; }
 

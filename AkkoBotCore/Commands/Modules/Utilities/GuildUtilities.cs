@@ -18,13 +18,9 @@ namespace AkkoBot.Commands.Modules.Utilities
     public class GuildUtilities : AkkoCommandModule
     {
         private readonly UtilitiesService _service;
-        private readonly DiscordShardedClient _clients;
 
-        public GuildUtilities(UtilitiesService service, DiscordShardedClient clients)
-        {
-            _service = service;
-            _clients = clients;
-        }
+        public GuildUtilities(UtilitiesService service)
+            => _service = service;
 
         [Command("say"), HiddenOverload]
         [Priority(0)]
