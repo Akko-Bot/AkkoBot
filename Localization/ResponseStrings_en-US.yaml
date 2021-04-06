@@ -22,11 +22,13 @@ arg_command: A valid command.
 arg_config_timeout: How long the bot should wait on interactive commands. Minimum of __10s__.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_color: The hexadecimal value of a color.
+arg_discord_message: ID or URL to a Discord message.
 arg_discord_role: ID or mention to a Discord role.
 arg_discord_roles: ID or mention to one or multiple Discord roles.
 arg_discord_user: ID or mention to a Discord user.
 arg_discord_voicechannel: ID or name of a voice channel.
 arg_double: A real number.
+arg_edit_message: The content of the new message.
 arg_emoji: A Discord emoji.
 arg_emoji_name: The name of the new emoji.
 arg_emoji_newname: The new name of the emoji.
@@ -152,6 +154,7 @@ cmd_deafen: Applies server deafening to a user.
 cmd_deleteallroles: Deletes all roles on this server that are below the bot and the user who used the command.
 cmd_deletechannel: Deletes a Discord channel.
 cmd_deleterole: Deletes a Discord role.
+cmd_edit: Edits the specified bot message.
 cmd_emoji: Groups commands for managing server emojis.
 cmd_emoji_add: Adds server emojis. Emojis must be in `.png` or `.gif` format and be under 256Kb in size. Provide no parameter to add emojis from the attachment.
 cmd_emoji_list: Lists all emojis in this server.
@@ -172,6 +175,7 @@ cmd_fw_notify: Toggles whether the notification message should be sent when a fi
 cmd_fw_remove: Removes a word from the list of filtered words.
 cmd_fw_removeignore: Removes a user, channel and/or role IDs from the list of ignored IDs.
 cmd_fw_removemany: Removes multiple words from the list of filtered words. Separate them with space.
+cmd_fw_stickers: Toggles the automatic deletion of messages containing stickers on the server.
 cmd_fw_warn: Toggles whether filtered messages should automatically issue a warning to the offending user.
 cmd_globalcmd: Toggles activation of a command.
 cmd_globalmodule: Toggles activation of all commands in the specified module.
@@ -202,6 +206,9 @@ cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
 cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
+cmd_react: Reacts to a message with the specified emoji.
+cmd_reactclear: Removes all reactions from the specified message.
+cmd_reactremove: Removes a reaction from the specified message.
 cmd_recreatechannel: Recreates a Discord channel.
 cmd_recreaterole: Recreates a Discord role.
 cmd_remind: Groups commands for managing reminders.
@@ -276,6 +283,8 @@ fw_ignored_users: Ignored Users
 fw_list_empty: There are no filtered words.
 fw_list_title: List of Filtered Words
 fw_notify: The notification for filtered messages has been {0}.
+fw_sticker_toggle: Automatic removal of stickers has been {0}.
+fw_stickers_notification: Stickers are not allowed in this server.
 fw_toggle: The word filter has been {0} on this server.
 fw_warn: Automatic warnings for filtered messages has been {0}.
 fw_warn_footer: This incident has been counted towards your infraction list.
@@ -460,10 +469,3 @@ warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
 xid: ID of {0} {1} is {2}.
-
-cmd_edit: Edits the specified bot message.
-arg_discord_message: ID or URL to a Discord message.
-arg_edit_message: The content of the new message.
-cmd_react: Reacts to a message with the specified emoji.
-cmd_reactremove: Removes a reaction from the specified message.
-cmd_reactclear: Removes all reactions from the specified message.

@@ -128,6 +128,19 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("stickers")]
+        [Description("cmd_fw_stickers")]
+        [RequireUserPermissions(Permissions.ManageGuild)]
+        public async Task ToggleStickerRemoval(CommandContext context)
+        {
+            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("fw_sticker_toggle", (success) ? "enabled" : "disabled"));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_fw_list")]
         public async Task ListFilteredWords(CommandContext context)

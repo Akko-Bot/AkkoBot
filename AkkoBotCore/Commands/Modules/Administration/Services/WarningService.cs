@@ -4,6 +4,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -281,14 +282,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="user">The user whose warning are going to be listed.</param>
         /// <param name="type">The type of records to get.</param>
         /// <returns>A collection of notices or warnings and saved users.</returns>
-        public async Task<(GuildConfigEntity, IEnumerable<DiscordUserEntity>)> GetInfractionsAsync(DiscordGuild server, DiscordUser user, WarnType type)
+        public async Task<(GuildConfigEntity, DiscordUserEntity)> GetInfractionsAsync(DiscordGuild server, DiscordUser user, WarnType type)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id, type);
-            var users = await db.DiscordUsers.GetAsync(x => guildSettings.WarnRel.Select(x => x.AuthorId).Contains(x.UserId));
+            var dbUser = await db.DiscordUsers.Table.FirstOrDefaultAsync(x => x.UserId == user.Id);
 
-            return (guildSettings, users);
+            return (guildSettings, dbUser);
         }
 
         /// <summary>
@@ -297,14 +298,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="server">The Discord the warning is associated with.</param>
         /// <param name="user">The user whose warning are going to be listed.</param>
         /// <returns>A collection of notice/warnings and saved users.</returns>
-        public async Task<(GuildConfigEntity, IEnumerable<DiscordUserEntity>)> GetInfractionsAsync(DiscordGuild server, DiscordUser user)
+        public async Task<(GuildConfigEntity, DiscordUserEntity)> GetInfractionsAsync(DiscordGuild server, DiscordUser user)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
             var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id);
-            var users = await db.DiscordUsers.GetAsync(x => guildSettings.WarnRel.Select(x => x.AuthorId).Contains(x.UserId));
+            var dbUser = await db.DiscordUsers.Table.FirstOrDefaultAsync(x => x.UserId == user.Id);
 
-            return (guildSettings, users);
+            return (guildSettings, dbUser);
         }
 
         /// <summary>

@@ -55,6 +55,9 @@ namespace AkkoBot.Core.Services
             // Delete filtered words
             _botCore.BotShardedClient.MessageCreated += FilterWord;
 
+            // Delete messages with stickers
+            _botCore.BotShardedClient.MessageCreated += FilterSticker;
+
             // On command
             foreach (var cmdHandler in _botCore.CommandExt.Values)
                 cmdHandler.CommandExecuted += SaveUserOnCmd;
@@ -258,6 +261,45 @@ namespace AkkoBot.Core.Services
                 // Apply warning, if enabled
                 if (toWarn)
                     await _warningService.SaveWarnAsync(dummyCtx, eventArgs.Guild.CurrentMember, dummyCtx.FormatLocalized("fw_default_warn"));
+
+                // Delete the notification message after some time
+                _ = DeleteWithDelayAsync(notification, TimeSpan.FromSeconds(30));
+            });
+        }
+
+        /// <summary>
+        /// Deletes a user message if it contains a sticker.
+        /// </summary>
+        private Task FilterSticker(DiscordClient client, MessageCreateEventArgs eventArgs)
+        {
+            if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
+                || !filteredWords.FilterStickers || eventArgs.Message.Stickers.Count == 0
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasFlag(Permissions.ManageMessages))
+                return Task.CompletedTask;
+
+            return Task.Run(async () =>
+            {
+                // Do not delete from ignored users, channels and roles
+                if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
+                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                    return;
+
+                // Delete the message
+                await eventArgs.Message.DeleteAsync();
+
+                // Send the notification
+                if (!filteredWords.NotifyOnDelete)
+                    return;
+
+                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription("fw_stickers_notification");
+
+                var fakeContext = cmdHandler.CreateContext(eventArgs.Message, null, null);
+
+                var notification = await fakeContext.RespondLocalizedAsync(eventArgs.Author.Mention, embed, false, true);
 
                 // Delete the notification message after some time
                 _ = DeleteWithDelayAsync(notification, TimeSpan.FromSeconds(30));

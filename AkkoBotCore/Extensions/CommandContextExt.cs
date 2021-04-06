@@ -301,6 +301,18 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
+        /// Gets the locale of the current context.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <returns>The locale to be used for localization.</returns>
+        public static string GetLocaleKey(this CommandContext context)
+        {
+            return (context.Guild is null)
+                ? context.Services.GetService<IDbCacher>().BotConfig.BotPrefix
+                : context.Services.GetService<IDbCacher>().Guilds[context.Guild.Id].Prefix;
+        }
+
+        /// <summary>
         /// Localizes an embed and generates paginable embeds of it.
         /// </summary>
         /// <param name="context">This command context.</param>

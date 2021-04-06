@@ -72,12 +72,9 @@ namespace AkkoBot.Services.Database.Entities
 
         // Greet and Bye channels and messages
         // .asar - .iam/.iamnot roles
-        // .fi - .sfi/.cfi Server invite filter
-        // .fw - .sfq/.cfw Word filter
-        // .repeat and .remind
-        // Warnings, warn expire and warn punishments
+        // .repeat
         // Xp notification
-        // .rero messages and reactions
+        // .rero messages
 
         public GuildConfigEntity()
         {

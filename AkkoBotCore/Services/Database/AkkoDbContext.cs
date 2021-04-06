@@ -13,7 +13,7 @@ namespace AkkoBot.Services.Database
         public DbSet<MutedUserEntity> MutedUsers { get; set; }
         public DbSet<WarnEntity> Warnings { get; set; }
         public DbSet<WarnPunishEntity> WarnPunishments { get; set; }
-        public DbSet<OccurrenceEntity> Occurrencies { get; set; }
+        public DbSet<OccurrenceEntity> Occurrences { get; set; }
         public DbSet<BlacklistEntity> Blacklist { get; set; }
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
         public DbSet<AliasEntity> Aliases { get; set; }
@@ -21,8 +21,7 @@ namespace AkkoBot.Services.Database
         public DbSet<ReminderEntity> Reminders { get; set; }
         public DbSet<CommandEntity> AutoCommands { get; set; }
 
-        public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
-            => base.Database.Migrate(); // Ensure that the database exists
+        public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

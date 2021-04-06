@@ -21,13 +21,11 @@ namespace AkkoBot.Commands.Modules.Self.Services
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;
 
-        private readonly IServiceProvider _services;
         private readonly IDbCacher _dbCache;
         private readonly DiscordShardedClient _clients;
 
         public StatusService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients) : base(services)
         {
-            _services = services;
             _dbCache = dbCache;
             _clients = clients;
         }

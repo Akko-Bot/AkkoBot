@@ -2,6 +2,7 @@
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models;
+using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -191,7 +192,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                         "{4}: {5}",
                         "region", server.VoiceRegion.Name,
                         "verification_level", server.VerificationLevel.ToString().ToLowerInvariant(),
-                        "created_at", server.CreationTimestamp.ToString("d")
+                        "created_at", server.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))
                     ),
                     true
                 )

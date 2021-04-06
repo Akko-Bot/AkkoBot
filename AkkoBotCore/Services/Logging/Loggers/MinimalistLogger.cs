@@ -80,10 +80,9 @@ namespace AkkoBot.Services.Logging.Loggers
         {
             _cmdContext = state as CommandContext;
 
-            if (_cmdContext is null)
-                throw new InvalidOperationException("This logger instance only supports \"CommandContext\" objects.");
-            else
-                return default;
+            return (_cmdContext is null)
+                ? throw new InvalidOperationException("This logger instance only supports \"CommandContext\" objects.")
+                : default;
         }
 
         private void ChangeConsoleTextColor(LogLevel logLevel)

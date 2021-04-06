@@ -433,6 +433,7 @@ namespace AkkoBot.Core.Common
 
             var botConfig = dbContext.BotConfig.FirstOrDefault() ?? new BotConfigEntity();
             var logConfig = dbContext.LogConfig.FirstOrDefault() ?? new LogConfigEntity();
+            dbContext.Database.Migrate();
             dbContext.Dispose();
 
             return (botConfig, logConfig);

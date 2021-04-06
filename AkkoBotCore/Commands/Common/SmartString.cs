@@ -120,7 +120,7 @@ namespace AkkoBot.Commands.Common
 
             if (_context.Services.GetService<IDbCacher>().Guilds[_context.Guild.Id].PermissiveRoleMention)
             {
-                // Sanitize by role hierarchy
+                // Sanitize by role hierarchy - Permissive
                 foreach (Match match in matches)
                 {
                     if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
@@ -132,7 +132,7 @@ namespace AkkoBot.Commands.Common
             }
             else
             {
-                // Sanitize by mention everyone permission
+                // Sanitize by mention everyone permission - Strict
                 foreach (Match match in matches)
                 {
                     if (ulong.TryParse(match.Groups[1].ToString(), out var rid)

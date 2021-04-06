@@ -146,19 +146,19 @@ namespace AkkoBot.Commands.Modules.Administration
             else if (user is null)
                 user = context.User;
 
-            var (guildSettings, users) = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
+            var (guildSettings, dbUser) = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
 
             foreach (var warn in guildSettings.WarnRel.OrderByDescending(x => x.Id))
             {
-                var position = "#" + Formatter.InlineCode(warn.Id.ToString(CultureInfo.InvariantCulture));
+                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
                     $"{position} {warn.DateAdded.Date.ToShortDateString()}",
                     $"{warn.DateAdded.Hour:00.}:{warn.DateAdded.Minute:00.}",
-                    users.FirstOrDefault(x => x.UserId == warn.AuthorId).ToString()
+                    dbUser.ToString()
                 );
 
                 embed.AddField(fieldName, warn.WarningText);
@@ -178,7 +178,7 @@ namespace AkkoBot.Commands.Modules.Administration
             if (user is null)
                 user = context.User;
 
-            var (guildSettings, users) = await _warnService.GetInfractionsAsync(context.Guild, user);
+            var (guildSettings, dbUser) = await _warnService.GetInfractionsAsync(context.Guild, user);
             var occurrence = guildSettings.OccurrenceRel.FirstOrDefault() ?? new OccurrenceEntity();
 
             var embed = new DiscordEmbedBuilder()
@@ -194,12 +194,12 @@ namespace AkkoBot.Commands.Modules.Administration
             foreach (var warn in guildSettings.WarnRel.OrderBy(x => x.Type).ThenByDescending(x => x.Id))
             {
                 var emote = (warn.Type == WarnType.Notice) ? "📝" : "⚠️";
-                var position = "#" + Formatter.InlineCode(warn.Id.ToString(CultureInfo.InvariantCulture));
+                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
                     $"{emote} {position} {warn.DateAdded.Date.ToShortDateString()}",
                     $"{warn.DateAdded.Hour:00.}:{warn.DateAdded.Minute:00.}",
-                    users.FirstOrDefault(x => x.UserId == warn.AuthorId).ToString()
+                    dbUser.ToString()
                 );
 
                 embed.AddField(fieldName, warn.WarningText);

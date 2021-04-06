@@ -2,6 +2,7 @@
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -70,11 +71,15 @@ namespace AkkoBot.Services
         /// Safely gets the culture info of the specified locale.
         /// </summary>
         /// <param name="locale">The locale.</param>
+        /// <param name="getDefault">
+        /// <see langword="true"/> to get the <see cref="CultureInfo"/> of <see cref="AkkoLocalizer.DefaultLanguage"/> if locale is invalid,
+        /// <see langword="false"/> to get <see langword="null"/> if the locale is invalid.
+        /// </param>
         /// <returns>A <see cref="CultureInfo"/> object, <see langword="null"/> if the locale is invalid.</returns>
-        public static CultureInfo GetCultureInfo(string locale)
+        public static CultureInfo GetCultureInfo(string locale, bool getDefault = false)
         {
             try { return CultureInfo.CreateSpecificCulture(locale); }
-            catch { return null; }
+            catch { return (getDefault) ? CultureInfo.CreateSpecificCulture(AkkoLocalizer.DefaultLanguage) : null; }
         }
 
         /// <summary>

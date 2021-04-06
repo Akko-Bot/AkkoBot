@@ -22,11 +22,13 @@ arg_command: Um comando válido.
 arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos. Mínimo de __10s__.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_color: O valor hexadecimal de uma cor.
+arg_discord_message: ID ou URL para uma mensagem do Discord.
 arg_discord_role: ID ou menção a um cargo do Discord.
 arg_discord_roles: ID ou menção a um ou mais cargos do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
 arg_discord_voicechannel: ID ou nome de um canal de voz.
 arg_double: Um número real.
+arg_edit_message: O conteúdo da nova mensagem.
 arg_emoji: Um emoji.
 arg_emoji_name: O nome of novo emoji.
 arg_emoji_newname: O novo nome do emoji.
@@ -152,6 +154,7 @@ cmd_deafen: Ensurdece um usuário.
 cmd_deleteallroles: Exclui todos os cargos desse servidor que estão abaixo do bot e do usuário que usou o comando.
 cmd_deletechannel: Exclui um canal do Discord.
 cmd_deleterole: Exclui um cargo do Discord.
+cmd_edit: Modifica uma mensagem do bot.
 cmd_emoji: Agrupa comandos de gerenciamento de emojis do servidor.
 cmd_emoji_add: Adiciona emojis ao servidor. Emojis precisam ser do formato `.png` ou `.gif` e ter menos de 256Kb em tamanho. Forneça nenhum parâmetro para adicionar emojis anexados.
 cmd_emoji_list: Exibe todos os emojis do servidor.
@@ -165,13 +168,14 @@ cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contém qu
 cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando o filtro de palavras para eles.
 cmd_fw_addmany: Adiciona múltiplas palavras ao filtro de palavras. Separe-as com espaço. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_clear: Remove todas a palavras do filtro de palavras.
-cmd_fw_enable: Ativa ou desativa a exclusão de mensagens que contém palavras proibidas no servidor.
+cmd_fw_enable: Ativa ou desativa a exclusão automática de mensagens que contém palavras proibidas no servidor.
 cmd_fw_list: Exibe todas a palavras proibidas no servidor e os usuários, canais e cargos ignorados pelo filtro de palavras.
 cmd_fw_message: Define a mensagem a ser automaticamente enviada quando uma mensagem for excluída por conter uma palavra proibida.
 cmd_fw_notify: Ativa ou desativa o envio de uma notificação quando uma mensagem filtrada for excluída.
 cmd_fw_remove: Remove uma palavra do filtro de palavras.
 cmd_fw_removeignore: Remove IDs de usuários, canais e/ou cargos da lista de IDs ignorados.
 cmd_fw_removemany: Remove múltiplas palavras do filtro de palavras. Separe-as com espaço.
+cmd_fw_stickers: Ativa ou desativa a exclusão automática de mensagens que contém figurinhas no servidor.
 cmd_fw_warn: Ativa ou desativa a advertência automática a usuários que enviarem mensagens com palavras proibidas.
 cmd_globalcmd: Ativa ou desativa um comando.
 cmd_globalmodule: Ativa ou desativa todos os comandos do módulo especificado.
@@ -202,6 +206,9 @@ cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
 cmd_prune: Exclui as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
+cmd_react: Reage a uma mensagem com o emoji especificado.
+cmd_reactclear: Remove todas as reações da mensagem especificada.
+cmd_reactremove: Remove uma reação da mensagem especificada.
 cmd_recreatechannel: Recria um canal do Discord.
 cmd_recreaterole: Recria um cargo do Discord.
 cmd_remind: Agrupa comandos de gerenciamento de lembretes.
@@ -276,7 +283,9 @@ fw_ignored_users: Usuários Ignorados
 fw_list_empty: Não há palavras proibidas.
 fw_list_title: Lista de Palavras Proibidas
 fw_notify: A notificação para mensagens filtradas foi {0}.
-fw_toggle: A filtragem de palavras foi {0} nesse servidor.
+fw_sticker_toggle: O filtro de figurinhas foi {0}.
+fw_stickers_notification: Figurinhas não são permitidas nesse servidor.
+fw_toggle: O filtro de palavras foi {0} nesse servidor.
 fw_warn: A advertência automática para mensagens filtradas foi {0}.
 fw_warn_footer: Esse incidente foi registrado na sua lista de infrações.
 gcmd_error: O comando {0} não foi encontrado.
@@ -460,10 +469,3 @@ warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 xid: ID do {0} {1} é {2}.
-
-cmd_edit: Modifica uma mensagem do bot.
-arg_discord_message: ID ou URL para uma mensagem do Discord.
-arg_edit_message: O conteúdo da nova mensagem.
-cmd_react: Reage a uma mensagem com o emoji especificado.
-cmd_reactremove: Remove uma reação da mensagem especificada.
-cmd_reactclear: Remove todas as reações da mensagem especificada.
