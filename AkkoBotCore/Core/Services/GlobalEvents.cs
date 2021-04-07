@@ -263,7 +263,7 @@ namespace AkkoBot.Core.Services
                     await _warningService.SaveWarnAsync(dummyCtx, eventArgs.Guild.CurrentMember, dummyCtx.FormatLocalized("fw_default_warn"));
 
                 // Delete the notification message after some time
-                _ = DeleteWithDelayAsync(notification, TimeSpan.FromSeconds(30));
+                _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
             });
         }
 
@@ -302,7 +302,7 @@ namespace AkkoBot.Core.Services
                 var notification = await fakeContext.RespondLocalizedAsync(eventArgs.Author.Mention, embed, false, true);
 
                 // Delete the notification message after some time
-                _ = DeleteWithDelayAsync(notification, TimeSpan.FromSeconds(30));
+                _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
             });
         }
 
@@ -376,17 +376,6 @@ namespace AkkoBot.Core.Services
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Deletes a <see cref="DiscordMessage"/> after the specified time.
-        /// </summary>
-        /// <param name="message">The message to be deleted.</param>
-        /// <param name="delay">How long to wait before the message is deleted.</param>
-        private async Task DeleteWithDelayAsync(DiscordMessage message, TimeSpan delay)
-        {
-            await Task.Delay(delay).ConfigureAwait(false);
-            try { await message.DeleteAsync(); } catch { }  // Message might get deleted by someone else in the meantime
         }
     }
 }

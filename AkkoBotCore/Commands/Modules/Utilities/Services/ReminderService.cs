@@ -1,8 +1,10 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -16,9 +18,10 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     /// </summary>
     public class ReminderService : AkkoCommandService
     {
+        private readonly IServiceProvider _services;
+
         public ReminderService(IServiceProvider services) : base(services)
-        {
-        }
+            => _services = services;
 
         /// <summary>
         /// Adds a reminder to the database.
@@ -35,7 +38,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365))
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Limit of 120 reminders per user
             if (await db.Reminders.UserReminderCountAsync(context.User.Id) >= 120)
@@ -83,7 +86,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the reminder got successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveReminderAsync(DiscordUser user, int id)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             var dbEntry = await db.Reminders.GetAsync(id);
 
             if (dbEntry is null || user.Id != dbEntry.AuthorId)
@@ -109,9 +112,11 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            return (await db.Reminders.GetAsync(x => x.AuthorId == user.Id))
+            return await db.Reminders.Table
+                .AsNoTracking()
+                .Where(x => x.AuthorId == user.Id)
                 .OrderBy(x => x.ElapseAt)
-                .ToList();
+                .ToListAsync();
         }
     }
 }

@@ -1,4 +1,7 @@
 using AkkoBot.Models;
+using AkkoBot.Services;
+using AkkoBot.Services.Localization.Abstractions;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System.Collections.Generic;
 
@@ -66,6 +69,21 @@ namespace AkkoBot.Extensions
                 model.Fields.Add(new SerializableEmbedField(field.Name, field.Value, field.Inline));
 
             return model;
+        }
+
+        /// <summary>
+        /// Adds a localized field to this embed.
+        /// </summary>
+        /// <param name="embed">This embed.</param>
+        /// <param name="context">The command context.</param>
+        /// <param name="name">The title of this field.</param>
+        /// <param name="value">The content of this field.</param>
+        /// <param name="inline">Whether the field should be inlined or not.</param>
+        /// <returns>This embed with a localized field added to it.</returns>
+        public static DiscordEmbedBuilder AddLocalizedField(this DiscordEmbedBuilder embed, CommandContext context, string name, string value, bool inline = false)
+        {
+            embed.AddField(context.FormatLocalized(name), context.FormatLocalized(value), inline);
+            return embed;
         }
     }
 }

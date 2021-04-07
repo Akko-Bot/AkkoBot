@@ -5,6 +5,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
@@ -56,6 +57,17 @@ namespace AkkoBot.Extensions
             return settings.UseEmbed
                 ? await msg.ModifyAsync(responseString, localizedEmbed.Build())
                 : await msg.ModifyAsync(responseString + "\n\n" + GeneralService.DeconstructEmbed(embed));
+        }
+
+        /// <summary>
+        /// Deletes this <see cref="DiscordMessage"/> after the specified time.
+        /// </summary>
+        /// <param name="message">This Discord message.</param>
+        /// <param name="delay">How long to wait before the message is deleted.</param>
+        public static async Task DeleteWithDelayAsync(this DiscordMessage message, TimeSpan delay)
+        {
+            await Task.Delay(delay).ConfigureAwait(false);
+            try { await message.DeleteAsync(); } catch { }  // Message might get deleted by someone else in the meantime
         }
     }
 }
