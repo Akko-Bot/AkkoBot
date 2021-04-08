@@ -30,7 +30,7 @@ namespace AkkoBot.Services
             => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetService<Credentials>().OwnerIds.Contains(id);
 
         /// <summary>
-        /// Gets a collection of all classes of the specified type in the AkkoBot namespace.
+        /// Gets a collection of all concrete classes of the specified type in the AkkoBot namespace.
         /// </summary>
         /// <param name="abstraction">The type implemented by all classes.</param>
         /// <returns>A collection of types.</returns>

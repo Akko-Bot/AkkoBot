@@ -222,7 +222,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             var embed = new DiscordEmbedBuilder();
 
-            if (user.VoiceState is not null)
+            if (user.VoiceState is null)
                 embed.WithDescription("voice_failure");
             else
             {

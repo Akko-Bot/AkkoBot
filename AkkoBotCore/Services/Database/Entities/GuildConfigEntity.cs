@@ -17,11 +17,13 @@ namespace AkkoBot.Services.Database.Entities
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
+        public FilteredWordsEntity FilteredWordsRel { get; set; }
         public List<MutedUserEntity> MutedUserRel { get; set; }
         public List<WarnEntity> WarnRel { get; set; }
         public List<WarnPunishEntity> WarnPunishRel { get; set; }
         public List<OccurrenceEntity> OccurrenceRel { get; set; }
-        public FilteredWordsEntity FilteredWordsRel { get; set; }
+        public List<VoiceRoleEntity> VoiceRolesRel { get; set; }
+        
 
         public ulong GuildId { get; set; }
 

@@ -3,10 +3,9 @@ using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 
 namespace AkkoBot.Core.Common
 {
@@ -18,7 +17,7 @@ namespace AkkoBot.Core.Common
         public DiscordShardedClient BotShardedClient { get; }
         public IReadOnlyDictionary<int, CommandsNextExtension> CommandExt { get; }
 
-        public BotCore(DiscordShardedClient client, IReadOnlyDictionary<int, CommandsNextExtension> cmdHandler)
+        internal BotCore(DiscordShardedClient client, IReadOnlyDictionary<int, CommandsNextExtension> cmdHandler)
         {
             BotShardedClient = client;
             CommandExt = cmdHandler;
@@ -41,16 +40,15 @@ namespace AkkoBot.Core.Common
         /// </summary>
         private void RegisterCommandModules()
         {
-            var modules = GeneralService.GetImplementables(typeof(BaseCommandModule)).ToArray();
+            var assembly = Assembly.GetExecutingAssembly();
             var converters = GeneralService.GetImplementables(typeof(IArgumentConverter));
-            var cogs = GeneralService.GetCogs().ToArray();
+            var cogs = GeneralService.GetCogs();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.
             foreach (var cmdHandler in CommandExt.Values)
             {
-                foreach (var cmdModule in modules)
-                    cmdHandler.RegisterCommands(cmdModule);
+                cmdHandler.RegisterCommands(assembly);
 
                 foreach (var converter in converters)
                     cmdHandler.RegisterConverter(converter);
@@ -58,11 +56,6 @@ namespace AkkoBot.Core.Common
                 foreach (var cog in cogs)
                     cmdHandler.RegisterCommands(cog);
             }
-
-            BotShardedClient.Logger.LogInformation(
-                new EventId(LoggerEvents.Startup.Id, "Startup"),
-                $"{modules.Length + cogs.Length} command modules were successfully loaded."
-            );
         }
     }
 }

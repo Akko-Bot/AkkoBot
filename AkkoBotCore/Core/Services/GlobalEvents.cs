@@ -2,12 +2,14 @@ using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -58,13 +60,16 @@ namespace AkkoBot.Core.Services
             // Delete messages with stickers
             _botCore.BotShardedClient.MessageCreated += FilterSticker;
 
+            // Assign role on channel join/leave
+            _botCore.BotShardedClient.VoiceStateUpdated += VoiceRole;
+
             // On command
             foreach (var cmdHandler in _botCore.CommandExt.Values)
                 cmdHandler.CommandExecuted += SaveUserOnCmd;
         }
 
         /* Event Methods */
-
+        
         /// <summary>
         /// Mutes a user that has been previously muted.
         /// </summary>
@@ -325,6 +330,56 @@ namespace AkkoBot.Core.Services
                 // Save if there is at least one user being tracked
                 if (isTracking)
                     await db.SaveChangesAsync();
+            });
+        }
+
+        /// <summary>
+        /// Assigns or revokes a role upon voice channel connection/disconnection
+        /// </summary>
+        private Task VoiceRole(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
+        {
+            // Check for role hierarchy, not just role perm
+            if (eventArgs.Before == eventArgs.After || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasFlag(Permissions.ManageRoles)))
+                return Task.CompletedTask;
+
+            return Task.Run(async () =>
+            {
+                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+                var user = eventArgs.User as DiscordMember;
+
+                var voiceRoles = await db.Set<VoiceRoleEntity>()
+                    .AsNoTracking()
+                    .Where(
+                        (user.VoiceState.Channel is null)
+                            ? x => x.GuildIdFk == eventArgs.Guild.Id
+                            : x => x.GuildIdFk == eventArgs.Guild.Id && x.ChannelId == eventArgs.Channel.Id
+                    )
+                    .ToListAsync();
+
+                if (user.VoiceState.Channel is not null)
+                {
+                    // Connection
+                    foreach (var voiceRole in voiceRoles.DistinctBy(x => x.RoleId))
+                    {
+                        if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role))
+                            await (eventArgs.User as DiscordMember).GrantRoleAsync(role);
+                        else if (role is null)
+                            db.Set<VoiceRoleEntity>().Remove(voiceRole);
+                    }
+                }
+                else
+                {
+                    // Disconnection
+                    foreach (var voiceRole in voiceRoles)
+                    {
+                        if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role))
+                            await (eventArgs.User as DiscordMember).RevokeRoleAsync(role);
+                        else if (role is null)
+                            db.Set<VoiceRoleEntity>().Remove(voiceRole);
+                    }
+                }
+
+                await db.SaveChangesAsync();
             });
         }
 

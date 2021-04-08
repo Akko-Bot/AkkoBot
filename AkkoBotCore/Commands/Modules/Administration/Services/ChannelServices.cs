@@ -59,7 +59,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             // Process everything else
             foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember) && x.Type is not ChannelType.Category))
             {
-                if (!channel.PermissionOverwrites.Any(x => x.Id == user.Id && x.Denied == denyPerms))
+                if (!channel.PermissionOverwrites.Any(x => x.Id == user.Id && x.Denied == denyPerms) && (!textOnly || channel.Type is not ChannelType.Voice))
                     await channel.AddOverwriteAsync(user, Permissions.None, denyPerms, reason);
             }
         }

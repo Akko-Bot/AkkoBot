@@ -45,6 +45,24 @@ namespace AkkoBot.Services.Database.Repository
         }
 
         /// <summary>
+        /// Gets the settings of the specified Discord guild with its voice roles.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <param name="track"><see langword="true"/> if the entities should be tracked by EF Core, <see langword="false"/> otherwise.</param>
+        /// <returns>The guild settings, <see langword="null"/> if for some reason the guild doesn't exist in the database.</returns>
+        public async Task<GuildConfigEntity> GetGuildWithVoiceRolesAsync(ulong sid, bool track = true)
+        {
+            var entry = await ((track) ? base.Table : base.Table.AsNoTracking())
+                .Include(x => x.VoiceRolesRel)
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+
+            if (entry.VoiceRolesRel is null)
+                entry.VoiceRolesRel = new(0);
+
+            return entry;
+        }
+
+        /// <summary>
         /// Gets the settings of the specified Discord guild with its filtered words.
         /// </summary>
         /// <param name="sid">The ID of the Discord guild.</param>

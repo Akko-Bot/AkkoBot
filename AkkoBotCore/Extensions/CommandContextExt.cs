@@ -316,8 +316,11 @@ namespace AkkoBot.Extensions
         /// </remarks>
         public static async Task RespondPaginatedByFieldsAsync(this CommandContext context, DiscordEmbedBuilder embed, IEnumerable<SerializableEmbedField> fields, int maxFields = 5, string message = null)
         {
-            if (!fields.Any())
+            if (fields.Count() <= maxFields)
             {
+                foreach (var field in fields)
+                    embed.AddField(field.Title, field.Text, field.Inline);
+
                 await context.RespondLocalizedAsync(message, embed, false);
                 return;
             }
