@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
@@ -46,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (cmd is null)
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Save the new entry to the database
             var newEntry = new AliasEntity()

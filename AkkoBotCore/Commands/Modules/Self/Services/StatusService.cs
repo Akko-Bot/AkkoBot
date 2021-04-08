@@ -1,4 +1,5 @@
 using AkkoBot.Commands.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
@@ -21,11 +22,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;
 
+        private readonly IServiceProvider _services;
         private readonly IDbCacher _dbCache;
         private readonly DiscordShardedClient _clients;
 
         public StatusService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients) : base(services)
         {
+            _services = services;
             _dbCache = dbCache;
             _clients = clients;
         }
@@ -42,7 +45,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (string.IsNullOrWhiteSpace(activity.Name))
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var newEntry = new PlayingStatusEntity()
             {
@@ -110,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if rotation has been toggled, <see langword="false"/> if there was no status to rotate.</returns>
         public async Task<bool> RotateStatusesAsync()
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Update the database entry
             db.BotConfig.Cache.RotateStatus = !db.BotConfig.Cache.RotateStatus;

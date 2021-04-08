@@ -22,9 +22,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordRole muteRole, string reason, bool textOnly)
         {
             var denyPerms = (textOnly) ? RoleService.MuteTextPermsDeny : RoleService.MutePermsDeny;
-            foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
+
+            // Process the category channels first
+            foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember) && x.Type is ChannelType.Category))
             {
-                if (denyPerms is RoleService.MutePermsDeny || !channel.PermissionOverwrites.Any(x => x.Id == muteRole.Id && x.Denied == denyPerms))
+                if (!channel.PermissionOverwrites.Any(x => x.Id == muteRole.Id && x.Denied == denyPerms))
+                    await channel.AddOverwriteAsync(muteRole, Permissions.None, denyPerms, reason);
+            }
+
+            // Process everything else
+            foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember) && x.Type is not ChannelType.Category))
+            {
+                if (!channel.PermissionOverwrites.Any(x => x.Id == muteRole.Id && x.Denied == denyPerms))
                     await channel.AddOverwriteAsync(muteRole, Permissions.None, denyPerms, reason);
             }
         }
@@ -39,9 +48,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         public async Task SetMuteOverwritesAsync(DiscordGuild server, DiscordMember user, string reason, bool textOnly)
         {
             var denyPerms = (textOnly) ? RoleService.MuteTextPermsDeny : RoleService.MutePermsDeny;
-            foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember)))
+
+            // Process the category channels first
+            foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember) && x.Type is ChannelType.Category))
             {
-                if (denyPerms is RoleService.MutePermsDeny || !channel.PermissionOverwrites.Any(x => x.Id == user.Id && x.Denied == denyPerms))
+                if (!channel.PermissionOverwrites.Any(x => x.Id == user.Id && x.Denied == denyPerms))
+                    await channel.AddOverwriteAsync(user, Permissions.None, denyPerms, reason);
+            }
+
+            // Process everything else
+            foreach (var channel in server.Channels.Values.Where(x => x.Users.Contains(server.CurrentMember) && x.Type is not ChannelType.Category))
+            {
+                if (!channel.PermissionOverwrites.Any(x => x.Id == user.Id && x.Denied == denyPerms))
                     await channel.AddOverwriteAsync(user, Permissions.None, denyPerms, reason);
             }
         }

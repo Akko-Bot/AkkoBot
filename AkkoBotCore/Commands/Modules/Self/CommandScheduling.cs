@@ -82,7 +82,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             var embed = new DiscordEmbedBuilder();
 
-            if (reminders.Count == 0)
+            if (!reminders.Any())
             {
                 embed.WithDescription("autocommand_empty");
                 await context.RespondLocalizedAsync(embed, isError: true);

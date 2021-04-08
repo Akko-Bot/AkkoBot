@@ -86,7 +86,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the reminder got successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveReminderAsync(DiscordUser user, int id)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
             var dbEntry = await db.Reminders.GetAsync(id);
 
             if (dbEntry is null || user.Id != dbEntry.AuthorId)

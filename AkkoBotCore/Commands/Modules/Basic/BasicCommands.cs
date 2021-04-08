@@ -2,7 +2,6 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Core;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

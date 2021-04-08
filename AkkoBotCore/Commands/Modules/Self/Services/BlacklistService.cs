@@ -17,9 +17,10 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class BlacklistService : AkkoCommandService
     {
+        private readonly IServiceProvider _services;
+
         public BlacklistService(IServiceProvider services) : base(services)
-        {
-        }
+            => _services = services;
 
         /// <summary>
         /// Saves a blacklist entry to the database.
@@ -34,7 +35,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </returns>
         public async Task<(BlacklistEntity, bool)> AddOrUpdateAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Generate the database entry
             var entry = new BlacklistEntity()
@@ -59,7 +60,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been added to the database.</returns>
         public async Task<int> AddRangeAsync(ulong[] ids)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var entries = ids.Distinct().Select(id => new BlacklistEntity()
             {
@@ -125,7 +126,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of database entries that match the criteria of <paramref name="selector"/>.</returns>
         public async Task<IEnumerable<BlacklistEntity>> GetAsync(Expression<Func<BlacklistEntity, bool>> selector)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.GetAsync(selector);
         }
 
@@ -135,7 +136,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of all blacklist entries.</returns>
         public async Task<IEnumerable<BlacklistEntity>> GetAllAsync()
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             return await db.Blacklist.GetAllAsync();
         }
 

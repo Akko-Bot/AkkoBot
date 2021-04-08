@@ -1,8 +1,10 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -36,7 +38,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is CommandType.Startup)
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var newTimer = new TimerEntity()
             {
@@ -82,7 +84,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null)
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var newCmd = new CommandEntity()
             {
@@ -132,13 +134,15 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="user">The Discord user who created the autocommands.</param>
         /// <returns>A collection of autocommands.</returns>
-        public async Task<List<CommandEntity>> GetAutoCommandsAsync(DiscordUser user)
+        public async Task<IEnumerable<CommandEntity>> GetAutoCommandsAsync(DiscordUser user)
         {
             var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
 
-            return (await db.AutoCommands.GetAsync(x => x.AuthorId == user.Id))
-                .OrderBy(x => GetElapseTime(x))
-                .ToList();
+            return (await db.AutoCommands.Table
+                .AsNoTracking()
+                .Where(x => x.AuthorId == user.Id)
+                .ToListAsync())
+                .OrderBy(x => GetElapseTime(x));
         }
 
         /// <summary>

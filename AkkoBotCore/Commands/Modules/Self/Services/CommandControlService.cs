@@ -16,13 +16,15 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods to register disabled commands to the database and the command handler.
     /// </summary>
-    public class CommandControlService : AkkoCommandService
+    public class CommandControlService : ICommandService
     {
+        private readonly IServiceProvider _services;
         private readonly IDbCacher _dbCache;
         private readonly DiscordShardedClient _clients;
 
-        public CommandControlService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients) : base(services)
+        public CommandControlService(IServiceProvider services, IDbCacher dbCache, DiscordShardedClient clients)
         {
+            _services = services;
             _dbCache = dbCache;
             _clients = clients;
         }
@@ -41,7 +43,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if the command got disabled, <see langword="false"/> otherwise.</returns>
         public async Task<bool> DisableGlobalCommandAsync(Command cmd)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Don't let user disable gcmd
             if (cmd.Module.ModuleType.Name.Equals("GlobalCommandControl") || !db.BotConfig.AddDisabledCommand(cmd))
@@ -61,7 +63,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if the command got enabled, <see langword="false"/> otherwise.</returns>
         public async Task<bool> EnableGlobalCommandAsync(string cmdString)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             if (!db.BotConfig.Cache.DisabledCommands.Contains(cmdString, StringComparison.InvariantCultureIgnoreCase, out var qualifiedName))
                 return false;
@@ -84,7 +86,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if at least one command got disabled, <see langword="false"/> otherwise.</returns>
         public async Task<bool> DisableGlobalCommandsAsync(IEnumerable<Command> cmds)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             var cmdHandlers = (await _clients.GetCommandsNextAsync()).Values;
 
             foreach (var cmd in cmds)
@@ -106,7 +108,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if at least one command got enabled, <see langword="false"/> otherwise.</returns>
         public async Task<bool> EnableGlobalCommandsAsync(string module)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             var registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
             var cmds = db.BotConfig.DisabledCommandCache.Values.Where(x => x.Module.ModuleType.FullName.Contains(module, StringComparison.InvariantCultureIgnoreCase));
 

@@ -17,6 +17,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class RoleService : AkkoCommandService
     {
+        private readonly IServiceProvider _services;
+
         /// <summary>
         /// Defines the set of denied permissions to be applied to a muted user.
         /// </summary>
@@ -33,8 +35,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         public const Permissions MutePermsAllow = Permissions.AccessChannels;
 
         public RoleService(IServiceProvider services) : base(services)
-        {
-        }
+            => _services = services;
 
         /// <summary>
         /// A more permissive version of <see cref="CheckHierarchyAsync(CommandContext, DiscordMember, string)"/>
@@ -92,13 +93,15 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
             if (!server.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole))
             {
+                using var scope = _services.GetScopedService<IUnitOfWork>(out var writeDb);
+
                 // Create a new mute role
                 muteRole = await server.CreateRoleAsync("AkkoMute", MutePermsAllow);
 
                 // Save it to the database
                 guildSettings.MuteRoleId = muteRole.Id;
-                db.GuildConfig.CreateOrUpdate(guildSettings);
-                await db.SaveChangesAsync();
+                writeDb.GuildConfig.CreateOrUpdate(guildSettings);
+                await writeDb.SaveChangesAsync();
             }
 
             return muteRole;
@@ -120,7 +123,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if a timer was created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> MuteUserAsync(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string reason)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             // Mute the user
             await user.GrantRoleAsync(muteRole, reason);

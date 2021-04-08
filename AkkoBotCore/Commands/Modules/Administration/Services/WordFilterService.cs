@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="words">The words to be added.</param>
         public async Task AddFilteredWordsAsync(ulong sid, params string[] words)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
 
@@ -51,7 +52,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one ID was added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddIgnoredIdsAsync(ulong sid, params ulong[] ids)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
             var amount = dbEntry.FilteredWordsRel.IgnoredIds.Count;
@@ -81,7 +82,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The setting returned by <paramref name="action"/>.</returns>
         public async Task<T> SetWordFilterSettingsAsync<T>(ulong sid, Func<FilteredWordsEntity, T> action)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
 
             var dbEntry = await db.GuildConfig.GetGuildWithFilteredWordsAsync(sid);
             var result = action(dbEntry.FilteredWordsRel);

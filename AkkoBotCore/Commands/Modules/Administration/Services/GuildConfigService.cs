@@ -14,12 +14,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="GuildConfigEntity"/> objects.
     /// </summary>
-    public class GuildConfigService : AkkoCommandService
+    public class GuildConfigService : ICommandService
     {
         private readonly IServiceProvider _services;
         private readonly ILocalizer _localizer;
 
-        public GuildConfigService(IServiceProvider services, ILocalizer localizer) : base(services)
+        public GuildConfigService(IServiceProvider services, ILocalizer localizer)
         {
             _services = services;
             _localizer = localizer;
@@ -50,7 +50,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The requested setting, <see langword="null"/> if the context is from a private context.</returns>
         public T GetOrSetProperty<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
             var guild = db.GuildConfig.GetGuild(server?.Id ?? default);
             var result = selector(guild);
 
