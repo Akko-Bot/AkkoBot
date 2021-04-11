@@ -2,11 +2,13 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,21 +30,23 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_emoji_list")]
         public async Task CheckGuildEmoji(CommandContext context)
         {
-            var embed = new DiscordEmbedBuilder();
+            var fields = new List<SerializableEmbedField>();
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle("emoji_list_title");
 
             var emojis = context.Guild.Emojis.Values
                 .Where(emoji => emoji.IsAvailable)
                 .OrderBy(x => x.Name)
                 .OrderBy(x => x.IsAnimated) // ThenBy() doesn't do anything here, for some reason
-                .SplitInto(AkkoConstants.LinesPerPage);
+                .SplitInto(15);
 
             foreach (var emojiGroup in emojis)
             {
-                embed.AddField("emojis", string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {Formatter.InlineCode(emoji.GetDiscordName())}").ToArray()), true);
-                embed.AddField("exclusive", string.Join('\n', emojiGroup.Select(x => (x.Roles.Count != 0) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name).ToArray()), true);
+                fields.Add(new("emojis", string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}").ToArray()), true));
+                fields.Add(new("exclusive", string.Join('\n', emojiGroup.Select(x => (x.Roles.Count != 0) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name).ToArray()), true));
             }
 
-            await context.RespondPaginatedByFieldsAsync(embed, 2);
+            await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
         }
 
         [Command("show"), Aliases("showemoji", "se")]
@@ -67,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             foreach (var emoji in emojis)
             {
-                success = success || await _service.AddGuildEmojiAsync(context, emoji, emoji.Name);
+                success |= await _service.AddGuildEmojiAsync(context, emoji, emoji.Name);
                 await Task.Delay(AkkoEntities.SafetyDelay.Add(TimeSpan.FromSeconds(_additionalDelay)));
             }
 

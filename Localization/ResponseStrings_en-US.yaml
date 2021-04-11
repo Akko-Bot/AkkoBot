@@ -480,3 +480,4 @@ vcrole_list_title: List of Voice Roles
 cmd_bl_check: Checks if the specified ID is blacklisted.
 bl_not_found: This ID is not blacklisted.
 cmd_playingstatus: Groups commands that manipulate the bot's playing status.
+emoji_list_title: Server Emojis

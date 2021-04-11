@@ -13,9 +13,7 @@ namespace AkkoBot.Core.Services
         private readonly IDbCache _dbCache;
 
         internal PrefixResolver(IDbCache dbCache)
-        {
-            _dbCache = dbCache;
-        }
+            => _dbCache = dbCache;
 
         /// <summary>
         /// Decides whether a Discord message starts with a command prefix.

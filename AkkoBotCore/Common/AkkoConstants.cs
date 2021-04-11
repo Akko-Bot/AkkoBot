@@ -34,5 +34,10 @@ namespace AkkoBot.Common
         /// Defines how many lines a paginated embed should have.
         /// </summary>
         public const int LinesPerPage = 20;
+
+        /// <summary>
+        /// Represents a whitespace character that is not detected as such.
+        /// </summary>
+        public const string ValidWhitespace = "\u200B";
     }
 }
