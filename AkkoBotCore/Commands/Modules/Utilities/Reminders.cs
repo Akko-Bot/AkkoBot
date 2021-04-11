@@ -68,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             var embed = new DiscordEmbedBuilder();
 
-            if (reminders.Count == 0)
+            if (reminders.Length == 0)
             {
                 embed.WithDescription("reminder_list_empty");
                 await context.RespondLocalizedAsync(embed, isError: true);

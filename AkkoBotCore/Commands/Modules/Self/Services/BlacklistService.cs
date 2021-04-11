@@ -1,9 +1,11 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +20,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
     public class BlacklistService : AkkoCommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
 
-        public BlacklistService(IServiceProvider services) : base(services)
-            => _services = services;
+        public BlacklistService(IServiceProvider services, IDbCache dbCache) : base(services)
+        {
+            _services = services;
+            _dbCache = dbCache;
+        }
 
         /// <summary>
         /// Saves a blacklist entry to the database.
@@ -35,7 +41,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </returns>
         public async Task<(BlacklistEntity, bool)> AddOrUpdateAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Generate the database entry
             var entry = new BlacklistEntity()
@@ -46,10 +52,10 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Reason = reason
             };
 
-            var success = await db.Blacklist.CreateOrUpdateAsync(entry);
+            db.Upsert(entry);
             await db.SaveChangesAsync();
 
-            return (entry, success);
+            return (entry, _dbCache.Blacklist.Add(id));
         }
 
         /// <summary>
@@ -60,19 +66,20 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been added to the database.</returns>
         public async Task<int> AddRangeAsync(ulong[] ids)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var entries = ids.Distinct().Select(id => new BlacklistEntity()
+            var newEntries = ids.Distinct().Select(id => new BlacklistEntity()
             {
                 ContextId = id,
                 Type = BlacklistType.Unspecified,
                 Name = null
             });
 
-            var result = await db.Blacklist.TryCreateRangeAsync(entries);
-            await db.SaveChangesAsync();
+            foreach (var blacklist in newEntries)
+                _dbCache.Blacklist.Add(blacklist.ContextId);
 
-            return result;
+            db.AddRange(newEntries);
+            return await db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -82,62 +89,49 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been removed from the database.</returns>
         public async Task<int> RemoveRangeAsync(ulong[] ids)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var dbEntries = (await db.Blacklist.Fetch().ToArrayAsync())
+                .Where(x => ids.Contains(x.ContextId));
 
-            var entries = ids.Distinct().Select(id => new BlacklistEntity()
-            {
-                ContextId = id,
-                Type = BlacklistType.Unspecified,
-                Name = null
-            });
+            foreach (var blacklist in dbEntries)
+                _dbCache.Blacklist.TryRemove(blacklist.ContextId);
 
-            var result = await db.Blacklist.TryRemoveRangeAsync(entries);
-            await db.SaveChangesAsync();
-
-            return result;
+            db.RemoveRange(dbEntries);
+            return await db.SaveChangesAsync();
         }
 
         /// <summary>
         /// Tries to remove a blacklist entry from the database, if it exists.
         /// </summary>
-        /// <param name="id">The ID of the entry, provided by the user.</param>
+        /// <param name="contextId">The context (user/channel/server) ID of the entry.</param>
         /// <returns>
         /// The entry and <see langword="true"/>, if the removal was successful,
         /// <see langword="null"/> and <see langword="false"/> otherwise.
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> TryRemoveAsync(ulong id)
+        public async Task<(BlacklistEntity, bool)> TryRemoveAsync(ulong contextId)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-
-            if (!db.Blacklist.Cache.Contains(id))
+            if (!_dbCache.Blacklist.Contains(contextId))
                 return (null, false);
 
-            var entry = await db.Blacklist.GetAsync(id);
-            var success = await db.Blacklist.TryRemoveAsync(id);
-            await db.SaveChangesAsync();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            return (entry, success);
+            var entry = await db.Blacklist.FirstOrDefaultAsync(x => x.ContextId == contextId);
+            _dbCache.Blacklist.TryRemove(contextId);
+            db.Remove(entry);
+
+            return (entry, await db.SaveChangesAsync() is not 0);
         }
 
         /// <summary>
-        /// Gets all blacklist entries from the database that meet the criteria of the <paramref name="selector"/>.
+        /// Gets all blacklist entries from the database that meet the criteria of the <paramref name="predicate"/>.
         /// </summary>
-        /// <param name="selector">Expression tree to filter the result.</param>
-        /// <returns>A collection of database entries that match the criteria of <paramref name="selector"/>.</returns>
-        public async Task<IEnumerable<BlacklistEntity>> GetAsync(Expression<Func<BlacklistEntity, bool>> selector)
+        /// <param name="predicate">Expression tree to filter the result.</param>
+        /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all blacklist entries.</remarks>
+        /// <returns>A collection of database entries that match the criteria of <paramref name="predicate"/>.</returns>
+        public async Task<BlacklistEntity[]> GetAsync(Expression<Func<BlacklistEntity, bool>> predicate = null)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            return await db.Blacklist.GetAsync(selector);
-        }
-
-        /// <summary>
-        /// Gets all blacklist entries from the database.
-        /// </summary>
-        /// <returns>A collection of all blacklist entries.</returns>
-        public async Task<IEnumerable<BlacklistEntity>> GetAllAsync()
-        {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            return await db.Blacklist.GetAllAsync();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            return await db.Blacklist.Fetch(predicate).ToArrayAsync();
         }
 
         /// <summary>
@@ -146,11 +140,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries removed.</returns>
         public async Task<int> ClearAsync()
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            var amount = await db.Blacklist.ClearAsync();
-            await db.SaveChangesAsync();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var blacklist = _dbCache.Blacklist;
 
-            return amount;
+            db.RemoveRange(_dbCache.Blacklist);
+            var result = await db.SaveChangesAsync();
+
+            blacklist.Clear();
+            return result;
         }
 
         /// <summary>

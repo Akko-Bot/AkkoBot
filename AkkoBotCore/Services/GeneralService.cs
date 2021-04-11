@@ -195,7 +195,7 @@ namespace AkkoBot.Services
         /// <returns>The localized message content, embed, and the message settings.</returns>
         internal static (string, DiscordEmbedBuilder, IMessageSettings) GetLocalizedMessage(CommandContext context, string message, DiscordEmbedBuilder embed, bool isError)
         {
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
             var localizer = context.Services.GetService<ILocalizer>();
 
             // Get the message settings (guild or dm)

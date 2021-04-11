@@ -65,16 +65,16 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         }
 
         /// <summary>
-        /// Removes the channel overwrites that match <paramref name="selector"/> from all Discord channels visible to the bot.
+        /// Removes the channel overwrites that match <paramref name="predicate"/> from all Discord channels visible to the bot.
         /// </summary>
         /// <param name="server">The Discord server.</param>
-        /// <param name="selector">A method that defines what overwrites should be removed.</param>
+        /// <param name="predicate">A method that defines what overwrites should be removed.</param>
         /// <param name="reason">The reason for the mute.</param>
-        public async Task RemoveOverwritesAsync(DiscordGuild server, string reason, Func<DiscordOverwrite, bool> selector)
+        public async Task RemoveOverwritesAsync(DiscordGuild server, string reason, Func<DiscordOverwrite, bool> predicate)
         {
             var overwrites = server.Channels.Values
                 .Where(x => x.Users.Contains(server.CurrentMember))
-                .SelectMany(x => x.PermissionOverwrites.Where(selector))
+                .SelectMany(x => x.PermissionOverwrites.Where(predicate))
                 .ToArray();
 
             for (var index = 0; index < overwrites.Length; index++)

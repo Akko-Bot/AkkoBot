@@ -26,8 +26,8 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task AddWord(CommandContext context, [RemainingText, Description("arg_fw_word")] string word)
         {
-            await _service.AddFilteredWordsAsync(context.Guild.Id, word);
-            await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
+            var success = await _service.AddFilteredWordsAsync(context.Guild.Id, word);
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
         [Command("addmany")]
@@ -35,8 +35,8 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task AddManyWords(CommandContext context, [Description("arg_fw_words")] params string[] words)
         {
-            await _service.AddFilteredWordsAsync(context.Guild.Id, words);
-            await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
+            var success = await _service.AddFilteredWordsAsync(context.Guild.Id, words);
+            await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
         [Command("message")]

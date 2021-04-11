@@ -11,7 +11,7 @@ namespace AkkoBot.Extensions
         /// <typeparam name="T">The type of the service.</typeparam>
         /// <param name="ioc">This service provider.</param>
         /// <param name="service">The requested scoped service. It will be <see langword="null"/> if <typeparamref name="T"/> is not registered.</param>
-        /// <remarks>This method is heavy on performance. Use sparingly.</remarks>
+        /// <remarks>This method is heavy on performance. Avoid using it in hot paths.</remarks>
         /// <returns>An <see cref="IServiceScope"/> to be disposed of after use.</returns>
         public static IServiceScope GetScopedService<T>(this IServiceProvider ioc, out T service)
         {

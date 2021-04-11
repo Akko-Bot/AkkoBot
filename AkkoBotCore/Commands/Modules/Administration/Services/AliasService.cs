@@ -1,11 +1,13 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +17,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="AliasEntity"/> objects.
     /// </summary>
-    public class AliasService : AkkoCommandService
+    public class AliasService : ICommandService
     {
         private readonly IServiceProvider _services;
-        private readonly IDbCacher _dbCache;
+        private readonly IDbCache _dbCache;
 
-        public AliasService(IServiceProvider services, IDbCacher dbCache) : base(services)
+        public AliasService(IServiceProvider services, IDbCache dbCache)
         {
             _services = services;
             _dbCache = dbCache;
@@ -35,7 +37,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the alias got successfully saved, <see langword="false"/> otherwise.</returns>
         public async Task<bool> SaveAliasAsync(CommandContext context, string alias, string command)
         {
-            if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
+            if (string.IsNullOrWhiteSpace(command) || context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
             // Sanitize the command input
@@ -47,7 +49,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (cmd is null)
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Save the new entry to the database
             var newEntry = new AliasEntity()
@@ -62,16 +64,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             };
 
             var guildId = newEntry.GuildId ?? default;
-            var created = db.Aliases.AddOrUpdate(newEntry, newEntry.GuildId, out var dbEntry);
-            await db.SaveChangesAsync();
+            var trackedEntity = db.Upsert(newEntry);
+            var dbEntry = trackedEntity.Entity as AliasEntity;
 
             // Update the cache
-            if (!db.Aliases.Cache.ContainsKey(guildId))
-                db.Aliases.Cache.TryAdd(guildId, new ConcurrentHashSet<AliasEntity>());
-            else if (!created)
-                db.Aliases.Cache[guildId].TryRemove(db.Aliases.Cache[guildId].FirstOrDefault(x => x.Id == dbEntry.Id));
+            if (!_dbCache.Aliases.ContainsKey(guildId))
+                _dbCache.Aliases.TryAdd(guildId, new ConcurrentHashSet<AliasEntity>());
+            else if (trackedEntity.State is EntityState.Modified)
+                _dbCache.Aliases[guildId].TryRemove(_dbCache.Aliases[guildId].FirstOrDefault(x => x.Id == dbEntry.Id));
 
-            return db.Aliases.Cache[guildId].Add(dbEntry);
+            _dbCache.Aliases[guildId].Add(dbEntry);
+
+            return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>
@@ -85,27 +89,24 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            if (!db.Aliases.Cache.TryGetValue(context.Guild?.Id ?? default, out var aliases))
+            if (!_dbCache.Aliases.TryGetValue(context.Guild?.Id ?? default, out var aliases))
                 return false;
-
-            var prefix = db.GuildConfig.GetGuild(context.Guild?.Id ?? 0)?.Prefix
-                ?? db.BotConfig.Cache.BotPrefix;
 
             var dbEntry = aliases.FirstOrDefault(x => x.Alias.Equals(alias, StringComparison.InvariantCultureIgnoreCase));
 
             if (dbEntry is null)
                 return false;
 
-            db.Aliases.Delete(dbEntry);
+            db.Remove(dbEntry);
             aliases.TryRemove(dbEntry);
 
-            return (await db.SaveChangesAsync()) is not 0;
+            return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>
-        /// Removes all aliases under the specified Discord server ID.
+        /// Removes all aliases under this context Discord server.
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <returns><see langword="true"/> if the aliases were successfully removed, <see langword="false"/> otherwise.</returns>
@@ -114,12 +115,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            if (!db.Aliases.Cache.TryGetValue(context.Guild?.Id ?? default, out var aliases))
+            if (!_dbCache.Aliases.TryGetValue(context.Guild?.Id ?? default, out var aliases))
                 return false;
 
-            db.Aliases.DeleteRange(aliases.ToArray());
+            db.RemoveRange(aliases);
             aliases.Clear();
 
             return (await db.SaveChangesAsync()) is not 0;

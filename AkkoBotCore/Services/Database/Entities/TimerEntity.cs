@@ -59,5 +59,20 @@ namespace AkkoBot.Services.Database.Entities
             Type = TimerType.TimedWarn;
             ElapseAt = warning.DateAdded.Add(time);
         }
+
+        /* Overrides */
+
+        public static bool operator ==(TimerEntity x, TimerEntity y)
+            => (x.UserId == y.UserId && x.GuildId == y.GuildId && x.ChannelId == y.ChannelId && x.RoleId == y.RoleId && x.Interval == y.Interval)
+            && (x.IsRepeatable == y.IsRepeatable && x.IsAbsolute == y.IsAbsolute && x.Type == y.Type);
+
+        public static bool operator !=(TimerEntity x, TimerEntity y)
+            => !(x == y);
+
+        public override bool Equals(object obj)
+            => ReferenceEquals(this, obj) || (obj is not null && obj is TimerEntity dbTimer && this == dbTimer);
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }

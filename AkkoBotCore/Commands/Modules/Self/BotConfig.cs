@@ -146,7 +146,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         private async Task ChangeProperty<T>(CommandContext context, Func<BotConfigEntity, T> selector)
         {
-            _botService.GetOrSetProperty(selector);
+            await _botService.GetOrSetPropertyAsync(selector);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
@@ -186,7 +186,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             private async Task ChangeProperty<T>(CommandContext context, Func<LogConfigEntity, T> selector)
             {
-                _service.GetOrSetProperty(selector);
+                await _service.GetOrSetPropertyAsync(selector);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
             }
         }

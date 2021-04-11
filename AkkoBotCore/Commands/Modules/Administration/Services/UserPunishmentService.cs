@@ -1,7 +1,9 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -16,9 +18,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     public class UserPunishmentService : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
 
-        public UserPunishmentService(IServiceProvider services)
-            => _services = services;
+        public UserPunishmentService(IServiceProvider services, IDbCache dbCache)
+        {
+            _services = services;
+            _dbCache = dbCache;
+        }
 
         /// <summary>
         /// Sends a direct message to the specified user with a localized message of the punishment they
@@ -76,7 +82,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task KickUser(DiscordGuild server, DiscordMember user, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             await user.RemoveAsync(reason);
 
@@ -87,7 +93,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 Kicks = 1
             };
 
-            await db.GuildConfig.CreateOccurrenceAsync(server, user.Id, occurrence);
+            db.Upsert(occurrence);
             await db.SaveChangesAsync();
         }
 
@@ -110,7 +116,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task SoftbanUser(DiscordGuild server, ulong userId, int days, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
             await server.BanMemberAsync(userId, days, reason);
@@ -125,7 +131,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 Softbans = 1
             };
 
-            await db.GuildConfig.CreateOccurrenceAsync(server, userId, occurrence);
+            db.Upsert(occurrence);
             await db.SaveChangesAsync();
         }
 
@@ -148,7 +154,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task BanUser(DiscordGuild server, ulong userId, int days, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
             await server.BanMemberAsync(userId, days, reason);
@@ -160,7 +166,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 Bans = 1
             };
 
-            await db.GuildConfig.CreateOccurrenceAsync(server, userId, occurrence);
+            db.Upsert(occurrence);
             await db.SaveChangesAsync();
         }
 
@@ -173,7 +179,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the ban.</param>
         public async Task TimedBanAsync(CommandContext context, TimeSpan time, ulong userId, string reason = null)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // If time is less than a minute, set it to a minute.
             if (time < TimeSpan.FromMinutes(1))
@@ -201,14 +207,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 Bans = 1
             };
 
-            await db.GuildConfig.CreateOccurrenceAsync(context.Guild, userId, occurrence);
+            db.Upsert(occurrence);
 
             // Upsert the entry
             db.Timers.Update(newEntry);
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            db.Timers.Cache.AddOrUpdateByEntity(context.Client, newEntry);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newEntry);
         }
 
         /// <summary>
@@ -223,7 +229,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
         public async Task TimedRolePunish(CommandContext context, WarnPunishType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // If time is less than a minute, set it to a minute.
             if (time < TimeSpan.FromMinutes(1))
@@ -253,11 +259,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             // *Not sure if I should support occurrences here* //
 
             // Upsert the entry
-            db.Timers.AddOrUpdate(newEntry, out var dbEntry);
+            db.Timers.Upsert(newEntry);
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            db.Timers.Cache.AddOrUpdateByEntity(context.Client, dbEntry);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newEntry);
         }
     }
 }

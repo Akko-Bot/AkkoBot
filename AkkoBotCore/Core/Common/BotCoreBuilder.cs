@@ -329,8 +329,7 @@ namespace AkkoBot.Core.Common
             {
                 // Add subsystems in here as needed
                 // > Database
-                ServiceDescriptor.Singleton<IDbCacher, AkkoDbCacher>(),
-                ServiceDescriptor.Scoped<IUnitOfWork, AkkoUnitOfWork>(),
+                ServiceDescriptor.Singleton<IDbCache, AkkoDbCache>(),
 
                 // > Localization
                 ServiceDescriptor.Singleton<ILocalizer, AkkoLocalizer>(),
@@ -362,18 +361,18 @@ namespace AkkoBot.Core.Common
         /// <returns>A collection of command handlers.</returns>
         private async Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlers(DiscordShardedClient botClients, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
         {
-            var pResolver = new PrefixResolver(services.GetService<IUnitOfWork>());
+            var pResolver = new PrefixResolver(services.GetService<IDbCache>());
 
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()
             {
-                CaseSensitive = isCaseSensitive,                        // Sets whether commands are case-sensitive
-                EnableDms = withDms,                                    // Sets whether the bot responds in dm or not
-                EnableMentionPrefix = withMentionPrefix,                // Sets whether the bot accepts its own mention as a prefix for commands
-                IgnoreExtraArguments = false,                           // Sets whether the bot ignores extra arguments on commands or not
-                Services = services,                                    // Sets the dependencies used by the command modules
-                EnableDefaultHelp = false,                              // Sets whether the bot should use the default help command from the library
-                PrefixResolver = (msg) => pResolver.ResolvePrefix(msg)  // Sets the prefix, defined by the users
+                CaseSensitive = isCaseSensitive,                            // Sets whether commands are case-sensitive
+                EnableDms = withDms,                                        // Sets whether the bot responds in dm or not
+                EnableMentionPrefix = withMentionPrefix,                    // Sets whether the bot accepts its own mention as a prefix for commands
+                IgnoreExtraArguments = false,                               // Sets whether the bot ignores extra arguments on commands or not
+                Services = services,                                        // Sets the dependencies used by the command modules
+                EnableDefaultHelp = false,                                  // Sets whether the bot should use the default help command from the library
+                PrefixResolver = (msg) => pResolver.ResolvePrefixAsync(msg) // Sets the prefix, defined by the users
             };
 
             // Initialize the command handlers
@@ -431,9 +430,25 @@ namespace AkkoBot.Core.Common
                     .Options
             );
 
-            var botConfig = dbContext.BotConfig.FirstOrDefault() ?? new BotConfigEntity();
-            var logConfig = dbContext.LogConfig.FirstOrDefault() ?? new LogConfigEntity();
             dbContext.Database.Migrate();
+
+            // Create base config if it doesn't exist
+            var botConfig = dbContext.BotConfig.FirstOrDefault();
+            var logConfig = dbContext.LogConfig.FirstOrDefault();
+
+            if (botConfig is null)
+            {
+                botConfig = new BotConfigEntity();
+                dbContext.Add(botConfig);
+            }
+
+            if (logConfig is null)
+            {
+                logConfig = new LogConfigEntity();
+                dbContext.Add(logConfig);
+            }
+
+            dbContext.SaveChanges();
             dbContext.Dispose();
 
             return (botConfig, logConfig);

@@ -2,6 +2,7 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Commands.Modules.Self.Services
@@ -20,9 +22,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
     public class BotConfigService : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
 
-        public BotConfigService(IServiceProvider services)
-            => _services = services;
+        public BotConfigService(IServiceProvider services, IDbCache dbCache)
+        {
+            _services = services;
+            _dbCache = dbCache;
+        }
 
         /// <summary>
         /// Gets the collection of currently available locales.
@@ -36,7 +42,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <returns>The bot settings.</returns>
         public BotConfigEntity GetConfig()
-            => _services.GetService<IDbCacher>().BotConfig;
+            => _dbCache.BotConfig;
 
         /// <summary>
         /// Reloads the response strings from the original files.
@@ -54,16 +60,16 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Gets or sets the specified bot configuration.
         /// </summary>
         /// <param name="selector">A method to get or set the property.</param>
-        public T GetOrSetProperty<T>(Func<BotConfigEntity, T> selector)
+        public async Task<T> GetOrSetPropertyAsync<T>(Func<BotConfigEntity, T> selector)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Change the cached settings
-            var result = selector(db.BotConfig.Cache);
+            var result = selector(_dbCache.BotConfig);
 
             // Set the database entry to the modified cached settings
-            db.BotConfig.Update(db.BotConfig.Cache);
-            db.SaveChanges();
+            db.BotConfig.Update(_dbCache.BotConfig);
+            await db.SaveChangesAsync();
 
             return result;
         }
@@ -72,16 +78,16 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Gets or sets the specified bot configuration.
         /// </summary>
         /// <param name="selector">A method to get or set the property.</param>
-        public T GetOrSetProperty<T>(Func<LogConfigEntity, T> selector)
+        public async Task<T> GetOrSetPropertyAsync<T>(Func<LogConfigEntity, T> selector)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Change the cached settings
-            var result = selector(db.LogConfig.Cache);
+            var result = selector(_dbCache.LogConfig);
 
             // Set the database entry to the modified cached settings
-            db.LogConfig.Update(db.LogConfig.Cache);
-            db.SaveChanges();
+            db.Update(_dbCache.LogConfig);
+            await db.SaveChangesAsync();
 
             return result;
         }
@@ -92,14 +98,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of setting name/value pairs.</returns>
         public IReadOnlyDictionary<string, string> GetConfigs()
         {
-            var dbCache = _services.GetService<IDbCacher>();
+            var settings = new Dictionary<string, string>(_dbCache.BotConfig.GetSettings());
 
-            var botConfig = dbCache.BotConfig;
-            var logConfig = dbCache.LogConfig;
-
-            var settings = new Dictionary<string, string>(botConfig.GetSettings());
-
-            foreach (var propPair in logConfig.GetSettings())
+            foreach (var propPair in _dbCache.LogConfig.GetSettings())
                 settings.TryAdd(propPair.Key, propPair.Value);
 
             return settings;

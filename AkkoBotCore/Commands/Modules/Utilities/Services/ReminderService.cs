@@ -1,13 +1,13 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,12 +16,16 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="ReminderEntity"/> objects.
     /// </summary>
-    public class ReminderService : AkkoCommandService
+    public class ReminderService : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
 
-        public ReminderService(IServiceProvider services) : base(services)
-            => _services = services;
+        public ReminderService(IServiceProvider services, IDbCache dbCache)
+        {
+            _services = services;
+            _dbCache = dbCache;
+        }
 
         /// <summary>
         /// Adds a reminder to the database.
@@ -38,10 +42,10 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365))
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Limit of 120 reminders per user
-            if (await db.Reminders.UserReminderCountAsync(context.User.Id) >= 120)
+            if (await db.CountAsync<ReminderEntity>(x => x.AuthorId == context.User.Id) >= 120)
                 return false;
 
             var newTimer = new TimerEntity()
@@ -56,7 +60,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
-            db.Timers.Create(newTimer);
+            db.Add(newTimer);
             await db.SaveChangesAsync();
 
             var newReminder = new ReminderEntity()
@@ -70,10 +74,10 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
-            db.Reminders.Create(newReminder);
+            db.Add(newReminder);
             await db.SaveChangesAsync();
 
-            db.Timers.Cache.AddOrUpdateByEntity(context.Client, newTimer);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
 
             return true;
         }
@@ -86,18 +90,18 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the reminder got successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveReminderAsync(DiscordUser user, int id)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            var dbEntry = await db.Reminders.GetAsync(id);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var dbEntry = await db.Reminders.FindAsync(id);
 
             if (dbEntry is null || user.Id != dbEntry.AuthorId)
                 return false;
 
-            var dbTimer = await db.Timers.GetAsync(dbEntry.TimerId);
+            var dbTimer = await db.Timers.FindAsync(dbEntry.TimerId);
 
-            db.Reminders.Delete(dbEntry);
-            db.Timers.Delete(dbTimer);
+            db.Remove(dbEntry);
+            db.Remove(dbTimer);
 
-            db.Timers.Cache.TryRemove(dbTimer.Id);
+            _dbCache.Timers.TryRemove(dbTimer.Id);
 
             return await db.SaveChangesAsync() is not 0;
         }
@@ -108,15 +112,13 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="user">The user to get the reminders for.</param>
         /// <remarks>The list is ordered by elapse time, in ascending order.</remarks>
         /// <returns>A collection of reminders."/></returns>
-        public async Task<List<ReminderEntity>> GetRemindersAsync(DiscordUser user)
+        public async Task<ReminderEntity[]> GetRemindersAsync(DiscordUser user)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            return await db.Reminders.Table
-                .AsNoTracking()
-                .Where(x => x.AuthorId == user.Id)
+            return await db.Reminders.Fetch(x => x.AuthorId == user.Id)
                 .OrderBy(x => x.ElapseAt)
-                .ToListAsync();
+                .ToArrayAsync();
         }
     }
 }

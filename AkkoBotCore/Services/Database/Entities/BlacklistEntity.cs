@@ -33,5 +33,19 @@ namespace AkkoBot.Services.Database.Entities
             get => _reason;
             set => _reason = value?.MaxLength(200);
         }
+
+        /* Overrides */
+
+        public static bool operator ==(BlacklistEntity x, BlacklistEntity y)
+            => (x.ContextId == y.ContextId && x.Type == y.Type && x.Name == y.Name && x.Reason == y.Reason);
+
+        public static bool operator !=(BlacklistEntity x, BlacklistEntity y)
+            => !(x == y);
+
+        public override bool Equals(object obj)
+            => ReferenceEquals(this, obj) || (obj is not null && obj is BlacklistEntity dbAlias && this == dbAlias);
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }

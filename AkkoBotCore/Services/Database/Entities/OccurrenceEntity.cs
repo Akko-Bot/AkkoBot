@@ -21,6 +21,8 @@ namespace AkkoBot.Services.Database.Entities
         {
             return new OccurrenceEntity()
             {
+                Id = x.Id,
+                DateAdded = x.DateAdded,
                 GuildIdFK = x.GuildIdFK,
                 UserId = x.UserId,
                 Notices = x.Notices + y.Notices,
@@ -36,6 +38,8 @@ namespace AkkoBot.Services.Database.Entities
         {
             return new OccurrenceEntity()
             {
+                Id = x.Id,
+                DateAdded = x.DateAdded,
                 GuildIdFK = x.GuildIdFK,
                 UserId = x.UserId,
                 Notices = x.Notices - y.Notices,

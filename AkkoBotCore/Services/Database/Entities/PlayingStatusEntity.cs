@@ -38,5 +38,19 @@ namespace AkkoBot.Services.Database.Entities
         /// <returns>A <see cref="DiscordActivity"/>.</returns>
         public DiscordActivity GetActivity()
             => new(Message, Type) { StreamUrl = this.StreamUrl };
+
+        /* Overrides */
+
+        public static bool operator ==(PlayingStatusEntity x, PlayingStatusEntity y)
+            => (x.Message == y.Message && x.StreamUrl == y.StreamUrl && x.Type == y.Type && x.RotationTime == y.RotationTime);
+
+        public static bool operator !=(PlayingStatusEntity x, PlayingStatusEntity y)
+            => !(x == y);
+
+        public override bool Equals(object obj)
+            => ReferenceEquals(this, obj) || (obj is not null && obj is PlayingStatusEntity pStatus && this == pStatus);
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }

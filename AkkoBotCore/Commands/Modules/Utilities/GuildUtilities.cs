@@ -10,7 +10,6 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -130,10 +129,10 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var canReact = _service.CanUseEmoji(context.Guild, message.Channel, emoji);
 
-            if (canReact) 
+            if (canReact)
             {
                 await message.CreateReactionAsync(emoji);
-                await Task.Delay(AkkoEntities.SafetyDelay);   
+                await Task.Delay(AkkoEntities.SafetyDelay);
             }
 
             await context.Message.CreateReactionAsync((canReact) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);

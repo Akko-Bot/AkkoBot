@@ -1,7 +1,8 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using System;
@@ -33,11 +34,11 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (channel.Type is not ChannelType.Voice)
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);
-            
-            if (guildSettings.VoiceRolesRel.Any(x => x.ChannelId == channel.Id && x.RoleId == role.Id))
+            var dbGuild = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);
+
+            if (dbGuild.VoiceRolesRel.Any(x => x.ChannelId == channel.Id && x.RoleId == role.Id))
                 return false;
 
             var newEntry = new VoiceRoleEntity()
@@ -47,8 +48,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 RoleId = role.Id
             };
 
-            guildSettings.VoiceRolesRel.Add(newEntry);
-            db.GuildConfig.Update(guildSettings);
+            dbGuild.VoiceRolesRel.Add(newEntry);
+            db.GuildConfig.Update(dbGuild);
 
             return await db.SaveChangesAsync() is not 0;
         }
@@ -61,11 +62,11 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if at least one voice role was removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveVoiceRoleAsync(DiscordGuild server, Predicate<VoiceRoleEntity> predicate)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);
-            guildSettings.VoiceRolesRel.RemoveAll(x => predicate(x));
-            db.GuildConfig.Update(guildSettings);
+            var dbGuild = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);
+            dbGuild.VoiceRolesRel.RemoveAll(x => predicate(x));
+            db.GuildConfig.Update(dbGuild);
 
             return await db.SaveChangesAsync() is not 0;
         }
@@ -77,17 +78,17 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns>A collection of voice roles.</returns>
         public async Task<List<VoiceRoleEntity>> GetVoiceRolesAsync(DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
-            var guildSettings = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);
-            var vcroles = guildSettings.VoiceRolesRel;
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var dbGuild = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);
+            var vcroles = dbGuild.VoiceRolesRel;
 
             for (var counter = 0; counter < vcroles.Count; counter++)
             {
                 if (!server.Channels.TryGetValue(vcroles[counter].ChannelId, out _) || !server.Roles.TryGetValue(vcroles[counter].RoleId, out _))
-                    vcroles.Remove(vcroles[counter]);
+                    vcroles.Remove(vcroles[counter--]);
             }
 
-            db.GuildConfig.Update(guildSettings);
+            db.GuildConfig.Update(dbGuild);
             await db.SaveChangesAsync();
 
             return vcroles;

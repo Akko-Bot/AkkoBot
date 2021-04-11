@@ -31,11 +31,21 @@ namespace AkkoBot.Services.Database.Entities
             Discriminator = user.Discriminator;
         }
 
-        // Global xp, maybe?
-        // Xp gain tick
-        // Xp notification override?
+        /* Overrides */
 
         public override string ToString()
             => $"{Username}#{Discriminator}";
+
+        public static bool operator ==(DiscordUserEntity x, DiscordUserEntity y)
+            => (x.UserId == y.UserId && x.Username == y.Username && x.Discriminator == y.Discriminator);
+
+        public static bool operator !=(DiscordUserEntity x, DiscordUserEntity y)
+            => !(x == y);
+
+        public override bool Equals(object obj)
+            => ReferenceEquals(this, obj) || (obj is not null && obj is DiscordUserEntity dbUser && this == dbUser);
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }

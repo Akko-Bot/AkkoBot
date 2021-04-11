@@ -175,7 +175,7 @@ namespace AkkoBot.Commands.Formatters
         /// <returns>The result help message.</returns>
         public (string, DiscordEmbedBuilder) Build()
         {
-            var dbCache = _cmdContext.Services.GetService<IDbCacher>();
+            var dbCache = _cmdContext.Services.GetService<IDbCache>();
             var useEmbed = (dbCache.Guilds.TryGetValue(_cmdContext.Guild?.Id ?? 0, out var dbGuild))
                 ? dbGuild.UseEmbed
                 : dbCache.BotConfig.UseEmbed;

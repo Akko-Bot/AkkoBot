@@ -1,14 +1,16 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Self.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Self
@@ -80,7 +82,7 @@ namespace AkkoBot.Commands.Modules.Self
         }
 
         [HiddenOverload]
-        [Command("remove"), Aliases("rem")]
+        [Command("remove"), Aliases("rm")]
         [Description("cmd_blacklist_rem")]
         public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
@@ -122,33 +124,29 @@ namespace AkkoBot.Commands.Modules.Self
         {
             // Get the blacklist. Returns an empty collection if there is nothing there.
             var blacklist = (type is null)
-                ? await _service.GetAllAsync()
+                ? await _service.GetAsync()
                 : await _service.GetAsync(b => b.Type == type.Value);
 
-            // Prepare localized response
-            StringBuilder responseIds = new(), responseTypes = new(), responseNames = new();
-
-            foreach (var entity in blacklist)
-            {
-                responseIds.AppendLine(entity.ContextId.ToString());
-                responseTypes.AppendLine(context.FormatLocalized(entity.Type.ToString().ToSnakeCase()));
-                responseNames.AppendLine((string.IsNullOrEmpty(entity.Name)) ? context.FormatLocalized("unknown") : entity.Name);
-            }
+            var unknown = context.FormatLocalized("unknown");
+            var fields = new List<SerializableEmbedField>();
 
             // Send response
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("bl_title");
 
-            if (responseIds.Length == 0)
+            if (blacklist.Length == 0)
                 embed.WithDescription("bl_empty");
             else
             {
-                embed.AddField("id", responseIds.ToString(), true)
-                .AddField("type", responseTypes.ToString(), true)
-                .AddField("name", responseNames.ToString(), true);
+                foreach (var blGroup in blacklist.SplitInto(AkkoConstants.LinesPerPage))
+                {
+                    fields.Add(new("id", string.Join("\n", blGroup.Select(x => x.ContextId)), true));
+                    fields.Add(new("type", string.Join("\n", blGroup.Select(x => x.Type)), true));
+                    fields.Add(new("name", string.Join("\n", blGroup.Select(x => x.Name ?? unknown)), true));
+                }
             }
 
-            await context.RespondLocalizedAsync(embed, false);
+            await context.RespondPaginatedByFieldsAsync(embed, fields, 3);
         }
 
         [Command("clear")]
@@ -156,7 +154,7 @@ namespace AkkoBot.Commands.Modules.Self
         public async Task BlacklistClear(CommandContext context)
         {
             // If blacklist is empty, return error
-            if (!(await _service.GetAllAsync()).Any())
+            if ((await _service.GetAsync()).Length == 0)
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription("bl_empty");

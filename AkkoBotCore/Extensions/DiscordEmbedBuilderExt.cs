@@ -1,6 +1,4 @@
 using AkkoBot.Models;
-using AkkoBot.Services;
-using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System.Collections.Generic;

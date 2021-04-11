@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Self
 {
     [BotOwner]
+    [Group("playingstatus"), Aliases("pl")]
+    [Description("cmd_playingstatus")]
     public class RotatingStatus : AkkoCommandModule
     {
         private readonly StatusService _statusService;
@@ -24,7 +26,7 @@ namespace AkkoBot.Commands.Modules.Self
             _botService = botService;
         }
 
-        [Command("setstatus"), HiddenOverload]
+        [Command("set"), HiddenOverload]
         public async Task ResetStatus(CommandContext context)
         {
             await context.Client.UpdateStatusAsync();
@@ -32,7 +34,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
-        [Command("setstatus")]
+        [Command("set")]
         [Description("cmd_setstatus")]
         public async Task SetStatus(CommandContext context,
             [Description("arg_pstatus_type")] ActivityType type,
@@ -45,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
-        [Command("setstatus")]
+        [Command("set")]
         [Description("cmd_setstatus")]
         public async Task SetStreamStatus(CommandContext context,
             [Description("arg_stream_url")] string streamUrl,
@@ -60,7 +62,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.Message.CreateReactionAsync((isValid) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
-        [Command("addstatus"), Aliases("adpl")]
+        [Command("add")]
         [Description("cmd_addstatus")]
         public async Task AddStatus(CommandContext context,
             [Description("arg_timed_pstatus")] TimeSpan time,
@@ -73,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
-        [Command("addstatus")]
+        [Command("add")]
         public async Task AddStreamStatus(CommandContext context,
             [Description("arg_timed_pstatus")] TimeSpan time,
             [Description("arg_stream_url")] string streamUrl,
@@ -85,7 +87,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.Message.CreateReactionAsync((isValid) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
-        [Command("liststatus"), Aliases("lipl")]
+        [Command("list"), Aliases("show")]
         [Description("cmd_liststatus")]
         public async Task ListStatus(CommandContext context)
         {
@@ -114,7 +116,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.RespondPaginatedByFieldsAsync(embed);
         }
 
-        [Command("removestatus")]
+        [Command("remove"), Aliases("rm")]
         [Description("cmd_removestatus")]
         public async Task RemoveStatus(CommandContext context, [Description("arg_int")] int id)
         {
@@ -126,7 +128,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
-        [Command("clearstatus"), Aliases("clearstatuses")]
+        [Command("clear")]
         [Description("cmd_clearstatus")]
         public async Task ClearStatus(CommandContext context)
         {

@@ -5,6 +5,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -21,7 +22,7 @@ namespace AkkoBot.Core.Services
     internal class GlobalEvents
     {
         private readonly IServiceScope _scope;
-        private readonly IDbCacher _dbCache;
+        private readonly IDbCache _dbCache;
         private readonly AliasService _aliasService;
         private readonly WarningService _warningService;
         private readonly RoleService _roleService;
@@ -30,7 +31,7 @@ namespace AkkoBot.Core.Services
         internal GlobalEvents(BotCore botCore, IServiceProvider services)
         {
             _scope = services.CreateScope();
-            _dbCache = services.GetService<IDbCacher>();
+            _dbCache = services.GetService<IDbCache>();
             _aliasService = services.GetService<AliasService>();
             _warningService = services.GetService<WarningService>();
             _roleService = services.GetService<RoleService>();
@@ -69,7 +70,7 @@ namespace AkkoBot.Core.Services
         }
 
         /* Event Methods */
-        
+
         /// <summary>
         /// Mutes a user that has been previously muted.
         /// </summary>
@@ -77,29 +78,29 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(async () =>
             {
-                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
+                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
                 var anyChannel = eventArgs.Guild.Channels.FirstOrDefault().Value;
-                var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasFlag(Permissions.ManageRoles));
+                var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.ManageRoles | Permissions.Administrator));
 
                 // Check if user is in the database
-                var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
-                var mutedUser = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == eventArgs.Member.Id);
+                var dbGuild = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
+                var mutedUser = dbGuild.MutedUserRel.FirstOrDefault(x => x.UserId == eventArgs.Member.Id);
 
                 if (mutedUser is not null && botHasManageRoles)
                 {
-                    if (eventArgs.Guild.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole))
+                    if (eventArgs.Guild.Roles.TryGetValue(dbGuild.MuteRoleId ?? 0, out var muteRole))
                     {
                         // If mute role exists, apply to the user
-                        muteRole = eventArgs.Guild.GetRole(guildSettings.MuteRoleId.Value);
+                        muteRole = eventArgs.Guild.GetRole(dbGuild.MuteRoleId.Value);
                         await eventArgs.Member.GrantRoleAsync(muteRole);
                     }
                     else
                     {
                         // If mute role doesn't exist anymore, delete the mute from the database
-                        guildSettings.MutedUserRel.Remove(mutedUser);
+                        dbGuild.MutedUserRel.Remove(mutedUser);
 
-                        db.GuildConfig.Update(guildSettings);
+                        db.GuildConfig.Update(dbGuild);
                         await db.SaveChangesAsync();
                     }
                 }
@@ -318,17 +319,18 @@ namespace AkkoBot.Core.Services
         {
             return Task.Run(async () =>
             {
-                var db = _scope.ServiceProvider.GetService<IUnitOfWork>();
+                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
                 // Track the user who triggered the command
-                var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);
+                //var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);
+                var isUnchanged = db.Upsert(eventArgs.Context.User).State is EntityState.Unchanged;
 
                 // Track the mentioned users in the message, if any
                 foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
-                    isTracking = isTracking || await db.DiscordUsers.CreateOrUpdateAsync(mentionedUser);
+                    isUnchanged &= db.Upsert(mentionedUser).State is EntityState.Unchanged;
 
                 // Save if there is at least one user being tracked
-                if (isTracking)
+                if (!isUnchanged)
                     await db.SaveChangesAsync();
             });
         }
@@ -347,14 +349,12 @@ namespace AkkoBot.Core.Services
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
                 var user = eventArgs.User as DiscordMember;
 
-                var voiceRoles = await db.Set<VoiceRoleEntity>()
-                    .AsNoTracking()
-                    .Where(
-                        (user.VoiceState.Channel is null)
+                var voiceRoles = await db.VoiceRoles.Fetch(
+                    (user.VoiceState.Channel is null)
                             ? x => x.GuildIdFk == eventArgs.Guild.Id
                             : x => x.GuildIdFk == eventArgs.Guild.Id && x.ChannelId == eventArgs.Channel.Id
-                    )
-                    .ToListAsync();
+                )
+                .ToArrayAsync();
 
                 if (user.VoiceState.Channel is not null)
                 {
@@ -362,9 +362,9 @@ namespace AkkoBot.Core.Services
                     foreach (var voiceRole in voiceRoles.DistinctBy(x => x.RoleId))
                     {
                         if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role))
-                            await (eventArgs.User as DiscordMember).GrantRoleAsync(role);
+                            await user.GrantRoleAsync(role);
                         else if (role is null)
-                            db.Set<VoiceRoleEntity>().Remove(voiceRole);
+                            db.Remove(voiceRole);
                     }
                 }
                 else
@@ -373,9 +373,9 @@ namespace AkkoBot.Core.Services
                     foreach (var voiceRole in voiceRoles)
                     {
                         if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role))
-                            await (eventArgs.User as DiscordMember).RevokeRoleAsync(role);
+                            await user.RevokeRoleAsync(role);
                         else if (role is null)
-                            db.Set<VoiceRoleEntity>().Remove(voiceRole);
+                            db.Remove(voiceRole);
                     }
                 }
 

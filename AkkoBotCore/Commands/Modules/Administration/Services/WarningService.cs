@@ -1,27 +1,29 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration.Services
 {
-    public class WarningService : AkkoCommandService
+    public class WarningService : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
         private readonly RoleService _roleService;
         private readonly UserPunishmentService _punishService;
 
-        public WarningService(IServiceProvider services, RoleService roleService, UserPunishmentService punishService) : base(services)
+        public WarningService(IServiceProvider services, IDbCache dbCache, RoleService roleService, UserPunishmentService punishService)
         {
             _services = services;
+            _dbCache = dbCache;
             _roleService = roleService;
             _punishService = punishService;
         }
@@ -36,14 +38,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The saved guild settings.</returns>
         public async Task<GuildConfigEntity> SaveInfractionAsync(CommandContext context, DiscordUser user, string note, WarnType type = WarnType.Notice)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Create the entry
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(context.Guild.Id, user.Id);
+            var dbGuild = await db.GuildConfig.GetGuildWithWarningsAsync(context.Guild.Id, user.Id);
 
             // Make sure the server has warning punishments set up
-            if (guildSettings.WarnPunishRel.Count == 0)
-                guildSettings.AddDefaultWarnPunishments();
+            if (dbGuild.WarnPunishRel.Count == 0)
+                dbGuild.AddDefaultWarnPunishments();
 
             // Create the warn entry
             var newNote = new WarnEntity()
@@ -68,20 +70,23 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             {
                 occurrence.Warnings = 1;
 
-                if (guildSettings.WarnExpire > TimeSpan.Zero)
+                if (dbGuild.WarnExpire > TimeSpan.Zero)
                     await CreateWarnTimerAsync(context, newNote);
             }
 
-            await db.GuildConfig.CreateOccurrenceAsync(context.Guild, user.Id, occurrence);
+            // Add to the collections
+            if (dbGuild.OccurrenceRel.Count == 0)
+                dbGuild.OccurrenceRel.Add(occurrence);
+            else
+                dbGuild.OccurrenceRel[0] += occurrence;
 
-            // Add the collection
-            guildSettings.WarnRel.Add(newNote);
+            dbGuild.WarnRel.Add(newNote);
 
             // Update
-            db.GuildConfig.Update(guildSettings);
+            db.GuildConfig.Update(dbGuild);
             await db.SaveChangesAsync();
 
-            return guildSettings;
+            return dbGuild;
         }
 
         /// <summary>
@@ -122,12 +127,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">Discord guild to get the punishments from.</param>
         /// <returns>A collection of server punishments.</returns>
-        public async Task<List<WarnPunishEntity>> GetServerPunishmentsAsync(DiscordGuild server)
+        public async Task<WarnPunishEntity[]> GetServerPunishmentsAsync(DiscordGuild server)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var punishments = await db.WarnPunishments.AsNoTracking()
+                .Where(x => x.GuildIdFK == server.Id)
+                .ToArrayAsync();
 
-            return guildSettings.WarnPunishRel;
+            return punishments;
         }
 
         /// <summary>
@@ -140,11 +147,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the punishment was saved, <see langword="false"/> if it was updated.</returns>
         public async Task<bool> SaveWarnPunishmentAsync(DiscordGuild server, int amount, WarnPunishType type, DiscordRole role, TimeSpan? interval)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
-            var punishment = guildSettings.WarnPunishRel.FirstOrDefault(x => x.WarnAmount == amount);
-            var isUpdated = false;
+            var punishment = await db.WarnPunishments.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.WarnAmount == amount);
 
             var newPunishment = new WarnPunishEntity()
             {
@@ -162,18 +167,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 PunishRoleId = role?.Id
             };
 
-            if (punishment is not null)
-            {
-                guildSettings.WarnPunishRel.Remove(punishment);
-                isUpdated = true;
-            }
-
-            guildSettings.WarnPunishRel.Add(newPunishment);
-
-            db.GuildConfig.Update(guildSettings);
+            var isCreated = db.Upsert(newPunishment).State is EntityState.Added;
             await db.SaveChangesAsync();
 
-            return isUpdated;
+            return isCreated;
         }
 
         /// <summary>
@@ -183,13 +180,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="time">How long the timers should last before being automatically deleted.</param>
         public async Task SaveWarnExpireAsync(CommandContext context, TimeSpan time)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             if (time < TimeSpan.Zero)
                 time = TimeSpan.Zero;
 
-            var guildSettings = db.GuildConfig.GetGuild(context.Guild.Id);
-            guildSettings.WarnExpire = time;
+            _dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild);
+            dbGuild.WarnExpire = time;
 
             // Remove the timers before adding the new ones
             await RemoveWarnTimersAsync(context.Guild);
@@ -197,7 +194,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (time != TimeSpan.Zero)
                 await CreateWarnTimersAsync(context, time);
 
-            db.GuildConfig.Update(guildSettings);
+            db.GuildConfig.Update(dbGuild);
             await db.SaveChangesAsync();
         }
 
@@ -206,25 +203,17 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">Discord guild to remove the punishment from.</param>
         /// <param name="amount">The amount required by the punishment.</param>
-        /// <returns><see langword="true"/> if the punishment was removed, <see langword="false"/> if it didn't exist.</returns>
+        /// <returns><see langword="true"/> if the punishment was removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveWarnPunishmentAsync(DiscordGuild server, int amount)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(server.Id);
-            var punishment = guildSettings.WarnPunishRel.FirstOrDefault(x => x.WarnAmount == amount);
-            var isRemoved = false;
+            var punishment = await db.WarnPunishments.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.WarnAmount == amount);
 
             if (punishment is not null)
-            {
-                guildSettings.WarnPunishRel.Remove(punishment);
-                isRemoved = true;
-            }
+                db.Remove(punishment);
 
-            db.GuildConfig.Update(guildSettings);
-            await db.SaveChangesAsync();
-
-            return isRemoved;
+            return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>
@@ -234,45 +223,38 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the punishment was removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveWarnPunishmentAsync(WarnPunishEntity entity)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            db.Remove(entity);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithPunishmentsAsync(entity.GuildIdFK);
-            var toRemove = guildSettings.WarnPunishRel.FirstOrDefault(x => x.WarnAmount == entity.WarnAmount);
-            var isRemoved = guildSettings.WarnPunishRel.Remove(toRemove);
-
-            db.GuildConfig.Update(guildSettings);
-            await db.SaveChangesAsync();
-
-            return isRemoved;
+            return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>
-        /// Removes a warning from the specified user at a given position.
+        /// Removes an infraction from the specified user at a given position.
         /// </summary>
-        /// <param name="server">The Discord the warning is associated with.</param>
-        /// <param name="user">The user whose warning needs to be removed.</param>
-        /// <param name="id">The position of the warning, starting at 1.</param>
+        /// <param name="server">The Discord the infraction is associated with.</param>
+        /// <param name="user">The user whose infractions need to be removed.</param>
+        /// <param name="id">The database ID of the infraction.</param>
         /// <returns>The amount of removed entries, 0 if no entry was removed.</returns>
         public async Task<int> RemoveInfractionAsync(DiscordGuild server, DiscordUser user, int? id)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id);
+            var warnings = db.Warnings.Where(x => x.GuildIdFK == server.Id && x.UserId == user.Id);
 
             if (id.HasValue)
             {
-                var toRemove = guildSettings.WarnRel.FirstOrDefault(x => x.Id == id.Value);
+                var toRemove = await warnings.FirstOrDefaultAsync(x => x.Id == id.Value);
 
                 if (toRemove is null)
                     return 0;
                 else
-                    guildSettings.WarnRel.Remove(toRemove);
+                    db.Remove(toRemove);
             }
             else
-                guildSettings.WarnRel.Clear();
+                db.RemoveRange(warnings);
 
-            db.GuildConfig.Update(guildSettings);
-            return await db.SaveChangesAsync() - 1; // Remove "guild_config" itself.
+            return await db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -284,12 +266,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>A collection of notices or warnings and saved users.</returns>
         public async Task<(GuildConfigEntity, DiscordUserEntity)> GetInfractionsAsync(DiscordGuild server, DiscordUser user, WarnType type)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id, type);
-            var dbUser = await db.DiscordUsers.Table.FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var dbGuild = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id, type);
+            var dbUser = await db.DiscordUsers.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == user.Id);
 
-            return (guildSettings, dbUser);
+            return (dbGuild, dbUser);
         }
 
         /// <summary>
@@ -300,12 +283,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>A collection of notice/warnings and saved users.</returns>
         public async Task<(GuildConfigEntity, DiscordUserEntity)> GetInfractionsAsync(DiscordGuild server, DiscordUser user)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id);
-            var dbUser = await db.DiscordUsers.Table.FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var dbGuild = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id);
+            var dbUser = await db.DiscordUsers.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == user.Id);
 
-            return (guildSettings, dbUser);
+            return (dbGuild, dbUser);
         }
 
         /// <summary>
@@ -315,14 +299,15 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="entry">The warning to create the timer for.</param>
         private async Task CreateWarnTimerAsync(CommandContext context, WarnEntity entry)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            var guildSettings = db.GuildConfig.GetGuild(context.Guild.Id);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var newTimer = new TimerEntity(entry, guildSettings.WarnExpire);
+            _dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild);
+
+            var newTimer = new TimerEntity(entry, dbGuild.WarnExpire);
             db.Timers.Update(newTimer);
             await db.SaveChangesAsync();
 
-            db.Timers.Cache.AddOrUpdateByEntity(context.Client, newTimer);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
         }
 
         /// <summary>
@@ -332,17 +317,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="time">The time the warnings should be removed after their creation.</param>
         private async Task CreateWarnTimersAsync(CommandContext context, TimeSpan time)
         {
-            var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(context.Guild.Id);
-            var toCreate = guildSettings.WarnRel.Select(warning => new TimerEntity(warning, time));
+            var warnings = await db.Warnings
+                .Where(x => x.GuildIdFK == context.Guild.Id)
+                .ToArrayAsync();
 
-            foreach (var timer in toCreate)
+            foreach (var timer in warnings.Select(warning => new TimerEntity(warning, time)))
             {
                 db.Timers.Update(timer);
                 await db.SaveChangesAsync();
 
-                db.Timers.Cache.AddOrUpdateByEntity(context.Client, timer);
+                _dbCache.Timers.AddOrUpdateByEntity(context.Client, timer);
             }
         }
 
@@ -353,17 +339,17 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The amount of timers removed from the database.</returns>
         private async Task<int> RemoveWarnTimersAsync(DiscordGuild server)
         {
-            var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             //Remove the timers
-            var toRemove = db.Timers.Table
+            var toRemove = db.Timers
                 .Where(x => x.Type == TimerType.TimedWarn && x.GuildId == server.Id)
                 .ToArray();
 
             foreach (var timer in toRemove)
-                db.Timers.Cache.TryRemove(timer.Id);
+                _dbCache.Timers.TryRemove(timer.Id);
 
-            db.Timers.DeleteRange(toRemove);
+            db.Timers.RemoveRange(toRemove);
             return await db.SaveChangesAsync();
         }
 
@@ -420,7 +406,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                     break;
 
                 default:
-                    throw new NotImplementedException("Invalid punishment type.");
+                    throw new NotImplementedException($"No punishment of type \"{punishment.Type}\" has been implemented.");
             }
         }
     }

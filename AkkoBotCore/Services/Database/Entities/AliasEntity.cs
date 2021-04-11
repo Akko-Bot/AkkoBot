@@ -62,5 +62,19 @@ namespace AkkoBot.Services.Database.Entities
             var args = aliasInput.Replace(Alias.Replace("{p}", prefix), string.Empty).Trim();
             return (string.IsNullOrWhiteSpace(args)) ? FullCommand : $"{Command} {args}";
         }
+
+        /* Overrides */
+
+        public static bool operator ==(AliasEntity x, AliasEntity y)
+            => (x.GuildId == y.GuildId && x.IsDynamic == y.IsDynamic && x.Alias == y.Alias && x.Command == y.Command && x.Arguments == y.Arguments);
+
+        public static bool operator !=(AliasEntity x, AliasEntity y)
+            => !(x == y);
+
+        public override bool Equals(object obj)
+            => ReferenceEquals(this, obj) || (obj is not null && obj is AliasEntity dbAlias && this == dbAlias);
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }

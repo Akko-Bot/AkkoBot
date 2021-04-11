@@ -5,24 +5,26 @@ namespace AkkoBot.Services.Database
 {
     public class AkkoDbContext : DbContext
     {
-        public DbSet<DiscordUserEntity> DiscordUsers { get; set; }
-        public DbSet<BotConfigEntity> BotConfig { get; set; }
-        public DbSet<GuildConfigEntity> GuildConfig { get; set; }
-        public DbSet<LogConfigEntity> LogConfig { get; set; }
-        public DbSet<TimerEntity> Timers { get; set; }
-        public DbSet<MutedUserEntity> MutedUsers { get; set; }
-        public DbSet<WarnEntity> Warnings { get; set; }
-        public DbSet<WarnPunishEntity> WarnPunishments { get; set; }
-        public DbSet<OccurrenceEntity> Occurrences { get; set; }
-        public DbSet<BlacklistEntity> Blacklist { get; set; }
-        public DbSet<PlayingStatusEntity> PlayingStatuses { get; set; }
-        public DbSet<AliasEntity> Aliases { get; set; }
-        public DbSet<FilteredWordsEntity> FilteredWords { get; set; }
-        public DbSet<ReminderEntity> Reminders { get; set; }
-        public DbSet<CommandEntity> AutoCommands { get; set; }
-        public DbSet<VoiceRoleEntity> VoiceRoles { get; set; }
+        public DbSet<DiscordUserEntity> DiscordUsers { get; init; }
+        public DbSet<BotConfigEntity> BotConfig { get; init; }
+        public DbSet<GuildConfigEntity> GuildConfig { get; init; }
+        public DbSet<LogConfigEntity> LogConfig { get; init; }
+        public DbSet<TimerEntity> Timers { get; init; }
+        public DbSet<MutedUserEntity> MutedUsers { get; init; }
+        public DbSet<WarnEntity> Warnings { get; init; }
+        public DbSet<WarnPunishEntity> WarnPunishments { get; init; }
+        public DbSet<OccurrenceEntity> Occurrences { get; init; }
+        public DbSet<BlacklistEntity> Blacklist { get; init; }
+        public DbSet<PlayingStatusEntity> PlayingStatuses { get; init; }
+        public DbSet<AliasEntity> Aliases { get; init; }
+        public DbSet<FilteredWordsEntity> FilteredWords { get; init; }
+        public DbSet<ReminderEntity> Reminders { get; init; }
+        public DbSet<CommandEntity> AutoCommands { get; init; }
+        public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
 
-        public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt) { }
+        public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

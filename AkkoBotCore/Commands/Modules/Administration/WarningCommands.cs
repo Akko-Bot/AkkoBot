@@ -1,4 +1,4 @@
-using AkkoBot.Commands.Abstractions;
+﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
@@ -10,7 +10,6 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -178,8 +177,8 @@ namespace AkkoBot.Commands.Modules.Administration
             if (user is null)
                 user = context.User;
 
-            var (guildSettings, dbUser) = await _warnService.GetInfractionsAsync(context.Guild, user);
-            var occurrence = guildSettings.OccurrenceRel.FirstOrDefault() ?? new OccurrenceEntity();
+            var (dbGuild, dbUser) = await _warnService.GetInfractionsAsync(context.Guild, user);
+            var occurrence = dbGuild.OccurrenceRel.FirstOrDefault() ?? new OccurrenceEntity();
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()))
@@ -191,7 +190,7 @@ namespace AkkoBot.Commands.Modules.Administration
                     )
                 );
 
-            foreach (var warn in guildSettings.WarnRel.OrderBy(x => x.Type).ThenByDescending(x => x.Id))
+            foreach (var warn in dbGuild.WarnRel.OrderBy(x => x.Type).ThenByDescending(x => x.Id))
             {
                 var emote = (warn.Type == WarnType.Notice) ? "📝" : "⚠️";
                 var position = "#" + Formatter.InlineCode(warn.Id.ToString());
@@ -205,7 +204,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 embed.AddField(fieldName, warn.WarningText);
             }
 
-            if (guildSettings.WarnRel.Count == 0)
+            if (dbGuild.WarnRel.Count == 0)
                 embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
             await context.RespondPaginatedByFieldsAsync(embed);
@@ -260,7 +259,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("warnpl_title");
 
-            if (punishments.Count == 0)
+            if (punishments.Length == 0)
             {
                 embed.WithDescription("warnpl_empty");
                 await context.RespondLocalizedAsync(embed, false, true);

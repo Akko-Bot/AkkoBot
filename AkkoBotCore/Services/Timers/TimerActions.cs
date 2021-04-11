@@ -3,8 +3,10 @@ using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -24,11 +26,13 @@ namespace AkkoBot.Services.Timers
     public class TimerActions : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
 
-        public TimerActions(IServiceProvider services, ILocalizer localizer)
+        public TimerActions(IServiceProvider services, IDbCache dbCache, ILocalizer localizer)
         {
             _services = services;
+            _dbCache = dbCache;
             _localizer = localizer;
         }
 
@@ -40,18 +44,18 @@ namespace AkkoBot.Services.Timers
         /// <param name="userId">The ID of the user to be unbanned.</param>
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var settings = db.GuildConfig.GetGuild(server.Id);
-            var localizedReason = _localizer.GetResponseString(settings.Locale, "timedban_title");
+            var dbGuild = await _dbCache.GetGuildAsync(server.Id);
+            var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedban_title");
 
             // Unban the user - they might have been unbanned in the meantime
             if ((await server.GetBansAsync()).FirstOrDefault(x => x.User.Id == userId) is not null)
                 await server.UnbanMemberAsync(userId, localizedReason);
 
             // Remove the entry
-            var dbEntity = await db.Timers.GetAsync(entryId);
-            db.Timers.Delete(dbEntity);
+            var dbEntity = await db.Timers.FindAsync(entryId);
+            db.Remove(dbEntity);
 
             await db.SaveChangesAsync();
         }
@@ -64,17 +68,17 @@ namespace AkkoBot.Services.Timers
         /// <param name="userId">The ID of the user to be unmuted.</param>
         public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(server.Id);
-            var localizedReason = _localizer.GetResponseString(guildSettings.Locale, "timedmute");
+            var dbGuild = await db.GuildConfig.GetGuildWithMutesAsync(server.Id);
+            var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedmute");
 
             try
             {
                 // User may not be in the guild when this method runs
                 // Or role may not exist anymore
                 // Or bot may not have role permissions anymore
-                server.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole);
+                server.Roles.TryGetValue(dbGuild.MuteRoleId ?? 0, out var muteRole);
                 var user = await server.GetMemberAsync(userId);
 
                 if (user.VoiceState is not null)
@@ -90,12 +94,12 @@ namespace AkkoBot.Services.Timers
             finally
             {
                 // Remove the entries from the database
-                var timerEntry = await db.Timers.GetAsync(entryId);
-                var muteEntry = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == userId);
-                guildSettings.MutedUserRel.Remove(muteEntry);
+                var timerEntry = await db.Timers.FindAsync(entryId);
+                var muteEntry = dbGuild.MutedUserRel.FirstOrDefault(x => x.UserId == userId);
+                dbGuild.MutedUserRel.Remove(muteEntry);
 
-                db.Timers.Delete(timerEntry);
-                db.GuildConfig.Update(guildSettings);
+                db.Remove(timerEntry);
+                db.Update(dbGuild);
 
                 await db.SaveChangesAsync();
             }
@@ -109,14 +113,14 @@ namespace AkkoBot.Services.Timers
         /// <param name="userId">The ID of the user to be unmuted.</param>
         public async Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, userId);
-            var timerEntry = await db.Timers.GetAsync(entryId);
-            var localizedReason = _localizer.GetResponseString(guildSettings.Locale, "timedrole");
+            var dbGuild = await _dbCache.GetGuildAsync(server.Id);
+            var timerEntry = await db.Timers.FindAsync(entryId);
 
             try
             {
+                var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedrole");
                 server.Roles.TryGetValue(timerEntry.RoleId.Value, out var punishRole);
                 var user = await server.GetMemberAsync(userId);
 
@@ -128,7 +132,7 @@ namespace AkkoBot.Services.Timers
             }
             finally
             {
-                db.Timers.Delete(timerEntry);
+                db.Remove(timerEntry);
                 await db.SaveChangesAsync();
             }
         }
@@ -141,14 +145,14 @@ namespace AkkoBot.Services.Timers
         /// <param name="userId">The ID of the user to be unmuted.</param>
         public async Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, userId);
-            var timerEntry = await db.Timers.GetAsync(entryId);
-            var localizedReason = _localizer.GetResponseString(guildSettings.Locale, "timedunrole");
+            var dbGuild = await _dbCache.GetGuildAsync(server.Id);
+            var timerEntry = await db.Timers.FindAsync(entryId);
 
             try
             {
+                var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedunrole");
                 server.Roles.TryGetValue(timerEntry.RoleId.Value, out var punishRole);
                 var user = await server.GetMemberAsync(userId);
 
@@ -160,7 +164,7 @@ namespace AkkoBot.Services.Timers
             }
             finally
             {
-                db.Timers.Delete(timerEntry);
+                db.Remove(timerEntry);
                 await db.SaveChangesAsync();
             }
         }
@@ -173,16 +177,18 @@ namespace AkkoBot.Services.Timers
         /// <param name="userId">The ID of the user to be unmuted.</param>
         public async Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var guildSettings = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, userId);
-            var timer = await db.Timers.GetAsync(entryId);
+            var timer = await db.Timers.FindAsync(entryId);
+            var guildSettings = await db.GuildConfig
+                .Include(x => x.WarnRel.Where(x => x.UserId == userId))
+                .FirstOrDefaultAsync(x => x.GuildId == server.Id);
 
             guildSettings.WarnRel.RemoveAll(x => x.DateAdded.Add(guildSettings.WarnExpire).Subtract(DateTimeOffset.Now) <= TimeSpan.Zero);
 
             // Update the entries
-            db.GuildConfig.Update(guildSettings);
-            db.Timers.Delete(timer);
+            db.Update(guildSettings);
+            db.Remove(timer);
 
             await db.SaveChangesAsync();
         }
@@ -195,10 +201,11 @@ namespace AkkoBot.Services.Timers
         /// <param name="server">The Discord server to unmute from.</param>
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbReminder = await db.Reminders.Table.FirstOrDefaultAsync(x => x.TimerId == entryId);
-            var dbTimer = await db.Timers.GetAsync(entryId);
+            var dbReminder = await db.Reminders.FirstOrDefaultAsync(x => x.TimerId == entryId);
+            var dbTimer = await db.Timers.FindAsync(entryId);
+            var dbGuild = await _dbCache.GetGuildAsync(dbReminder.GuildId.Value);
             var cmdHandler = client.GetExtension<CommandsNextExtension>();
 
             try
@@ -213,7 +220,7 @@ namespace AkkoBot.Services.Timers
                     user,
                     user.Guild.Channels.Values.FirstOrDefault(), // If channel is private, this throws
                     dbReminder.Content,
-                    (dbReminder.IsPrivate) ? db.BotConfig.Cache.BotPrefix : db.GuildConfig.GetGuild(dbReminder.GuildId.Value).Prefix,
+                    (dbReminder.IsPrivate) ? _dbCache.BotConfig.BotPrefix : dbGuild.Prefix,
                     null
                 );
 
@@ -222,8 +229,8 @@ namespace AkkoBot.Services.Timers
                 dmsg ??= new();
 
                 var localizedDate = (server is null)
-                    ? dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(db.BotConfig.Cache.Locale))
-                    : dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(db.GuildConfig.GetGuild(server.Id).Locale));
+                    ? dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(_dbCache.BotConfig.Locale))
+                    : dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(dbGuild.Locale));
 
                 var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
 
@@ -239,8 +246,8 @@ namespace AkkoBot.Services.Timers
             }
             finally
             {
-                db.Reminders.Delete(dbReminder);
-                db.Timers.Delete(dbTimer);
+                db.Remove(dbReminder);
+                db.Remove(dbTimer);
 
                 await db.SaveChangesAsync();
             }
@@ -254,10 +261,10 @@ namespace AkkoBot.Services.Timers
         /// <param name="server">The Discord server to unmute from.</param>
         public async Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbCmd = await db.AutoCommands.Table.FirstOrDefaultAsync(x => x.TimerId == entryId);
-            var dbTimer = await db.Timers.GetAsync(entryId);
+            var dbCmd = await db.AutoCommands.FirstOrDefaultAsync(x => x.TimerId == entryId);
+            var dbTimer = await db.FindAsync<TimerEntity>(entryId);
             var cmdHandler = client.GetExtension<CommandsNextExtension>();
 
             try
@@ -269,7 +276,7 @@ namespace AkkoBot.Services.Timers
                     user,
                     server.GetChannel(dbCmd.ChannelId), // If channel is private, this throws
                     dbCmd.CommandString,
-                    db.GuildConfig.GetGuild(dbCmd.GuildId).Prefix,
+                    (await _dbCache.GetGuildAsync(dbCmd.GuildId)).Prefix,
                     cmd,
                     args
                 );
@@ -285,8 +292,8 @@ namespace AkkoBot.Services.Timers
             {
                 if (dbCmd.Type is CommandType.Scheduled)
                 {
-                    db.AutoCommands.Delete(dbCmd);
-                    db.Timers.Delete(dbTimer);
+                    db.Remove(dbCmd);
+                    db.Remove(dbTimer);
 
                     await db.SaveChangesAsync();
                 }

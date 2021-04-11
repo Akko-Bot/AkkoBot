@@ -19,7 +19,7 @@ namespace AkkoBot.Commands.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
             return Task.FromResult(dbCache.BotConfig.EnableHelp);
         }
     }

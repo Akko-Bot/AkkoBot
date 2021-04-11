@@ -36,7 +36,7 @@ namespace AkkoBot.Extensions
         /// <returns>The newly edited Discord message.</returns>
         public static async Task<DiscordMessage> ModifyLocalizedAsync(this DiscordMessage msg, CommandContext context, string message, DiscordEmbedBuilder embed, bool isMarked = true, bool isError = false)
         {
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
             var localizer = context.Services.GetService<ILocalizer>();
 
             // Get the message settings (guild or dm)

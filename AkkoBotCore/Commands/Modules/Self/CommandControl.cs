@@ -24,7 +24,7 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_globalcmd")]
         public async Task GlobalCommandToggle(CommandContext context, [RemainingText, Description("arg_command")] string command)
         {
-            if (command.StartsWith(context.Prefix))
+            if (!string.IsNullOrWhiteSpace(command) && command.StartsWith(context.Prefix))
                 command = command[context.Prefix.Length..];
 
             var cmd = context.CommandsNext.FindCommand(command, out _);

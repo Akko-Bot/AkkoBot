@@ -1,5 +1,5 @@
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
@@ -34,8 +34,8 @@ namespace AkkoBot.Services.Timers
             _updateTimer.Start();
 
             // Initialize the cache
-            using var scope = services.GetScopedService<IUnitOfWork>(out var db);
-            var timerEntries = db.Timers.GetAllSync()
+            using var scope = services.GetScopedService<AkkoDbContext>(out var db);
+            var timerEntries = db.Timers.ToArray()
                 .Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) < TimeSpan.FromDays(_timerDayAge));
 
             foreach (var client in clients.ShardClients.Values)
@@ -207,10 +207,10 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private void UpdateFromDb(object obj, ElapsedEventArgs args)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
             var clients = _services.GetService<DiscordShardedClient>();
 
-            var nextEntries = db.Timers.GetAllSync()
+            var nextEntries = db.Timers.ToArray()
                 .Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) < TimeSpan.FromDays(_timerDayAge));
 
             foreach (var client in clients.ShardClients.Values)

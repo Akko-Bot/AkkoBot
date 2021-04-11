@@ -4,39 +4,44 @@ using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database
 {
     /// <summary>
     /// This class acts as a singleton cache for UoW objects.
     /// </summary>
-    public class AkkoDbCacher : IDbCacher
+    public class AkkoDbCache : IDbCache
     {
+        private readonly IServiceProvider _services;
         private bool _isDisposed = false;
 
         public ConcurrentHashSet<ulong> Blacklist { get; private set; }
         public BotConfigEntity BotConfig { get; set; }
         public LogConfigEntity LogConfig { get; set; }
-        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
 
         // Lazily instantiated
-        public ITimerManager Timers { get; set; }
+        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
 
+        public ITimerManager Timers { get; set; }
         public ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
 
-        public AkkoDbCacher(AkkoDbContext dbContext)
+        public AkkoDbCache(IServiceProvider services)
         {
-            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
+            using var scope = services.GetScopedService<AkkoDbContext>(out var dbContext);
+
+            _services = services;
             BotConfig = dbContext.BotConfig.FirstOrDefault();
             LogConfig = dbContext.LogConfig.FirstOrDefault();
-            Guilds = new(); // Guild configs will be loaded into the cache as needed.
+            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
 
             Aliases = dbContext.Aliases
@@ -44,7 +49,34 @@ namespace AkkoBot.Services.Database
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
 
+            Guilds = new(); // Guild configs will be loaded into the cache as needed.
             FilteredWords = new(); // Filtered words will be loaded into the cache as needed
+        }
+
+        /// <summary>
+        /// Safely gets a database guild.
+        /// </summary>
+        /// <param name="sid">The GuildId of the database entry.</param>
+        /// <remarks>If the entry doesn't exist, it creates one.</remarks>
+        /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
+        public async Task<GuildConfigEntity> GetGuildAsync(ulong sid)
+        {
+            if (Guilds.TryGetValue(sid, out var dbGuild))
+                return dbGuild;
+
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            dbGuild = await db.GuildConfig.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.GuildId == sid);
+
+            if (dbGuild is null)
+            {
+                dbGuild = new GuildConfigEntity(BotConfig) { GuildId = sid };
+                db.Add(dbGuild);
+                await db.SaveChangesAsync();
+            }
+
+            Guilds.TryAdd(dbGuild.GuildId, dbGuild);
+            return dbGuild;
         }
 
         /// <summary>

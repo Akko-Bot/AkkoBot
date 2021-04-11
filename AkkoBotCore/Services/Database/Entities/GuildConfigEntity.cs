@@ -23,9 +23,8 @@ namespace AkkoBot.Services.Database.Entities
         public List<WarnPunishEntity> WarnPunishRel { get; set; }
         public List<OccurrenceEntity> OccurrenceRel { get; set; }
         public List<VoiceRoleEntity> VoiceRolesRel { get; set; }
-        
 
-        public ulong GuildId { get; set; }
+        public ulong GuildId { get; init; }
 
         [Required]
         [MaxLength(15)]
@@ -91,6 +90,11 @@ namespace AkkoBot.Services.Database.Entities
             ErrorColor = config.ErrorColor;
         }
 
+        /// <summary>
+        /// Adds the default server punishments to this instance.
+        /// </summary>
+        /// <remarks>Kick at 3 warnings, ban at 5 warnings.</remarks>
+        /// <returns>This instance.</returns>
         public GuildConfigEntity AddDefaultWarnPunishments()
         {
             var defaultPunishments = new WarnPunishEntity[]

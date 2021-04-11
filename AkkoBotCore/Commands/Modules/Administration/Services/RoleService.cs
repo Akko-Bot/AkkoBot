@@ -1,13 +1,14 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration.Services
@@ -15,9 +16,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordRole"/> objects.
     /// </summary>
-    public class RoleService : AkkoCommandService
+    public class RoleService : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
 
         /// <summary>
         /// Defines the set of denied permissions to be applied to a muted user.
@@ -34,8 +36,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         public const Permissions MutePermsAllow = Permissions.AccessChannels;
 
-        public RoleService(IServiceProvider services) : base(services)
-            => _services = services;
+        public RoleService(IServiceProvider services, IDbCache dbCache)
+        {
+            _services = services;
+            _dbCache = dbCache;
+        }
 
         /// <summary>
         /// A more permissive version of <see cref="CheckHierarchyAsync(CommandContext, DiscordMember, string)"/>
@@ -88,20 +93,19 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The server mute role.</returns>
         public async Task<DiscordRole> FetchMuteRoleAsync(DiscordGuild server)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
-            var guildSettings = db.GuildConfig.GetGuild(server.Id);
+            _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
 
-            if (!server.Roles.TryGetValue(guildSettings.MuteRoleId ?? 0, out var muteRole))
+            if (!server.Roles.TryGetValue(dbGuild.MuteRoleId ?? 0, out var muteRole))
             {
-                using var scope = _services.GetScopedService<IUnitOfWork>(out var writeDb);
+                using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
                 // Create a new mute role
                 muteRole = await server.CreateRoleAsync("AkkoMute", MutePermsAllow);
 
                 // Save it to the database
-                guildSettings.MuteRoleId = muteRole.Id;
-                writeDb.GuildConfig.CreateOrUpdate(guildSettings);
-                await writeDb.SaveChangesAsync();
+                dbGuild.MuteRoleId = muteRole.Id;
+                db.GuildConfig.Update(dbGuild);
+                await db.SaveChangesAsync();
             }
 
             return muteRole;
@@ -123,7 +127,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if a timer was created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> MuteUserAsync(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string reason)
         {
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Mute the user
             await user.GrantRoleAsync(muteRole, reason);
@@ -132,7 +136,6 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 await user.SetMuteAsync(true);
 
             // Save to the database
-            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(context.Guild.Id);
 
             var muteEntry = new MutedUserEntity()
             {
@@ -140,19 +143,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 UserId = user.Id
             };
 
-            var occurrence = new OccurrenceEntity()
-            {
-                GuildIdFK = context.Guild.Id,
-                UserId = user.Id,
-                Mutes = 1
-            };
-
             // If user is already muted, do nothing
-            if (!guildSettings.MutedUserRel.Any(x => x.UserId == user.Id))
+            if (!await db.MutedUsers.AnyAsync(x => x.GuildIdFK == context.Guild.Id && x.UserId == user.Id))
             {
-                await db.GuildConfig.CreateOccurrenceAsync(context.Guild, user.Id, occurrence);
-                guildSettings.MutedUserRel.Add(muteEntry);
-                db.GuildConfig.Update(guildSettings);
+                var occurrence = new OccurrenceEntity()
+                {
+                    GuildIdFK = context.Guild.Id,
+                    UserId = user.Id,
+                    Mutes = 1
+                };
+
+                db.Add(muteEntry);
+                db.Upsert(occurrence);
             }
 
             // Add timer if mute is not permanent
@@ -160,10 +162,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             {
                 var timerEntry = new TimerEntity(muteEntry, time);
 
-                db.Timers.AddOrUpdate(timerEntry, out var dbTimerEntry);
+                db.Timers.Upsert(timerEntry);
                 await db.SaveChangesAsync();
 
-                db.Timers.Cache.AddOrUpdateByEntity(context.Client, dbTimerEntry);
+                _dbCache.Timers.AddOrUpdateByEntity(context.Client, timerEntry);
                 return true;
             }
 
@@ -180,7 +182,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the unmute.</param>
         public async Task UnmuteUserAsync(DiscordGuild server, DiscordRole muteRole, DiscordMember user, string reason)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Unmute the user
             await user.RevokeRoleAsync(muteRole, reason);
@@ -189,22 +191,16 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 await user.SetMuteAsync(false);
 
             // Remove from the database
-            var guildSettings = await db.GuildConfig.GetGuildWithMutesAsync(server.Id);
-            var muteEntry = guildSettings.MutedUserRel.FirstOrDefault(x => x.UserId == user.Id);
-
-            var timerEntry = (await db.Timers.GetAsync(x => x.GuildId == server.Id && x.UserId == user.Id))
-                .FirstOrDefault();
+            var muteEntry = await db.MutedUsers.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.UserId == user.Id);
+            var timerEntry = await db.Timers.FirstOrDefaultAsync(x => x.GuildId == server.Id && x.UserId == user.Id);
 
             if (muteEntry is not null)
-            {
-                guildSettings.MutedUserRel.Remove(muteEntry);
-                db.GuildConfig.Update(guildSettings);
-            }
+                db.MutedUsers.Remove(muteEntry);
 
             if (timerEntry is not null)
             {
-                db.Timers.Delete(timerEntry);
-                db.Timers.Cache.TryRemove(timerEntry.Id);
+                db.Timers.Remove(timerEntry);
+                _dbCache.Timers.TryRemove(timerEntry.Id);
             }
 
             await db.SaveChangesAsync();

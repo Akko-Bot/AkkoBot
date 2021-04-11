@@ -46,7 +46,7 @@ namespace AkkoBot.Extensions
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
         {
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
 
             // Get the timeout
             dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild);
@@ -173,7 +173,7 @@ namespace AkkoBot.Extensions
         /// <returns>A formatted and localized response string.</returns>
         public static string FormatLocalized(this CommandContext context, string key, params object[] args)
         {
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
             var localizer = context.Services.GetService<ILocalizer>();
 
             var locale = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
@@ -216,7 +216,7 @@ namespace AkkoBot.Extensions
                 return;
             }
 
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
@@ -287,7 +287,7 @@ namespace AkkoBot.Extensions
                 return;
             }
 
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
@@ -327,7 +327,7 @@ namespace AkkoBot.Extensions
             else if (maxFields > 25)
                 throw new ArgumentException("Embeds cannot have more than 25 fields.", nameof(maxFields));
 
-            var dbCache = context.Services.GetService<IDbCacher>();
+            var dbCache = context.Services.GetService<IDbCache>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
@@ -388,8 +388,8 @@ namespace AkkoBot.Extensions
         public static string GetLocaleKey(this CommandContext context)
         {
             return (context.Guild is null)
-                ? context.Services.GetService<IDbCacher>().BotConfig.BotPrefix
-                : context.Services.GetService<IDbCacher>().Guilds[context.Guild.Id].Prefix;
+                ? context.Services.GetService<IDbCache>().BotConfig.BotPrefix
+                : context.Services.GetService<IDbCache>().Guilds[context.Guild.Id].Prefix;
         }
 
         /// <summary>

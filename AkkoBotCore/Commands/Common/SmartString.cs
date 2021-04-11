@@ -118,7 +118,7 @@ namespace AkkoBot.Commands.Common
                 _parsedContent.Replace("@here", Formatter.InlineCode("@here"));
             }
 
-            if (_context.Services.GetService<IDbCacher>().Guilds[_context.Guild.Id].PermissiveRoleMention)
+            if (_context.Services.GetService<IDbCache>().Guilds[_context.Guild.Id].PermissiveRoleMention)
             {
                 // Sanitize by role hierarchy - Permissive
                 foreach (Match match in matches)

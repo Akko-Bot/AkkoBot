@@ -1,11 +1,12 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,16 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="CommandEntity"/> objects.
     /// </summary>
-    public class CommandScheduleService : AkkoCommandService
+    public class CommandScheduleService : ICommandService
     {
         private readonly IServiceProvider _services;
+        private readonly IDbCache _dbCache;
 
-        public CommandScheduleService(IServiceProvider services) : base(services)
-            => _services = services;
+        public CommandScheduleService(IServiceProvider services, IDbCache dbCache)
+        {
+            _services = services;
+            _dbCache = dbCache;
+        }
 
         /// <summary>
         /// Adds an autocommand to the database and initializes its corresponding timer.
@@ -38,7 +43,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is CommandType.Startup)
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var newTimer = new TimerEntity()
             {
@@ -52,7 +57,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
-            db.Timers.Create(newTimer);
+            db.Add(newTimer);
             await db.SaveChangesAsync();
 
             var newCmd = new CommandEntity()
@@ -65,8 +70,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Type = cmdType
             };
 
-            db.AutoCommands.Create(newCmd);
-            db.Timers.Cache.AddOrUpdateByEntity(context.Client, newTimer);
+            db.Add(newCmd);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
             await db.SaveChangesAsync();
 
             return true;
@@ -84,7 +89,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null)
                 return false;
 
-            using var scope = _services.GetScopedService<IUnitOfWork>(out var db);
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var newCmd = new CommandEntity()
             {
@@ -95,7 +100,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Type = CommandType.Startup
             };
 
-            db.AutoCommands.Create(newCmd);
+            db.Add(newCmd);
             await db.SaveChangesAsync();
 
             return true;
@@ -109,22 +114,22 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if the autocommand was successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveAutoCommandAsync(DiscordUser user, int id)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbCmd = await db.AutoCommands.GetAsync(id);
+            var dbCmd = await db.FindAsync<CommandEntity>(id);
 
             if (dbCmd is null || user.Id != dbCmd.AuthorId)
                 return false;
 
-            var dbTimer = await db.Timers.GetAsync(dbCmd.TimerId);
+            var dbTimer = await db.FindAsync<TimerEntity>(dbCmd.TimerId);
 
             if (dbTimer is not null)
             {
-                db.Timers.Delete(dbTimer);
-                db.Timers.Cache.TryRemove(dbTimer.Id);
+                db.Remove(dbTimer);
+                _dbCache.Timers.TryRemove(dbTimer.Id);
             }
 
-            db.AutoCommands.Delete(dbCmd);
+            db.Remove(dbCmd);
 
             return await db.SaveChangesAsync() is not 0;
         }
@@ -136,12 +141,10 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of autocommands.</returns>
         public async Task<IEnumerable<CommandEntity>> GetAutoCommandsAsync(DiscordUser user)
         {
-            var db = base.Scope.ServiceProvider.GetService<IUnitOfWork>();
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            return (await db.AutoCommands.Table
-                .AsNoTracking()
-                .Where(x => x.AuthorId == user.Id)
-                .ToListAsync())
+            return (await db.AutoCommands.Fetch(x => x.AuthorId == user.Id)
+                .ToArrayAsync())
                 .OrderBy(x => GetElapseTime(x));
         }
 
@@ -159,7 +162,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
                 case CommandType.Scheduled:
                 case CommandType.Repeated:
-                    _services.GetService<IDbCacher>().Timers.TryGetValue(dbEntry.TimerId.Value, out var timer);
+                    _dbCache.Timers.TryGetValue(dbEntry.TimerId.Value, out var timer);
                     return timer.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m");
 
                 default:

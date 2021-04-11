@@ -81,7 +81,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
             }
 
-            _guildService.GetOrSetProperty(context.Guild, x => x.Prefix = newPrefix);
+            await _guildService.GetOrSetPropertyAsync(context.Guild, x => x.Prefix = newPrefix);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(newPrefix)));
@@ -192,8 +192,8 @@ namespace AkkoBot.Commands.Modules.Administration
         /// <param name="context">The command context.</param>
         private async Task CheckPrefixAsync(CommandContext context)
         {
-            var prefix = _guildService.GetOrSetProperty(context.Guild, x => x?.Prefix)
-                ?? _botService.GetOrSetProperty(x => x.BotPrefix);
+            var prefix = await _guildService.GetOrSetPropertyAsync(context.Guild, x => x?.Prefix)
+                ?? await _botService.GetOrSetPropertyAsync(x => x.BotPrefix);
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
             var embed = new DiscordEmbedBuilder()

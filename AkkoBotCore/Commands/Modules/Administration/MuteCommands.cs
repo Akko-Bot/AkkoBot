@@ -26,7 +26,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("mute"), HiddenOverload]
         [Description("cmd_mute")]
         [RequirePermissions(Permissions.MuteMembers)]
-        [RequireBotPermissions(Permissions.ManageRoles)]
+        [RequireBotPermissions(Permissions.ManageRoles | Permissions.ManageChannels)]
         [Priority(0)]
         public async Task Mute(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [RemainingText, Description("arg_punishment_reason")] string reason)
             => await TimedMute(context, user, TimeSpan.FromHours(1), reason);

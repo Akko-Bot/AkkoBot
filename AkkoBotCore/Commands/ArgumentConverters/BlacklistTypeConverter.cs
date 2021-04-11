@@ -16,7 +16,7 @@ namespace AkkoBot.Commands.ArgumentConverters
                 "u" or "user" or "users" => Task.FromResult(Optional.FromValue(BlacklistType.User)),
                 "c" or "channel" or "channels" => Task.FromResult(Optional.FromValue(BlacklistType.Channel)),
                 "s" or "server" or "servers" => Task.FromResult(Optional.FromValue(BlacklistType.Server)),
-                _ => Task.FromResult(Optional.FromValue(BlacklistType.Unspecified))
+                _ => Task.FromResult(Optional.FromNoValue<BlacklistType>())
             };
         }
     }
