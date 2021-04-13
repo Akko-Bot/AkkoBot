@@ -481,3 +481,12 @@ cmd_bl_check: Checks if the specified ID is blacklisted.
 bl_not_found: This ID is not blacklisted.
 cmd_playingstatus: Groups commands that manipulate the bot's playing status.
 emoji_list_title: Server Emojis
+arg_time_of_day: Time of day, in `HH:mm` format.
+cmd_guild_timezone: Sets this guild's time zone.
+timezone_list: Time Zones
+cmd_timezones: Lists all time zones available to the bot.
+cmd_timezone: Shows the time zone of the current server.
+arg_timezone: Name of the time zone.
+server_timezone: Time zone on this server is {0}.
+guild_timezone_error: This time zone is not available. Use {0} to see the list of available time zones.
+guild_timezone_changed: The time zone of this server has been changed to {0}.

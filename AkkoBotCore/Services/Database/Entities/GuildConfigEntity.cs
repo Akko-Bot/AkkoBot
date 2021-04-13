@@ -65,6 +65,9 @@ namespace AkkoBot.Services.Database.Entities
             set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
+        [MaxLength(100)]
+        public string Timezone { get; set; }
+
         public ulong? MuteRoleId { get; set; }
 
         public TimeSpan WarnExpire { get; set; } = TimeSpan.FromDays(30 * 6);
@@ -119,5 +122,13 @@ namespace AkkoBot.Services.Database.Entities
             WarnPunishRel.AddRange(defaultPunishments);
             return this;
         }
+
+        public override IReadOnlyDictionary<string, string> GetSettings()
+        {
+            var result = base.GetSettings() as Dictionary<string, string>;
+            result.Remove(nameof(GuildId).ToSnakeCase());
+
+            return result;
+        }     
     }
 }

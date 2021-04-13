@@ -383,13 +383,27 @@ namespace AkkoBot.Extensions
         /// <summary>
         /// Gets the locale of the current context.
         /// </summary>
-        /// <param name="context">The command context.</param>
+        /// <param name="context">This command context.</param>
         /// <returns>The locale to be used for localization.</returns>
         public static string GetLocaleKey(this CommandContext context)
         {
             return (context.Guild is null)
                 ? context.Services.GetService<IDbCache>().BotConfig.BotPrefix
                 : context.Services.GetService<IDbCache>().Guilds[context.Guild.Id].Prefix;
+        }
+
+        /// <summary>
+        /// Gets the timezone of the current context.
+        /// </summary>
+        /// <param name="context">This command context.</param>
+        /// <returns>The <see cref="TimeZoneInfo"/> associated with this context or <see cref="TimeZoneInfo.Local"/> if there isn't one.</returns>
+        public static TimeZoneInfo GetTimeZone(this CommandContext context)
+        {
+            if (context.Guild is null)
+                return TimeZoneInfo.Local;
+
+            var dbCache = context.Services.GetService<IDbCache>();
+            return GeneralService.GetTimeZone(dbCache.Guilds[context.Guild.Id].Timezone, true);
         }
 
         /// <summary>

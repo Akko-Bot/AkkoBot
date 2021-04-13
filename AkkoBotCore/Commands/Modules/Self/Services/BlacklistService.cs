@@ -17,12 +17,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="BlacklistEntity"/> objects.
     /// </summary>
-    public class BlacklistService : AkkoCommandService
+    public class BlacklistService : ICommandService
     {
         private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
 
-        public BlacklistService(IServiceProvider services, IDbCache dbCache) : base(services)
+        public BlacklistService(IServiceProvider services, IDbCache dbCache)
         {
             _services = services;
             _dbCache = dbCache;

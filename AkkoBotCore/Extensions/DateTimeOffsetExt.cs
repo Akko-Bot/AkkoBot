@@ -8,8 +8,9 @@ namespace AkkoBot.Extensions
         /// Gets the beginning of the day of this date.
         /// </summary>
         /// <param name="date">This date.</param>
+        /// <param name="offset">UTC offset.</param>
         /// <returns>This <see cref="DateTimeOffset"/> with its <see cref="DateTimeOffset.TimeOfDay"/> set to zero.</returns>
-        public static DateTimeOffset StartOfDay(this DateTimeOffset date)
-            => new(date.Year, date.Month, date.Day, 0, 0, 0, 0, TimeSpan.Zero);
+        public static DateTimeOffset StartOfDay(this DateTimeOffset date, TimeSpan offset = default)
+            => new(date.Year, date.Month, date.Day, 0, 0, 0, 0, offset);
     }
 }

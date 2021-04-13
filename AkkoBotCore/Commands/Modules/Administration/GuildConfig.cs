@@ -1,18 +1,21 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models;
 using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration
 {
-    [Group("serverconfig"), Aliases("guildconfig", "servercfg", "guildcfg")]
+    [Group("serverconfig"), Aliases("guildconfig", "server", "guild")]
     [Description("cmd_guild")]
     [RequireGuild, RequireUserPermissions(Permissions.ManageGuild)]
     public class GuildConfig : AkkoCommandModule
@@ -148,6 +151,24 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("timezone")]
+        [Description("cmd_guild_timezone")]
+        public async Task Timezone(CommandContext context, [RemainingText, Description("arg_timezone")] string timezone)
+        {
+            var zone = GeneralService.GetTimeZone(timezone);
+            var embed = new DiscordEmbedBuilder()
+            {
+                Description = (zone is null)
+                    ? context.FormatLocalized("guild_timezone_error", Formatter.InlineCode(context.Prefix + "timezones"))
+                    : context.FormatLocalized("guild_timezone_changed", Formatter.InlineCode($"{zone.StandardName} ({zone.BaseUtcOffset.Hours:00}:{zone.BaseUtcOffset.Minutes:00})"))
+            };
+
+            if (zone is not null)
+                await _service.GetOrSetPropertyAsync(context.Guild, x => x.Timezone = zone.StandardName);
+
+            await context.RespondLocalizedAsync(embed, isError: zone is null);
+        }
+
         [GroupCommand, Command("list")]
         [Description("cmd_guild_list")]
         public async Task ListGuildConfigs(CommandContext context)
@@ -156,8 +177,8 @@ namespace AkkoBot.Commands.Modules.Administration
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("guild_settings_title")
-                .AddField("settings", string.Join("\n", settings.Keys.ToArray()), true)
-                .AddField("value", string.Join("\n", settings.Values.ToArray()), true);
+                .AddField("settings", string.Join("\n", settings.Keys), true)
+                .AddField("value", string.Join("\n", settings.Values), true);
 
             await context.RespondLocalizedAsync(embed);
         }

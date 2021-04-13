@@ -22,6 +22,30 @@ namespace AkkoBot.Commands.Modules.Utilities
             => _service = service;
 
         [Command("me")]
+        public async Task AddPrivateReminder(CommandContext context, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [RemainingText, Description("arg_remind_message")] string message)
+            => await AddPrivateReminder(context, timeOfDay.Interval, message);
+
+        [Command("here")]
+        public async Task AddGuildReminder(CommandContext context, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [RemainingText, Description("arg_remind_message")] string message)
+            => await AddGuildReminder(context, timeOfDay.Interval, message);
+
+        [Command("channel")]
+        public async Task AddChannelReminder(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [RemainingText, Description("arg_remind_message")] string message)
+            => await AddChannelReminder(context, channel, timeOfDay.Interval, message);
+
+        [Command("me")]
+        public async Task AddPrivateReminder(CommandContext context, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
+            => await AddPrivateReminder(context, timeOfDay.Interval.Add(time), message);
+
+        [Command("here")]
+        public async Task AddGuildReminder(CommandContext context, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
+            => await AddGuildReminder(context, timeOfDay.Interval.Add(time), message);
+
+        [Command("channel")]
+        public async Task AddPrivateReminder(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
+            => await AddChannelReminder(context, channel, timeOfDay.Interval.Add(time), message);
+
+        [Command("me")]
         [Description("cmd_remind_me")]
         public async Task AddPrivateReminder(CommandContext context, [Description("arg_remind_time")] TimeSpan time, [RemainingText, Description("arg_remind_message")] string message)
         {
@@ -40,7 +64,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [GroupCommand, Command("channel")]
         [Description("cmd_remind_channel")]
         [RequireUserPermissions(Permissions.ManageMessages)] // Shows up on !help, but doesn't perform the check
-        public async Task AddGuildReminder(CommandContext context,
+        public async Task AddChannelReminder(CommandContext context,
             [Description("arg_discord_channel")] DiscordChannel channel,
             [Description("arg_remind_time")] TimeSpan time,
             [RemainingText, Description("arg_remind_message")] string message)

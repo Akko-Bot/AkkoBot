@@ -8,6 +8,7 @@ using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -114,7 +115,7 @@ namespace AkkoBot.Core.Services
         private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             // May want to remove this method
-            _services.GetService<IDbCache>().Timers ??= _services.GetService<ITimerManager>();
+            _dbCache.Timers ??= _services.GetService<ITimerManager>();
             return Task.CompletedTask;
         }
 
@@ -206,17 +207,9 @@ namespace AkkoBot.Core.Services
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
-                dbGuild = await db.GuildConfig.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.GuildId == eventArgs.Guild.Id);
+                dbGuild = await _dbCache.GetGuildAsync(eventArgs.Guild.Id);
                 var filteredWords = await db.FilteredWords.AsNoTracking()
                     .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
-
-                if (dbGuild is null)
-                {
-                    dbGuild = new GuildConfigEntity(_dbCache.BotConfig) { GuildId = eventArgs.Guild.Id };
-                    db.Add(dbGuild);
-                    await db.SaveChangesAsync();
-                }
 
                 _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
 
@@ -250,11 +243,11 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
         {
-            //if (eventArgs.Exception
-            //is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
-            //and not ChecksFailedException       // Ignore command check fails
-            //and not CommandNotFoundException    // Ignore commands that do not exist
-            //and not InvalidOperationException)  // Ignore groups that are not commands themselves
+            if (eventArgs.Exception
+            is not ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
+            and not ChecksFailedException       // Ignore command check fails
+            and not CommandNotFoundException    // Ignore commands that do not exist
+            and not InvalidOperationException)  // Ignore groups that are not commands themselves
             {
                 cmdHandler.Client.Logger.LogCommand(
                     LogLevel.Error,

@@ -83,6 +83,18 @@ namespace AkkoBot.Services
         }
 
         /// <summary>
+        /// Safely gets the specified timezone info.
+        /// </summary>
+        /// <param name="id">The timezone ID.</param>
+        /// <param name="getDefault"><see langword="true"/> to return the local timezone if the specified ID is invalid, <see langword="false"/> to return <see langword="null"/>.</param>
+        /// <returns>A <see cref="TimeZoneInfo"/> object, <see langword="null"/> if the specified ID is invalid.</returns>
+        public static TimeZoneInfo GetTimeZone(string id, bool getDefault = false)
+        {
+            try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
+            catch { return (getDefault) ? TimeZoneInfo.Local : null; }
+        }
+
+        /// <summary>
         /// Safely gets a color for the specified hexadecimal color code.
         /// </summary>
         /// <param name="colorCode">The hexadecimal color code.</param>
