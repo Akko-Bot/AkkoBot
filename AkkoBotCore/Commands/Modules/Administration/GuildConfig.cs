@@ -117,8 +117,8 @@ namespace AkkoBot.Commands.Modules.Administration
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("locales_title")
-                .AddField("code", string.Join('\n', locales.ToArray()), true)
-                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x).ToArray()), true);
+                .AddField("code", string.Join('\n', locales), true)
+                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x)), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -126,29 +126,21 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("locale"), Aliases("languages")]
         public async Task ChangeGuildLocale(CommandContext context, [Description("arg_locale")] string languageCode)
         {
-            // If locale does not exist, send error message
-            if (!_service.IsLocaleRegistered(languageCode, out var responseKey))
-            {
-                var errorEmbed = new DiscordEmbedBuilder()
-                    .WithDescription(
-                        context.FormatLocalized(
-                            "guild_locale_unavailable",
-                            Formatter.InlineCode(context.Prefix + context.Command.QualifiedName)
-                        )
-                    );
-
-                await context.RespondLocalizedAsync(errorEmbed, isError: true);
-                return;
-            }
+            var success = _service.IsLocaleRegistered(languageCode, out var responseKey);
 
             // Change the locale
-            await _service.GetOrSetPropertyAsync(context.Guild, x => x.Locale = responseKey);
+            if (success)
+                await _service.GetOrSetPropertyAsync(context.Guild, x => x.Locale = responseKey);
 
             // Send the message
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey)));
-
-            await context.RespondLocalizedAsync(embed);
+            {
+                Description = (success)
+                    ? context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey))
+                    : context.FormatLocalized("guild_locale_unavailable", Formatter.InlineCode(context.Prefix + context.Command.QualifiedName))
+            };
+            
+            await context.RespondLocalizedAsync(embed, isError: !success);
         }
 
         [Command("timezone")]

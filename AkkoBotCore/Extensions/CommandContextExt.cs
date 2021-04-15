@@ -29,7 +29,7 @@ namespace AkkoBot.Extensions
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <remarks>The question message gets deleted, regardless of user input.</remarks>
         /// <returns>The interaction between the user and the message.</returns>
-        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, DiscordEmbedBuilder embed, string expectedResponse, Func<Task> action, bool isMarked = true, bool isError = false)
             => await RespondInteractiveAsync(context, null, embed, expectedResponse, action, isMarked, isError);
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace AkkoBot.Extensions
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
         /// <remarks>The question message gets deleted, regardless of user input.</remarks>
         /// <returns>The interaction between the user and the message.</returns>
-        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, string expectedResponse, Action action, bool isMarked = true, bool isError = false)
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, string message, DiscordEmbedBuilder embed, string expectedResponse, Func<Task> action, bool isMarked = true, bool isError = false)
         {
             var dbCache = context.Services.GetService<IDbCache>();
 
@@ -66,7 +66,7 @@ namespace AkkoBot.Extensions
 
             // If user replied with the expected response, execute the action
             if (!result.TimedOut && result.Result.Content.EqualsOrStartsWith(response))
-                action();
+                await action();
 
             return result;
         }

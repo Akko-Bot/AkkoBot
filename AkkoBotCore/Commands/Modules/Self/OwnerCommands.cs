@@ -18,19 +18,10 @@ namespace AkkoBot.Commands.Modules.Self
     [BotOwner]
     public class OwnerCommands : AkkoCommandModule
     {
-        private readonly BotConfigService _service;
         private readonly UtilitiesService _utilities;
 
-        public OwnerCommands(BotConfigService service, UtilitiesService utilities)
-        {
-            _service = service;
-            _utilities = utilities;
-        }
-
-        [Command("reloadlocales"), Aliases("reloadresponses")]
-        [Description("cmd_config_reloadlocales")]
-        public async Task ReloadResponseStrings(CommandContext context)
-                => await context.Message.CreateReactionAsync((_service.ReloadLocales() is not 0) ? AkkoEntities.SuccessEmoji : AkkoEntities.WarningEmoji);
+        public OwnerCommands(UtilitiesService utilities)
+            => _utilities = utilities;
 
         [Command("senddirectmessage"), Aliases("senddm")]
         [Description("cmd_senddm")]

@@ -58,11 +58,13 @@ arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
 arg_stream_url: The URL of the stream.
+arg_time_of_day: Time of day, in `HH:mm` format.
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
 arg_timed_pstatus: For how long the status should be displayed.
 arg_timed_warn: How long the warnings should last for.
 arg_timeout: An integer number higher than 10 and less than 120.
+arg_timezone: Name of the time zone.
 arg_uint: An integer number higher or equal to zero.
 arg_ulong_id: A valid Discord ID.
 arg_ulong_id_col: Multiple valid Discord IDs.
@@ -87,6 +89,7 @@ bl_clear: '{0} entries were successfully removed from the blacklist.'
 bl_empty: There are no entries in the blacklist.
 bl_exist: '{0} {1} {2} is blacklisted already.'
 bl_not_exist: '{0} {1} {2} is not blacklisted.'
+bl_not_found: This ID is not blacklisted.
 bl_removed: Successfully removed {0} {1} {2} from the blacklist.
 bl_removed_range: '{0} IDs were removed from the blacklist.'
 bl_title: Blacklist
@@ -110,6 +113,7 @@ cmd_autocommand_list: Lists all autocommands you have created.
 cmd_autocommand_remove: Removes an autocommand with the specified ID.
 cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
 cmd_ban: Bans a user.
+cmd_bl_check: Checks if the specified ID is blacklisted.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
 cmd_blacklist_clear: Clears the blacklist.
@@ -188,6 +192,7 @@ cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
 cmd_guild_rolemention: 'Toggles whether users can ping roles through the bot based solely on their position in the role hierarchy. Caution: depending on how the server permissions are set up, enabling this setting may enable role ping abuse.'
 cmd_guild_timeout: Sets how long the bot should wait for user response on interactive commands, in seconds. Provide no parameter to reset it back to default.
+cmd_guild_timezone: Sets this server's time zone.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
 cmd_inrole: Lists all users on this server with the specified role.
@@ -205,6 +210,7 @@ cmd_moveuser: Moves a user to another voice channel. Provide no channel to force
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
+cmd_playingstatus: Groups commands to manage the bot's playing status.
 cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
 cmd_react: Reacts to a message with the specified emoji.
 cmd_reactclear: Removes all reactions from the specified message.
@@ -237,8 +243,11 @@ cmd_setrole: Adds a role to the specified user.
 cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
 cmd_settopic: Sets the topic for the current text channel.
 cmd_slowmode: Sets how frequently users are allowed to send messages in this text channel. Provide no parameter to disable.
+cmd_sql: Runs a SQL query on the database.
 cmd_sudo: Executes a command as the specified user.
 cmd_timedban: Temporarily bans a user from the server.
+cmd_timezone: Shows the time zone used in this server.
+cmd_timezones: Lists all time zones available to the bot.
 cmd_unban: Unbans a user from the server.
 cmd_undeafen: Removes server deafening from a user.
 cmd_unlockchannel: Unlocks the current channel so users can send messages again.
@@ -246,6 +255,11 @@ cmd_unmute: Unmutes a user from text and voice channels.
 cmd_userid: Shows the ID of the specified user. Provide no parameter to show the ID of the current user.
 cmd_userinfo: Shows basic information about the specified Discord user. Provide no parameter to show information about yourself.
 cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
+cmd_voicerole: Groups commands for managing voice channel roles.
+cmd_voicerole_add: Adds a role to the specified voice channel. You can ommit the channel if you are connected to it. Users who join the channel will automatically be assigned the specified role.
+cmd_voicerole_list: Lists all voice roles in this Discord server.
+cmd_voicerole_remove: Removes a role from the specified voice channel. You can ommit the channel if you are connected to it.
+cmd_voicerole_removeall: Removes all roles from the specified voice channel. You can ommit the channel if you are connected to it.
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
 cmd_warn: Warns a user.
 cmd_warnc: Clears all notices and warnings from a user or a specific one if the ID is provided.
@@ -268,6 +282,7 @@ deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
 disabled: disabled
+emoji_list_title: Server Emojis
 emojis: Emojis
 enabled: enabled
 error_hierarchy: This command can only be used on users with a role lower to mine and yours in the role hierarchy.
@@ -304,6 +319,8 @@ guild_role_mention: Permissive role mentions have been {0}.
 guild_settings_title: Server Settings
 guild_timeout_changed: Command timeout on this server has been set to {0} seconds.
 guild_timeout_reset: Command timeout on this server has been reset.
+guild_timezone_changed: The time zone of this server has been changed to {0}.
+guild_timezone_error: This time zone is not available. Use {0} to see the list of available time zones.
 hackban_title: User Hackbanned
 help_add_reactions: Add Reactions
 help_administrator: Administrator
@@ -402,6 +419,7 @@ q_blclear: remove all blacklist entries
 q_deleteallroles: delete {0} roles
 q_no: 'no'
 q_operation_length_seconds: This operation will take at least {0} seconds.
+q_sql_query: run this query
 q_yes: 'yes'
 reason: Reason
 region: Region
@@ -418,11 +436,14 @@ sban_notification: You have been soft-banned from the {0} server.
 sban_title: User Soft-banned
 seconds: Seconds
 server: Server
+server_timezone: Time zone on this server is {0}.
 settings: Settings
 shutdown: Shutting down.
 slowmode: Slowmode
 softban: Soft-ban
 softban_enum: soft-banned
+sqlexec_success: Query successfully run in {0} ms. {1} rows affected.
+sqlselect_title: Query Result
 store: Store
 text: Text
 timedban_notification: You have been banned from the {0} server for {0}.
@@ -430,6 +451,7 @@ timedban_title: Temporary Ban
 timedmute: Expired Mute
 timedrole: Punishment Role
 timedunrole: Punishment Role Removal
+timezone_list: Time Zones
 total: '{0} total'
 triggers_in: Triggers In
 type: Type
@@ -449,6 +471,8 @@ user_limit: User Limit
 userroles_title: "{0}'s roles"
 value: Value
 vanity_url: Vanity URL
+vcrole_empty: No voice roles were found.
+vcrole_list_title: List of Voice Roles
 verification_level: Verification Level
 visible_to: Visible To
 voice: Voice
@@ -469,24 +493,3 @@ warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
 xid: ID of {0} {1} is {2}.
-
-cmd_voicerole: Groups commands for managing voice channel roles.
-cmd_voicerole_add: Adds a role to the specified voice channel. You can ommit the channel as long as you are connected to it.
-cmd_voicerole_remove: Removes a role from the specified voice channel. You can ommit the channel as long as you are connected to it.
-cmd_voicerole_removeall: Removes all roles from the specified voice channel. You can ommit the channel as long as you are connected to it.
-cmd_voicerole_list: Lists all voice roles in this Discord server.
-vcrole_empty: No voice roles were found.
-vcrole_list_title: List of Voice Roles
-cmd_bl_check: Checks if the specified ID is blacklisted.
-bl_not_found: This ID is not blacklisted.
-cmd_playingstatus: Groups commands that manipulate the bot's playing status.
-emoji_list_title: Server Emojis
-arg_time_of_day: Time of day, in `HH:mm` format.
-cmd_guild_timezone: Sets this guild's time zone.
-timezone_list: Time Zones
-cmd_timezones: Lists all time zones available to the bot.
-cmd_timezone: Shows the time zone of the current server.
-arg_timezone: Name of the time zone.
-server_timezone: Time zone on this server is {0}.
-guild_timezone_error: This time zone is not available. Use {0} to see the list of available time zones.
-guild_timezone_changed: The time zone of this server has been changed to {0}.

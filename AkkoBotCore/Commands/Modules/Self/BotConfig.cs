@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Self
 {
     [BotOwner]
-    [Group("botconfig"), Aliases("self", "botcfg")]
+    [Group("botconfig"), Aliases("self", "bot")]
     [Description("cmd_config")]
     public class BotConfig : AkkoCommandModule
     {
@@ -36,6 +36,11 @@ namespace AkkoBot.Commands.Modules.Self
         public async Task SetBotPrefix(CommandContext context, [Description("arg_prefix")] string prefix)
             => await ChangeProperty(context, x => x.BotPrefix = prefix);
 
+        [Command("reloadlocales"), Aliases("reloadresponses")]
+        [Description("cmd_config_reloadlocales")]
+        public async Task ReloadResponseStrings(CommandContext context)
+                => await context.Message.CreateReactionAsync((_botService.ReloadLocales() is not 0) ? AkkoEntities.SuccessEmoji : AkkoEntities.WarningEmoji);
+
         [Command("locale")]
         [Description("cmd_config_locale")]
         public async Task ListLocales(CommandContext context)
@@ -45,8 +50,8 @@ namespace AkkoBot.Commands.Modules.Self
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("locales_title")
-                .AddField("code", string.Join('\n', locales.ToArray()), true)
-                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x).ToArray()), true);
+                .AddField("code", string.Join('\n', locales), true)
+                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x)), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }

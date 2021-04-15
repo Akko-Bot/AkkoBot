@@ -58,11 +58,13 @@ arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
 arg_say: A mensagem a ser enviada.
 arg_stream_url: A URL do stream.
+arg_time_of_day: Hora do dia, no formato `HH:mm`.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
 arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
 arg_timed_pstatus: Por quanto tempo o status deve ser exibido.
 arg_timed_warn: Quanto tempo as advertências devem durar.
 arg_timeout: Um número inteiro maior que 10 e menor que 120.
+arg_timezone: Nome do fuso horário.
 arg_uint: Um número inteiro maior ou igual a zero.
 arg_ulong_id: Um ID válido do Discord.
 arg_ulong_id_col: Múltiplos IDs válidos do Discord.
@@ -87,6 +89,7 @@ bl_clear: '{0} registros foram removidos da lista negra.'
 bl_empty: Não há registros na lista negra.
 bl_exist: '{0} {1} {2} já se encontra na lista negra.'
 bl_not_exist: '{0} {1} {2} não se encontra na lista negra.'
+bl_not_found: Esse ID não se encontra na lista negra.
 bl_removed: '{0} {1} {2} foi removido da lista negra.'
 bl_removed_range: '{0} IDs foram removidos da lista negra.'
 bl_title: Lista Negra
@@ -110,6 +113,7 @@ cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
 cmd_autocommand_remove: Remove um comando automático com o ID especificado.
 cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
 cmd_ban: Bane um usuário.
+cmd_bl_check: Checa se o ID especificado está na lista negra.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
 cmd_blacklist_clear: Limpa a lista negra.
@@ -188,6 +192,7 @@ cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor
 cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
 cmd_guild_rolemention: 'Define se usuários podem mencionar cargos através do bot meramente pela sua posição na hierarquia de cargos. Atenção: dependendo de como as permissões do servidor foram definidas, ativar essa configuração pode levar a comportamento abusivo por parte dos usuários.'
 cmd_guild_timeout: Define o quão longo comandos interativos devem esperar pela resposta do usuário, em segundos. Forneça nenhum parâmetro para redefini-lo para o valor padrão.
+cmd_guild_timezone: Define o fuso horário desse servidor.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especificado.
@@ -205,6 +210,7 @@ cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal pa
 cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
+cmd_playingstatus: Agrupa comands para gerenciar o status do bot.
 cmd_prune: Exclui as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
 cmd_react: Reage a uma mensagem com o emoji especificado.
 cmd_reactclear: Remove todas as reações da mensagem especificada.
@@ -237,8 +243,11 @@ cmd_setrole: Adiciona um cargo ao usuário especificado.
 cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
 cmd_settopic: Define o tópico do canal de texto atual.
 cmd_slowmode: Define com que frequência usuários podem enviar mensagens nesse canal de texto. Forneça nenhum parâmetro para desabilitar.
+cmd_sql: Executa uma instrução SQL no banco de dados.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_timedban: Bane um usuário temporariamente do servidor.
+cmd_timezone: Exibe o fuso horário utilizado nesse servidor.
+cmd_timezones: Exibe todos os fusos horários disponíveis ao bot.
 cmd_unban: Desbane um usuário do servidor.
 cmd_undeafen: Remove o ensurdecimento de um usuário.
 cmd_unlockchannel: Destranca o canal atual, permitindo que os usuários voltem a enviar mensagens.
@@ -246,6 +255,11 @@ cmd_unmute: Remove o silenciamento de um usuário nos canais de voz e texto.
 cmd_userid: Exibe of ID do usuário especificado. Forneça nenhum parâmetro para exibir o ID do usuário atual.
 cmd_userinfo: Exibe informações básicas sobre o usuário especificado. Forneça nenhum parâmetro para exibir informações de si mesmo.
 cmd_voicemute: Silencia um usuário, impedindo-o de falar em canais de voz.
+cmd_voicerole: Agrupa comands para gerenciar cargos de canal de voz.
+cmd_voicerole_add: Adiciona um cargo ao canal de voz especificado. Você pode omitir o canal se estiver conectado a ele. Usuários que se conectarem ao canal automaticamente receberão o cargo especificado.
+cmd_voicerole_list: Exibe todos os cargos de canal de voz desse servidor.
+cmd_voicerole_remove: Remove um cargo do canal de voz especificado. Você pode omitir o canal se estiver conectado a ele.
+cmd_voicerole_removeall: Remove todos os cargos do canal de voz especificado. Você pode omitir o canal se estiver conectado a ele.
 cmd_voiceunmute: Remove o silenciamento de um usuário, permitindo-o voltar a falar nos canais de voz.
 cmd_warn: Adverte um usuário.
 cmd_warnc: Remove todas as anotações e advertências de um usuário ou uma específica se o ID for fornecido.
@@ -268,6 +282,7 @@ deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novam
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
 disabled: desativado
+emoji_list_title: Emojis do Servidor
 emojis: Emojis
 enabled: ativado
 error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor que o meu e o seu na hierarquia de cargos.
@@ -304,6 +319,8 @@ guild_role_mention: Menções permissivas de cargos foram {0}s.
 guild_settings_title: Configurações do Servidor
 guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
 guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
+guild_timezone_changed: O fuso horário desse servidor foi alterado para {0}.
+guild_timezone_error: Esse fuso horário não está disponível. Utilize {0} para exibir a lista de fusos horários disponíveis.
 hackban_title: Usuário Preventivamente Banido
 help_add_reactions: Adicionar Reações
 help_administrator: Administrador
@@ -402,6 +419,7 @@ q_blclear: remover todos os registros da lista negra
 q_deleteallroles: excluir {0} cargos
 q_no: 'não'
 q_operation_length_seconds: Essa operação levará pelo menos {0} segundos.
+q_sql_query: executar essa instrução
 q_yes: 'sim'
 reason: Motivo
 region: Região
@@ -418,11 +436,14 @@ sban_notification: Você foi expulso do servidor {0}.
 sban_title: Usuário Expulso
 seconds: Segundos
 server: Servidor
+server_timezone: O fuso horário desse servidor é {0}.
 settings: Configuração
 shutdown: Desligando.
 slowmode: Modo Lento
 softban: Expulsar e Excluir
 softban_enum: expulso
+sqlexec_success: Instrução executada com sucesso em {0} ms. {1} linhas alteradas.
+sqlselect_title: Resultado da Instrução
 store: Loja
 text: Texto
 timedban_notification: Você foi banido do servidor {0} por {0}.
@@ -430,6 +451,7 @@ timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
+timezone_list: Fusos Horários
 total: 'Total de {0}'
 triggers_in: Ativa Em
 type: Tipo
@@ -449,6 +471,8 @@ user_limit: Limite de Usuários
 userroles_title: 'Cargos do {0}'
 value: Valor
 vanity_url: Vanity URL
+vcrole_empty: Nenhum cargo de voz foi encontrado.
+vcrole_list_title: Lista de Cargos de Voz
 verification_level: Nível de Verificação
 visible_to: Visível Para
 voice: Voz

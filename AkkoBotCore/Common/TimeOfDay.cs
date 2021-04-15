@@ -16,6 +16,11 @@ namespace AkkoBot.Common
         public TimeSpan Time => _dateTime.TimeOfDay;
 
         /// <summary>
+        /// Gets this time's offset from Coordinated Universal Time (UTC).
+        /// </summary>
+        public TimeSpan Offset => _dateTime.Offset;
+
+        /// <summary>
         /// Defines how long it will take for the next <see cref="Time"/> to be reached.
         /// </summary>
         public TimeSpan Interval => GetInterval(_dateTime);
