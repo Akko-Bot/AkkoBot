@@ -10,6 +10,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using AkkoBot.Commands.Abstractions;
 
 namespace AkkoBot.Services.Database
 {
@@ -22,11 +24,12 @@ namespace AkkoBot.Services.Database
         private bool _isDisposed = false;
 
         public ConcurrentHashSet<ulong> Blacklist { get; private set; }
-        public BotConfigEntity BotConfig { get; set; }
-        public LogConfigEntity LogConfig { get; set; }
+        public BotConfigEntity BotConfig { get; private set; }
+        public LogConfigEntity LogConfig { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
+        public ICommandCooldown CooldownCommands { get; private set; }
 
         // Lazily instantiated
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
@@ -43,6 +46,7 @@ namespace AkkoBot.Services.Database
             LogConfig = dbContext.LogConfig.FirstOrDefault();
             Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
+            CooldownCommands = services.GetService<ICommandCooldown>().LoadFromEntities(dbContext.CommandCooldown.AsEnumerable());
 
             Aliases = dbContext.Aliases
                 .SplitBy(x => x.GuildId ?? default)
@@ -117,6 +121,7 @@ namespace AkkoBot.Services.Database
                 Aliases = null;
                 FilteredWords = null;
                 DisabledCommandCache = null;
+                CooldownCommands = null;
 
                 _isDisposed = true;
             }

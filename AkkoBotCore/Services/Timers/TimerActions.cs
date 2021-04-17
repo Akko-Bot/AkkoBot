@@ -206,7 +206,7 @@ namespace AkkoBot.Services.Timers
             var dbReminder = await db.Reminders.FirstOrDefaultAsync(x => x.TimerId == entryId);
             var dbTimer = await db.Timers.FindAsync(entryId);
             var dbGuild = await _dbCache.GetGuildAsync(dbReminder.GuildId.Value);
-            var cmdHandler = client.GetExtension<CommandsNextExtension>();
+            var cmdHandler = client.GetCommandsNext();
 
             try
             {
@@ -265,7 +265,7 @@ namespace AkkoBot.Services.Timers
 
             var dbCmd = await db.AutoCommands.FirstOrDefaultAsync(x => x.TimerId == entryId);
             var dbTimer = await db.FindAsync<TimerEntity>(entryId);
-            var cmdHandler = client.GetExtension<CommandsNextExtension>();
+            var cmdHandler = client.GetCommandsNext();
 
             try
             {

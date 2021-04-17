@@ -13,8 +13,9 @@ namespace AkkoBot.Extensions
         /// <param name="logger">This logger.</param>
         /// <param name="level">The severity level of the log.</param>
         /// <param name="context">The command context.</param>
+        /// <param name="message">An optional message to be shown on the log's header.</param>
         /// <param name="exception">The excetion that occurred during command execution.</param>
-        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, Exception exception = null)
+        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = null, Exception exception = null)
         {
             logger.BeginScope(context);
 
@@ -22,7 +23,7 @@ namespace AkkoBot.Extensions
                 level,
                 new EventId(LoggerEvents.Misc.Id, "Command"),
                 exception,
-                context.Message.Content
+                message
             );
         }
     }

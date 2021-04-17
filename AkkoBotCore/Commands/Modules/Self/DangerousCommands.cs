@@ -84,7 +84,7 @@ namespace AkkoBot.Commands.Modules.Self
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <param name="task">An awaited <see cref="Task"/>.</param>
-        /// <exception cref="AggregateException">Occurs when <see cref="Task.Exception"/> is not of type <see cref="PostgresException"/>.</exception>
+        /// <exception cref="AggregateException">Occurs when <see cref="Task.Exception"/> is not of base type <see cref="PostgresException"/>.</exception>
         /// <exception cref="NullReferenceException">Occurs when <see cref="Task.Exception"/> is null.</exception>
         private async Task SendPsqlErrorAsync(CommandContext context, Task task)
         {

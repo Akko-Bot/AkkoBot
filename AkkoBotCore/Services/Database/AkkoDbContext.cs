@@ -21,6 +21,7 @@ namespace AkkoBot.Services.Database
         public DbSet<ReminderEntity> Reminders { get; init; }
         public DbSet<CommandEntity> AutoCommands { get; init; }
         public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
+        public DbSet<CommandCooldownEntity> CommandCooldown { get; init; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
         {
@@ -106,6 +107,9 @@ namespace AkkoBot.Services.Database
                 .HasIndex(x => x.Id);
 
             modelBuilder.Entity<CommandEntity>()
+                .HasIndex(x => x.Id);
+
+            modelBuilder.Entity<CommandCooldownEntity>()
                 .HasIndex(x => x.Id);
         }
     }

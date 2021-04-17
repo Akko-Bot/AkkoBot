@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Commands.Common;
 using AkkoBot.Core.Services;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
@@ -288,11 +289,11 @@ namespace AkkoBot.Core.Common
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
-        /// <exception cref="NullReferenceException">Occurs when no credentials object is provided to this builder.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no credentials object is provided to this builder.</exception>
         public async Task<BotCore> BuildAsync(double? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
             if (_creds is null)
-                throw new NullReferenceException("No 'Credentials' object was provided.");
+                throw new InvalidOperationException("No 'Credentials' object was provided.");
 
             var botClients = await GetBotClientAsync(timeout); // Initialize the sharded clients
 
@@ -339,7 +340,10 @@ namespace AkkoBot.Core.Common
                 //ServiceDescriptor.Singleton(typeof(TimerActions))
 
                 // > Utilities
-                ServiceDescriptor.Singleton(new HttpClient())
+                ServiceDescriptor.Singleton(new HttpClient()),
+
+                // > Commands
+                ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>()
             };
 
             foreach (var service in servicesList)

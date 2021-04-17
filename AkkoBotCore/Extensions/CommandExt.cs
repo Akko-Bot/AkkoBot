@@ -16,7 +16,7 @@ namespace AkkoBot.Extensions
             var execution = await command.ExecuteAsync(context).ConfigureAwait(false);
             var level = (execution.IsSuccessful) ? LogLevel.Information : LogLevel.Error;
 
-            context.Client.Logger.LogCommand(level, context, execution.Exception);
+            context.Client.Logger.LogCommand(level, context, null, execution.Exception);
         }
     }
 }

@@ -20,6 +20,7 @@ arg_channel_topic: The new channel topic.
 arg_color: A 6-digit, hexadecimal code of a color.
 arg_command: A valid command.
 arg_config_timeout: How long the bot should wait on interactive commands. Minimum of __10s__.
+arg_cooldown_time: For how long the cooldown should last.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_color: The hexadecimal value of a color.
 arg_discord_message: ID or URL to a Discord message.
@@ -62,7 +63,7 @@ arg_time_of_day: Time of day, in `HH:mm` format.
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
 arg_timed_pstatus: For how long the status should be displayed.
-arg_timed_warn: How long the warnings should last for.
+arg_timed_warn: For how long the warnings should last.
 arg_timeout: An integer number higher than 10 and less than 120.
 arg_timezone: Name of the time zone.
 arg_uint: An integer number higher or equal to zero.
@@ -150,6 +151,10 @@ cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_reloadlocales: Reloads the response strings available to the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
+cmd_cooldown: Groups commands related to command cooldowns.
+cmd_cooldown_add: Sets the cooldown for a command. Use it in direct message with the bot to make the cooldown global.
+cmd_cooldown_list: Lists all active cooldowns on this server. Use it in direct message with the bot to list global cooldowns.
+cmd_cooldown_remove: Removes the cooldown from a command. Use it in direct message with the bot to remove a global cooldown.
 cmd_createcategorychannel: Creates a category.
 cmd_createrole: Creates a Discord role.
 cmd_createtextchannel: Creates a text channel.
@@ -274,6 +279,10 @@ command_not_found: Command not found.
 commands: Commands
 connected_users: Connected Users
 contains: Contains
+cooldown: Cooldown
+cooldown_empty: No cooldowns were found.
+cooldown_title_global: Global Cooldowns
+cooldown_title_server: Server Cooldowns
 created_at: Created at
 days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'

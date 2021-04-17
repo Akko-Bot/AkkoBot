@@ -68,7 +68,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
             // Get the column names
             for (var column = 0; column < reader.FieldCount; column++)
             {
-                result.Add(new(reader.GetName(column), string.Empty, true));
+                // Constant so the column name doesn't get localized
+                result.Add(new(AkkoConstants.ValidWhitespace + reader.GetName(column), string.Empty, true));
                 fieldBuilders.Add(new());
             }   
 

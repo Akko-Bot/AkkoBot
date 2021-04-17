@@ -20,6 +20,7 @@ arg_channel_topic: O novo tópico do canal.
 arg_color: Um código de cor hexadecimal de seis dígitos.
 arg_command: Um comando válido.
 arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos. Mínimo de __10s__.
+arg_cooldown_time: Por quanto tempo o cooldown deve durar.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_color: O valor hexadecimal de uma cor.
 arg_discord_message: ID ou URL para uma mensagem do Discord.
@@ -150,6 +151,10 @@ cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_reloadlocales: Recarrega os textos de resposta disponíveis ao bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
+cmd_cooldown: Agrupa comandos relacionados a cooldowns.
+cmd_cooldown_add: Define o cooldown para um comando. Use em mensagem direta com o bot para criar um cooldown global.
+cmd_cooldown_list: Lista todos os cooldowns ativos nesse servidor. Use em mensagem direta com o bot para listar os cooldowns globais.
+cmd_cooldown_remove: Remove o cooldown de um comando. Use em mensagem direta com o bot para remover um cooldown global.
 cmd_createcategorychannel: Cria uma categoria.
 cmd_createrole: Cria um cargo do Discord.
 cmd_createtextchannel: Cria um canal de texto.
@@ -274,6 +279,10 @@ command_not_found: Comando não encontrado.
 commands: Comandos
 connected_users: Usuários Conectados
 contains: Contém
+cooldown: Cooldown
+cooldown_empty: Nenhum cooldown foi encontrado.
+cooldown_title_global: Cooldowns Globais
+cooldown_title_server: Cooldowns do Servidor
 created_at: Criado em
 days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'

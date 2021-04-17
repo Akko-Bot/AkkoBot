@@ -1,6 +1,5 @@
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Core.Common;
-using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
@@ -8,13 +7,9 @@ using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Exceptions;
-using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Npgsql;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -23,7 +18,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Core.Services
 {
     /// <summary>
-    /// Registers events the bot should listen to once it connects to Discord.
+    /// Manages the behavior the bot should have for specific Discord events on startup.
     /// </summary>
     internal class Startup
     {
@@ -41,15 +36,13 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
-        /// Defines the core behavior the bot should have for specific Discord events.
+        /// Registers events the bot should listen to once it connects to Discord.
         /// </summary>
-        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="InvalidOperationException"/>
         internal void RegisterEvents()
         {
-            if (_services is null)
-                throw new ArgumentNullException(nameof(_services), "No IoC container was found.");
-            else if (_botCore is null)
-                throw new ArgumentNullException(nameof(_botCore), "Bot core cannot be null.");
+            if (_botCore is null)
+                throw new InvalidOperationException("Bot core cannot be null.");
 
             // Create bot configs on ready, if there isn't one already
             _botCore.BotShardedClient.Ready += LoadBotConfig;
@@ -65,19 +58,6 @@ namespace AkkoBot.Core.Services
 
             // Executes startup commands
             _botCore.BotShardedClient.GuildDownloadCompleted += ExecuteStartupCommands;
-
-            // Save guild on join
-            _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
-
-            // Decache guild on leave
-            _botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
-
-            // Command logging
-            foreach (var cmdHandler in _botCore.CommandExt.Values)
-            {
-                cmdHandler.CommandExecuted += LogCmdExecution;
-                cmdHandler.CommandErrored += LogCmdError;
-            }
         }
 
         /* Event Methods */
@@ -117,7 +97,9 @@ namespace AkkoBot.Core.Services
         private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             // May want to remove this method
-            _dbCache.Timers ??= _services.GetService<ITimerManager>();
+            var cmdHandler = client.GetCommandsNext();
+            _dbCache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
+
             return Task.CompletedTask;
         }
 
@@ -176,7 +158,7 @@ namespace AkkoBot.Core.Services
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
-                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetCommandsNext();
                 var startupCmds = await db.AutoCommands.Fetch(x => x.Type == CommandType.Startup)
                     .ToArrayAsync();
 
@@ -187,7 +169,7 @@ namespace AkkoBot.Core.Services
                     if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
                         continue;
 
-                    var prefix = _services.GetService<IDbCache>().Guilds[server.Id].Prefix;
+                    var prefix = (await _dbCache.GetGuildAsync(server.Id)).Prefix;
 
                     var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
 
@@ -195,72 +177,6 @@ namespace AkkoBot.Core.Services
                         _ = cmd.ExecuteAsync(fakeContext);  // Can't await because it takes too long to run
                 }
             });
-        }
-
-        /// <summary>
-        /// Saves default guild settings to the database and caches when the bot joins a guild.
-        /// </summary>
-        private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
-        {
-            if (_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild))
-                return Task.CompletedTask;
-
-            return Task.Run(async () =>
-            {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
-
-                dbGuild = await _dbCache.GetGuildAsync(eventArgs.Guild.Id);
-                var filteredWords = await db.FilteredWords.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
-
-                _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
-
-                if (filteredWords is not null)
-                    _dbCache.FilteredWords.TryAdd(filteredWords.GuildIdFK, filteredWords);
-            });
-        }
-
-        /// <summary>
-        /// Remove a guild from the cache when the bot is removed from it.
-        /// </summary>
-        private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
-        {
-            _dbCache.Guilds.TryRemove(eventArgs.Guild.Id, out _);
-            _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Logs basic information about command execution.
-        /// </summary>
-        private Task LogCmdExecution(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
-        {
-            cmdHandler.Client.Logger.LogCommand(LogLevel.Information, eventArgs.Context);
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Logs exceptions thrown during command execution.
-        /// </summary>
-        private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
-        {
-            if (eventArgs.Exception
-            is ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
-            or ChecksFailedException        // Ignore command check fails
-            or CommandNotFoundException     // Ignore commands that do not exist
-            or InvalidOperationException)   // Ignore groups that are not commands themselves
-            {
-                return Task.CompletedTask;
-            }
-
-            cmdHandler.Client.Logger.LogCommand(
-                LogLevel.Error,
-                eventArgs.Context,
-                eventArgs.Exception
-            );
-
-            return Task.CompletedTask;
         }
 
         /* Utility Methods */
@@ -273,7 +189,7 @@ namespace AkkoBot.Core.Services
         private Task UnregisterCommands(DiscordClient client)
         {
             var disabledCommands = new ConcurrentDictionary<string, Command>(); // Initialize the cache
-            var cmdHandler = client.GetExtension<CommandsNextExtension>();      // Initialize the command handler
+            var cmdHandler = client.GetCommandsNext();                          // Initialize the command handler
 
             // Unregister the disabled commands from the command handlers
             foreach (var dbCmd in _dbCache.BotConfig.DisabledCommands)

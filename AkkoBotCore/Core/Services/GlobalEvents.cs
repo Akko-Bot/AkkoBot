@@ -1,5 +1,7 @@
+using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Common;
 using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
@@ -8,10 +10,12 @@ using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +23,9 @@ using static DSharpPlus.Entities.DiscordEmbedBuilder;
 
 namespace AkkoBot.Core.Services
 {
+    /// <summary>
+    /// Manages the behavior the bot should have for specific user actions.
+    /// </summary>
     internal class GlobalEvents
     {
         private readonly IServiceScope _scope;
@@ -39,10 +46,14 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
-        /// Defines the behaviors the bot should have for specific user actions.
+        /// Registers events the bot should listen to in order to react to specific user actions.
         /// </summary>
+        /// <exception cref="InvalidOperationException"/>
         internal void RegisterEvents()
         {
+            if (_botCore is null)
+                throw new InvalidOperationException("Bot core cannot be null.");
+
             // Prevent mute evasion
             _botCore.BotShardedClient.GuildMemberAdded += Remute;
 
@@ -64,9 +75,21 @@ namespace AkkoBot.Core.Services
             // Assign role on channel join/leave
             _botCore.BotShardedClient.VoiceStateUpdated += VoiceRole;
 
-            // On command
+            // Save guild on join
+            _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
+
+            // Decache guild on leave
+            _botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
+
             foreach (var cmdHandler in _botCore.CommandExt.Values)
+            {
+                // Log command execution
+                cmdHandler.CommandExecuted += LogCmdExecution;
+                cmdHandler.CommandErrored += LogCmdError;
+
+                // Save user on command
                 cmdHandler.CommandExecuted += SaveUserOnCmd;
+            }
         }
 
         /* Event Methods */
@@ -141,7 +164,7 @@ namespace AkkoBot.Core.Services
                     return;
 
                 // Get command handler and prefix command
-                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetCommandsNext();
                 var cmd = cmdHandler.FindCommand(eventArgs.Message.Content[prefix.Length..], out var cmdArgs)
                     ?? cmdHandler.FindCommand(eventArgs.Message.Content[1..], out cmdArgs);
 
@@ -175,7 +198,7 @@ namespace AkkoBot.Core.Services
                     : _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
                 // Get a string that parses its placeholders automatically
-                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetCommandsNext();
                 var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, prefix, null);
                 var parsedMsg = new SmartString(dummyCtx, string.Empty);
 
@@ -234,7 +257,7 @@ namespace AkkoBot.Core.Services
                 if (match is null)
                     return;
 
-                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetCommandsNext();
 
                 // Do not delete legitimate commands
                 if (cmdHandler.FindCommand(eventArgs.Message.Content[_dbCache.Guilds[eventArgs.Guild.Id].Prefix.Length..], out _) is not null)
@@ -298,7 +321,7 @@ namespace AkkoBot.Core.Services
                 if (!filteredWords.NotifyOnDelete)
                     return;
 
-                var cmdHandler = client.GetExtension<CommandsNextExtension>();
+                var cmdHandler = client.GetCommandsNext();
 
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription("fw_stickers_notification");
@@ -381,6 +404,77 @@ namespace AkkoBot.Core.Services
 
                 await db.SaveChangesAsync();
             });
+        }
+
+        /// <summary>
+        /// Saves default guild settings to the database and caches when the bot joins a guild.
+        /// </summary>
+        private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
+        {
+            if (_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild))
+                return Task.CompletedTask;
+
+            return Task.Run(async () =>
+            {
+                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+
+                dbGuild = await _dbCache.GetGuildAsync(eventArgs.Guild.Id);
+                var filteredWords = await db.FilteredWords.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
+
+                _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
+
+                if (filteredWords is not null)
+                    _dbCache.FilteredWords.TryAdd(filteredWords.GuildIdFK, filteredWords);
+            });
+        }
+
+        /// <summary>
+        /// Remove a guild from the cache when the bot is removed from it.
+        /// </summary>
+        private Task DecacheGuildOnLeave(DiscordClient client, GuildDeleteEventArgs eventArgs)
+        {
+            _dbCache.Guilds.TryRemove(eventArgs.Guild.Id, out _);
+            _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Logs basic information about command execution.
+        /// </summary>
+        private Task LogCmdExecution(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
+        {
+            cmdHandler.Client.Logger.LogCommand(LogLevel.Information, eventArgs.Context);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Logs exceptions thrown during command execution.
+        /// </summary>
+        private Task LogCmdError(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
+        {
+            if (eventArgs.Exception
+                is not ArgumentException             // Ignore commands with invalid arguments and subcommands that do not exist
+                and not ChecksFailedException        // Ignore command check fails
+                and not CommandNotFoundException     // Ignore commands that do not exist
+                and not InvalidOperationException)   // Ignore groups that are not commands themselves
+            {
+                // Log common errors
+                cmdHandler.Client.Logger.LogCommand(
+                    LogLevel.Error,
+                    eventArgs.Context,
+                    null,
+                    eventArgs.Exception
+                );
+            }
+            else if (eventArgs.Exception is ChecksFailedException ex && ex.FailedChecks[0].GetType() == typeof(GlobalCooldownAttribute))
+            {
+                cmdHandler.Client.Logger.LogCommand(LogLevel.Warning, eventArgs.Context, "Command execution has been cancelled due to an active cooldown.");
+                return eventArgs.Context.Message.CreateReactionAsync(AkkoEntities.CooldownEmoji);
+            }
+
+            return Task.CompletedTask;
         }
 
         /* Utility Methods */

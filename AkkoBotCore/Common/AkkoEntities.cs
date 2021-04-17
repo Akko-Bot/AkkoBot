@@ -24,6 +24,11 @@ namespace AkkoBot.Common
         public static DiscordEmoji WarningEmoji { get; } = DiscordEmoji.FromUnicode("⚠️");
 
         /// <summary>
+        /// Represents an emoji for warning the user that the command they tried to run is on a cooldown.
+        /// </summary>
+        public static DiscordEmoji CooldownEmoji { get; } = DiscordEmoji.FromUnicode("⏰");
+
+        /// <summary>
         /// Defines for how long the bot should wait between API calls when performing several of them in sequence.
         /// </summary>
         public static TimeSpan SafetyDelay { get; } = TimeSpan.FromSeconds(0.6);

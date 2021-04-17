@@ -51,11 +51,11 @@ namespace AkkoBot.Services.Logging.Loggers
                 else
                 {
                     var logBody =
-                        $"[Shard {_cmdContext.Client.ShardId}]\n\t" +
+                        $"[Shard {_cmdContext.Client.ShardId}] {message}\n\t" +
                         $"User: {_cmdContext.User.Username}#{_cmdContext.User.Discriminator} [{_cmdContext.User.Id}]\n\t" +
                         $"Server: {_cmdContext.Guild?.Name ?? "Private"} {((_cmdContext.Guild is null) ? string.Empty : "[" + _cmdContext.Guild.Id + "]")}\n\t" +
                         $"Channel: #{_cmdContext.Channel.Name ?? "Private"} [{_cmdContext.Channel.Id}]\n\t" +
-                        $"Message: {message}\n";
+                        $"Message: {_cmdContext.Message.Content}\n";
 
                     logEntry.AppendLine(logBody);
                 }
