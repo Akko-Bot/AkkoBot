@@ -41,6 +41,7 @@ arg_fw_word: Uma palavra.
 arg_fw_words: Múltiplas palavras, separadas por espaço.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_int: Um número inteiro.
+arg_keyword: O termo da busca.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
 arg_mention: Um ID ou menção válido do Discord.
@@ -58,6 +59,7 @@ arg_remind_time: Tempo até o lembrete ser ativado. Mínimo de __1m__.
 arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
 arg_say: A mensagem a ser enviada.
+arg_sql: Uma instrução SQL válida.
 arg_stream_url: A URL do stream.
 arg_time_of_day: Hora do dia, no formato `HH:mm`.
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
@@ -239,6 +241,7 @@ cmd_roleid: Exibe od ID do cargo especificado.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
+cmd_search: Busca por um comando com a palavra-chave especificada.
 cmd_send: Envia uma mensagem ao canal do Discord especificado.
 cmd_senddm: Envia uma mensagem direta ao usuário especificado.
 cmd_serverid: Exibe of ID do servidor atual.
@@ -290,6 +293,7 @@ deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
+description: Descrição
 disabled: desativado
 emoji_list_title: Emojis do Servidor
 emojis: Emojis
@@ -443,6 +447,8 @@ roles: Cargos
 roles_title: Cargos nesse servidor
 sban_notification: Você foi expulso do servidor {0}.
 sban_title: Usuário Expulso
+search_result_description: Resultado da busca por {0}.
+search_result_empty: Nenhum comando com o termo {0} foi encontrado.
 seconds: Segundos
 server: Servidor
 server_timezone: O fuso horário desse servidor é {0}.

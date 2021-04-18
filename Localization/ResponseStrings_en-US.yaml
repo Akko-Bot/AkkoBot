@@ -41,6 +41,7 @@ arg_fw_word: A word.
 arg_fw_words: Multiple words, separated by space.
 arg_infraction: The infraction to be added to the user's modlog.
 arg_int: An integer number.
+arg_keyword: The term to search for.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
 arg_mention: A valid Discord ID or mention.
@@ -58,6 +59,7 @@ arg_remind_time: How long until the reminder is triggered. Minimum of __1m__.
 arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
+arg_sql: A valid SQL query.
 arg_stream_url: The URL of the stream.
 arg_time_of_day: Time of day, in `HH:mm` format.
 arg_timed_ban: For how long the user should remain banned.
@@ -239,6 +241,7 @@ cmd_roleid: Shows the ID of the specified role.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
+cmd_search: Searches for a command with the specified keyword.
 cmd_send: Sends a message to the specified Discord channel.
 cmd_senddm: Sends a direct message to the specified user.
 cmd_serverid: Shows the ID of the current Discord server.
@@ -290,6 +293,7 @@ deafen_success: User {0} can no longer hear other users speaking in voice channe
 deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
+description: Description
 disabled: disabled
 emoji_list_title: Server Emojis
 emojis: Emojis
@@ -443,6 +447,8 @@ roles: Roles
 roles_title: Roles on this server
 sban_notification: You have been soft-banned from the {0} server.
 sban_title: User Soft-banned
+search_result_description: Search result for {0}.
+search_result_empty: No command with the term {0} was found.
 seconds: Seconds
 server: Server
 server_timezone: Time zone on this server is {0}.

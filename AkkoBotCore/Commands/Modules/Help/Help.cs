@@ -2,17 +2,19 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Formatters;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Help
 {
-    [HelpCommand, IsNotBlacklisted]
+    [HelpCommand, IsNotBlacklisted, GlobalCooldown]
     public class Help : BaseCommandModule
     {
         [HiddenOverload]
@@ -134,6 +136,49 @@ namespace AkkoBot.Commands.Modules.Help
 
                 await context.RespondLocalizedAsync(embed, false);
             }
+        }
+
+        [Command("search")]
+        [Description("cmd_search")]
+        [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
+        public async Task Search(CommandContext context, [RemainingText, Description("arg_keyword")] string keyword)
+        {
+            if (keyword.StartsWith(context.Prefix))
+                keyword = keyword[context.Prefix.Length..];
+
+
+            var embed = new DiscordEmbedBuilder();
+            var cmds = context.CommandsNext.RegisteredCommands.Values
+                .Concat(
+                    context.CommandsNext.RegisteredCommands.Values
+                        .Where(x => x is CommandGroup)
+                        .SelectMany(x => (x as CommandGroup).Children)
+                )
+                .Where(
+                    x => x.QualifiedName.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+                        || x.Aliases.Any(x => x.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                )
+                .DistinctBy(x => x.QualifiedName)
+                .OrderBy(x => x.QualifiedName);
+
+            if (!cmds.Any())
+            {
+                embed.WithDescription(context.FormatLocalized("search_result_empty", Formatter.InlineCode(keyword)));
+                await context.RespondLocalizedAsync(embed, isError: true);
+
+                return;
+            }
+
+            var fields = new List<SerializableEmbedField>();
+            embed.WithTitle(context.FormatLocalized("search_result_description", Formatter.InlineCode(keyword)));
+
+            foreach (var cmd in cmds.SplitInto(AkkoConstants.LinesPerPage))
+            {
+                fields.Add(new("command", string.Join("\n", cmd.Select(x => context.Prefix + x.QualifiedName)), true));
+                fields.Add(new("description", string.Join("\n", cmd.Select(x => context.FormatLocalized(x.Description).MaxLength(50, "[...]"))), true));
+            }
+
+            await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
         }
     }
 }

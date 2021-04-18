@@ -35,7 +35,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="match">The locale if found, <see langword="null"/> otherwise.</param>
         /// <returns><see langword="true"/> if a match is found, <see langword="false"/> otherwise.</returns>
         public bool IsLocaleRegistered(string locale, out string match)
-            => _localizer.GetLocales().Contains(locale, StringComparison.InvariantCultureIgnoreCase, out match);
+            => _localizer.GetLocales().Equals(locale, StringComparison.InvariantCultureIgnoreCase, out match);
 
         /// <summary>
         /// Gets all registered localed.

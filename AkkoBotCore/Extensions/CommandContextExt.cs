@@ -100,8 +100,8 @@ namespace AkkoBot.Extensions
                 localizedEmbed.Description = localizedEmbed.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return settings.UseEmbed
-                ? await context.RespondAsync(responseString, localizedEmbed)
-                : await context.RespondAsync(responseString + ((embed is null) ? string.Empty : "\n\n" + GeneralService.DeconstructEmbed(embed)));
+                ? await context.Channel.SendMessageAsync(responseString, localizedEmbed)
+                : await context.Channel.SendMessageAsync(responseString + ((embed is null) ? string.Empty : "\n\n" + GeneralService.DeconstructEmbed(embed)));
         }
 
         /// <summary>

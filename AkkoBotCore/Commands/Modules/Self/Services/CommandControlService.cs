@@ -69,7 +69,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            if (!_dbCache.DisabledCommandCache.Keys.Contains(cmdString, StringComparison.InvariantCultureIgnoreCase, out var qualifiedName))
+            if (!_dbCache.DisabledCommandCache.Keys.Equals(cmdString, StringComparison.InvariantCultureIgnoreCase, out var qualifiedName))
                 return false;
             if (!_dbCache.DisabledCommandCache.TryRemove(qualifiedName, out var cmd))
                 return false;

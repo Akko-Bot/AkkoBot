@@ -102,8 +102,6 @@ namespace AkkoBot.Core.Services
             return Task.Run(async () =>
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
-
-                var anyChannel = eventArgs.Guild.Channels.FirstOrDefault().Value;
                 var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.ManageRoles | Permissions.Administrator));
 
                 // Check if user is in the database
@@ -184,7 +182,7 @@ namespace AkkoBot.Core.Services
         private Task HandleCommandAlias(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             var aliasExists = _dbCache.Aliases.TryGetValue(eventArgs.Guild?.Id ?? default, out var aliases);
-            aliasExists = _dbCache.Aliases.TryGetValue(default, out var globalAliases) && aliasExists;
+            aliasExists &= _dbCache.Aliases.TryGetValue(default, out var globalAliases);
 
             // If message is from a bot or there aren't any global or server aliases, quit.
             if (eventArgs.Author.IsBot && !aliasExists)
@@ -372,7 +370,7 @@ namespace AkkoBot.Core.Services
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
                 var user = eventArgs.User as DiscordMember;
 
-                var voiceRoles = await db.VoiceRoles.Fetch(
+                var voiceRoles = await db.VoiceRoles.Where(
                     (user.VoiceState.Channel is null)
                             ? x => x.GuildIdFk == eventArgs.Guild.Id
                             : x => x.GuildIdFk == eventArgs.Guild.Id && x.ChannelId == eventArgs.Channel.Id

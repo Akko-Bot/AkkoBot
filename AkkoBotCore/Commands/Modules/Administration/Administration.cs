@@ -22,7 +22,7 @@ namespace AkkoBot.Commands.Modules.Administration
         /// <summary>
         /// Represents the (allowed) permissions of the roles that should be exempt from channel lockdowns.
         /// </summary>
-        private const Permissions _lockChannelModPerms = Permissions.KickMembers | Permissions.BanMembers | Permissions.ManageChannels;
+        private const Permissions _lockChannelModPerms = Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers | Permissions.ManageChannels;
 
         /// <summary>
         /// Represents the permissions that should be denied for lockdown overwrites.

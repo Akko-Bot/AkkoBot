@@ -153,14 +153,14 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <param name="collection">This string collection.</param>
         /// <param name="target">The string to be compared with.</param>
-        /// <param name="comparison">The comparison rules.</param>
+        /// <param name="comparisonType">The comparison rules.</param>
         /// <param name="match">The resulting match in the collection or <see langword="null"/> if none was found.</param>
         /// <returns><see langword="true"/> if there was one matching entry, <see langword="false"/> otherwise.</returns>
-        public static bool Contains(this IEnumerable<string> collection, string target, StringComparison comparison, out string match)
+        public static bool Equals(this IEnumerable<string> collection, string target, StringComparison comparisonType, out string match)
         {
             foreach (var word in collection)
             {
-                if (word.Equals(target, comparison))
+                if (word.Equals(target, comparisonType))
                 {
                     match = word;
                     return true;
@@ -168,6 +168,24 @@ namespace AkkoBot.Extensions
             }
 
             match = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if this string occurs within at least one of the entries in the specified collection.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="collection">The collection to compare to.</param>
+        /// <param name="comparisonType">The type of string comparison to be used.</param>
+        /// <returns><see langword="true"/> if a match occurred, <see langword="false"/> otherwise.</returns>
+        public static bool Contains(this string text, IEnumerable<string> collection, StringComparison comparisonType = StringComparison.Ordinal)
+        {
+            foreach (var word in collection)
+            {
+                if (text.Contains(word, comparisonType))
+                    return true;
+            }
+
             return false;
         }
 
