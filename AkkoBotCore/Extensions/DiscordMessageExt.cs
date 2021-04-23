@@ -1,3 +1,4 @@
+using AkkoBot.Common;
 using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
@@ -6,6 +7,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
@@ -15,7 +17,7 @@ namespace AkkoBot.Extensions
         /// <summary>
         /// Edits the current Discord message with a localized message.
         /// </summary>
-        /// <param name="msg">This Discord Message.</param>
+        /// <param name="msg">This Discord message.</param>
         /// <param name="context">The context the message is from.</param>
         /// <param name="embed">The message's new embed.</param>
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
@@ -27,7 +29,7 @@ namespace AkkoBot.Extensions
         /// <summary>
         /// Edits the current Discord message with a localized message.
         /// </summary>
-        /// <param name="msg">This Discord Message.</param>
+        /// <param name="msg">This Discord message.</param>
         /// <param name="context">The context the message is from.</param>
         /// <param name="message">The message's new content.</param>
         /// <param name="embed">The message's new embed.</param>
@@ -68,6 +70,36 @@ namespace AkkoBot.Extensions
         {
             await Task.Delay(delay).ConfigureAwait(false);
             try { await message.DeleteAsync(); } catch { }  // Message might get deleted by someone else in the meantime
+        }
+
+        /// <summary>
+        /// Adds multiple reactions to this message.
+        /// </summary>
+        /// <param name="message">This Discord message.</param>
+        /// <param name="emojis">A collection of Discord emojis.</param>
+        /// <remarks>There is a delay of <see cref="AkkoEntities.SafetyDelay"/> between the addition of each reaction.</remarks>
+        public static async Task CreateReactionsAsync(this DiscordMessage message, params DiscordEmoji[] emojis)
+        {
+            foreach (var emoji in emojis)
+            {
+                await message.CreateReactionAsync(emoji);
+                await Task.Delay(AkkoEntities.SafetyDelay);
+            }
+        }
+
+        /// <summary>
+        /// Adds multiple reactions to this message.
+        /// </summary>
+        /// <param name="message">This Discord message.</param>
+        /// <param name="emojis">A collection of Discord emojis.</param>
+        /// <remarks>There is a delay of <see cref="AkkoEntities.SafetyDelay"/> between the addition of each reaction.</remarks>
+        public static async Task CreateReactionsAsync(this DiscordMessage message, IEnumerable<DiscordEmoji> emojis)
+        {
+            foreach (var emoji in emojis)
+            {
+                await message.CreateReactionAsync(emoji);
+                await Task.Delay(AkkoEntities.SafetyDelay);
+            }
         }
     }
 }

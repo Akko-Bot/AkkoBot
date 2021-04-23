@@ -23,6 +23,7 @@ namespace AkkoBot.Services.Database.Entities
         public List<WarnPunishEntity> WarnPunishRel { get; set; }
         public List<OccurrenceEntity> OccurrenceRel { get; set; }
         public List<VoiceRoleEntity> VoiceRolesRel { get; set; }
+        public List<PollEntity> PollRel { get; set; }
 
         public ulong GuildId { get; init; }
 

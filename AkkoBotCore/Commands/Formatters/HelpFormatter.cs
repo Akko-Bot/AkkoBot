@@ -14,8 +14,6 @@ using System.Text;
 
 namespace AkkoBot.Commands.Formatters
 {
-    // To increase performance: instead of using FormatLocalized,
-    // perhaps it would be better to fetch the strings directly from the ILocalizer?
     public class HelpFormatter
     {
         private string _helpTitle;
@@ -50,6 +48,8 @@ namespace AkkoBot.Commands.Formatters
             {
                 if (att.AttributeType == typeof(BotOwnerAttribute))
                     _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_bot_owner"));
+                else if (att.AttributeType == typeof(RequireDirectMessageAttribute))
+                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_require_dm"));
                 else
                     _helpRequiresField.AppendLine(GetLocalizedPermissions(att.ConstructorArguments));
             }
@@ -254,6 +254,7 @@ namespace AkkoBot.Commands.Formatters
                 .Concat(GetAttributeTree(cmd))
                 .Where(
                     attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
+                        || attribute.AttributeType == typeof(RequireDirectMessageAttribute)
                         || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
                         || attribute.AttributeType == typeof(RequirePermissionsAttribute)
                 )

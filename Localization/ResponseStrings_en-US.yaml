@@ -24,6 +24,7 @@ arg_cooldown_time: For how long the cooldown should last.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_color: The hexadecimal value of a color.
 arg_discord_message: ID or URL to a Discord message.
+arg_discord_message_link: URL to a Discord message.
 arg_discord_role: ID or mention to a Discord role.
 arg_discord_roles: ID or mention to one or multiple Discord roles.
 arg_discord_user: ID or mention to a Discord user.
@@ -48,6 +49,10 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
+arg_poll_id: ID of the poll.
+arg_poll_qanswer: The question and the answers, separated by a semicolon `;`.
+arg_poll_question: A question.
+arg_poll_vote: The number of the answer you want to vote for.
 arg_prefix: The new prefix.
 arg_prune_options: '`-s` or `--safe` to prevent deletion of pinned messages.'
 arg_pstatus: The message to be displayed in the status.
@@ -218,6 +223,15 @@ cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
 cmd_playingstatus: Groups commands to manage the bot's playing status.
+cmd_poll: Groups commands for managing polls.
+cmd_poll_forcestop: Forces a poll to stop. Use this if you have accidentally deleted a poll and can't close it anymore.
+cmd_poll_list: Lists all active polls in this server.
+cmd_poll_startanonymous: Starts a poll where users vote by typing the number of the answer in the current channel. It's also possible to vote by using the `poll vote` command in direct message with the bot.
+cmd_poll_startnumeric: Starts a poll with up to 10 answers.
+cmd_poll_startsimple: Starts a poll for a yes or no question.
+cmd_poll_status: Checks the current state of the specified poll.
+cmd_poll_stop: Stops the specified poll and shows its result. Provide no parameter to stop the latest poll on the current channel.
+cmd_poll_vote: Casts a vote to the specified anonymous poll.
 cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
 cmd_react: Reacts to a message with the specified emoji.
 cmd_reactclear: Removes all reactions from the specified message.
@@ -359,6 +373,7 @@ help_move_members: Move Members
 help_mute_members: Mute Members
 help_optional: Optional
 help_priority_speaker: Priority Speaker
+help_require_dm: Direct Message
 help_send_messages: Send Messages
 help_speak: Speak
 help_stream: Stream
@@ -418,6 +433,14 @@ online_since: Online since
 owner: Owner
 owners: Owners
 pages: Page {0}/{1}
+poll: Poll
+poll_anonymous_error: There is an anonymous poll already active in this channel.
+poll_anonymous_footer: You can also use the {0} command in direct message to vote on this poll.
+poll_closed: Poll Closed
+poll_list_empty: There are no active polls in this server.
+poll_list_title: Server Polls
+poll_not_found: Poll not found.
+poll_title: '{0} created a poll'
 position: Position
 private: Private
 private: Private
@@ -494,6 +517,8 @@ voice: Voice
 voice_failure: The user needs to be connected to a voice channel for this command to work.
 voicemute_success: User {0} has been muted from voice channels.
 voiceunmute_success: User {0} has been unmuted from voice channels.
+vote_failure: The specified poll does not exist or you have already voted for it.
+voted_for: 'You have successfully voted for: {0}'
 warn_and_punish: User {0} has been warned and {1}.
 warn_dm: You have been warned on {0}.
 warn_success: User {0} has been warned.
@@ -507,4 +532,5 @@ warnpl_empty: There are no punishments for this server.
 warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
+with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.

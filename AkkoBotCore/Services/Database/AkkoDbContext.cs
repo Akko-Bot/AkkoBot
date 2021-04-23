@@ -22,6 +22,7 @@ namespace AkkoBot.Services.Database
         public DbSet<CommandEntity> AutoCommands { get; init; }
         public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
         public DbSet<CommandCooldownEntity> CommandCooldown { get; init; }
+        public DbSet<PollEntity> Polls { get; init; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
         {
@@ -92,6 +93,13 @@ namespace AkkoBot.Services.Database
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.VoiceRolesRel)
                 .HasForeignKey(x => x.GuildIdFk)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PollEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.PollRel)
+                .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 

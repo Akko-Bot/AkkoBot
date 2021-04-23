@@ -29,6 +29,33 @@ namespace AkkoBot.Common
         public static DiscordEmoji CooldownEmoji { get; } = DiscordEmoji.FromUnicode("⏰");
 
         /// <summary>
+        /// Represents a thumbs up emoji.
+        /// </summary>
+        public static DiscordEmoji ThumbsUpEmoji { get; } = DiscordEmoji.FromUnicode("👍");
+
+        /// <summary>
+        /// Represents a thumbs down emoji.
+        /// </summary>
+        public static DiscordEmoji ThumbsDownEmoji { get; } = DiscordEmoji.FromUnicode("👎");
+
+        /// <summary>
+        /// Represents all numeric emojis from 1 to 10.
+        /// </summary>
+        public static DiscordEmoji[] NumericEmojis { get; } = new DiscordEmoji[10]
+        {
+            DiscordEmoji.FromUnicode("1️⃣"),
+            DiscordEmoji.FromUnicode("2️⃣"),
+            DiscordEmoji.FromUnicode("3️⃣"),
+            DiscordEmoji.FromUnicode("4️⃣"),
+            DiscordEmoji.FromUnicode("5️⃣"),
+            DiscordEmoji.FromUnicode("6️⃣"),
+            DiscordEmoji.FromUnicode("7️⃣"),
+            DiscordEmoji.FromUnicode("8️⃣"),
+            DiscordEmoji.FromUnicode("9️⃣"),
+            DiscordEmoji.FromUnicode("🔟")
+        };
+
+        /// <summary>
         /// Defines for how long the bot should wait between API calls when performing several of them in sequence.
         /// </summary>
         public static TimeSpan SafetyDelay { get; } = TimeSpan.FromSeconds(0.6);

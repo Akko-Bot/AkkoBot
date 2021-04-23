@@ -25,6 +25,7 @@ namespace AkkoBot.Services.Database.Abstractions
         ITimerManager Timers { get; set; }
         ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
         ICommandCooldown CooldownCommands { get; }
+        ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; }
 
         /// <summary>
         /// Safely gets a database guild.

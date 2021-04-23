@@ -60,6 +60,9 @@ namespace AkkoBot.Core.Services
             // Prevent events from running for blacklisted users, channels and servers
             _botCore.BotShardedClient.MessageCreated += BlockBlacklisted;
 
+            // Voting for anonymous polls in the context channel
+            _botCore.BotShardedClient.MessageCreated += PollVote;
+
             // Show prefix regardless of current config
             _botCore.BotShardedClient.MessageCreated += DefaultPrefix;
 
@@ -142,6 +145,36 @@ namespace AkkoBot.Core.Services
             }
 
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Registers a vote for anonymous polls.
+        /// </summary>
+        private Task PollVote(DiscordClient client, MessageCreateEventArgs eventArgs)
+        {
+            if (!int.TryParse(eventArgs.Message.Content, out var vote) || vote <= 0 || !_dbCache.Polls.TryGetValue(eventArgs.Guild.Id, out var polls))
+                return Task.CompletedTask;
+
+            var poll = polls.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id && x.Type is PollType.Anonymous);
+
+            if (poll is null || vote > poll.Answers.Length || poll.Voters.Contains((long)eventArgs.Author.Id))
+                return Task.CompletedTask;
+
+            return Task.Run(async () =>
+            {
+                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+
+                poll.Votes[vote - 1]++;
+                poll.Voters.Add((long)eventArgs.Author.Id);
+
+                db.Polls.Update(poll);
+                await db.SaveChangesAsync();
+
+                if (eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasFlag(Permissions.ManageMessages))
+                    await eventArgs.Message.DeleteAsync();
+
+                eventArgs.Handled = true;
+            });
         }
 
         /// <summary>

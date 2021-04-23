@@ -30,6 +30,7 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
         public ICommandCooldown CooldownCommands { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
 
         // Lazily instantiated
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
@@ -52,6 +53,11 @@ namespace AkkoBot.Services.Database
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
+
+            Polls = dbContext.Polls
+                .SplitBy(x => x.GuildIdFK)
+                .Select(x => x.ToConcurrentHashSet())
+                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
 
             Guilds = new(); // Guild configs will be loaded into the cache as needed.
             FilteredWords = new(); // Filtered words will be loaded into the cache as needed
@@ -110,6 +116,11 @@ namespace AkkoBot.Services.Database
                     Aliases?.Clear();
                     FilteredWords?.Clear();
                     DisabledCommandCache?.Clear();
+
+                    foreach (var group in Polls.Values)
+                        group?.Clear();
+
+                    Polls?.Clear();
                 }
 
                 Blacklist = null;
@@ -122,6 +133,7 @@ namespace AkkoBot.Services.Database
                 FilteredWords = null;
                 DisabledCommandCache = null;
                 CooldownCommands = null;
+                Polls = null;
 
                 _isDisposed = true;
             }

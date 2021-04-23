@@ -24,6 +24,7 @@ arg_cooldown_time: Por quanto tempo o cooldown deve durar.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_color: O valor hexadecimal de uma cor.
 arg_discord_message: ID ou URL para uma mensagem do Discord.
+arg_discord_message_link: URL para uma mensagem do Discord.
 arg_discord_role: ID ou menção a um cargo do Discord.
 arg_discord_roles: ID ou menção a um ou mais cargos do Discord.
 arg_discord_user: ID ou menção a um usuário do Discord.
@@ -48,6 +49,10 @@ arg_mention: Um ID ou menção válido do Discord.
 arg_module: Um módulo válido.
 arg_nickname: O novo apelido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
+arg_poll_id: ID da enquete.
+arg_poll_qanswer: A pergunta e as respostas, separadas por ponto-vírgula `;`.
+arg_poll_question: Uma pergunta.
+arg_poll_vote: O número da opção na qual você deseja votar.
 arg_prefix: O novo prefixo.
 arg_prune_options: '`-s` ou `--safe` para evitar a exclusão de mensagens fixadas.'
 arg_pstatus: A mensagem a ser exibida no status.
@@ -218,6 +223,15 @@ cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
 cmd_playingstatus: Agrupa comands para gerenciar o status do bot.
+cmd_poll: Agrupa comandos para gerenciar enquetes.
+cmd_poll_forcestop: Força uma enquete a encerrar. Use esse comando se você acidentalmente excluir uma enquete e não puder encerrá-la.
+cmd_poll_list: Exibe todas as enquetes ativas desse servidor.
+cmd_poll_startanonymous: Inicia uma enquete onde usuários votam digitando o número da opção desejada no canal atual. Também é possível votar utilizando o comando `poll vote` em mensagem direta com o bot.
+cmd_poll_startnumeric: Inicia uma enquete com até 10 opções.
+cmd_poll_startsimple: Inicia uma enquete para uma pergunta de sim ou não.
+cmd_poll_status: Checa o estado atual da enquete especificada.
+cmd_poll_stop: Encerra a enquete especificada e exibe o resultado da votação. Forneça nenhum parâmetro para encerrar a enquete mais recente no canal atual.
+cmd_poll_vote: Submete um voto à enquete anônima especificada.
 cmd_prune: Exclui as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
 cmd_react: Reage a uma mensagem com o emoji especificado.
 cmd_reactclear: Remove todas as reações da mensagem especificada.
@@ -359,6 +373,7 @@ help_move_members: Mover Membros
 help_mute_members: Silenciar Membros
 help_optional: Opcional
 help_priority_speaker: Voz Prioritária
+help_require_dm: Mensagem Direta
 help_send_messages: Enviar Mensagens
 help_speak: Falar
 help_stream: Vídeo
@@ -418,6 +433,14 @@ online_since: Online desde
 owner: Dono
 owners: Donos
 pages: Página {0}/{1}
+poll: Enquete
+poll_anonymous_error: Já existe uma enquete anônima ativa nesse canal.
+poll_anonymous_footer: Você também pode usar o comando {0} em mensagem direta para votar nessa enquete.
+poll_closed: Enquete Encerrada
+poll_list_empty: Não há enquetes ativas nesse servidor.
+poll_list_title: Enquetes do Servidor
+poll_not_found: Enquete não encontrada.
+poll_title: '{0} criou uma enquete'
 position: Posição
 private: Privado
 private: Privado
@@ -494,6 +517,8 @@ voice: Voz
 voice_failure: O usuário precisa estar conectado a um canal de voz para este comando funcionar.
 voicemute_success: Usuário {0} foi silenciado nos canais de voz.
 voiceunmute_success: Usuário {0} pode voltar a falar nos canais de voz.
+vote_failure: A enquete especificada não existe ou você já votou nela.
+voted_for: 'Você votou na opção: {0}'
 warn_and_punish: Usuário {0} foi advertido e {1}.
 warn_dm: Você foi advertido no servidor {0}.
 warn_success: Usuário {0} foi advertido.
@@ -507,4 +532,5 @@ warnpl_empty: Não há punições nesse servidor.
 warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
+with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
