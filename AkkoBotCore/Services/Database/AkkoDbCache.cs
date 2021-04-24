@@ -69,7 +69,7 @@ namespace AkkoBot.Services.Database
         /// <param name="sid">The GuildId of the database entry.</param>
         /// <remarks>If the entry doesn't exist, it creates one.</remarks>
         /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
-        public async Task<GuildConfigEntity> GetGuildAsync(ulong sid)
+        public async ValueTask<GuildConfigEntity> GetGuildAsync(ulong sid)
         {
             if (Guilds.TryGetValue(sid, out var dbGuild))
                 return dbGuild;

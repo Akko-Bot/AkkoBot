@@ -33,6 +33,6 @@ namespace AkkoBot.Services.Database.Abstractions
         /// <param name="sid">The GuildId of the database entry.</param>
         /// <remarks>If the entry doesn't exist, it creates one.</remarks>
         /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
-        Task<GuildConfigEntity> GetGuildAsync(ulong sid);
+        ValueTask<GuildConfigEntity> GetGuildAsync(ulong sid);
     }
 }
