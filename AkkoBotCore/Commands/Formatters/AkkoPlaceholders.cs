@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace AkkoBot.Commands.Formatters
 {
@@ -73,28 +75,64 @@ namespace AkkoBot.Commands.Formatters
             ["user.nitrodate"] = (context) => context.Member?.PremiumSince,
             ["user.nitrotype"] = (context) => context.Member?.PremiumType,
             ["user.roles"] = (context) => string.Join(", ", context.Member?.Roles.Select(x => x.Name).ToArray() ?? Array.Empty<string>()),
-            ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name
+            ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name,
+
+            /* Miscelaneous */
+            ["rng"] = (context) => context.Services.GetService<Random>().Next()
+        };
+
+        private readonly IReadOnlyDictionary<string, Func<CommandContext, object, object>> _parameterizedActions = new Dictionary<string, Func<CommandContext, object, object>>()
+        {
+            /* Miscelaneous */
+
+            ["remaining.text"] = (context, endMatchIndex) => context.RawArgumentString[(int)endMatchIndex..].Trim(),
+
+            ["rng"] = (context, parameter) =>
+            {
+                if (parameter is not string[] arguments || arguments.Length != 2 
+                    || !int.TryParse(arguments[0], out var x) || !int.TryParse(arguments[1], out var y))
+                    return null;
+
+                if (x > y)
+                    GeneralService.Swap(ref x, ref y);
+
+                return context.Services.GetService<Random>().Next(x, y);
+            }
         };
 
         /// <summary>
         /// Parses a string placeholder to the value it represents.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="placeholder">The placeholder.</param>
-        /// <param name="result">The string representation of the parsed placeholder, <see langword="null"/> if parsing fails.</param>
-        /// <returns>The value of the boxed object the placeholder represents, <see langword="null"/> if parsing fails.</returns>
-        public object Parse(CommandContext context, string placeholder, out string result)
+        /// <param name="match">The regex match for the placeholder.</param>
+        /// <param name="result">The parsed placeholder, <see langword="null"/> if parsing fails.</param>
+        /// <remarks><paramref name="result"/> can return <see langword="null"/> even if this method returns <see langword="true"/>.</remarks>
+        /// <returns><see langword="true"/> if the placeholder was recognized, <see langword="false"/>.</returns>
+        public bool TryParse(CommandContext context, Match match, out object result)
         {
-            object obj = null;
-            result = null;
+            var groups = match.Groups.Values
+                .Where(x => !string.IsNullOrWhiteSpace(x.Value))    // This is needed because for some reason groups can contain empty values.
+                .ToArray();
 
-            if (_placeholderActions.TryGetValue(placeholder, out var action))
+            if (_placeholderActions.TryGetValue(groups[1].Value, out var action) && groups.Length <= 2)
             {
-                obj = action(context);
-                result = obj?.ToString();
+                result = action(context);
+                return true;
             }
+            else if (_parameterizedActions.TryGetValue(groups[1].Value, out var pAction))
+            {
+                object parameter = (groups.Length <= 2)
+                    ? match.Index + match.Length
+                    : groups[2].Value.Split(',');
 
-            return obj;
+                result = pAction(context, parameter);
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
         }
     }
 }

@@ -12,9 +12,12 @@ using System.Text.RegularExpressions;
 
 namespace AkkoBot.Commands.Common
 {
+    /// <summary>
+    /// Represents a string that automatically replaces placeholders matched by a regex with values from a formatter.
+    /// </summary>
     public class SmartString
     {
-        private readonly Regex _roleRegex = new("<@&(.*?)>", RegexOptions.Compiled);
+        private readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
         private readonly StringBuilder _parsedContent;
         private readonly CommandContext _context;
         private readonly IPlaceholderFormatter _formatter;
@@ -59,13 +62,13 @@ namespace AkkoBot.Commands.Common
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <param name="content">The text with placeholders in it.</param>
-        /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{(.*?)}".</param>
+        /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\s\.]+)\(([\w\s\,]+)\)}|{([\w\s\.]+)}".</param>
         /// <param name="formatter">The object responsible for converting the placeholders to the values they represent. Default is <see cref="AkkoPlaceholders"/>.</param>
         public SmartString(CommandContext context, string content, Regex regex = null, IPlaceholderFormatter formatter = null)
         {
             _context = context;
             _parsedContent = new(content ?? context.RawArgumentString);
-            ParseRegex = regex ?? new Regex("{(.*?)}", RegexOptions.Compiled);
+            ParseRegex = regex ?? new Regex(@"{([\w\s\.]+)\(([\w\s\,]+)\)}|{([\w\s\.]+)}", RegexOptions.Compiled);
             _formatter = formatter ?? context.CommandsNext.Services.GetService<AkkoPlaceholders>();
         }
 
@@ -91,8 +94,8 @@ namespace AkkoBot.Commands.Common
 
             foreach (Match match in matches)
             {
-                if (_formatter.Parse(_context, match.Groups[1].ToString(), out var parsedPh) is not null)
-                    _parsedContent.Replace(match.ToString(), parsedPh);
+                if (_formatter.TryParse(_context, match, out var result) && result is not null)
+                    _parsedContent.Replace(match.ToString(), result.ToString());
             }
 
             return true;
@@ -109,7 +112,7 @@ namespace AkkoBot.Commands.Common
             if (_context.Guild is null || matches.Count == 0)
                 return false;
 
-            var canMentionAll = _context.Member.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.MentionEveryone | Permissions.Administrator));
+            var canMentionAll = _context.Member.PermissionsIn(_context.Channel).HasOneFlag(Permissions.MentionEveryone | Permissions.Administrator);
 
             // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
             if (_context.Member.Hierarchy != int.MaxValue && !canMentionAll)
@@ -123,11 +126,11 @@ namespace AkkoBot.Commands.Common
                 // Sanitize by role hierarchy - Permissive
                 foreach (Match match in matches)
                 {
-                    if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
+                    if (ulong.TryParse(match.Groups[1].Value, out var rid)
                         && _context.Guild.Roles.TryGetValue(rid, out var role)
                         && !role.IsMentionable
                         && _context.Member.Hierarchy <= role.Position)
-                        _parsedContent.Replace(match.Groups[0].ToString(), $"@{role.Name}");
+                        _parsedContent.Replace(match.Groups[0].Value, $"@{role.Name}");
                 }
             }
             else
@@ -135,11 +138,11 @@ namespace AkkoBot.Commands.Common
                 // Sanitize by mention everyone permission - Strict
                 foreach (Match match in matches)
                 {
-                    if (ulong.TryParse(match.Groups[1].ToString(), out var rid)
+                    if (ulong.TryParse(match.Groups[1].Value, out var rid)
                         && _context.Guild.Roles.TryGetValue(rid, out var role)
                         && !role.IsMentionable
                         && !canMentionAll)
-                        _parsedContent.Replace(match.Groups[0].ToString(), $"@{role.Name}");
+                        _parsedContent.Replace(match.Groups[0].Value, $"@{role.Name}");
                 }
             }
 

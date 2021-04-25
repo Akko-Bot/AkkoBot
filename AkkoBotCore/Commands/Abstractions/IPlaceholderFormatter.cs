@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.CommandsNext;
+using System.Text.RegularExpressions;
 
 namespace AkkoBot.Commands.Abstractions
 {
@@ -11,9 +12,10 @@ namespace AkkoBot.Commands.Abstractions
         /// Parses a string placeholder to the value it represents.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="placeholder">The placeholder.</param>
-        /// <param name="result">The string representation of the parsed placeholder, <see langword="null"/> if parsing fails.</param>
-        /// <returns>The value of the boxed object the placeholder represents, <see langword="null"/> if parsing fails.</returns>
-        public object Parse(CommandContext context, string placeholder, out string result);
+        /// <param name="match">The regex match for the placeholder.</param>
+        /// <param name="result">The parsed placeholder, <see langword="null"/> if parsing fails.</param>
+        /// <remarks><paramref name="result"/> can return <see langword="null"/> even if this method returns <see langword="true"/>.</remarks>
+        /// <returns><see langword="true"/> if the placeholder was recognized, <see langword="false"/>.</returns>
+        bool TryParse(CommandContext context, Match match, out object result);
     }
 }

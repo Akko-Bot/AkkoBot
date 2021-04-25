@@ -68,6 +68,19 @@ namespace AkkoBot.Services
         }
 
         /// <summary>
+        /// Swaps the reference of two variables with each other.
+        /// </summary>
+        /// <typeparam name="T">The type of the data.</typeparam>
+        /// <param name="x">First <typeparamref name="T"/>.</param>
+        /// <param name="y">Second <typeparamref name="T"/>.</param>
+        public static void Swap<T>(ref T x, ref T y)
+        {
+            var temp = x;
+            x = y;
+            y = temp;
+        }
+
+        /// <summary>
         /// Safely gets the culture info of the specified locale.
         /// </summary>
         /// <param name="locale">The locale.</param>

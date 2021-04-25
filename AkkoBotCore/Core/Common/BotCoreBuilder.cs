@@ -341,6 +341,7 @@ namespace AkkoBot.Core.Common
 
                 // > Utilities
                 ServiceDescriptor.Singleton(new HttpClient()),
+                ServiceDescriptor.Singleton(new Random()),
 
                 // > Commands
                 ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>()
