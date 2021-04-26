@@ -29,6 +29,7 @@ namespace AkkoBot.Services.Database
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; private set; }
         public ICommandCooldown CooldownCommands { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
 
@@ -59,8 +60,9 @@ namespace AkkoBot.Services.Database
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
 
-            Guilds = new(); // Guild configs will be loaded into the cache as needed.
-            FilteredWords = new(); // Filtered words will be loaded into the cache as needed
+            Guilds = new(); // Guild configs are be loaded into the cache as needed.
+            FilteredWords = new(); // Filtered words are be loaded into the cache as needed
+            FilteredContent = new(); // Special filters are be loaded into the cache as needed
         }
 
         /// <summary>
@@ -109,18 +111,25 @@ namespace AkkoBot.Services.Database
                     Timers?.Dispose();
                     PlayingStatuses?.Clear();
                     PlayingStatuses?.TrimExcess();
-
-                    foreach (var group in Aliases.Values)
-                        group?.Clear();
-
-                    Aliases?.Clear();
                     FilteredWords?.Clear();
+                    FilteredContent?.Clear();
                     DisabledCommandCache?.Clear();
 
-                    foreach (var group in Polls.Values)
-                        group?.Clear();
+                    if (Aliases is not null)
+                    {
+                        foreach (var group in Aliases.Values)
+                            group.Clear();
 
-                    Polls?.Clear();
+                        Aliases.Clear();
+                    }
+
+                    if (Polls is not null)
+                    {
+                        foreach (var group in Polls.Values)
+                            group.Clear();
+
+                        Polls.Clear();
+                    }
                 }
 
                 Blacklist = null;
@@ -131,6 +140,7 @@ namespace AkkoBot.Services.Database
                 PlayingStatuses = null;
                 Aliases = null;
                 FilteredWords = null;
+                FilteredContent = null;
                 DisabledCommandCache = null;
                 CooldownCommands = null;
                 Polls = null;

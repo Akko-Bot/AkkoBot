@@ -76,6 +76,19 @@ namespace AkkoBot.Extensions
         /// <see langword="true"/> if at least one element contained in <paramref name="targetCollection"/> is present
         /// in <paramref name="collection"/>, <see langword="false"/> otherwise.
         /// </returns>
+        public static bool ContainsOne<T>(this IEnumerable<T> collection, params T[] targetCollection)
+            => ContainsOne(collection, targetCollection.AsEnumerable());
+
+        /// <summary>
+        /// Checks if the current collection contains at least one element of a given collection.
+        /// </summary>
+        /// <typeparam name="T">Data type contained in the collection.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="targetCollection">The collection to compare to.</param>
+        /// <returns>
+        /// <see langword="true"/> if at least one element contained in <paramref name="targetCollection"/> is present
+        /// in <paramref name="collection"/>, <see langword="false"/> otherwise.
+        /// </returns>
         public static bool ContainsOne<T>(this IEnumerable<T> collection, IEnumerable<T> targetCollection)
         {
             foreach (var element in targetCollection)

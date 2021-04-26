@@ -22,6 +22,7 @@ namespace AkkoBot.Services.Database.Abstractions
         List<PlayingStatusEntity> PlayingStatuses { get; }
         ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; }
         ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; }
+        ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; }
         ITimerManager Timers { get; set; }
         ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
         ICommandCooldown CooldownCommands { get; }

@@ -36,6 +36,7 @@ arg_emoji_name: O nome of novo emoji.
 arg_emoji_newname: O novo nome do emoji.
 arg_emoji_url: Um link direto a uma imagem.
 arg_emojis: Um ou mais emojis.
+arg_fc_id: ID do filtro de conteúdo.
 arg_fw_ids: IDs de usuários, canais e/ou cargos, separados por espaço.
 arg_fw_message: A mensagem a ser enviada.
 arg_fw_word: Uma palavra.
@@ -179,6 +180,14 @@ cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos 
 cmd_emoji_rename: Renomeia um emoji do servidor.
 cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
 cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
+cmd_fc: Agrupa comandos que filtram mensagens que não contenham um determinado tipo de conteúdo.
+cmd_fc_att: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um anexo no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
+cmd_fc_clear: Remove todos os filtros de conteúdo desse servidor.
+cmd_fc_img: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha uma imagem no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
+cmd_fc_invite: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um convite de servidor no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
+cmd_fc_list: Exibe todos os filtros de conteúdo ativos nesse servidor.
+cmd_fc_remove: Remove um filtro de conteúdo.
+cmd_fc_url: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha uma URL no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fw: Agrupa comandos que filtram palavras indesejáveis do servidor.
 cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando o filtro de palavras para eles.
@@ -316,6 +325,12 @@ error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
+fc_allow: Permite Apenas
+fc_att_toggle: O filtro de anexos foi {0} no canal {1}.
+fc_img_toggle: O filtro de imagens foi {0} no canal {1}.
+fc_invite_toggle: O filtro de convites foi {0} no canal {1}.
+fc_list_empty: Não há filtros de conteúdo ativos nesse servidor.
+fc_url_toggle: O filtro de URL foi {0} no canal {1}.
 features: Recursos
 fw_default_notification: Sua mensagem foi removida por conter uma palavra proibida. Cuidado com o palavreado.
 fw_default_warn: Usou uma palavra proibida.
@@ -391,7 +406,11 @@ infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
 invalid_color: O código de cor especificado é inválido.
+is_attachment_only: Anexos
+is_image_only: Imagens
+is_invite_only: Convites
 is_mod: É Moderador
+is_url_only: URLs
 joined_at: Entrou Em
 kick: Expulsar
 kick_enum: expulso

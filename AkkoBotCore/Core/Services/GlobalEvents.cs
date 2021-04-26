@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static DSharpPlus.Entities.DiscordEmbedBuilder;
 
@@ -28,6 +29,7 @@ namespace AkkoBot.Core.Services
     /// </summary>
     internal class GlobalEvents
     {
+        private readonly Regex _imageUrlRegex = new(@"http\S*?(.png|.jpg|.jpeg|.gif)", RegexOptions.Compiled);
         private readonly IServiceScope _scope;
         private readonly IDbCache _dbCache;
         private readonly AliasService _aliasService;
@@ -74,6 +76,9 @@ namespace AkkoBot.Core.Services
 
             // Delete messages with stickers
             _botCore.BotShardedClient.MessageCreated += FilterSticker;
+
+            // Deletes messages that don't contain a certain type of content
+            _botCore.BotShardedClient.MessageCreated += FilterContent;
 
             // Assign role on channel join/leave
             _botCore.BotShardedClient.VoiceStateUpdated += VoiceRole;
@@ -324,6 +329,8 @@ namespace AkkoBot.Core.Services
 
                 // Delete the notification message after some time
                 _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
+
+                eventArgs.Handled = true;
             });
         }
 
@@ -363,7 +370,37 @@ namespace AkkoBot.Core.Services
 
                 // Delete the notification message after some time
                 _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
+
+                eventArgs.Handled = true;
             });
+        }
+
+        /// <summary>
+        /// Deletes a message that doesn't contain a certain type of content.
+        /// </summary>
+        private Task FilterContent(DiscordClient _, MessageCreateEventArgs eventArgs)
+        {
+            if (!_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
+                || _dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | Permissions.ManageMessages))
+                return Task.CompletedTask;
+
+            var filter = filters.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id);
+
+            if (filter is null || !filter.IsActive())
+                return Task.CompletedTask;
+
+            // Check if message contains a valid content. If it doesn't, delete it.
+            if ((filter.IsAttachmentOnly && eventArgs.Message.Attachments.Count == 0)
+                || (filter.IsUrlOnly && !eventArgs.Message.Content.Contains(new string[2] { "http://", "https://" }, StringComparison.OrdinalIgnoreCase))
+                || (filter.IsInviteOnly && !eventArgs.Message.Content.Contains("discord.gg/", StringComparison.OrdinalIgnoreCase))
+                || (filter.IsImageOnly && !HasImage(eventArgs.Message)))
+            {
+                eventArgs.Handled = true;
+                return eventArgs.Message.DeleteAsync();
+            }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -453,10 +490,16 @@ namespace AkkoBot.Core.Services
                 var filteredWords = await db.FilteredWords.AsNoTracking()
                     .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
 
+                var filteredContent = await db.FilteredContent.AsNoTracking()
+                    .ToArrayAsync();
+
                 _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
 
                 if (filteredWords is not null)
                     _dbCache.FilteredWords.TryAdd(filteredWords.GuildIdFK, filteredWords);
+
+                if (filteredContent.Length is not 0)
+                    _dbCache.FilteredContent.TryAdd(dbGuild.GuildId, new(filteredContent));
             });
         }
 
@@ -467,6 +510,8 @@ namespace AkkoBot.Core.Services
         {
             _dbCache.Guilds.TryRemove(eventArgs.Guild.Id, out _);
             _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
+            _dbCache.FilteredContent.TryRemove(eventArgs.Guild.Id, out var filters);
+            filters.Clear();
 
             return Task.CompletedTask;
         }
@@ -495,7 +540,7 @@ namespace AkkoBot.Core.Services
                 cmdHandler.Client.Logger.LogCommand(
                     LogLevel.Error,
                     eventArgs.Context,
-                    null,
+                    string.Empty,
                     eventArgs.Exception
                 );
             }
@@ -509,6 +554,14 @@ namespace AkkoBot.Core.Services
         }
 
         /* Utility Methods */
+
+        /// <summary>
+        /// Checks if a Discord message contains images.
+        /// </summary>
+        /// <param name="message">The Discord message.</param>
+        /// <returns><see langword="true"/> if it contains an image, <see langword="false"/> otherwise.</returns>
+        private bool HasImage(DiscordMessage message)
+            => _imageUrlRegex.Matches(message.Content + string.Join("\n", message.Attachments.Select(x => x.Url))).Count is not 0;
 
         /// <summary>
         /// Deletes a <see cref="DiscordMessage"/> if its content matches the specified filtered word.

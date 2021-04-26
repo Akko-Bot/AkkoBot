@@ -15,7 +15,7 @@ namespace AkkoBot.Extensions
         /// <param name="context">The command context.</param>
         /// <param name="message">An optional message to be shown on the log's header.</param>
         /// <param name="exception">The excetion that occurred during command execution.</param>
-        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = null, Exception exception = null)
+        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = "", Exception exception = null)
         {
             logger.BeginScope(context);
 

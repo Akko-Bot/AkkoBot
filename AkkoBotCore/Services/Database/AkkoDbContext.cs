@@ -18,6 +18,7 @@ namespace AkkoBot.Services.Database
         public DbSet<PlayingStatusEntity> PlayingStatuses { get; init; }
         public DbSet<AliasEntity> Aliases { get; init; }
         public DbSet<FilteredWordsEntity> FilteredWords { get; init; }
+        public DbSet<FilteredContentEntity> FilteredContent { get; init; }
         public DbSet<ReminderEntity> Reminders { get; init; }
         public DbSet<CommandEntity> AutoCommands { get; init; }
         public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
@@ -87,6 +88,13 @@ namespace AkkoBot.Services.Database
                 .WithOne(x => x.FilteredWordsRel)
                 .HasForeignKey<FilteredWordsEntity>(x => x.GuildIdFK)
                 .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FilteredContentEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.FilteredContentRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VoiceRoleEntity>()

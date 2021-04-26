@@ -54,7 +54,7 @@ namespace AkkoBot.Core.Services
             _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuilds;
 
             // Caches guild filtered words
-            _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredWords;
+            _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredElements;
 
             // Executes startup commands
             _botCore.BotShardedClient.GuildDownloadCompleted += ExecuteStartupCommands;
@@ -133,7 +133,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Caches the filtered words of all guilds available to this client.
         /// </summary>
-        private Task CacheFilteredWords(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        private Task CacheFilteredElements(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             return Task.Run(async () =>
             {
@@ -144,8 +144,15 @@ namespace AkkoBot.Core.Services
                     .ToArrayAsync())    // Query the database
                     .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
 
+                var filteredContent = (await db.FilteredContent.AsNoTracking()
+                    .ToArrayAsync())    // Query the database
+                    .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
+
                 foreach (var entry in filteredWords)
                     _dbCache.FilteredWords.TryAdd(entry.GuildIdFK, entry);
+
+                foreach (var entry in filteredContent)
+                    _dbCache.FilteredContent.TryAdd(entry.GuildIdFK, new(filteredContent.Where(x => x.GuildIdFK == entry.GuildIdFK)));
             });
         }
 

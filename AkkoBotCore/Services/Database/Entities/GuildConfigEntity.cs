@@ -18,6 +18,7 @@ namespace AkkoBot.Services.Database.Entities
         private string _errorColor = "FB3D28";
 
         public FilteredWordsEntity FilteredWordsRel { get; set; }
+        public List<FilteredContentEntity> FilteredContentRel { get; set; }
         public List<MutedUserEntity> MutedUserRel { get; set; }
         public List<WarnEntity> WarnRel { get; set; }
         public List<WarnPunishEntity> WarnPunishRel { get; set; }
