@@ -112,7 +112,7 @@ namespace AkkoBot.Commands.Common
             if (_context.Guild is null || matches.Count == 0)
                 return false;
 
-            var canMentionAll = _context.Member.PermissionsIn(_context.Channel).HasOneFlag(Permissions.MentionEveryone | Permissions.Administrator);
+            var canMentionAll = _context.Member.PermissionsIn(_context.Channel).HasPermission(Permissions.MentionEveryone);
 
             // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
             if (_context.Member.Hierarchy != int.MaxValue && !canMentionAll)

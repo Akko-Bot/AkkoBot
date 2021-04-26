@@ -70,7 +70,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             [RemainingText, Description("arg_remind_message")] string message)
         {
             var success = context.Guild is not null
-                && (context.Member.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.ManageMessages | Permissions.Administrator)))
+                && (context.Member.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageMessages)))
                 && await _service.AddReminderAsync(context, channel, time, false, message);
 
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);

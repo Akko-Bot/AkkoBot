@@ -110,7 +110,7 @@ namespace AkkoBot.Core.Services
             return Task.Run(async () =>
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
-                var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.ManageRoles | Permissions.Administrator));
+                var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasPermission(Permissions.ManageRoles));
 
                 // Check if user is in the database
                 var dbGuild = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
@@ -146,7 +146,11 @@ namespace AkkoBot.Core.Services
                 || _dbCache.Blacklist.Contains(eventArgs.Guild?.Id ?? default))
             {
                 eventArgs.Handled = true;
-                return FilterWord(client, eventArgs);
+                return Task.Run(async () =>
+                {
+                    if (!(await FilterWord(client, eventArgs) || await FilterSticker(client, eventArgs)))
+                        await FilterContent(client, eventArgs);
+                }); 
             }
 
             return Task.CompletedTask;
@@ -175,7 +179,7 @@ namespace AkkoBot.Core.Services
                 db.Polls.Update(poll);
                 await db.SaveChangesAsync();
 
-                if (eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasFlag(Permissions.ManageMessages))
+                if (eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                     await eventArgs.Message.DeleteAsync();
 
                 eventArgs.Handled = true;
@@ -190,15 +194,15 @@ namespace AkkoBot.Core.Services
             if (!eventArgs.Message.Content.StartsWith("!prefix", StringComparison.InvariantCultureIgnoreCase))
                 return Task.CompletedTask;
 
-            return Task.Run(async () =>
-            {
-                var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
+            var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
                     ? dbGuild.Prefix
                     : _dbCache.BotConfig.BotPrefix;
 
-                if (eventArgs.Guild is not null && prefix.Equals("!"))
-                    return;
+            if (eventArgs.Guild is not null && prefix.Equals("!"))
+                return Task.CompletedTask;
 
+            return Task.Run(async () =>
+            {
                 // Get command handler and prefix command
                 var cmdHandler = client.GetCommandsNext();
                 var cmd = cmdHandler.FindCommand(eventArgs.Message.Content[prefix.Length..], out var cmdArgs)
@@ -269,15 +273,15 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Deletes a user message if it contains a filtered word.
         /// </summary>
-        private Task FilterWord(DiscordClient client, MessageCreateEventArgs eventArgs)
+        private Task<bool> FilterWord(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             // If message starts with the server prefix or bot has no permission to delete messages or server has no filtered words, quit
             if (eventArgs.Author.IsBot
                 || !_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || filteredWords.Words.Count == 0
                 || !filteredWords.Enabled
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasFlag(Permissions.ManageMessages))
-                return Task.CompletedTask;
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
+                return Task.FromResult(false);
 
             return Task.Run(async () =>
             {
@@ -285,27 +289,35 @@ namespace AkkoBot.Core.Services
                 if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
                 || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
-                    return;
+                    return false;
 
-                var match = filteredWords.Words.FirstOrDefault(word => eventArgs.Message.Content.Contains(word.Trim('*'), StringComparison.InvariantCultureIgnoreCase));
+                var matches = filteredWords.Words.Where(word => eventArgs.Message.Content.Contains(word.Trim('*'), StringComparison.InvariantCultureIgnoreCase));
 
                 // If message doesn't contain any of the filtered words, quit
-                if (match is null)
-                    return;
+                if (!matches.Any())
+                    return false;
 
                 var cmdHandler = client.GetCommandsNext();
 
                 // Do not delete legitimate commands
                 if (cmdHandler.FindCommand(eventArgs.Message.Content[_dbCache.Guilds[eventArgs.Guild.Id].Prefix.Length..], out _) is not null)
-                    return;
+                    return false;
 
                 // Delete the message
-                if (!await DeleteFilteredMessageAsync(eventArgs.Message, match))
-                    return;
+                var isDeleted = false;
+
+                foreach (var match in matches)
+                {
+                    if (await DeleteFilteredMessageAsync(eventArgs.Message, match))
+                    {
+                        isDeleted = true;
+                        break;
+                    }
+                }
 
                 // Send notification message, if enabled
-                if (!filteredWords.NotifyOnDelete && !filteredWords.WarnOnDelete)
-                    return;
+                if (!isDeleted || (!filteredWords.NotifyOnDelete && !filteredWords.WarnOnDelete))
+                    return true;
 
                 var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
                 var toWarn = filteredWords.WarnOnDelete && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
@@ -331,33 +343,32 @@ namespace AkkoBot.Core.Services
                 _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
 
                 eventArgs.Handled = true;
+
+                return true;
             });
         }
 
         /// <summary>
         /// Deletes a user message if it contains a sticker.
         /// </summary>
-        private Task FilterSticker(DiscordClient client, MessageCreateEventArgs eventArgs)
+        private Task<bool> FilterSticker(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || !filteredWords.FilterStickers || eventArgs.Message.Stickers.Count == 0
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasFlag(Permissions.ManageMessages))
-                return Task.CompletedTask;
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
+                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                return Task.FromResult(false);
 
             return Task.Run(async () =>
             {
-                // Do not delete from ignored users, channels and roles
-                if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)
-                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
-                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
-                    return;
-
                 // Delete the message
                 await eventArgs.Message.DeleteAsync();
 
                 // Send the notification
                 if (!filteredWords.NotifyOnDelete)
-                    return;
+                    return true;
 
                 var cmdHandler = client.GetCommandsNext();
 
@@ -372,6 +383,8 @@ namespace AkkoBot.Core.Services
                 _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
 
                 eventArgs.Handled = true;
+
+                return true;
             });
         }
 
@@ -380,9 +393,9 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task FilterContent(DiscordClient _, MessageCreateEventArgs eventArgs)
         {
-            if (!_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
+            if (eventArgs.Author.IsBot || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
                 || _dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | Permissions.ManageMessages))
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                 return Task.CompletedTask;
 
             var filter = filters.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id);
@@ -406,24 +419,25 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Saves a user to the database on command execution.
         /// </summary>
+        /// <remarks>
+        /// Users who are cached by EF Core but have been manually deleted from
+        /// the database won't get re-added until the bot is restarted.
+        /// </remarks>
         private Task SaveUserOnCmd(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
         {
-            return Task.Run(async () =>
-            {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+            var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
-                // Track the user who triggered the command
-                //var isTracking = await db.DiscordUsers.CreateOrUpdateAsync(eventArgs.Context.User);
-                var isUnchanged = db.Upsert(eventArgs.Context.User).State is EntityState.Unchanged;
+            // Track the user who triggered the command
+            var isUnchanged = db.Upsert(eventArgs.Context.User).State is EntityState.Unchanged;
 
-                // Track the mentioned users in the message, if any
-                foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
-                    isUnchanged &= db.Upsert(mentionedUser).State is EntityState.Unchanged;
+            // Track the mentioned users in the message, if any
+            foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
+                isUnchanged &= db.Upsert(mentionedUser).State is EntityState.Unchanged;
 
-                // Save if there is at least one user being tracked
-                if (!isUnchanged)
-                    await db.SaveChangesAsync();
-            });
+            // Save if there is at least one user being tracked
+            return (!isUnchanged)
+                ? db.SaveChangesAsync()
+                : Task.CompletedTask;
         }
 
         /// <summary>
@@ -491,6 +505,7 @@ namespace AkkoBot.Core.Services
                     .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
 
                 var filteredContent = await db.FilteredContent.AsNoTracking()
+                    .Where(x => x.GuildIdFK == eventArgs.Guild.Id)
                     .ToArrayAsync();
 
                 _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
