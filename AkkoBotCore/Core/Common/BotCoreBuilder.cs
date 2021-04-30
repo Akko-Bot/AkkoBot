@@ -87,11 +87,11 @@ namespace AkkoBot.Core.Common
                 builder.AddProvider(logProvider)
                     .AddFilter((category, level) =>
                         (category.Equals(DbLoggerCategory.Database.Command.Name) && level is LogLevel.Information)
-                        || (category.Equals(typeof(BaseDiscordClient).FullName) && level >= logLevel)
+                        || category.Equals(typeof(BaseDiscordClient).FullName)
                     )
             );
 
-            _cmdServices.AddSingleton(logProvider);
+            _cmdServices.AddSingleton<IAkkoLoggerProvider>(logProvider);
             return this;
         }
 

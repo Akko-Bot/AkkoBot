@@ -174,7 +174,7 @@ namespace AkkoBot.Commands.Modules.Self
                 await ChangeProperty(context, x => x.LogLevel = logLevel);
 
                 var logConfig = _service.GetLogConfig();
-                context.Services.GetService<AkkoLoggerProvider>().UpdateLoggers(logConfig);
+                context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
             }
 
             [Command("format")]
@@ -184,7 +184,7 @@ namespace AkkoBot.Commands.Modules.Self
                 await ChangeProperty(context, x => x.LogFormat = logFormat);
 
                 var logConfig = _service.GetLogConfig();
-                context.Services.GetService<AkkoLoggerProvider>().UpdateLoggers(logConfig);
+                context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
             }
 
             [Command("timeformat")]
@@ -200,7 +200,7 @@ namespace AkkoBot.Commands.Modules.Self
                 await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
 
                 var logConfig = _service.GetLogConfig();
-                context.Services.GetService<AkkoLoggerProvider>().UpdateLoggers(logConfig);
+                context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
             }
 
             [Command("filetimestamp")]
@@ -230,10 +230,10 @@ namespace AkkoBot.Commands.Modules.Self
                 {
                     var logConfig = _service.GetLogConfig();
                     var fileLogger = new AkkoFileLogger(logConfig.LogSizeMB, logConfig.LogTimeStamp);
-                    context.Services.GetService<AkkoLoggerProvider>().UpdateFileLogger(fileLogger);
+                    context.Services.GetService<IAkkoLoggerProvider>().UpdateFileLogger(fileLogger);
                 }
                 else if (!isEnabled)
-                    context.Services.GetService<AkkoLoggerProvider>().UpdateFileLogger(null);
+                    context.Services.GetService<IAkkoLoggerProvider>().UpdateFileLogger(null);
             }
 
             [Command("size"), Aliases("setsize")]

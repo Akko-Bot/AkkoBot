@@ -49,10 +49,6 @@ namespace AkkoBot.Services.Logging.Loggers
                     _fileLogger.CacheLogging(log.ToString());
 
                 Console.ResetColor();
-
-                // This fixes a weird bug when the console resets from a custom foreground color
-                if (logLevel is LogLevel.Critical)
-                    Console.WriteLine();
             }
         }
 

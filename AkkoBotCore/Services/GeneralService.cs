@@ -84,7 +84,7 @@ namespace AkkoBot.Services
         }
 
         /// <summary>
-        /// Checks if the specified time formar is valid.
+        /// Checks if the specified time format is valid.
         /// </summary>
         /// <param name="timeFormat">The time format to be checked.</param>
         /// <returns><see langword="true"/> if the format is valid, <see langword="false"/> otherwise.</returns>

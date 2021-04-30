@@ -11,7 +11,7 @@ namespace AkkoBot.Services.Logging
     /// <summary>
     /// Creates and updates logger objects.
     /// </summary>
-    public class AkkoLoggerProvider : ILoggerProvider
+    public class AkkoLoggerProvider : IAkkoLoggerProvider
     {
         private bool _isDisposed = false;
         private IFileLogger _fileLogger;
@@ -50,7 +50,7 @@ namespace AkkoBot.Services.Logging
         }
 
         /// <summary>
-        /// Updates the loggers with the specified settings.
+        /// Updates the loggers registered in this provider with the specified settings.
         /// </summary>
         /// <param name="logConfig">The log settings.</param>
         public void UpdateLoggers(LogConfigEntity logConfig)
@@ -58,15 +58,16 @@ namespace AkkoBot.Services.Logging
             _minLogLevel = logConfig.LogLevel;
             _logFormat = logConfig.LogFormat;
             _timeFormat = logConfig.LogTimeFormat;
-            
+
             foreach (var logger in _loggers)
                 logger.BeginScope(logConfig);
         }
 
         /// <summary>
-        /// Updates the file loggers with a new instance.
+        /// Updates the file logger of all loggers registered in this provider with the specified instance.
         /// </summary>
         /// <param name="fileLogger">The new file logger, <see langword="null"/> to disable file logging.</param>
+        /// <remarks>Pass in <see langword="null"/> to disable file logging.</remarks>
         public void UpdateFileLogger(IFileLogger fileLogger)
         {
             _fileLogger = fileLogger;
