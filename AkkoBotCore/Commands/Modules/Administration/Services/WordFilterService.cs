@@ -33,7 +33,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid)
+                ?? new() { GuildIdFK = sid };
 
             // Add the new words to the db entry
             foreach (var word in words)

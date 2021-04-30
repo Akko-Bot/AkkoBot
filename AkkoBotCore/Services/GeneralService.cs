@@ -18,6 +18,9 @@ using System.Text;
 
 namespace AkkoBot.Services
 {
+    /// <summary>
+    /// Groups utility methods for various purposes.
+    /// </summary>
     public static class GeneralService
     {
         /// <summary>
@@ -78,6 +81,24 @@ namespace AkkoBot.Services
             var temp = x;
             x = y;
             y = temp;
+        }
+
+        /// <summary>
+        /// Checks if the specified time formar is valid.
+        /// </summary>
+        /// <param name="timeFormat">The time format to be checked.</param>
+        /// <returns><see langword="true"/> if the format is valid, <see langword="false"/> otherwise.</returns>
+        public static bool IsValidTimeFormat(string timeFormat)
+        {
+            try
+            {
+                _ = DateTimeOffset.Now.ToString(timeFormat, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>

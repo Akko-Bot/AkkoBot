@@ -7,9 +7,12 @@ using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Logging;
+using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -167,27 +170,81 @@ namespace AkkoBot.Commands.Modules.Self
             [Command("level")]
             [Description("cmd_config_log_level")]
             public async Task SetBotLogLevel(CommandContext context, [Description("arg_loglevel")] LogLevel logLevel)
-                => await ChangeProperty(context, x => x.LogLevel = logLevel);
+            {
+                await ChangeProperty(context, x => x.LogLevel = logLevel);
+
+                var logConfig = _service.GetLogConfig();
+                context.Services.GetService<AkkoLoggerProvider>().UpdateLoggers(logConfig);
+            }
 
             [Command("format")]
             [Description("cmd_config_log_format")]
             public async Task SetBotLogFormat(CommandContext context, [Description("cmd_config_log_format_arg")] string logFormat)
-                => await ChangeProperty(context, x => x.LogFormat = logFormat);
+            {
+                await ChangeProperty(context, x => x.LogFormat = logFormat);
+
+                var logConfig = _service.GetLogConfig();
+                context.Services.GetService<AkkoLoggerProvider>().UpdateLoggers(logConfig);
+            }
 
             [Command("timeformat")]
             [Description("cmd_config_log_timeformat")]
             public async Task SetBotLogTimeFormat(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string logTimeFormat = null)
-                => await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
+            {
+                if (!GeneralService.IsValidTimeFormat(logTimeFormat))
+                {
+                    await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                    return;
+                }
+
+                await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
+
+                var logConfig = _service.GetLogConfig();
+                context.Services.GetService<AkkoLoggerProvider>().UpdateLoggers(logConfig);
+            }
+
+            [Command("filetimestamp")]
+            [Description("cmd_config_log_filetimestamp")]
+            public async Task SetFileLogTimeFormat(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string timestampFormat = null)
+            {
+                if (!GeneralService.IsValidTimeFormat(timestampFormat))
+                {
+                    await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                    return;
+                }
+
+                await ChangeProperty(context, x => x.LogTimeStamp = timestampFormat);
+
+                if (context.Client.Logger.BeginScope(null) is IFileLogger fileLogger)
+                    fileLogger.TimeStampFormat = timestampFormat;
+            }
 
             [Command("save")]
             [Description("cmd_config_log_save")]
             public async Task SetFileLogging(CommandContext context, [Description("arg_bool")] bool isEnabled)
-                => await ChangeProperty(context, x => x.IsLoggedToFile = isEnabled);
+            {
+                var wasEnabled = _service.GetLogConfig().IsLoggedToFile;
+                await ChangeProperty(context, x => x.IsLoggedToFile = isEnabled);
+
+                if (isEnabled && isEnabled != wasEnabled)
+                {
+                    var logConfig = _service.GetLogConfig();
+                    var fileLogger = new AkkoFileLogger(logConfig.LogSizeMB, logConfig.LogTimeStamp);
+                    context.Services.GetService<AkkoLoggerProvider>().UpdateFileLogger(fileLogger);
+                }
+                else if (!isEnabled)
+                    context.Services.GetService<AkkoLoggerProvider>().UpdateFileLogger(null);
+            }
 
             [Command("size"), Aliases("setsize")]
             [Description("cmd_config_log_size")]
             public async Task SetFileMaxSize(CommandContext context, [Description("arg_double")] double size)
-                => await ChangeProperty(context, x => x.LogSizeMB = size);
+            {
+                await ChangeProperty(context, x => x.LogSizeMB = size);
+
+                if (context.Client.Logger.BeginScope(null) is IFileLogger fileLogger)
+                    fileLogger.FileSizeLimitMB = size;
+            }
 
             private async Task ChangeProperty<T>(CommandContext context, Func<LogConfigEntity, T> selector)
             {

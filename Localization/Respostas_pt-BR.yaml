@@ -143,12 +143,12 @@ cmd_config_help: Define se o bot deve responder a comandos de ajuda.
 cmd_config_list: Mostra as configurações atuais do bot.
 cmd_config_locale: Define o idioma padrão do bot. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
 cmd_config_log: Agrupa configuracões que controlam como logs devem ser tratados.
-cmd_config_log_format: Define o formato do log a ser user utilizado. Requer reinicialização para tomar efeito.
+cmd_config_log_format: Define o formato do log a ser user utilizado.
 cmd_config_log_format_arg: 'O formato dos logs. Valores possíveis incluem: __Default__, __Simple__ e __Minimalist__.'
-cmd_config_log_level: Define o nível mínimo de severidade dos logs que devem ser registrados. Requer reinicialização para tomar efeito.
-cmd_config_log_save: Define se os logs devem ser salvos em um arquivo de texto. Requer reinicialização para tomar efeito.
-cmd_config_log_size: Defines the size a log file should have, in MB. Requires a restart to take effect.
-cmd_config_log_timeformat: Define o formato de hora a ser utilizado nos logs. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings). Requer reinicialização para tomar efeito.
+cmd_config_log_level: Define o nível mínimo de severidade dos logs que devem ser registrados.
+cmd_config_log_save: Define se os logs devem ser salvos em um arquivo de texto.
+cmd_config_log_size: Define o tamanho que arquivos de log devem ter, em MB.
+cmd_config_log_timeformat: Define o formato de hora a ser utilizado nos logs. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings).
 cmd_config_log_timeformat_arg: O formato de hora a ser utilizado. Deixe vazio para redefini-lo de volta ao valor padrão.
 cmd_config_mention: Define se o bot deve responder a comandos executados com uma menção a si como prefixo. Requer reinicialização para tomar efeito.
 cmd_config_okcolor: Define a cor padrão a ser utilizada em embeds.
@@ -553,3 +553,5 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
+
+cmd_config_log_filetimestamp: Define o formato da data a ser utilizado no nome dos arquivos de log. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings).

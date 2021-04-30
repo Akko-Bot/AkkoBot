@@ -1,4 +1,5 @@
-﻿using AkkoBot.Common;
+﻿using System.Globalization;
+using AkkoBot.Common;
 using AkkoBot.Services.Logging.Abstractions;
 using System;
 using System.IO;
@@ -6,14 +7,17 @@ using System.Text;
 
 namespace AkkoBot.Services.Logging
 {
+    /// <summary>
+    /// Writes logs to a file once a certain threshold is reached.
+    /// </summary>
     public class AkkoFileLogger : IFileLogger
     {
-        private const double MB = 1000000.0;
+        private const double MB = 1000000.0;    // Byte to Megabyte ratio
         private DateTimeOffset _time = DateTimeOffset.Now;
         private readonly MemoryStream _logStream = new();
         private readonly string _directory = AkkoEnvironment.LogsDirectory;
-        private readonly double _fileSizeLimitMB;
-        private readonly string _timeStamp;
+        public string TimeStampFormat { get; set; }
+        public double FileSizeLimitMB { get; set; }
 
         /// <summary>
         /// Indicates whether this object has been disposed or not.
@@ -22,8 +26,8 @@ namespace AkkoBot.Services.Logging
 
         public AkkoFileLogger(double fileSizeLimit = 1.0, string timeFormat = null)
         {
-            _fileSizeLimitMB = (fileSizeLimit <= 0.0) ? 1.0 : fileSizeLimit;
-            _timeStamp = (string.IsNullOrWhiteSpace(timeFormat)) ? "dd-MM-yyyy_HH-mm_fffff" : timeFormat;
+            FileSizeLimitMB = (fileSizeLimit <= 0.0) ? 1.0 : fileSizeLimit;
+            TimeStampFormat = (string.IsNullOrWhiteSpace(timeFormat)) ? "dd-MM-yyyy_HH-mm_fffff" : timeFormat;
         }
 
         /// <summary>
@@ -39,7 +43,7 @@ namespace AkkoBot.Services.Logging
             var encodedEntry = Encoding.UTF8.GetBytes(logEntry);
             _logStream.Write(encodedEntry);
 
-            if (_logStream.Length / MB > _fileSizeLimitMB || DateTimeOffset.Now.Subtract(_time) > TimeSpan.FromDays(1))
+            if (_logStream.Length / MB > FileSizeLimitMB || DateTimeOffset.Now.Subtract(_time) > TimeSpan.FromDays(1))
                 DumpToFile();
         }
 
@@ -48,11 +52,14 @@ namespace AkkoBot.Services.Logging
         /// </summary>
         public void DumpToFile()
         {
+            if (IsDisposed || _logStream.Length is 0)
+                return;
+
             if (!Directory.Exists(_directory))
                 Directory.CreateDirectory(_directory);
 
             using var fileStream = new FileStream(
-                _directory + $"AkkoLog_{_time.ToString(_timeStamp)}.txt",
+                _directory + $"AkkoLog_{_time.ToString(TimeStampFormat, CultureInfo.InvariantCulture)}.txt",
                 FileMode.Create, FileAccess.ReadWrite, FileShare.Read,
                 bufferSize: 4096, useAsync: true
             );
@@ -78,7 +85,8 @@ namespace AkkoBot.Services.Logging
             {
                 if (isDisposing)
                 {
-                    _logStream.Dispose();
+                    DumpToFile();
+                    _logStream?.Dispose();
                 }
 
                 IsDisposed = true;

@@ -3,8 +3,22 @@ using System.IO;
 
 namespace AkkoBot.Services.Logging.Abstractions
 {
+    /// <summary>
+    /// Represents an object that caches logs and writes them to
+    /// a file once a certain threshold is reached.
+    /// </summary>
     public interface IFileLogger : IDisposable
     {
+        /// <summary>
+        /// The format of the time-stamp to be included in the name of the log files.
+        /// </summary>
+        public string TimeStampFormat { get; set; }
+
+        /// <summary>
+        /// Defines the size of log files, in MB.
+        /// </summary>
+        public double FileSizeLimitMB { get; set; }
+
         /// <summary>
         /// Indicates whether this object has been disposed or not.
         /// </summary>

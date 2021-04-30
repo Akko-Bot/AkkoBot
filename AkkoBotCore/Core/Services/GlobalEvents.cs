@@ -561,7 +561,13 @@ namespace AkkoBot.Core.Services
             }
             else if (eventArgs.Exception is ChecksFailedException ex && ex.FailedChecks[0].GetType() == typeof(GlobalCooldownAttribute))
             {
-                cmdHandler.Client.Logger.LogCommand(LogLevel.Warning, eventArgs.Context, "Command execution has been cancelled due to an active cooldown.");
+                // Log command cooldowns
+                cmdHandler.Client.Logger.LogCommand(
+                    LogLevel.Warning,
+                    eventArgs.Context,
+                    "Command execution has been cancelled due to an active cooldown."
+                );
+
                 return eventArgs.Context.Message.CreateReactionAsync(AkkoEntities.CooldownEmoji);
             }
 

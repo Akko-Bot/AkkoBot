@@ -1,18 +1,24 @@
-﻿using AkkoBot.Services.Logging.Abstractions;
+﻿using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Logging.Abstractions;
+using AkkoBot.Services.Logging.Loggers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AkkoBot.Services.Logging
 {
+    /// <summary>
+    /// Creates and updates logger objects.
+    /// </summary>
     public class AkkoLoggerProvider : ILoggerProvider
     {
         private bool _isDisposed = false;
-        private readonly LogLevel _minLogLevel;
-        private readonly string _timeFormat;
-        private readonly List<Type> _loggerRegister;
-        private readonly IFileLogger _fileLogger;
+        private IFileLogger _fileLogger;
+        private LogLevel _minLogLevel;
+        private string _logFormat;
+        private string _timeFormat;
+        private readonly List<ILogger> _loggers = new();
 
         /// <summary>
         /// Creates a provider of <see cref="ILogger"/> objects.
@@ -20,28 +26,57 @@ namespace AkkoBot.Services.Logging
         /// <param name="minLogLevel">Defines the minimum level of logging. Default is <see cref="LogLevel.Information"/>.</param>
         /// <param name="fileLogger">Defines the file logger for logging to a text file. Default is <see langword="null"/> for no logging.</param>
         /// <param name="logFormat">Defines the type of <see cref="ILogger"/> that should be created. Default is "Default".</param>
-        public AkkoLoggerProvider(LogLevel minLogLevel, string timeFormat, IFileLogger fileLogger = null)
+        public AkkoLoggerProvider(LogLevel minLogLevel, string logFormat, string timeFormat, IFileLogger fileLogger = null)
         {
             _minLogLevel = minLogLevel;
+            _logFormat = logFormat;
             _timeFormat = timeFormat;
-            _loggerRegister = GeneralService.GetImplementables(typeof(ILogger)).ToList();
             _fileLogger = fileLogger;
         }
 
         /// <summary>
-        /// Creates an <see cref="ILogger"/> instance whose name has been specified in <paramref name="categoryName"/>.
+        /// Creates an <see cref="ILogger"/> instance for the namespace specified in <paramref name="categoryName"/>.
         /// </summary>
-        /// <param name="categoryName">The name of the <see cref="ILogger"/> to be created.</param>
-        /// <returns>An <see cref="ILogger"/> object, <see langword="null"/> if none was found.</returns>
+        /// <param name="categoryName">Fullname of the namespace to create a log for.</param>
+        /// <returns>An <see cref="ILogger"/>.</returns>
         public ILogger CreateLogger(string categoryName)
         {
-            foreach (var logger in _loggerRegister)
-            {
-                if (logger.Name.Contains(categoryName, StringComparison.OrdinalIgnoreCase))
-                    return Activator.CreateInstance(logger, _minLogLevel, _timeFormat, _fileLogger) as ILogger;
-            }
+            ILogger logger = (categoryName.Equals(DbLoggerCategory.Database.Command.Name))
+                ? new DebugLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat)   // Log EF Core queries as debug logs
+                : new AkkoLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat);   // Log everything else as normal
 
-            return null;
+            _loggers.Add(logger);
+            return logger;
+        }
+
+        /// <summary>
+        /// Updates the loggers with the specified settings.
+        /// </summary>
+        /// <param name="logConfig">The log settings.</param>
+        public void UpdateLoggers(LogConfigEntity logConfig)
+        {
+            _minLogLevel = logConfig.LogLevel;
+            _logFormat = logConfig.LogFormat;
+            _timeFormat = logConfig.LogTimeFormat;
+            
+            foreach (var logger in _loggers)
+                logger.BeginScope(logConfig);
+        }
+
+        /// <summary>
+        /// Updates the file loggers with a new instance.
+        /// </summary>
+        /// <param name="fileLogger">The new file logger, <see langword="null"/> to disable file logging.</param>
+        public void UpdateFileLogger(IFileLogger fileLogger)
+        {
+            _fileLogger = fileLogger;
+            _loggers[0].BeginScope(null)?.Dispose();
+
+            if (fileLogger is null)
+                return;
+
+            foreach (var logger in _loggers)
+                logger.BeginScope(fileLogger);
         }
 
         /// <summary>
@@ -59,9 +94,8 @@ namespace AkkoBot.Services.Logging
             {
                 if (disposing)
                 {
+                    _loggers?.Clear();
                     _fileLogger?.Dispose();
-                    _loggerRegister.Clear();
-                    _loggerRegister.TrimExcess();
                 }
 
                 _isDisposed = true;

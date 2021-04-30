@@ -45,6 +45,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
             => _dbCache.BotConfig;
 
         /// <summary>
+        /// Gets the bot's log settings.
+        /// </summary>
+        /// <returns>The log settings.</returns>
+        public LogConfigEntity GetLogConfig()
+            => _dbCache.LogConfig;
+
+        /// <summary>
         /// Reloads the response strings from the original files.
         /// </summary>
         /// <returns>The amount of locales stored in memory.</returns>

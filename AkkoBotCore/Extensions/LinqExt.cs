@@ -123,7 +123,7 @@ namespace AkkoBot.Extensions
         /// Filters a sequence of values based on an asynchronous predicate.
         /// </summary>
         /// <param name="collection">This collection.</param>
-        /// <param name="predicate"></param>
+        /// <param name="predicate">A method to test each element for a condition.</param>
         /// <typeparam name="T">Data type contained in the collection.</typeparam>
         /// <returns>An awaitable collection of <typeparamref name="T"/>.</returns>
         public static async Task<IEnumerable<T>> WhereAsync<T>(this IEnumerable<T> collection, Func<T, Task<bool>> predicate)

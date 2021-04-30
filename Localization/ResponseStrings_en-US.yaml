@@ -143,12 +143,12 @@ cmd_config_help: Sets whether the bot should respond to help commands or not.
 cmd_config_list: Shows the bot's current settings.
 cmd_config_locale: Sets the default language for the bot. Provide no parameter to see the list of available languages.
 cmd_config_log: Groups settings that control how logs should be handled.
-cmd_config_log_format: Sets the log format used for logging. Requires a restart to take effect.
+cmd_config_log_format: Sets the log format used for logging.
 cmd_config_log_format_arg: 'The format of the logs. Possible values include: __Default__, __Simple__ and __Minimalist__.'
-cmd_config_log_level: Sets the minimum severity level of the logs that should be registered. Requires a restart to take effect.
-cmd_config_log_save: Sets whether logs should be saved to a text file. Requires a restart to take effect.
-cmd_config_log_size: Defines the size a log file should have, in MB. Requires a restart to take effect.
-cmd_config_log_timeformat: Sets the time format used for logging on the console. You can find the reference [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings). Requires a restart to take effect.
+cmd_config_log_level: Sets the minimum severity level of the logs that should be registered.
+cmd_config_log_save: Sets whether logs should be saved to a text file.
+cmd_config_log_size: Defines the size a log file should have, in MB.
+cmd_config_log_timeformat: Sets the time format used for logging on the console. You can find the reference [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings).
 cmd_config_log_timeformat_arg: The time format to be used. Leave it empty to reset to the default.
 cmd_config_mention: Sets whether the bot should respond to commands executed with a mention to itself as a prefix. Requires a restart to take effect.
 cmd_config_okcolor: Sets the default color that should be used on embeds.
@@ -553,3 +553,5 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
+
+cmd_config_log_filetimestamp: Sets the time format used on the file name for log files. You can find the reference [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings).

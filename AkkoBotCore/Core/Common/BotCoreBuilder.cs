@@ -56,7 +56,7 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Overrides DSharpPlus' default logger with an <see cref="AkkoLoggerFactory"/>.
+        /// Overrides DSharpPlus' default logger with Akko loggers.
         /// </summary>
         /// <remarks>The factory will be configured with the settings defined in the database, if possible.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
@@ -64,27 +64,34 @@ namespace AkkoBot.Core.Common
         {
             var (_, logConfig) = GetBotSettings();
 
-            _loggerFactory = new AkkoLoggerFactory(
-                logConfig.LogLevel,
-                (logConfig.IsLoggedToFile) ? new AkkoFileLogger(logConfig.LogSizeMB, logConfig.LogTimeFormat) : null,
-                logConfig.LogFormat,
-                logConfig.LogTimeFormat
-            );
+            var fileLogger = (logConfig.IsLoggedToFile)
+                ? new AkkoFileLogger(logConfig.LogSizeMB, logConfig.LogTimeStamp)
+                : null;
 
-            return this;
+            return WithDefaultLogging(logConfig.LogLevel, fileLogger, logConfig.LogFormat, logConfig.LogTimeFormat);
         }
 
         /// <summary>
-        /// Overrides DSharpPlus' default logger with an <see cref="AkkoLoggerFactory"/>.
+        /// Overrides DSharpPlus' default logger with Akko loggers.
         /// </summary>
-        /// <param name="logLevel">Minimum log severity to be logged. Default is "Information".</param>
+        /// <param name="logLevel">Minimum log severity to be logged.</param>
         /// <param name="fileLogger">An object responsible for writing the logs to a text file. Default is <see langword="null"/> (no file logging).</param>
         /// <param name="logFormat">The type of logging to be output. Default is "Default".</param>
         /// <param name="timeFormat">The format of the time stamp to be used in the logs. Default depends on <paramref name="logFormat"/>.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithDefaultLogging(LogLevel? logLevel = null, IFileLogger fileLogger = null, string logFormat = null, string timeFormat = null)
+        public BotCoreBuilder WithDefaultLogging(LogLevel logLevel = LogLevel.Information, IFileLogger fileLogger = null, string logFormat = null, string timeFormat = null)
         {
-            _loggerFactory = new AkkoLoggerFactory(logLevel, fileLogger, logFormat, timeFormat);
+            var logProvider = new AkkoLoggerProvider(logLevel, logFormat, timeFormat, fileLogger);
+
+            _loggerFactory = LoggerFactory.Create(builder =>
+                builder.AddProvider(logProvider)
+                    .AddFilter((category, level) =>
+                        (category.Equals(DbLoggerCategory.Database.Command.Name) && level is LogLevel.Information)
+                        || (category.Equals(typeof(BaseDiscordClient).FullName) && level >= logLevel)
+                    )
+            );
+
+            _cmdServices.AddSingleton(logProvider);
             return this;
         }
 
@@ -243,6 +250,7 @@ namespace AkkoBot.Core.Common
             _cmdServices.AddDbContext<AkkoDbContext>(options =>
                 options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(GetConnectionString())
+                    .UseLoggerFactory(_loggerFactory)
             );
 
             return this;

@@ -11,6 +11,10 @@ namespace AkkoBot.Services.Database.Entities
     public class LogConfigEntity : DbEntity
     {
         private string _logFormat = "Default";
+        private string _logTimeFormat;
+        private string _logTimeStamp;
+
+        public LogLevel LogLevel { get; set; } = LogLevel.Information;
 
         [Required]
         [MaxLength(20)]
@@ -21,16 +25,24 @@ namespace AkkoBot.Services.Database.Entities
             set => _logFormat = value?.MaxLength(20);
         }
 
+        [MaxLength(20)]
         [Column(TypeName = "varchar")]
-        public string LogTimeFormat { get; set; }
+        public string LogTimeFormat
+        {
+            get => _logTimeFormat;
+            set => _logTimeFormat = value?.MaxLength(20);
+        }
 
-        [Required]
-        public LogLevel LogLevel { get; set; } = LogLevel.Information;
+        [MaxLength(20)]
+        [Column(TypeName = "varchar")]
+        public string LogTimeStamp
+        {
+            get => _logTimeStamp;
+            set => _logTimeStamp = value?.MaxLength(20);
+        }
 
-        [Required]
         public bool IsLoggedToFile { get; set; } = false;
 
-        [Required]
         public double LogSizeMB { get; set; } = 1.0;
     }
 }
