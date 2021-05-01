@@ -21,7 +21,9 @@ namespace AkkoBot.Services.Database.Entities
 
         public bool Enabled { get; set; } = true;
 
-        public bool FilterStickers { get; set; } = false;
+        public bool FilterStickers { get; set; }
+
+        public bool FilterInvites { get; set; }
 
         public bool NotifyOnDelete { get; set; }
 

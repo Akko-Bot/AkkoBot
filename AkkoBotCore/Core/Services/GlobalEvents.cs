@@ -29,13 +29,22 @@ namespace AkkoBot.Core.Services
     /// </summary>
     internal class GlobalEvents
     {
-        private readonly Regex _imageUrlRegex = new(@"http\S*?(.png|.jpg|.jpeg|.gif)", RegexOptions.Compiled);
         private readonly IServiceScope _scope;
         private readonly IDbCache _dbCache;
         private readonly AliasService _aliasService;
         private readonly WarningService _warningService;
         private readonly RoleService _roleService;
         private readonly BotCore _botCore;
+
+        private readonly Regex _imageUrlRegex = new(
+            @"http\S*?\.(png|jpg|jpeg|gif)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
+        private readonly Regex _inviteRegex = new(
+            @"(?:discord\.(?:gg|io|me|li)|discord(?:.com|app.com)\/invite)\/(\w+)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
 
         internal GlobalEvents(BotCore botCore, IServiceProvider services)
         {
@@ -71,8 +80,11 @@ namespace AkkoBot.Core.Services
             // Catch aliased commands and execute them
             _botCore.BotShardedClient.MessageCreated += HandleCommandAlias;
 
-            // Delete filtered words
+            // Delete messages with filtered words
             _botCore.BotShardedClient.MessageCreated += FilterWord;
+
+            // Delete messages with server invites
+            _botCore.BotShardedClient.MessageCreated += FilterInvite;
 
             // Delete messages with stickers
             _botCore.BotShardedClient.MessageCreated += FilterSticker;
@@ -148,7 +160,7 @@ namespace AkkoBot.Core.Services
                 eventArgs.Handled = true;
                 return Task.Run(async () =>
                 {
-                    if (!(await FilterWord(client, eventArgs) || await FilterSticker(client, eventArgs)))
+                    if (!(await FilterWord(client, eventArgs) || await FilterInvite(client, eventArgs) || await FilterSticker(client, eventArgs)))
                         await FilterContent(client, eventArgs);
                 }); 
             }
@@ -349,6 +361,25 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
+        /// Deletes a user message if it contains a server invite.
+        /// </summary>
+        private Task<bool> FilterInvite(DiscordClient _, MessageCreateEventArgs eventArgs)
+        {
+            if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
+                || !filteredWords.FilterInvites || !HasInvite(eventArgs.Message)
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
+                || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
+                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                return Task.FromResult(false);
+
+            eventArgs.Message.DeleteAsync();
+            eventArgs.Handled = true;
+
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
         /// Deletes a user message if it contains a sticker.
         /// </summary>
         private Task<bool> FilterSticker(DiscordClient client, MessageCreateEventArgs eventArgs)
@@ -406,7 +437,7 @@ namespace AkkoBot.Core.Services
             // Check if message contains a valid content. If it doesn't, delete it.
             if ((filter.IsAttachmentOnly && eventArgs.Message.Attachments.Count == 0)
                 || (filter.IsUrlOnly && !eventArgs.Message.Content.Contains(new string[2] { "http://", "https://" }, StringComparison.OrdinalIgnoreCase))
-                || (filter.IsInviteOnly && !eventArgs.Message.Content.Contains("discord.gg/", StringComparison.OrdinalIgnoreCase))
+                || (filter.IsInviteOnly && !HasInvite(eventArgs.Message))
                 || (filter.IsImageOnly && !HasImage(eventArgs.Message)))
             {
                 eventArgs.Handled = true;
@@ -583,6 +614,14 @@ namespace AkkoBot.Core.Services
         /// <returns><see langword="true"/> if it contains an image, <see langword="false"/> otherwise.</returns>
         private bool HasImage(DiscordMessage message)
             => _imageUrlRegex.Matches(message.Content + string.Join("\n", message.Attachments.Select(x => x.Url))).Count is not 0;
+
+        /// <summary>
+        /// Checks if a Discord message contains a server invite.
+        /// </summary>
+        /// <param name="message">The Discord message.</param>
+        /// <returns><see langword="true"/> if it contains an invite, <see langword="false"/> otherwise.</returns>
+        private bool HasInvite(DiscordMessage message)
+            => _inviteRegex.Matches(message.Content).Count is not 0;
 
         /// <summary>
         /// Deletes a <see cref="DiscordMessage"/> if its content matches the specified filtered word.

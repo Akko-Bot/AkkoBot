@@ -128,6 +128,19 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("invites"), Aliases("invite")]
+        [Description("cmd_fw_invites")]
+        [RequireUserPermissions(Permissions.ManageGuild)]
+        public async Task ToggleInviteRemoval(CommandContext context)
+        {
+            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized("fw_invite_toggle", (success) ? "enabled" : "disabled"));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [Command("stickers")]
         [Description("cmd_fw_stickers")]
         [RequireUserPermissions(Permissions.ManageGuild)]
@@ -186,6 +199,15 @@ namespace AkkoBot.Commands.Modules.Administration
 
                 if (members.Length != 0)
                     embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoConstants.EmbedFieldMaxLength, "[...]"));
+
+                if (dbEntry.FilterInvites || dbEntry.FilterStickers)
+                {
+                    var extraFilters = dbEntry.GetSettings()
+                        .Where(x => x.Key is "filter_invites" or "filter_stickers" && x.Value is "True")
+                        .Select(x => context.FormatLocalized(x.Key));
+
+                    embed.WithFooter($"{context.FormatLocalized("fw_extra_filters")}: {string.Join(", ", extraFilters)}");
+                }
             }
 
             await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);

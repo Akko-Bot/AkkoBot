@@ -189,18 +189,18 @@ cmd_fc_list: Exibe todos os filtros de conteúdo ativos nesse servidor.
 cmd_fc_remove: Remove um filtro de conteúdo.
 cmd_fc_url: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha uma URL no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fw: Agrupa comandos que filtram palavras indesejáveis do servidor.
-cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
+cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contenham qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando o filtro de palavras para eles.
-cmd_fw_addmany: Adiciona múltiplas palavras ao filtro de palavras. Separe-as com espaço. Mensagens que contém qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
+cmd_fw_addmany: Adiciona múltiplas palavras ao filtro de palavras. Separe-as com espaço. Mensagens que contenham qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_clear: Remove todas a palavras do filtro de palavras.
-cmd_fw_enable: Ativa ou desativa a exclusão automática de mensagens que contém palavras proibidas no servidor.
+cmd_fw_enable: Ativa ou desativa a exclusão automática de mensagens que contenham palavras proibidas no servidor.
 cmd_fw_list: Exibe todas a palavras proibidas no servidor e os usuários, canais e cargos ignorados pelo filtro de palavras.
 cmd_fw_message: Define a mensagem a ser automaticamente enviada quando uma mensagem for excluída por conter uma palavra proibida.
 cmd_fw_notify: Ativa ou desativa o envio de uma notificação quando uma mensagem filtrada for excluída.
 cmd_fw_remove: Remove uma palavra do filtro de palavras.
 cmd_fw_removeignore: Remove IDs de usuários, canais e/ou cargos da lista de IDs ignorados.
 cmd_fw_removemany: Remove múltiplas palavras do filtro de palavras. Separe-as com espaço.
-cmd_fw_stickers: Ativa ou desativa a exclusão automática de mensagens que contém figurinhas no servidor.
+cmd_fw_stickers: Ativa ou desativa a exclusão automática de mensagens que contenham figurinhas no servidor.
 cmd_fw_warn: Ativa ou desativa a advertência automática a usuários que enviarem mensagens com palavras proibidas.
 cmd_globalcmd: Ativa ou desativa um comando.
 cmd_globalmodule: Ativa ou desativa todos os comandos do módulo especificado.
@@ -555,3 +555,8 @@ with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
 
 cmd_config_log_filetimestamp: Define o formato da data a ser utilizado no nome dos arquivos de log. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings).
+cmd_fw_invites: Ativa ou desativa a exclusão automática de mensagens que contenham convites no servidor.
+fw_invite_toggle: O filtro de convites de servidor foi {0}.
+filter_invites: convites
+filter_stickers: figurinhas
+fw_extra_filters: Filtros extras

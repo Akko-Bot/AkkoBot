@@ -555,3 +555,8 @@ with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
 
 cmd_config_log_filetimestamp: Sets the time format used on the file name for log files. You can find the reference [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings).
+cmd_fw_invites: Toggles the automatic deletion of messages containing invites on the server.
+fw_invite_toggle: Automatic removal of server invites has been {0}.
+filter_invites: invites
+filter_stickers: stickers
+fw_extra_filters: Extra filters
