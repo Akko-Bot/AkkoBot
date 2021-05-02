@@ -162,7 +162,7 @@ namespace AkkoBot.Core.Services
                 {
                     if (!(await FilterWord(client, eventArgs) || await FilterInvite(client, eventArgs) || await FilterSticker(client, eventArgs)))
                         await FilterContent(client, eventArgs);
-                }); 
+                });
             }
 
             return Task.CompletedTask;

@@ -1,12 +1,10 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Formatters;
-using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -62,13 +60,13 @@ namespace AkkoBot.Commands.Common
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <param name="content">The text with placeholders in it.</param>
-        /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\s\.]+)\(([\w\s\,]+)\)}|{([\w\s\.]+)}".</param>
+        /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\.]+)\((.+?)\)}|{([\w\.]+)}".</param>
         /// <param name="formatter">The object responsible for converting the placeholders to the values they represent. Default is <see cref="AkkoPlaceholders"/>.</param>
         public SmartString(CommandContext context, string content, Regex regex = null, IPlaceholderFormatter formatter = null)
         {
             _context = context;
             _parsedContent = new(content ?? context.RawArgumentString);
-            ParseRegex = regex ?? new Regex(@"{([\w\s\.]+)\(([\w\s\,]+)\)}|{([\w\s\.]+)}", RegexOptions.Compiled);
+            ParseRegex = regex ?? new Regex(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
             _formatter = formatter ?? context.CommandsNext.Services.GetService<AkkoPlaceholders>();
         }
 

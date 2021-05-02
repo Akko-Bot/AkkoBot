@@ -89,7 +89,7 @@ namespace AkkoBot.Commands.Formatters
 
             ["rng"] = (context, parameter) =>
             {
-                if (parameter is not string[] arguments || arguments.Length != 2 
+                if (parameter is not string[] arguments || arguments.Length != 2
                     || !int.TryParse(arguments[0], out var x) || !int.TryParse(arguments[1], out var y))
                     return null;
 
@@ -97,6 +97,13 @@ namespace AkkoBot.Commands.Formatters
                     GeneralService.Swap(ref x, ref y);
 
                 return context.Services.GetService<Random>().Next(x, y);
+            },
+
+            ["choose"] = (context, parameter) =>
+            {
+                return (parameter is not string[] arguments || arguments.Length == 0)
+                    ? null
+                    : arguments[context.Services.GetService<Random>().Next(0, arguments.Length)].Trim();
             }
         };
 
