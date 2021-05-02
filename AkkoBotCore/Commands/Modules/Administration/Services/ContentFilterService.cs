@@ -55,7 +55,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             await db.SaveChangesAsync();
 
             // Update the cache
-            _dbCache.FilteredContent[server.Id].Add(dbFilter);
+            if (dbFilter.IsActive())
+                _dbCache.FilteredContent[server.Id].Add(dbFilter);
+            else
+                _dbCache.FilteredContent[server.Id].TryRemove(dbFilter);
 
             return result;
         }

@@ -45,6 +45,11 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task InviteToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
             => await SetPropertyAsync(context, channel, "fc_invite_toggle", x => x.IsInviteOnly = !x.IsInviteOnly);
 
+        [Command("command"), Aliases("cmd")]
+        [Description("cmd_fc_command")]
+        public async Task CommandToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+            => await SetPropertyAsync(context, channel, "fc_command_toggle", x => x.IsCommandOnly = !x.IsCommandOnly);
+
         [Command("remove"), Aliases("rm")]
         [Description("cmd_fc_remove")]
         public async Task RemoveFilter(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
@@ -80,7 +85,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var embed = new DiscordEmbedBuilder();
             var filters = _service.GetContentFilters(context.Guild)
-                .Where(x => x.IsAttachmentOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly);
+                .Where(x => x.IsActive());
 
             if (!filters.Any())
             {

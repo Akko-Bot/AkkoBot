@@ -422,7 +422,7 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Deletes a message that doesn't contain a certain type of content.
         /// </summary>
-        private Task FilterContent(DiscordClient _, MessageCreateEventArgs eventArgs)
+        private Task FilterContent(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (eventArgs.Author.IsBot || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
                 || _dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
@@ -434,11 +434,14 @@ namespace AkkoBot.Core.Services
             if (filter is null || !filter.IsActive())
                 return Task.CompletedTask;
 
+            var prefix = _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
+
             // Check if message contains a valid content. If it doesn't, delete it.
             if ((filter.IsAttachmentOnly && eventArgs.Message.Attachments.Count == 0)
                 || (filter.IsUrlOnly && !eventArgs.Message.Content.Contains(new string[2] { "http://", "https://" }, StringComparison.OrdinalIgnoreCase))
                 || (filter.IsInviteOnly && !HasInvite(eventArgs.Message))
-                || (filter.IsImageOnly && !HasImage(eventArgs.Message)))
+                || (filter.IsImageOnly && !HasImage(eventArgs.Message))
+                || (filter.IsCommandOnly && client.GetCommandsNext().FindCommand(eventArgs.Message.Content[prefix.Length..], out _) is null))
             {
                 eventArgs.Handled = true;
                 return eventArgs.Message.DeleteAsync();

@@ -145,6 +145,7 @@ namespace AkkoBot.Core.Services
                     .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
 
                 var filteredContent = (await db.FilteredContent.AsNoTracking()
+                    .Where(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
                     .ToArrayAsync())    // Query the database
                     .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
 

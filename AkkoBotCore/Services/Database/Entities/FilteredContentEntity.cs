@@ -17,6 +17,7 @@ namespace AkkoBot.Services.Database.Entities
         public bool IsImageOnly { get; set; }
         public bool IsUrlOnly { get; set; }
         public bool IsInviteOnly { get; set; }
+        public bool IsCommandOnly { get; set; }
 
         /// <summary>
         /// Gets the name of all active filters.
@@ -30,7 +31,7 @@ namespace AkkoBot.Services.Database.Entities
         /// </summary>
         /// <returns><see langword="true"/> if at least one filter is active, <see langword="false"/> otherwise.</returns>
         public bool IsActive()
-            => IsAttachmentOnly || IsImageOnly || IsUrlOnly || IsInviteOnly;
+            => IsAttachmentOnly || IsImageOnly || IsUrlOnly || IsInviteOnly || IsCommandOnly;
 
         /// <summary>
         /// Gets the filters and the value they are currently set to.
@@ -43,7 +44,8 @@ namespace AkkoBot.Services.Database.Entities
                 [nameof(IsAttachmentOnly).ToSnakeCase()] = IsAttachmentOnly,
                 [nameof(IsImageOnly).ToSnakeCase()] = IsImageOnly,
                 [nameof(IsUrlOnly).ToSnakeCase()] = IsUrlOnly,
-                [nameof(IsInviteOnly).ToSnakeCase()] = IsInviteOnly
+                [nameof(IsInviteOnly).ToSnakeCase()] = IsInviteOnly,
+                [nameof(IsCommandOnly).ToSnakeCase()] = IsCommandOnly
             };
         }
     }

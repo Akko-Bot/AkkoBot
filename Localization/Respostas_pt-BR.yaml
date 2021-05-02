@@ -143,6 +143,7 @@ cmd_config_help: Define se o bot deve responder a comandos de ajuda.
 cmd_config_list: Mostra as configurações atuais do bot.
 cmd_config_locale: Define o idioma padrão do bot. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
 cmd_config_log: Agrupa configuracões que controlam como logs devem ser tratados.
+cmd_config_log_filetimestamp: Define o formato da data a ser utilizado no nome dos arquivos de log. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings).
 cmd_config_log_format: Define o formato do log a ser user utilizado.
 cmd_config_log_format_arg: 'O formato dos logs. Valores possíveis incluem: __Default__, __Simple__ e __Minimalist__.'
 cmd_config_log_level: Define o nível mínimo de severidade dos logs que devem ser registrados.
@@ -183,6 +184,7 @@ cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
 cmd_fc: Agrupa comandos que filtram mensagens que não contenham um determinado tipo de conteúdo.
 cmd_fc_att: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um anexo no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_clear: Remove todos os filtros de conteúdo desse servidor.
+cmd_fc_command: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um comando válido no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_img: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha uma imagem no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_invite: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um convite de servidor no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_list: Exibe todos os filtros de conteúdo ativos nesse servidor.
@@ -194,6 +196,7 @@ cmd_fw_addignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs 
 cmd_fw_addmany: Adiciona múltiplas palavras ao filtro de palavras. Separe-as com espaço. Mensagens que contenham qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
 cmd_fw_clear: Remove todas a palavras do filtro de palavras.
 cmd_fw_enable: Ativa ou desativa a exclusão automática de mensagens que contenham palavras proibidas no servidor.
+cmd_fw_invites: Ativa ou desativa a exclusão automática de mensagens que contenham convites no servidor.
 cmd_fw_list: Exibe todas a palavras proibidas no servidor e os usuários, canais e cargos ignorados pelo filtro de palavras.
 cmd_fw_message: Define a mensagem a ser automaticamente enviada quando uma mensagem for excluída por conter uma palavra proibida.
 cmd_fw_notify: Ativa ou desativa o envio de uma notificação quando uma mensagem filtrada for excluída.
@@ -327,16 +330,21 @@ error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
 fc_allow: Permite Apenas
 fc_att_toggle: O filtro de anexos foi {0} no canal {1}.
+fc_command_toggle: O filtro de comandos foi {0} no canal {1}.
 fc_img_toggle: O filtro de imagens foi {0} no canal {1}.
 fc_invite_toggle: O filtro de convites foi {0} no canal {1}.
 fc_list_empty: Não há filtros de conteúdo ativos nesse servidor.
 fc_url_toggle: O filtro de URL foi {0} no canal {1}.
 features: Recursos
+filter_invites: convites
+filter_stickers: figurinhas
 fw_default_notification: Sua mensagem foi removida por conter uma palavra proibida. Cuidado com o palavreado.
 fw_default_warn: Usou uma palavra proibida.
+fw_extra_filters: Filtros extras
 fw_ignored_channels: Canais Ignorados
 fw_ignored_roles: Cargos Ignorados
 fw_ignored_users: Usuários Ignorados
+fw_invite_toggle: O filtro de convites de servidor foi {0}.
 fw_list_empty: Não há palavras proibidas.
 fw_list_title: Lista de Palavras Proibidas
 fw_notify: A notificação para mensagens filtradas foi {0}.
@@ -407,6 +415,7 @@ infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
 invalid_color: O código de cor especificado é inválido.
 is_attachment_only: Anexos
+is_command_only: Comandos
 is_image_only: Imagens
 is_invite_only: Convites
 is_mod: É Moderador
@@ -553,10 +562,3 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
-
-cmd_config_log_filetimestamp: Define o formato da data a ser utilizado no nome dos arquivos de log. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings).
-cmd_fw_invites: Ativa ou desativa a exclusão automática de mensagens que contenham convites no servidor.
-fw_invite_toggle: O filtro de convites de servidor foi {0}.
-filter_invites: convites
-filter_stickers: figurinhas
-fw_extra_filters: Filtros extras
