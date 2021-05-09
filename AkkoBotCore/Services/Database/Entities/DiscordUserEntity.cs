@@ -20,6 +20,10 @@ namespace AkkoBot.Services.Database.Entities
         [Column(TypeName = "varchar(4)")]
         public string Discriminator { get; set; }
 
+        [NotMapped]
+        public string FullName 
+            => $"{Username}#{Discriminator}";
+
         public DiscordUserEntity()
         {
         }

@@ -50,7 +50,6 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 GuildId = context.Guild?.Id,
                 ChannelId = context.Channel.Id,
                 UserId = context.User.Id,
-                IsAbsolute = true,
                 IsRepeatable = cmdType is CommandType.Repeated,
                 Interval = time,
                 Type = TimerType.Command,

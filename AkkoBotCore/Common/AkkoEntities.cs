@@ -39,9 +39,14 @@ namespace AkkoBot.Common
         public static DiscordEmoji ThumbsDownEmoji { get; } = DiscordEmoji.FromUnicode("👎");
 
         /// <summary>
+        /// Represents a repeater emoji.
+        /// </summary>
+        public static DiscordEmoji RepeaterEmoji { get; } = DiscordEmoji.FromUnicode("🔄");
+
+        /// <summary>
         /// Represents all numeric emojis from 1 to 10.
         /// </summary>
-        public static DiscordEmoji[] NumericEmojis { get; } = new DiscordEmoji[10]
+        public static DiscordEmoji[] NumericEmojis { get; } = new DiscordEmoji[]
         {
             DiscordEmoji.FromUnicode("1️⃣"),
             DiscordEmoji.FromUnicode("2️⃣"),

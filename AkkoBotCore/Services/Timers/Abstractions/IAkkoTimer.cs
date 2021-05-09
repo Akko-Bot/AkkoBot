@@ -18,6 +18,16 @@ namespace AkkoBot.Services.Timers.Abstractions
         TimeSpan Interval { get; }
 
         /// <summary>
+        /// Gets the date time when this timer is going to trigger.
+        /// </summary>
+        DateTimeOffset ElapseAt { get; }
+
+        /// <summary>
+        /// Gets the time when this timer is going to trigger.
+        /// </summary>
+        TimeSpan ElapseIn { get; }
+
+        /// <summary>
         /// Gets whether this timer is active or not.
         /// </summary>
         /// <value><see langword="true"/> if it is active, <see langword="false"/> otherwise.</value>
@@ -30,14 +40,9 @@ namespace AkkoBot.Services.Timers.Abstractions
         bool AutoReset { get; }
 
         /// <summary>
-        /// Gets the time when this timer is going to trigger.
+        /// Triggers when this timer gets disposed.
         /// </summary>
-        DateTimeOffset ElapseAt { get; }
-
-        /// <summary>
-        /// Fires when this timer gets disposed.
-        /// </summary>
-        /// <remarks>It fires only once.</remarks>
+        /// <remarks>It triggers only once.</remarks>
         event EventHandler OnDispose;
     }
 }

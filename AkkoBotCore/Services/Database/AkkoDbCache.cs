@@ -32,6 +32,7 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; private set; }
         public ICommandCooldown CooldownCommands { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; private set; }
 
         // Lazily instantiated
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
@@ -60,9 +61,15 @@ namespace AkkoBot.Services.Database
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
 
-            Guilds = new(); // Guild configs are be loaded into the cache as needed.
-            FilteredWords = new(); // Filtered words are be loaded into the cache as needed
-            FilteredContent = new(); // Special filters are be loaded into the cache as needed
+            Repeaters = dbContext.Repeaters
+                .Where(x => x.Interval <= TimeSpan.FromDays(1))
+                .SplitBy(x => x.GuildIdFK)
+                .Select(x => x.ToConcurrentHashSet())
+                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
+
+            Guilds = new(); // Guild configs are loaded into the cache as needed.
+            FilteredWords = new(); // Filtered words are loaded into the cache as needed
+            FilteredContent = new(); // Special filters are loaded into the cache as needed
         }
 
         /// <summary>
@@ -130,6 +137,14 @@ namespace AkkoBot.Services.Database
 
                         Polls.Clear();
                     }
+
+                    if (Repeaters is not null)
+                    {
+                        foreach (var group in Repeaters.Values)
+                            group.Clear();
+
+                        Repeaters.Clear();
+                    }
                 }
 
                 Blacklist = null;
@@ -144,6 +159,7 @@ namespace AkkoBot.Services.Database
                 DisabledCommandCache = null;
                 CooldownCommands = null;
                 Polls = null;
+                Repeaters = null;
 
                 _isDisposed = true;
             }

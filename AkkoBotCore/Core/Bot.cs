@@ -2,7 +2,9 @@
 using AkkoBot.Core.Common;
 using AkkoBot.Credential;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -39,6 +41,7 @@ namespace AkkoBot.Core
             }
             catch (TaskCanceledException)
             {
+                botCore.CommandExt[0].Services.GetService<IAkkoLoggerProvider>().Dispose();
                 Console.WriteLine();
             }
             catch (Exception ex)

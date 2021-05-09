@@ -62,12 +62,14 @@ arg_punishment_reason: O motivo da punição.
 arg_remind_id: O ID fo lembrete.
 arg_remind_message: A mensagem a ser enviada no lembrete.
 arg_remind_time: Tempo até o lembrete ser ativado. Mínimo de __1m__.
+arg_repeat_message: A mensagem a ser repetida.
+arg_repeat_time: Tempo até a execução do repetidor. Mínimo de __1m__.
 arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
 arg_say: A mensagem a ser enviada.
 arg_sql: Uma instrução SQL válida.
 arg_stream_url: A URL do stream.
-arg_time_of_day: Hora do dia, no formato `HH:mm`.
+arg_time_of_day: Hora do dia, no formato `HH:mm` (24 horas).
 arg_timed_ban: Por quanto tempo o usuário deve permanecer banido.
 arg_timed_mute: Por quanto tempo o usuário deve permanecer silenciado. O padrão é __1h__.
 arg_timed_pstatus: Por quanto tempo o status deve ser exibido.
@@ -84,6 +86,7 @@ arg_warnp_rem_amount: A quantidade de advertências da punição a ser removida.
 arg_warnp_role: Um cargo a ser adicionado ou removido do usuário, se aplicável.
 arg_warnp_time: Por quanto tempo a punição deve durar. Deixe em branco para torná-la permanente.
 arg_warnp_type: O tipo de punição a ser aplicada.
+author: Autor
 autocommand_empty: Nenhum comando automático foi encontrado.
 autocommand_title: Lista de Comandos Automáticos
 ban: Banir
@@ -250,7 +253,7 @@ cmd_reactclear: Remove todas as reações da mensagem especificada.
 cmd_reactremove: Remove uma reação da mensagem especificada.
 cmd_recreatechannel: Recria um canal do Discord.
 cmd_recreaterole: Recria um cargo do Discord.
-cmd_remind: Agrupa comandos de gerenciamento de lembretes.
+cmd_remind: Agrupa comandos de gerenciamento de lembretes. Lembretes são limitados a 20 por usuário, 3 por servidor se o usuário não tiver permissão para gerenciar mensagens.
 cmd_remind_channel: Envia um lembrete a um canal de texto após o período de tempo especificado.
 cmd_remind_here: Envia um lembrete no canal atual após o período de tempo especificado.
 cmd_remind_list: Exibe todos os lembretes criados por você.
@@ -261,6 +264,13 @@ cmd_removerole: Remove um cargo do usuário especificado.
 cmd_removestatus: Remove o status com o ID especificado.
 cmd_renamechannel: Renomeia um canal do Discord.
 cmd_renamerole: Renomeia um cargo do Discord.
+cmd_repeat: Agrupa commandos que gerenciam repetidores - mensagens que são periodicamente enviadas a um canal de texto. Limitado a 5 por servidor.
+cmd_repeat_channel: Cria um repetidor no canal especificado. Especifique um intervalo de tempo para criar um repetidor que executa periodicamente ao longo do tempo ou uma hora do dia para criar um repetidor que executa todo dia à hora especificada.
+cmd_repeat_clear: Remove todos os repetidores desse servidor.
+cmd_repeat_here: Cria um repetidor no canal atual. Especifique um intervalo de tempo para criar um repetidor que executa periodicamente ao longo do tempo ou uma hora do dia para criar um repetidor que executa todo dia à hora especificada.
+cmd_repeat_info: Exibe informação detalhada sobre o repetidor com o ID especificado.
+cmd_repeat_list: Exibe todos os repetidores desse servidor.
+cmd_repeat_remove: Remove o repetidor com o ID especificado.
 cmd_rolecolor: Define a cor de um cargo. Forneça nenhuma cor para exibir a cor atual do cargo especificado.
 cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do servidor.
 cmd_roleid: Exibe od ID do cargo especificado.
@@ -413,6 +423,7 @@ infractions_empty: Esse usuário não possui infrações.
 infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
+interval: Intervalo
 invalid_color: O código de cor especificado é inválido.
 is_attachment_only: Anexos
 is_command_only: Comandos
@@ -492,6 +503,11 @@ reminder_list_title: Lista de Lembretes
 removeallroles: '{0} cargos foram removidos do {1} com sucesso.'
 removerole: Remover Cargo
 removerole_enum: teve um cargo removido
+repeat_list_empty: Nenhum repetidor foi encontrado.
+repeat_over_24h: Mais de 24 horas
+repeater: Repetidor
+repeater_list_title: Repetidores do Servidor
+repeater_not_found: Repetidor de ID {0} não foi encontrado.
 requires: Requer
 role: Cargo
 roles: Cargos
@@ -519,7 +535,8 @@ timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
 timezone_list: Fusos Horários
 total: 'Total de {0}'
-triggers_in: Ativa Em
+triggers_at: Data de Execução
+triggers_in: Executa Em
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.

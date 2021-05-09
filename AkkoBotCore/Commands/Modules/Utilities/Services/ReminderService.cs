@@ -4,6 +4,7 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -44,8 +45,13 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            // Limit of 120 reminders per user
-            if (await db.CountAsync<ReminderEntity>(x => x.AuthorId == context.User.Id) >= 120)
+            var userReminders = await db.Reminders
+                .Where(x => x.AuthorId == context.User.Id)
+                .ToArrayAsync();
+
+            // Limit of 20 reminders per user, 3 reminders per guild if user doesn't have permission to manage messages
+            if (userReminders.Length >= 20
+                || (userReminders.Count(x => x.GuildId == context.Guild.Id) >= 3) && !context.Member.PermissionsIn(channel).HasPermission(Permissions.ManageMessages))
                 return false;
 
             var newTimer = new TimerEntity()
@@ -53,7 +59,6 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 GuildId = context.Guild?.Id,
                 ChannelId = channel.Id,
                 UserId = context.User.Id,
-                IsAbsolute = true,
                 IsRepeatable = false,
                 Interval = time,
                 Type = TimerType.Reminder,

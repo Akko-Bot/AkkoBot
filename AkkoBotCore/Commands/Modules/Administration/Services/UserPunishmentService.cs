@@ -193,7 +193,6 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             {
                 GuildId = context.Guild.Id,
                 UserId = userId,
-                IsAbsolute = true,
                 IsRepeatable = false,
                 Interval = time,
                 Type = TimerType.TimedBan,
@@ -249,7 +248,6 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 GuildId = context.Guild.Id,
                 UserId = user.Id,
                 RoleId = role.Id,
-                IsAbsolute = true,
                 IsRepeatable = false,
                 Interval = time,
                 Type = (type == WarnPunishType.AddRole) ? TimerType.TimedUnrole : TimerType.TimedRole,

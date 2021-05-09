@@ -4,7 +4,7 @@ using System;
 namespace AkkoBot.Common
 {
     /// <summary>
-    /// Small wrapper class for time inputs formatted as HH:mm
+    /// Calculates the time interval from <see cref="DateTimeOffset.Now"/> to the next time of day specified.
     /// </summary>
     public class TimeOfDay
     {
@@ -36,13 +36,13 @@ namespace AkkoBot.Common
         /// </summary>
         /// <param name="future">A point of time in the future.</param>
         /// <returns>The interval between <see cref="DateTimeOffset.Now"/> and the <paramref name="future"/>'s TimeOfDay.</returns>
-        public TimeSpan GetInterval(DateTimeOffset future)
+        public static TimeSpan GetInterval(DateTimeOffset future)
         {
             var result = future.Subtract(DateTimeOffset.Now);
 
             if (result.Days < 0)
             {
-                future = future.Add(TimeSpan.FromDays(-result.Days));
+                future = future.AddDays(-result.Days);
                 result = future.Subtract(DateTimeOffset.Now);
             }
 
@@ -51,6 +51,7 @@ namespace AkkoBot.Common
                 : result;
         }
 
+        /// <inheritdoc />
         public override string ToString() 
             => Time.ToString();
 

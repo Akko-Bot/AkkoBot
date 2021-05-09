@@ -1,5 +1,4 @@
-﻿using AkkoBot.Commands.Abstractions;
-using AkkoBot.Commands.Common;
+﻿using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
@@ -8,6 +7,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Localization.Abstractions;
+using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -21,9 +21,9 @@ using System.Threading.Tasks;
 namespace AkkoBot.Services.Timers
 {
     /// <summary>
-    /// Encapsulates the set of timed actions a Discord user can create.
+    /// Defines the actions to be performed when a timer triggers.
     /// </summary>
-    public class TimerActions : ICommandService
+    public class TimerActions : ITimerActions
     {
         private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
@@ -36,12 +36,7 @@ namespace AkkoBot.Services.Timers
             _localizer = localizer;
         }
 
-        /// <summary>
-        /// Unbans a user from a Discord server.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unban from.</param>
-        /// <param name="userId">The ID of the user to be unbanned.</param>
+        /// <inheritdoc />
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -60,12 +55,7 @@ namespace AkkoBot.Services.Timers
             await db.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Unmutes a user on a Discord server.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
-        /// <param name="userId">The ID of the user to be unmuted.</param>
+        /// <inheritdoc />
         public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -105,12 +95,7 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <summary>
-        /// Adds a role to a Discord user.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
-        /// <param name="userId">The ID of the user to be unmuted.</param>
+        /// <inheritdoc />
         public async Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -137,12 +122,7 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <summary>
-        /// Removes a role from a Discord user.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
-        /// <param name="userId">The ID of the user to be unmuted.</param>
+        /// <inheritdoc />
         public async Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -169,12 +149,7 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <summary>
-        /// Removes old warnings from the specified user.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
-        /// <param name="userId">The ID of the user to be unmuted.</param>
+        /// <inheritdoc />
         public async Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -193,28 +168,26 @@ namespace AkkoBot.Services.Timers
             await db.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Sends a reminder to the channel specified in the database.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="client">The Discord client that created the reminder.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <inheritdoc />
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var dbReminder = await db.Reminders.FirstOrDefaultAsync(x => x.TimerId == entryId);
             var dbTimer = await db.Timers.FindAsync(entryId);
-            var dbGuild = await _dbCache.GetGuildAsync(dbReminder.GuildId.Value);
             var cmdHandler = client.GetCommandsNext();
 
             try
             {
+                var dbGuild = await _dbCache.GetGuildAsync(dbReminder.GuildId.Value);
                 var user = FindMember(dbReminder.AuthorId, server);
 
                 var channel = (dbReminder.IsPrivate)
                         ? await user.CreateDmChannelAsync()
                         : server.GetChannel(dbReminder.ChannelId);
+
+                if (!HasPermissionTo(server.CurrentMember, channel, Permissions.SendMessages))
+                    return;
 
                 var fakeContext = cmdHandler.CreateFakeContext(
                     user,
@@ -253,12 +226,7 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <summary>
-        /// Executes a command in the context stored in the database.
-        /// </summary>
-        /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="client">The Discord client that created the autocommand.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <inheritdoc />
         public async Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -299,6 +267,69 @@ namespace AkkoBot.Services.Timers
                 }
             }
         }
+
+        /// <inheritdoc />
+        public async Task SendRepeaterAsync(int entryId, DiscordClient client, DiscordGuild server)
+        {
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+
+            _dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache);
+            var cmdHandler = client.GetCommandsNext();
+            var dbRepeater = repeaterCache.FirstOrDefault(x => x.TimerId == entryId)
+                ?? await db.Repeaters.Fetch(x => x.TimerId == entryId).FirstOrDefaultAsync();
+                        
+            try
+            {
+                var dbGuild = await _dbCache.GetGuildAsync(dbRepeater.GuildIdFK);
+                var user = FindMember(dbRepeater.AuthorId, server);
+                var channel = server.GetChannel(dbRepeater.ChannelId);
+
+                if (!HasPermissionTo(server.CurrentMember, channel, Permissions.SendMessages))
+                    return;
+
+                var lastMessage = await channel.GetLatestMessageAsync(client);
+                var fakeContext = cmdHandler.CreateFakeContext(user, channel, dbRepeater.Content, dbGuild.Prefix, null);
+
+                var message = new SmartString(fakeContext, dbRepeater.Content);
+                var wasDeserialized = _services.GetService<UtilitiesService>().DeserializeEmbed(message.Content, out var dmsg);
+
+                // If last message is the same repeated message, do nothing
+                if (lastMessage.Author == server.CurrentMember
+                    && (wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
+                    || (!wasDeserialized && lastMessage.Content == message.Content))
+                    return;
+
+                // Send the repeater
+                var discordMessage = (wasDeserialized)
+                    ? await channel.SendMessageAsync(dmsg)
+                    : await channel.SendMessageAsync(message.Content);
+
+                if (HasPermissionTo(server.CurrentMember, channel, Permissions.AddReactions))
+                    await discordMessage.CreateReactionAsync(AkkoEntities.RepeaterEmoji);
+            }
+            catch
+            {
+                // If an error occurs, remove the repeater
+                var dbTimer = await db.Timers.FindAsync(entryId);
+
+                db.Remove(dbRepeater);
+                db.Remove(dbTimer);
+
+                await db.SaveChangesAsync();
+
+                _dbCache.Timers.TryRemove(dbTimer.Id);
+            }
+        }
+
+        /// <summary>
+        /// Checks if the specified user has permission to perform an action.
+        /// </summary>
+        /// <param name="user">The Discord user.</param>
+        /// <param name="channel">The Discord channel to check the permissions for.</param>
+        /// <param name="permissions">The permissions the user must have.</param>
+        /// <returns><see langword="true"/> if the user has permission, <see langword="false"/> otherwise.</returns>
+        private bool HasPermissionTo(DiscordMember user, DiscordChannel channel, Permissions permissions)
+            => channel.IsPrivate || user.PermissionsIn(channel).HasOneFlag(Permissions.Administrator | permissions);
 
         /// <summary>
         /// Finds a <see cref="DiscordMember"/> with the specified ID.

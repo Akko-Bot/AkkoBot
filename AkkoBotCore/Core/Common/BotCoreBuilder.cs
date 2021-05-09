@@ -344,8 +344,8 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<ILocalizer, AkkoLocalizer>(),
 
                 // > Timers
+                ServiceDescriptor.Singleton<ITimerActions, TimerActions>(),
                 ServiceDescriptor.Singleton<ITimerManager, TimerManager>(),
-                //ServiceDescriptor.Singleton(typeof(TimerActions))
 
                 // > Utilities
                 ServiceDescriptor.Singleton(new HttpClient()),
@@ -407,7 +407,7 @@ namespace AkkoBot.Core.Common
                 TokenType = TokenType.Bot,      // Defines the type of token; User = 0, Bot = 1, Bearer = 2
                 AutoReconnect = true,           // Sets whether the bot should automatically reconnect in case it disconnects
                 ReconnectIndefinitely = false,  // Sets whether the bot should attempt to reconnect indefinitely
-                MessageCacheSize = 200,         // Defines how many messages should be cached by the library, per channel
+                MessageCacheSize = 200,         // Defines how many messages should be cached per DiscordClient
                 LoggerFactory = _loggerFactory  // Overrides D#+ default logger with my own
             };
 

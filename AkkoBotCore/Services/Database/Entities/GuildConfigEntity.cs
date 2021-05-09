@@ -25,6 +25,7 @@ namespace AkkoBot.Services.Database.Entities
         public List<OccurrenceEntity> OccurrenceRel { get; set; }
         public List<VoiceRoleEntity> VoiceRolesRel { get; set; }
         public List<PollEntity> PollRel { get; set; }
+        public List<RepeaterEntity> RepeaterRel { get; set; }
 
         public ulong GuildId { get; init; }
 

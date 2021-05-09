@@ -47,11 +47,11 @@ namespace AkkoBot.Core.Services
             // Create bot configs on ready, if there isn't one already
             _botCore.BotShardedClient.Ready += LoadBotConfig;
 
-            // Initialize the timers stored in the database
-            _botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
-
             // Save visible guilds on ready
             _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuilds;
+
+            // Initialize the timers stored in the database
+            _botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
 
             // Caches guild filtered words
             _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredElements;
@@ -92,18 +92,6 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
-        /// Initializes the timers.
-        /// </summary>
-        private Task InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
-        {
-            // May want to remove this method
-            var cmdHandler = client.GetCommandsNext();
-            _dbCache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
         /// Saves new guilds to the database on startup and caches them.
         /// </summary>
         private Task SaveNewGuilds(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
@@ -128,6 +116,17 @@ namespace AkkoBot.Core.Services
                 foreach (var guild in newGuilds)
                     _dbCache.Guilds.TryAdd(guild.GuildId, guild);
             });
+        }
+
+        /// <summary>
+        /// Initializes the timers.
+        /// </summary>
+        private Task<bool> InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        {
+            var cmdHandler = client.GetCommandsNext();
+            _dbCache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
+
+            return _dbCache.Timers.CreateClientTimersAsync(client).AsTask();
         }
 
         /// <summary>

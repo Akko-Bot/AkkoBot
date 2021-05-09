@@ -1,6 +1,7 @@
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using System;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Timers.Abstractions
 {
@@ -21,6 +22,13 @@ namespace AkkoBot.Services.Timers.Abstractions
         /// </remarks>
         /// <returns><see langword="true"/> if the timer was generated and added, <see langword="false"/> otherwise.</returns>
         bool AddOrUpdateByEntity(DiscordClient client, TimerEntity entity);
+
+        /// <summary>
+        /// Creates timers for the specified client.
+        /// </summary>
+        /// <param name="client">The Discord client.</param>
+        /// <returns><see langword="true"/> if timers were created, <see langword="false"/> otherwise.</returns>
+        ValueTask<bool> CreateClientTimersAsync(DiscordClient client);
 
         /// <summary>
         /// Attempts to add the specified <see cref="IAkkoTimer"/> to the cache.

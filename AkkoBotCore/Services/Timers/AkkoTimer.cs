@@ -1,3 +1,4 @@
+using AkkoBot.Common;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using System;
@@ -12,46 +13,33 @@ namespace AkkoBot.Services.Timers
     public sealed class AkkoTimer : IAkkoTimer
     {
         private readonly Timer _internalTimer;
-        private DateTimeOffset _startedAt = DateTimeOffset.Now;
         private bool _isDisposed;
 
         private event ElapsedEventHandler ActionHandler;
 
-        /// <summary>
-        /// Fires when this timer gets disposed.
-        /// </summary>
-        /// <remarks>It fires only once.</remarks>
+        /// <inheritdoc />
         public event EventHandler OnDispose;
 
-        /// <summary>
-        /// Gets the database ID of this timer.
-        /// </summary>
+        /// <inheritdoc />
         public int Id { get; }
 
-        /// <summary>
-        /// Gets the interval for how frequently this timer should trigger.
-        /// </summary>
+        /// <inheritdoc />
         public TimeSpan Interval { get; }
 
-        /// <summary>
-        /// Gets whether this timer is active or not.
-        /// </summary>
-        /// <value><see langword="true"/> if it is active, <see langword="false"/> otherwise.</value>
+        /// <inheritdoc />
+        public DateTimeOffset ElapseAt { get; private set; }
+
+        /// <inheritdoc />
+        public TimeSpan ElapseIn
+            => ElapseAt.Subtract(DateTimeOffset.Now);
+
+        /// <inheritdoc />
         public bool Enabled
             => _internalTimer.Enabled;
 
-        /// <summary>
-        /// Gets whether this timer disables itself after triggering once.
-        /// </summary>
-        /// <value><see langword="true"/> if it doesn't disable, <see langword="false"/> otherwise.</value>
+        /// <inheritdoc />
         public bool AutoReset
             => _internalTimer.AutoReset;
-
-        /// <summary>
-        /// Gets the time when this timer is going to trigger.
-        /// </summary>
-        public DateTimeOffset ElapseAt
-            => _startedAt.AddMilliseconds(_internalTimer.Interval);
 
         /// <summary>
         /// Initializes and starts a timer.
@@ -60,15 +48,18 @@ namespace AkkoBot.Services.Timers
         /// <param name="action">Operation to be performed when this timer triggers.</param>
         public AkkoTimer(TimerEntity entity, Func<Task> action)
         {
+            var isProvisory = entity.TimeOfDay.HasValue && entity.Interval != TimeSpan.FromDays(1);
+
             Id = entity.Id;
-            Interval = entity.Interval;
+            Interval = (isProvisory) ? TimeSpan.FromDays(1) : entity.Interval;
+            ElapseAt = entity.ElapseAt;
 
             // Initialize the timer
-            _internalTimer = GetTimer(entity);
+            _internalTimer = GetTimer(entity, isProvisory);
             _internalTimer.Elapsed += TriggerAction;
 
             // Initialize the event handler
-            ActionHandler += async (x, y) => await action();
+            ActionHandler += async (_, _) => await action();
 
             // Start the timer
             _internalTimer.Start();
@@ -78,8 +69,9 @@ namespace AkkoBot.Services.Timers
         /// Builds this timer based on a database entry.
         /// </summary>
         /// <param name="entity">A database entry.</param>
-        /// <returns>A <see cref="Timer"/>> object.</returns>
-        private Timer GetTimer(TimerEntity entity)
+        /// <param name="isProvisory">Determines whether this timer is going to be replaced after it triggers.</param>
+        /// <returns>A <see cref="Timer"/> object.</returns>
+        private Timer GetTimer(TimerEntity entity, bool isProvisory)
         {
             var timeLeft = entity.ElapseAt.Subtract(DateTimeOffset.Now);
 
@@ -87,7 +79,7 @@ namespace AkkoBot.Services.Timers
                 ? TimeFromExpiredEntity(entity)
                 : TimeFromValidEntry(timeLeft, entity);
 
-            return new Timer(timeLeft.TotalMilliseconds) { AutoReset = entity.IsRepeatable };
+            return new Timer(timeLeft.TotalMilliseconds) { AutoReset = entity.IsRepeatable && !isProvisory };
         }
 
         /// <summary>
@@ -95,15 +87,9 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private TimeSpan TimeFromValidEntry(TimeSpan timeDifference, TimerEntity entity)
         {
-            if (entity.IsRepeatable)
-            {
-                // Daily Repeater
-                // DateTimeOffset.Add() requires a TimeSpan with whole minutes
-                timeDifference = TimeSpan.FromMinutes(Interval.TotalMinutes);
-                //_startedAt.StartOfDay().Add(timeDifference);
-            }
-
-            return timeDifference;
+            return (entity.IsRepeatable && entity.TimeOfDay.HasValue)
+                ? TimeOfDay.GetInterval(entity.ElapseAt)
+                : (entity.IsRepeatable) ? TimeSpan.FromMinutes(entity.Interval.TotalMinutes) : timeDifference;
         }
 
         /// <summary>
@@ -111,22 +97,11 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private TimeSpan TimeFromExpiredEntity(TimerEntity entity)
         {
-            TimeSpan result;
+            var result =  (entity.IsRepeatable && entity.TimeOfDay.HasValue)
+                ? TimeOfDay.GetInterval(entity.ElapseAt)
+                : (entity.IsRepeatable) ? TimeSpan.FromMinutes(entity.Interval.TotalMinutes) : TimeSpan.FromSeconds(10);
 
-            if (!entity.IsRepeatable)
-            {
-                // TimedBan, TimedMute, TimedWarn
-                // Trigger 10 seconds after the bot connects
-                result = TimeSpan.FromSeconds(10);
-            }
-            else
-            {
-                // Daily Repeater
-                // DateTimeOffset.Add() requires a TimeSpan with whole minutes
-                result = TimeSpan.FromMinutes(Interval.TotalMinutes);
-                //_startedAt.StartOfDay().Add(result);
-            }
-
+            ElapseAt = DateTimeOffset.Now.Add(result);
             return result;
         }
 
@@ -140,7 +115,7 @@ namespace AkkoBot.Services.Timers
 
             // Update the internal clock
             _internalTimer.Interval = Interval.TotalMilliseconds;
-            _startedAt = _startedAt.AddMilliseconds(Interval.TotalMilliseconds);
+            ElapseAt = ElapseAt.Add(Interval);
 
             // Execute the operation
             ActionHandler.Invoke(obj, args);
@@ -150,9 +125,7 @@ namespace AkkoBot.Services.Timers
                 Dispose();
         }
 
-        /// <summary>
-        /// Releases all resources used by this <see cref="AkkoTimer"/>.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
@@ -166,6 +139,7 @@ namespace AkkoBot.Services.Timers
                 if (disposing)
                 {
                     // Dispose the timer
+                    _internalTimer.AutoReset = false;
                     _internalTimer.Elapsed -= TriggerAction;
                     _internalTimer.Stop();
                     _internalTimer.Dispose();

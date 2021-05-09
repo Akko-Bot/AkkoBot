@@ -120,19 +120,19 @@ namespace AkkoBot.Extensions
         }
 
         /// <summary>
-        /// Filters a sequence of values based on an asynchronous predicate.
+        /// Creates a collection from an asynchronous predicate.
         /// </summary>
         /// <param name="collection">This collection.</param>
         /// <param name="predicate">A method to test each element for a condition.</param>
         /// <typeparam name="T">Data type contained in the collection.</typeparam>
         /// <returns>An awaitable collection of <typeparamref name="T"/>.</returns>
-        public static async Task<IEnumerable<T>> WhereAsync<T>(this IEnumerable<T> collection, Func<T, Task<bool>> predicate)
+        public static async Task<IEnumerable<T>> ToListAsync<T>(this IEnumerable<T> collection, Func<T, Task<bool>> predicate)
         {
             var result = new List<T>();
 
             foreach (var element in collection)
             {
-                if (await predicate(element))
+                if (await predicate(element).ConfigureAwait(false))
                     result.Add(element);
             }
 
@@ -150,7 +150,7 @@ namespace AkkoBot.Extensions
             var result = new List<T>();
 
             foreach (var element in collection)
-                result.Add(await element);
+                result.Add(await element.ConfigureAwait(false));
 
             return result;
         }
@@ -273,6 +273,120 @@ namespace AkkoBot.Extensions
             }
 
             return result.Values;
+        }
+
+        /// <summary>
+        /// Gets the <typeparamref name="T1"/> with the maximum property value defined by <paramref name="selector"/> in this collection.
+        /// </summary>
+        /// <typeparam name="T1">Type of the elements.</typeparam>
+        /// <typeparam name="T2">Type of the selected property.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="selector">A method that defines the property to compare the elements with.</param>
+        /// <param name="comparer">The comparer to compare the objects in the collection.</param>
+        /// <returns>The <typeparamref name="T1"/> with the highest value of <typeparamref name="T2"/>.</returns>
+        public static T1 MaxBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector, IComparer<T2> comparer = default)
+        {
+            using var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();  // Start iteration
+
+            T1 result = default, previous = enumerator.Current;
+            comparer ??= Comparer<T2>.Default;
+
+            while (enumerator.MoveNext())
+            {
+                if (comparer.Compare(selector(previous), selector(enumerator.Current)) < 0)
+                    result = enumerator.Current;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the <typeparamref name="T1"/> with the minimum property value defined by <paramref name="selector"/> in this collection.
+        /// </summary>
+        /// <typeparam name="T1">Type of the elements.</typeparam>
+        /// <typeparam name="T2">Type of the selected property.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="selector">A method that defines the property to compare the elements with.</param>
+        /// <param name="comparer">The comparer to compare the objects in the collection.</param>
+        /// <returns>The <typeparamref name="T1"/> with the lowest value of <typeparamref name="T2"/>.</returns>
+        public static T1 MinBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector, IComparer<T2> comparer = default)
+        {
+            using var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();  // Start iteration
+
+            T1 result = default, previous = enumerator.Current;
+            comparer ??= Comparer<T2>.Default;
+
+            while (enumerator.MoveNext())
+            {
+                if (comparer.Compare(selector(previous), selector(enumerator.Current)) > 0)
+                    result = enumerator.Current;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the <typeparamref name="T1"/> with the maximum property value defined by <paramref name="selector"/>
+        /// in this collection that conforms to the specified <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="T1">Type of the elements.</typeparam>
+        /// <typeparam name="T2">Type of the selected property.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="selector">A method that defines the property to compare the elements with.</param>
+        /// <param name="predicate">A method to test each element for a condition.</param>
+        /// <param name="comparer">The comparer to compare the objects in the collection.</param>
+        /// <returns>
+        /// The <typeparamref name="T1"/> with the highest value of <typeparamref name="T2"/>
+        /// or <see langword="default"/> if no element matched the <paramref name="predicate"/>.
+        /// </returns>
+        public static T1 WhereMax<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector, Predicate<T1> predicate, IComparer<T2> comparer = default)
+        {
+            using var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();  // Start iteration
+
+            var result = enumerator.Current;
+            comparer ??= Comparer<T2>.Default;
+
+            while (enumerator.MoveNext())
+            {
+                if (predicate(enumerator.Current) && comparer.Compare(selector(result), selector(enumerator.Current)) < 0)
+                    result = enumerator.Current;
+            }
+
+            return (predicate(result)) ? result : default;
+        }
+
+        /// <summary>
+        /// Gets the <typeparamref name="T1"/> with the minimum property value defined by <paramref name="selector"/>
+        /// in this collection that conforms to the specified <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="T1">Type of the elements.</typeparam>
+        /// <typeparam name="T2">Type of the selected property.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <param name="selector">A method that defines the property to compare the elements with.</param>
+        /// <param name="predicate">A method to test each element for a condition.</param>
+        /// <param name="comparer">The comparer to compare the objects in the collection.</param>
+        /// <returns>
+        /// The <typeparamref name="T1"/> with the lowest value of <typeparamref name="T2"/>
+        /// or <see langword="default"/> if no element matched the <paramref name="predicate"/>.
+        /// </returns>
+        public static T1 WhereMin<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector, Predicate<T1> predicate, IComparer<T2> comparer = default)
+        {
+            using var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();  // Start iteration
+
+            var result = enumerator.Current;
+            comparer ??= Comparer<T2>.Default;
+
+            while (enumerator.MoveNext())
+            {
+                if (predicate(enumerator.Current) && comparer.Compare(selector(result), selector(enumerator.Current)) > 0)
+                    result = enumerator.Current;
+            }
+
+            return (predicate(result)) ? result : default;
         }
     }
 }

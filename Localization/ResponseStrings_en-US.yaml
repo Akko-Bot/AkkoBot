@@ -62,12 +62,14 @@ arg_punishment_reason: The reason for the punishment.
 arg_remind_id: The ID of the reminder.
 arg_remind_message: The message to be sent in the reminder.
 arg_remind_time: How long until the reminder is triggered. Minimum of __1m__.
+arg_repeat_message: The message to be repeated.
+arg_repeat_time: How long until the repeater is triggered. Minimum of __1m__.
 arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
 arg_sql: A valid SQL query.
 arg_stream_url: The URL of the stream.
-arg_time_of_day: Time of day, in `HH:mm` format.
+arg_time_of_day: Time of day, in `HH:mm` format (24 hours).
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
 arg_timed_pstatus: For how long the status should be displayed.
@@ -84,6 +86,7 @@ arg_warnp_rem_amount: The amount of warnings of the punishment to be removed.
 arg_warnp_role: A role to be added or removed from the user, if applicable.
 arg_warnp_time: For how long the punishment should last. Leave it empty to make it permanent.
 arg_warnp_type: The type of punishment to be applied.
+author: Author
 autocommand_empty: No autocommands were found.
 autocommand_title: List of Autocommands
 ban: Ban
@@ -250,7 +253,7 @@ cmd_reactclear: Removes all reactions from the specified message.
 cmd_reactremove: Removes a reaction from the specified message.
 cmd_recreatechannel: Recreates a Discord channel.
 cmd_recreaterole: Recreates a Discord role.
-cmd_remind: Groups commands for managing reminders.
+cmd_remind: Groups commands for managing reminders. Reminders are limited to 20 per user, 3 per guild if the user doesn't have permission to manage messages.
 cmd_remind_channel: Sends a reminder to a text channel after the specified time.
 cmd_remind_here: Sends a reminder in the current channel after the specified time.
 cmd_remind_list: Lists all reminders you have created.
@@ -261,6 +264,13 @@ cmd_removerole: Removes a role from the specified user.
 cmd_removestatus: Removes the status with the specified ID.
 cmd_renamechannel: Renames a Discord channel.
 cmd_renamerole: Renames a Discord role.
+cmd_repeat: Groups commands for managing repeaters - messages that are periodically sent to a text channel. Limited to 5 per server.
+cmd_repeat_channel: Creates a repeater in the specified channel. Specifying a time interval creates a repeater that triggers periodically over time whereas specifying a time of day creates a repeater that triggers once a day at the specified time.
+cmd_repeat_clear: Removes all repeaters from this server.
+cmd_repeat_here: Creates a repeater in the current channel. Specifying a time interval creates a repeater that triggers periodically over time whereas specifying a time of day creates a repeater that triggers once a day at the specified time.
+cmd_repeat_info: Shows detailed information about the repeater with the specified ID.
+cmd_repeat_list: Lists all repeaters in this server.
+cmd_repeat_remove: Removes the repeater with the specified ID.
 cmd_rolecolor: Sets the color of a role. Provide no color to see the current color of the specified role.
 cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_roleid: Shows the ID of the specified role.
@@ -413,6 +423,7 @@ infractions_empty: There are no infractions to show.
 infractions_field: '{0} at {1} by {2}'
 infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
+interval: Interval
 invalid_color: The specified color code is invalid.
 is_attachment_only: Attachments
 is_command_only: Commands
@@ -492,6 +503,11 @@ reminder_list_title: List of Reminders
 removeallroles: '{0} roles were successfully removed from {1}.'
 removerole: Remove Role
 removerole_enum: had a role removed
+repeat_list_empty: No repeaters were found.
+repeat_over_24h: Over 24 hours
+repeater: Repeater
+repeater_list_title: Server Repeaters
+repeater_not_found: Repeater of ID {0} was not found.
 requires: Requires
 role: Role
 roles: Roles
@@ -519,6 +535,7 @@ timedrole: Punishment Role
 timedunrole: Punishment Role Removal
 timezone_list: Time Zones
 total: '{0} total'
+triggers_at: Triggers At
 triggers_in: Triggers In
 type: Type
 unban_not_found: This user is not banned.

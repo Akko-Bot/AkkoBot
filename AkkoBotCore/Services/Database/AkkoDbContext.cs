@@ -20,6 +20,7 @@ namespace AkkoBot.Services.Database
         public DbSet<FilteredWordsEntity> FilteredWords { get; init; }
         public DbSet<FilteredContentEntity> FilteredContent { get; init; }
         public DbSet<ReminderEntity> Reminders { get; init; }
+        public DbSet<RepeaterEntity> Repeaters { get; init; }
         public DbSet<CommandEntity> AutoCommands { get; init; }
         public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
         public DbSet<CommandCooldownEntity> CommandCooldown { get; init; }
@@ -107,6 +108,13 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<PollEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.PollRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RepeaterEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.RepeaterRel)
                 .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);

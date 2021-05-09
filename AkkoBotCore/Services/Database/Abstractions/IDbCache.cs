@@ -15,6 +15,7 @@ namespace AkkoBot.Services.Database.Abstractions
     /// </summary>
     public interface IDbCache : IDisposable
     {
+        // TODO: add documentation for all of these
         ConcurrentHashSet<ulong> Blacklist { get; }
         BotConfigEntity BotConfig { get; }
         LogConfigEntity LogConfig { get; }
@@ -27,6 +28,12 @@ namespace AkkoBot.Services.Database.Abstractions
         ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
         ICommandCooldown CooldownCommands { get; }
         ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; }
+
+        /// <summary>
+        /// Stores all repeaters with an interval lower than 1 day
+        /// </summary>
+        /// <remarks>The <see langword="ulong"/> is a Discord guild's ID, the <see cref="ConcurrentHashSet{T}"/> is the collection of repeaters.</remarks>
+        ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; }
 
         /// <summary>
         /// Safely gets a database guild.

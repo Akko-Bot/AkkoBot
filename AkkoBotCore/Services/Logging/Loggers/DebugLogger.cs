@@ -39,7 +39,7 @@ namespace AkkoBot.Services.Logging.Loggers
 
                 var log = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
 
-                log.Append(formatter(state, exception));
+                log.AppendLine(formatter(state, exception));
                 Console.WriteLine(log.ToString());
 
                 // Create the log file

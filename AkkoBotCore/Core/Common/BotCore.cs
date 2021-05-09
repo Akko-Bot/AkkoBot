@@ -27,15 +27,6 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Returns the service container for the specified bot shard.
-        /// </summary>
-        /// <param name="shard">The bot shard to get the IoC container from.</param>
-        /// <returns>The IoC container servicing this bot shard or <see langword="null"/> if there is none.</returns>
-        /// <exception cref="IndexOutOfRangeException"/>
-        public IServiceProvider GetServices(int shard)
-            => CommandExt[shard].Services;
-
-        /// <summary>
         /// Registers all commands in the project into the command handler.
         /// </summary>
         private void RegisterCommandModules()
@@ -48,6 +39,9 @@ namespace AkkoBot.Core.Common
             // each one of them to the command handler of each shard.
             foreach (var cmdHandler in CommandExt.Values)
             {
+                // Remove the default TimeSpan converter, as Akko has one of her own
+                cmdHandler.UnregisterConverter<TimeSpan>();
+
                 cmdHandler.RegisterCommands(assembly);
 
                 foreach (var converter in converters)

@@ -1,6 +1,7 @@
 using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -24,11 +25,15 @@ namespace AkkoBot.Services.Database.Entities
         public ulong? GuildId { get; init; }
         public ulong? ChannelId { get; init; }
         public ulong? RoleId { get; init; }
-        public TimeSpan Interval { get; init; }
         public bool IsRepeatable { get; init; }
-        public bool IsAbsolute { get; init; } // Might want to remove this
         public TimerType Type { get; init; }
+        public TimeSpan Interval { get; set; }
+        public TimeSpan? TimeOfDay { get; init; }
         public DateTimeOffset ElapseAt { get; set; }
+
+        [NotMapped]
+        public TimeSpan ElapseIn
+            => ElapseAt.Subtract(DateTimeOffset.Now);
 
         public TimerEntity()
         {
@@ -42,7 +47,6 @@ namespace AkkoBot.Services.Database.Entities
             RoleId = null;
             Interval = time;
             IsRepeatable = false;
-            IsAbsolute = true;
             Type = TimerType.TimedMute;
             ElapseAt = muteUser.DateAdded.Add(time);
         }
@@ -55,7 +59,6 @@ namespace AkkoBot.Services.Database.Entities
             RoleId = null;
             Interval = time;
             IsRepeatable = false;
-            IsAbsolute = true;
             Type = TimerType.TimedWarn;
             ElapseAt = warning.DateAdded.Add(time);
         }
@@ -64,7 +67,7 @@ namespace AkkoBot.Services.Database.Entities
 
         public static bool operator ==(TimerEntity x, TimerEntity y)
             => (x.UserId == y.UserId && x.GuildId == y.GuildId && x.ChannelId == y.ChannelId && x.RoleId == y.RoleId && x.Interval == y.Interval)
-            && (x.IsRepeatable == y.IsRepeatable && x.IsAbsolute == y.IsAbsolute && x.Type == y.Type);
+            && (x.IsRepeatable == y.IsRepeatable && x.Type == y.Type);
 
         public static bool operator !=(TimerEntity x, TimerEntity y)
             => !(x == y);
