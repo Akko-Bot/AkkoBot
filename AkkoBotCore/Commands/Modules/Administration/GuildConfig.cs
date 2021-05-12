@@ -1,15 +1,12 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Administration.Services;
-using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
 using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -139,7 +136,7 @@ namespace AkkoBot.Commands.Modules.Administration
                     ? context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey))
                     : context.FormatLocalized("guild_locale_unavailable", Formatter.InlineCode(context.Prefix + context.Command.QualifiedName))
             };
-            
+
             await context.RespondLocalizedAsync(embed, isError: !success);
         }
 

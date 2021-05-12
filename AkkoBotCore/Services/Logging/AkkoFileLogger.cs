@@ -1,7 +1,7 @@
-﻿using System.Globalization;
-using AkkoBot.Common;
+﻿using AkkoBot.Common;
 using AkkoBot.Services.Logging.Abstractions;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -18,10 +18,6 @@ namespace AkkoBot.Services.Logging
         private readonly string _directory = AkkoEnvironment.LogsDirectory;
         public string TimeStampFormat { get; set; }
         public double FileSizeLimitMB { get; set; }
-
-        /// <summary>
-        /// Indicates whether this object has been disposed or not.
-        /// </summary>
         public bool IsDisposed { get; private set; } = false;
 
         public AkkoFileLogger(double fileSizeLimit = 1.0, string timeFormat = null)
@@ -30,14 +26,6 @@ namespace AkkoBot.Services.Logging
             TimeStampFormat = (string.IsNullOrWhiteSpace(timeFormat)) ? "dd-MM-yyyy_HH-mm_fffff" : timeFormat;
         }
 
-        /// <summary>
-        /// Stores <paramref name="logEntry"/> into a <see cref="MemoryStream"/>.
-        /// </summary>
-        /// <remarks>
-        /// If the addition of the log causes the stream to exceed its max threshold, it dumps
-        /// its content to a text file and the stream is set back to zero.
-        /// </remarks>
-        /// <param name="logEntry">The log entry to be cached.</param>
         public void CacheLogging(string logEntry)
         {
             var encodedEntry = Encoding.UTF8.GetBytes(logEntry);
@@ -47,9 +35,6 @@ namespace AkkoBot.Services.Logging
                 DumpToFile();
         }
 
-        /// <summary>
-        /// Writes the log stream to a text file and resets the stream.
-        /// </summary>
         public void DumpToFile()
         {
             if (IsDisposed || _logStream.Length is 0)
@@ -70,9 +55,6 @@ namespace AkkoBot.Services.Logging
             _time = DateTimeOffset.Now;
         }
 
-        /// <summary>
-        /// Releases the allocated resources for this file logger.
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);

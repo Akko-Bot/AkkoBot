@@ -43,7 +43,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 _dbCache.FilteredContent.TryAdd(server.Id, new());
                 filters = new();
             }
-            
+
             var dbFilter = filters.FirstOrDefault(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
                 ?? await db.FilteredContent.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
                 ?? new() { GuildIdFK = server.Id, ChannelId = channel.Id };
@@ -55,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             await db.SaveChangesAsync();
 
             // Update the cache
-            if (dbFilter.IsActive())
+            if (dbFilter.IsActive)
                 _dbCache.FilteredContent[server.Id].Add(dbFilter);
             else
                 _dbCache.FilteredContent[server.Id].TryRemove(dbFilter);

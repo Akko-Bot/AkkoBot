@@ -36,12 +36,11 @@ namespace AkkoBot.Services.Timers
             _localizer = localizer;
         }
 
-        /// <inheritdoc />
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbGuild = await _dbCache.GetGuildAsync(server.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedban_title");
 
             // Unban the user - they might have been unbanned in the meantime
@@ -55,7 +54,6 @@ namespace AkkoBot.Services.Timers
             await db.SaveChangesAsync();
         }
 
-        /// <inheritdoc />
         public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -86,21 +84,19 @@ namespace AkkoBot.Services.Timers
                 // Remove the entries from the database
                 var timerEntry = await db.Timers.FindAsync(entryId);
                 var muteEntry = dbGuild.MutedUserRel.FirstOrDefault(x => x.UserId == userId);
-                dbGuild.MutedUserRel.Remove(muteEntry);
 
                 db.Remove(timerEntry);
-                db.Update(dbGuild);
+                db.Remove(muteEntry);
 
                 await db.SaveChangesAsync();
             }
         }
 
-        /// <inheritdoc />
         public async Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbGuild = await _dbCache.GetGuildAsync(server.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers.FindAsync(entryId);
 
             try
@@ -122,12 +118,11 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <inheritdoc />
         public async Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbGuild = await _dbCache.GetGuildAsync(server.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers.FindAsync(entryId);
 
             try
@@ -149,7 +144,6 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <inheritdoc />
         public async Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -168,7 +162,6 @@ namespace AkkoBot.Services.Timers
             await db.SaveChangesAsync();
         }
 
-        /// <inheritdoc />
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -179,7 +172,7 @@ namespace AkkoBot.Services.Timers
 
             try
             {
-                var dbGuild = await _dbCache.GetGuildAsync(dbReminder.GuildId.Value);
+                var dbGuild = await _dbCache.GetDbGuildAsync(dbReminder.GuildId.Value);
                 var user = FindMember(dbReminder.AuthorId, server);
 
                 var channel = (dbReminder.IsPrivate)
@@ -226,7 +219,6 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <inheritdoc />
         public async Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -244,7 +236,7 @@ namespace AkkoBot.Services.Timers
                     user,
                     server.GetChannel(dbCmd.ChannelId), // If channel is private, this throws
                     dbCmd.CommandString,
-                    (await _dbCache.GetGuildAsync(dbCmd.GuildId)).Prefix,
+                    (await _dbCache.GetDbGuildAsync(dbCmd.GuildId)).Prefix,
                     cmd,
                     args
                 );
@@ -258,7 +250,7 @@ namespace AkkoBot.Services.Timers
             }
             finally
             {
-                if (dbCmd.Type is CommandType.Scheduled)
+                if (dbCmd.Type is AutoCommandType.Scheduled)
                 {
                     db.Remove(dbCmd);
                     db.Remove(dbTimer);
@@ -268,7 +260,6 @@ namespace AkkoBot.Services.Timers
             }
         }
 
-        /// <inheritdoc />
         public async Task SendRepeaterAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -277,10 +268,10 @@ namespace AkkoBot.Services.Timers
             var cmdHandler = client.GetCommandsNext();
             var dbRepeater = repeaterCache.FirstOrDefault(x => x.TimerId == entryId)
                 ?? await db.Repeaters.Fetch(x => x.TimerId == entryId).FirstOrDefaultAsync();
-                        
+
             try
             {
-                var dbGuild = await _dbCache.GetGuildAsync(dbRepeater.GuildIdFK);
+                var dbGuild = await _dbCache.GetDbGuildAsync(dbRepeater.GuildIdFK);
                 var user = FindMember(dbRepeater.AuthorId, server);
                 var channel = server.GetChannel(dbRepeater.ChannelId);
 
@@ -320,6 +311,8 @@ namespace AkkoBot.Services.Timers
                 _dbCache.Timers.TryRemove(dbTimer.Id);
             }
         }
+
+        /* Utility Methods */
 
         /// <summary>
         /// Checks if the specified user has permission to perform an action.

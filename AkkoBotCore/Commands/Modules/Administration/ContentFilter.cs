@@ -70,7 +70,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var success = await _service.RemoveContentFilterAsync(context.Guild, id);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
-        
+
         [Command("clear")]
         [Description("cmd_fc_clear")]
         public async Task ClearAll(CommandContext context)
@@ -85,7 +85,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var embed = new DiscordEmbedBuilder();
             var filters = _service.GetContentFilters(context.Guild)
-                .Where(x => x.IsActive());
+                .Where(x => x.IsActive);
 
             if (!filters.Any())
             {
@@ -101,7 +101,7 @@ namespace AkkoBot.Commands.Modules.Administration
             {
                 fields.Add(new("id", string.Join("\n", filterGroup.Select(x => x.Id)), true));
                 fields.Add(new("channel", string.Join("\n", filterGroup.Select(x => $"<#{x.ChannelId}>")), true));
-                fields.Add(new("fc_allow", string.Join("\n", filterGroup.Select(x => string.Join(", ", x.GetActiveFilters().Select(y => context.FormatLocalized(y))))), true));
+                fields.Add(new("fc_allow", string.Join("\n", filterGroup.Select(x => string.Join(", ", x.ActiveFilters.Select(y => context.FormatLocalized(y))))), true));
             }
 
             await context.RespondPaginatedByFieldsAsync(embed, fields, 3);

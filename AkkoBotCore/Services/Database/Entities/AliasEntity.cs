@@ -1,4 +1,7 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Commands.Common;
+using AkkoBot.Common;
+using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -6,9 +9,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
+    /// <summary>
+    /// Stores command aliases.
+    /// </summary>
     [Comment("Stores command aliases.")]
     public class AliasEntity : DbEntity
     {
+        private readonly string _alias;
+        private string _command;
+        private string _arguments;
+
+        /// <summary>
+        /// The ID of the Discord guild associated with this alias.
+        /// </summary>
+        /// <remarks>This property is <see langword="null"/> if the alias is global.</remarks>
         public ulong? GuildId { get; init; }
 
         /// <summary>
@@ -20,27 +34,41 @@ namespace AkkoBot.Services.Database.Entities
         /// The command alias.
         /// </summary>
         [Required]
-        [MaxLength(2000)]
-        public string Alias { get; init; }
+        [MaxLength(AkkoConstants.MessageMaxLength)]
+        public string Alias
+        {
+            get => _alias;
+            init => _alias = value?.MaxLength(AkkoConstants.MessageMaxLength);
+        }
 
         /// <summary>
-        /// The actual command this alias is mapped to.
+        /// The qualified command name this alias is mapped to.
         /// </summary>
         [Required]
         [MaxLength(200)]
-        public string Command { get; set; }
+        public string Command
+        {
+            get => _command;
+            set => _command = value?.MaxLength(200);
+        }
 
         /// <summary>
         /// The arguments of the command alias, if any.
         /// </summary>
-        [MaxLength(2000)]
-        public string Arguments { get; set; }
+        [MaxLength(AkkoConstants.MessageMaxLength)]
+        public string Arguments
+        {
+            get => _arguments;
+            set => _arguments = value?.MaxLength(AkkoConstants.MessageMaxLength);
+        }
 
         /// <summary>
         /// Gets the full command string mapped to this alias.
         /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
         [NotMapped]
-        public string FullCommand => (string.IsNullOrWhiteSpace(Arguments)) ? Command : $"{Command} {Arguments}";
+        public string FullCommand
+            => (string.IsNullOrWhiteSpace(Arguments)) ? Command : $"{Command} {Arguments}";
 
         /// <summary>
         /// Gets the command associated with this alias.
@@ -54,12 +82,13 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// Parses a command alias and its arguments into an actual command string.
         /// </summary>
-        /// <param name="prefix">The context prefix.</param>
+        /// <param name="smartString">A smart string with the context where the command should run.</param>
         /// <param name="aliasInput">The raw command alias with arguments, if any.</param>
         /// <returns>The command string with the alias' arguments.</returns>
-        public string ParseAliasInput(string prefix, string aliasInput)
+        public string ParseAliasInput(SmartString smartString, string aliasInput)
         {
-            var args = aliasInput.Replace(Alias.Replace("{p}", prefix), string.Empty).Trim();
+            smartString.Content = Alias;
+            var args = aliasInput.Replace(smartString.Content, string.Empty).Trim();
             return (string.IsNullOrWhiteSpace(args)) ? FullCommand : $"{Command} {args}";
         }
 

@@ -7,7 +7,6 @@ using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration.Services
@@ -35,14 +34,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="match">The locale if found, <see langword="null"/> otherwise.</param>
         /// <returns><see langword="true"/> if a match is found, <see langword="false"/> otherwise.</returns>
         public bool IsLocaleRegistered(string locale, out string match)
-            => _localizer.GetLocales().Equals(locale, StringComparison.InvariantCultureIgnoreCase, out match);
+            => _localizer.Locales.Equals(locale, StringComparison.InvariantCultureIgnoreCase, out match);
 
         /// <summary>
         /// Gets all registered localed.
         /// </summary>
         /// <returns>A collection of registered locales.</returns>
         public IEnumerable<string> GetLocales()
-            => _localizer.GetLocales();
+            => _localizer.Locales;
 
         /// <summary>
         /// Gets or sets the specified guild setting.

@@ -9,10 +9,9 @@ namespace AkkoBot.Services.Localization.Abstractions
     public interface ILocalizer
     {
         /// <summary>
-        /// Gets all cached locales.
+        /// Gets all registered locale keys.
         /// </summary>
-        /// <returns>A collection of the registered locale keys.</returns>
-        IEnumerable<string> GetLocales();
+        Dictionary<string, IReadOnlyDictionary<string, string>>.KeyCollection Locales { get; }
 
         /// <summary>
         /// Checks if a given locale is registered.

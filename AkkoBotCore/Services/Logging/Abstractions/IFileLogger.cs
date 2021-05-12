@@ -25,11 +25,11 @@ namespace AkkoBot.Services.Logging.Abstractions
         bool IsDisposed { get; }
 
         /// <summary>
-        /// Stores <paramref name="logEntry"/> into a <see cref="MemoryStream"/>.
+        /// Stores a string into a <see cref="MemoryStream"/>.
         /// </summary>
         /// <remarks>
         /// If the addition of the log causes the stream to exceed its max threshold, it dumps
-        /// its content to a text file and the stream is set back to zero.
+        /// its content to a text file and the stream's length is set back to zero.
         /// </remarks>
         /// <param name="logEntry">The log entry to be cached.</param>
         void CacheLogging(string logEntry);

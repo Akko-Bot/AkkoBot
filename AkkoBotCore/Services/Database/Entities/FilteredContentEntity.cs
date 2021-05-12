@@ -2,51 +2,87 @@
 using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace AkkoBot.Services.Database.Entities
 {
+    /// <summary>
+    /// Stores the content filters to be applied to a Discord channel.
+    /// </summary>
     [Comment("Stores the content filters to be applied to a Discord channel.")]
     public class FilteredContentEntity : DbEntity
     {
-        public GuildConfigEntity GuildConfigRel { get; set; }
+        /// <summary>
+        /// The settings of the Discord guild this filter is associated with.
+        /// </summary>
+        public GuildConfigEntity GuildConfigRel { get; init; }
 
+        /// <summary>
+        /// The ID of the Discord guild this filter is associated with.
+        /// </summary>
         public ulong GuildIdFK { get; init; }
+
+        /// <summary>
+        /// The ID of the Discord channel this filter has been applied to.
+        /// </summary>
         public ulong ChannelId { get; init; }
+
+        /// <summary>
+        /// Determines whether only messages with attachments are allowed.
+        /// </summary>
         public bool IsAttachmentOnly { get; set; }
+
+        /// <summary>
+        /// Determines whether only messages with images are allowed.
+        /// </summary>
         public bool IsImageOnly { get; set; }
+
+        /// <summary>
+        /// Determines whether only messages with URLs are allowed.
+        /// </summary>
         public bool IsUrlOnly { get; set; }
+
+        /// <summary>
+        /// Determines whether only messages with server invites are allowed.
+        /// </summary>
         public bool IsInviteOnly { get; set; }
+
+        /// <summary>
+        /// Determines whether only messages with valid commands are allowed.
+        /// </summary>
         public bool IsCommandOnly { get; set; }
 
         /// <summary>
-        /// Gets the name of all active filters.
+        /// Gets the name of all currently active content filters.
         /// </summary>
-        /// <returns>A collection of names of all active filters.</returns>
-        public IEnumerable<string> GetActiveFilters()
-            => GetFilters().Where(x => x.Value).Select(x => x.Key);
+        /// <remarks>This property is not mapped.</remarks>
+        [NotMapped]
+        public IEnumerable<string> ActiveFilters
+            => Filters.Where(x => x.Value).Select(x => x.Key);
 
         /// <summary>
         /// Checks whether this filter is active.
         /// </summary>
-        /// <returns><see langword="true"/> if at least one filter is active, <see langword="false"/> otherwise.</returns>
-        public bool IsActive()
+        /// <remarks> This property is not mapped.</remarks>
+        /// <value><see langword="true"/> if active, <see langword="false"/> otherwise.</value>
+        [NotMapped]
+        public bool IsActive
             => IsAttachmentOnly || IsImageOnly || IsUrlOnly || IsInviteOnly || IsCommandOnly;
 
         /// <summary>
-        /// Gets the filters and the value they are currently set to.
+        /// Gets the content filters and the value they are currently set to.
         /// </summary>
-        /// <returns>The filters and its value.</returns>
-        public IReadOnlyDictionary<string, bool> GetFilters()
+        /// <remarks> This property is not mapped.</remarks>
+        /// <value>The filters' name and their corresponding value.</value>
+        [NotMapped]
+        public IReadOnlyDictionary<string, bool> Filters => new Dictionary<string, bool>()
         {
-            return new Dictionary<string, bool>()
-            {
-                [nameof(IsAttachmentOnly).ToSnakeCase()] = IsAttachmentOnly,
-                [nameof(IsImageOnly).ToSnakeCase()] = IsImageOnly,
-                [nameof(IsUrlOnly).ToSnakeCase()] = IsUrlOnly,
-                [nameof(IsInviteOnly).ToSnakeCase()] = IsInviteOnly,
-                [nameof(IsCommandOnly).ToSnakeCase()] = IsCommandOnly
-            };
-        }
+            [nameof(IsAttachmentOnly).ToSnakeCase()] = IsAttachmentOnly,
+            [nameof(IsImageOnly).ToSnakeCase()] = IsImageOnly,
+            [nameof(IsUrlOnly).ToSnakeCase()] = IsUrlOnly,
+            [nameof(IsInviteOnly).ToSnakeCase()] = IsInviteOnly,
+            [nameof(IsCommandOnly).ToSnakeCase()] = IsCommandOnly
+        };
     }
 }

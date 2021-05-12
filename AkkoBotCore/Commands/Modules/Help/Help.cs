@@ -146,7 +146,6 @@ namespace AkkoBot.Commands.Modules.Help
             if (keyword.StartsWith(context.Prefix))
                 keyword = keyword[context.Prefix.Length..];
 
-
             var embed = new DiscordEmbedBuilder();
             var cmds = context.CommandsNext.RegisteredCommands.Values
                 .Concat(

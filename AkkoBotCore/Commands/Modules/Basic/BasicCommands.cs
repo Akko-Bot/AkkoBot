@@ -1,6 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
-using AkkoBot.Common;
 using AkkoBot.Core;
 using AkkoBot.Extensions;
 using DSharpPlus;
@@ -9,7 +8,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Basic

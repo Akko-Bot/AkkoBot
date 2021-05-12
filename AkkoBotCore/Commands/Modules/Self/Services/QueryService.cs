@@ -1,16 +1,16 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models;
 using AkkoBot.Services.Database;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using AkkoBot.Models;
-using System.Linq;
-using AkkoBot.Common;
-using System.Text;
-using Npgsql;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Self.Services
 {
@@ -71,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 // Constant so the column name doesn't get localized
                 result.Add(new(AkkoConstants.ValidWhitespace + reader.GetName(column), string.Empty, true));
                 fieldBuilders.Add(new());
-            }   
+            }
 
             // Get the row values
             while (await reader.ReadAsync())

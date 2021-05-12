@@ -1,9 +1,9 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using AkkoBot.Commands.Abstractions;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using System;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
-using AkkoBot.Commands.Abstractions;
 
 namespace AkkoBot.Commands.Attributes
 {
@@ -26,7 +26,6 @@ namespace AkkoBot.Commands.Attributes
                 // Command has no cooldown
                 return Task.FromResult(true);
             }
-                
             else if (!cmdCooldown.IsOnCooldown(context.Command, context.User, context.Guild))
             {
                 // Command has a cooldown but is not active for this user

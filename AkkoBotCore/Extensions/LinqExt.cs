@@ -204,9 +204,9 @@ namespace AkkoBot.Extensions
         /// <param name="collection">This collection of collections of <typeparamref name="T"/>.</param>
         /// <param name="sample">The <typeparamref name="T"/> object to be added to the inner collections.</param>
         /// <typeparam name="T">Data type contained in the inner collections.</typeparam>
-        /// <returns>An <see cref="IEnumerable{T}"/> with collections of the same size.</returns>
+        /// <returns>A <see cref="List{T}"/> with collections of the same size.</returns>
         /// <exception cref="NullReferenceException">Occurs when <paramref name="sample"/> is <see langword="null"/>.</exception>
-        public static IEnumerable<IEnumerable<T>> Fill<T>(this IEnumerable<IEnumerable<T>> collection, T sample)
+        public static List<IEnumerable<T>> Fill<T>(this IEnumerable<IEnumerable<T>> collection, T sample)
         {
             var outerCollection = collection.ToList();
 
@@ -216,9 +216,11 @@ namespace AkkoBot.Extensions
                 max = Math.Max(max, innerCollection.Count());
 
             // Fill the collections until they have the same size
-            for (var index = 0; index < collection.Count(); index++)
+            for (var index = 0; index < outerCollection.Count; index++)
             {
-                while (outerCollection[index].Count() != max)
+                var innerCount = outerCollection[index].Count();
+
+                while (innerCount != max)
                     outerCollection[index] = outerCollection[index].Append(sample);
             }
 
@@ -231,8 +233,8 @@ namespace AkkoBot.Extensions
         /// <param name="collection">This collection.</param>
         /// <param name="amount">The maximum amount of elements per subcollection.</param>
         /// <typeparam name="T">Data type of this collection.</typeparam>
-        /// <returns>A collection of <see cref="IEnumerable{T}"/>.</returns>
-        public static IEnumerable<IEnumerable<T>> SplitInto<T>(this IEnumerable<T> collection, int amount)
+        /// <returns>A collection of <see cref="List{T}"/> with maximum length of <paramref name="amount"/>.</returns>
+        public static List<List<T>> SplitInto<T>(this IEnumerable<T> collection, int amount)
         {
             int index = 0, count = 0;
             var collectionCount = collection.Count();
@@ -256,9 +258,9 @@ namespace AkkoBot.Extensions
         /// <typeparam name="T2">Type of the selected property.</typeparam>
         /// <param name="collection">This collection.</param>
         /// <param name="selector">A method that defines the property to filter the elements.</param>
-        /// <returns>A collection of <see cref="IEnumerable{T1}"/> where all the elements have the same value for the property defined by <paramref name="selector"/>.</returns>
+        /// <returns>An <see cref="IEnumerable{T1}"/> where all <typeparamref name="T1"/> have the same value for the property defined by <paramref name="selector"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when the predicate returns a null value.</exception>
-        public static IEnumerable<IEnumerable<T1>> SplitBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector)
+        public static IEnumerable<HashSet<T1>> SplitBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector)
         {
             var result = new Dictionary<T2, HashSet<T1>>();
 

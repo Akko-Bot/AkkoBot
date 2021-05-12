@@ -1,8 +1,8 @@
-using System.Text;
+using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
 using System;
-using AkkoBot.Services.Database.Entities;
+using System.Text;
 
 namespace AkkoBot.Services.Logging.Loggers
 {
@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Logging.Loggers
         }
 
         public bool IsEnabled(LogLevel logLevel)
-            => logLevel >= _minimumLevel && _minimumLevel is not LogLevel.Information;
+            => (logLevel >= _minimumLevel) && _minimumLevel is not LogLevel.Information;
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {

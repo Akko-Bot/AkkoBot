@@ -6,22 +6,38 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    [Comment("Stores data and settings related to individual Discord users.")]
+    /// <summary>
+    /// Stores data related to individual Discord users.
+    /// </summary>
+    [Comment("Stores data related to individual Discord users.")]
     public class DiscordUserEntity : DbEntity
     {
-        public ulong UserId { get; set; }
+        /// <summary>
+        /// The ID of the Discord user.
+        /// </summary>
+        public ulong UserId { get; init; }
 
+        /// <summary>
+        /// The username of the Discord user.
+        /// </summary>
         [Required]
         [MaxLength(32)]
         public string Username { get; set; }
 
+        /// <summary>
+        /// The discriminator of the Discord user.
+        /// </summary>
         [Required]
         [StringLength(4)]
         [Column(TypeName = "varchar(4)")]
         public string Discriminator { get; set; }
 
+        /// <summary>
+        /// The username and discriminator of the Discord user.
+        /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
         [NotMapped]
-        public string FullName 
+        public string FullName
             => $"{Username}#{Discriminator}";
 
         public DiscordUserEntity()

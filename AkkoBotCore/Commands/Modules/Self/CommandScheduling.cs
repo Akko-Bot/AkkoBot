@@ -33,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             var cmd = context.CommandsNext.FindCommand(command, out var args);
             var success = !(await cmd.RunChecksAsync(context, false)).Any()
-                && await _service.AddAutoCommandAsync(context, time, CommandType.Scheduled, cmd, args);
+                && await _service.AddAutoCommandAsync(context, time, AutoCommandType.Scheduled, cmd, args);
 
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
@@ -47,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             var cmd = context.CommandsNext.FindCommand(command, out var args);
             var success = !(await cmd.RunChecksAsync(context, false)).Any()
-                && await _service.AddAutoCommandAsync(context, time, CommandType.Repeated, cmd, args);
+                && await _service.AddAutoCommandAsync(context, time, AutoCommandType.Repeated, cmd, args);
 
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }

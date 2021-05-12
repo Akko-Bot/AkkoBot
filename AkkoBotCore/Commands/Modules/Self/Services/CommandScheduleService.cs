@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Commands.Modules.Self.Services
 {
     /// <summary>
-    /// Groups utility methods for retrieving and manipulating <see cref="CommandEntity"/> objects.
+    /// Groups utility methods for retrieving and manipulating <see cref="AutoCommandEntity"/> objects.
     /// </summary>
     public class CommandScheduleService : ICommandService
     {
@@ -33,14 +33,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <param name="time">How long until the command triggers.</param>
-        /// <param name="cmdType"><see cref="CommandType.Scheduled"/> for a command that triggers only once, <see cref="CommandType.Repeated"/> for a command that triggers multiple times.</param>
+        /// <param name="cmdType"><see cref="AutoCommandType.Scheduled"/> for a command that triggers only once, <see cref="AutoCommandType.Repeated"/> for a command that triggers multiple times.</param>
         /// <param name="cmd">The command to be executed.</param>
         /// <param name="cmdArgs">The command's arguments, if any.</param>
         /// <remarks>To create startup commands, use <see cref="AddStartupCommandAsync(CommandContext, Command, string)"/> instead.</remarks>
         /// <returns><see langword="true"/> if the autocommand was successfully created, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddAutoCommandAsync(CommandContext context, TimeSpan time, CommandType cmdType, Command cmd, string cmdArgs = null)
+        public async Task<bool> AddAutoCommandAsync(CommandContext context, TimeSpan time, AutoCommandType cmdType, Command cmd, string cmdArgs = null)
         {
-            if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is CommandType.Startup)
+            if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is AutoCommandType.Startup)
                 return false;
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
@@ -50,7 +50,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 GuildId = context.Guild?.Id,
                 ChannelId = context.Channel.Id,
                 UserId = context.User.Id,
-                IsRepeatable = cmdType is CommandType.Repeated,
+                IsRepeatable = cmdType is AutoCommandType.Repeated,
                 Interval = time,
                 Type = TimerType.Command,
                 ElapseAt = DateTimeOffset.Now.Add(time)
@@ -59,7 +59,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             db.Add(newTimer);
             await db.SaveChangesAsync();
 
-            var newCmd = new CommandEntity()
+            var newCmd = new AutoCommandEntity()
             {
                 TimerId = newTimer.Id,
                 CommandString = cmd.QualifiedName + ((string.IsNullOrWhiteSpace(cmdArgs)) ? string.Empty : " " + cmdArgs),
@@ -90,13 +90,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var newCmd = new CommandEntity()
+            var newCmd = new AutoCommandEntity()
             {
                 CommandString = cmd.QualifiedName + ((string.IsNullOrWhiteSpace(cmdArgs)) ? string.Empty : " " + cmdArgs),
                 GuildId = context.Guild.Id,
                 AuthorId = context.User.Id,
                 ChannelId = context.Channel.Id,
-                Type = CommandType.Startup
+                Type = AutoCommandType.Startup
             };
 
             db.Add(newCmd);
@@ -115,7 +115,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbCmd = await db.FindAsync<CommandEntity>(id);
+            var dbCmd = await db.FindAsync<AutoCommandEntity>(id);
 
             if (dbCmd is null || user.Id != dbCmd.AuthorId)
                 return false;
@@ -138,7 +138,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="user">The Discord user who created the autocommands.</param>
         /// <returns>A collection of autocommands.</returns>
-        public async Task<IEnumerable<CommandEntity>> GetAutoCommandsAsync(DiscordUser user)
+        public async Task<IEnumerable<AutoCommandEntity>> GetAutoCommandsAsync(DiscordUser user)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
@@ -152,15 +152,15 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="dbEntry">The autocommand entry.</param>
         /// <returns>The time remaining.</returns>
-        public string GetElapseTime(CommandEntity dbEntry)
+        public string GetElapseTime(AutoCommandEntity dbEntry)
         {
             switch (dbEntry.Type)
             {
-                case CommandType.Startup:
+                case AutoCommandType.Startup:
                     return "-";
 
-                case CommandType.Scheduled:
-                case CommandType.Repeated:
+                case AutoCommandType.Scheduled:
+                case AutoCommandType.Repeated:
                     _dbCache.Timers.TryGetValue(dbEntry.TimerId.Value, out var timer);
                     return timer.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m");
 

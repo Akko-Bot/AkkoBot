@@ -7,9 +7,9 @@ using System.Collections.Generic;
 namespace AkkoBot.Commands.Abstractions
 {
     /// <summary>
-    /// Defines an object that keeps track of commands and users on a global cooldown.
+    /// Defines an object that keeps track of commands and users on a global and/or guild cooldown.
     /// </summary>
-    public interface ICommandCooldown
+    public interface ICommandCooldown : IDisposable
     {
         /// <summary>
         /// Collection of qualified names of all global commands with a cooldown.
@@ -68,7 +68,7 @@ namespace AkkoBot.Commands.Abstractions
         /// Initializes this object with entries from the database.
         /// </summary>
         /// <param name="dbCommands">Collection of entries to be loaded into memory.</param>
-        /// <returns>This object.</returns>
+        /// <returns>This <see cref="ICommandCooldown"/>.</returns>
         public ICommandCooldown LoadFromEntities(IEnumerable<CommandCooldownEntity> dbCommands);
     }
 }

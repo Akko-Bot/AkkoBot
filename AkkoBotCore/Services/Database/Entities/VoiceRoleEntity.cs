@@ -3,13 +3,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database.Entities
 {
+    /// <summary>
+    /// Stores a voice chat role.
+    /// </summary>
     [Comment("Stores a voice chat role.")]
     public class VoiceRoleEntity : DbEntity
     {
-        public GuildConfigEntity GuildConfigRel { get; set; }
+        /// <summary>
+        /// The settings of the Discord guild this voice role is associated with.
+        /// </summary>
+        public GuildConfigEntity GuildConfigRel { get; init; }
 
-        public ulong GuildIdFk { get; set; }
-        public ulong ChannelId { get; set; }
-        public ulong RoleId { get; set; }
+        /// <summary>
+        /// The ID of the Discord guild this voice role is associated with.
+        /// </summary>
+        public ulong GuildIdFk { get; init; }
+
+        /// <summary>
+        /// The ID of the Discord voice channel this voice role is associated with.
+        /// </summary>
+        public ulong ChannelId { get; init; }
+
+        /// <summary>
+        /// The ID of the Discord role this voice role is associated with.
+        /// </summary>
+        public ulong RoleId { get; init; }
     }
 }

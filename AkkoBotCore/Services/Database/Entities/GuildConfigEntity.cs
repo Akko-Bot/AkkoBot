@@ -9,7 +9,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    [Comment("Stores settings related to individual Discord servers.")]
+    /// <summary>
+    /// Stores settings and data related to a Discord guild.
+    /// </summary>
+    [Comment("Stores settings and data related to a Discord server.")]
     public class GuildConfigEntity : DbEntity, IMessageSettings
     {
         private string _prefix = "!";
@@ -17,18 +20,59 @@ namespace AkkoBot.Services.Database.Entities
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
-        public FilteredWordsEntity FilteredWordsRel { get; set; }
-        public List<FilteredContentEntity> FilteredContentRel { get; set; }
-        public List<MutedUserEntity> MutedUserRel { get; set; }
-        public List<WarnEntity> WarnRel { get; set; }
-        public List<WarnPunishEntity> WarnPunishRel { get; set; }
-        public List<OccurrenceEntity> OccurrenceRel { get; set; }
-        public List<VoiceRoleEntity> VoiceRolesRel { get; set; }
-        public List<PollEntity> PollRel { get; set; }
-        public List<RepeaterEntity> RepeaterRel { get; set; }
+        /// <summary>
+        /// The settings of the word filter and the words it is keeping track of.
+        /// </summary>
+        public FilteredWordsEntity FilteredWordsRel { get; init; }
 
+        /// <summary>
+        /// The list of content filters.
+        /// </summary>
+        public List<FilteredContentEntity> FilteredContentRel { get; init; }
+
+        /// <summary>
+        /// The list of muted users.
+        /// </summary>
+        public List<MutedUserEntity> MutedUserRel { get; init; }
+
+        /// <summary>
+        /// The list of warnings.
+        /// </summary>
+        public List<WarnEntity> WarnRel { get; init; }
+
+        /// <summary>
+        /// The list of warn punishments.
+        /// </summary>
+        public List<WarnPunishEntity> WarnPunishRel { get; private set; }
+
+        /// <summary>
+        /// The list of user occurrences.
+        /// </summary>
+        public List<OccurrenceEntity> OccurrenceRel { get; init; }
+
+        /// <summary>
+        /// The list of voice roles.
+        /// </summary>
+        public List<VoiceRoleEntity> VoiceRolesRel { get; init; }
+
+        /// <summary>
+        /// The list of polls.
+        /// </summary>
+        public List<PollEntity> PollRel { get; init; }
+
+        /// <summary>
+        /// The list of repeaters.
+        /// </summary>
+        public List<RepeaterEntity> RepeaterRel { get; init; }
+
+        /// <summary>
+        /// The ID of the Discord guild these settings are associated with.
+        /// </summary>
         public ulong GuildId { get; init; }
 
+        /// <summary>
+        /// The prefix used in this guild.
+        /// </summary>
         [Required]
         [MaxLength(15)]
         public string Prefix
@@ -37,6 +81,9 @@ namespace AkkoBot.Services.Database.Entities
             set => _prefix = value?.MaxLength(15);
         }
 
+        /// <summary>
+        /// The locale used in this guild.
+        /// </summary>
         [Required]
         [MaxLength(10)]
         [Column(TypeName = "varchar(10)")]
@@ -46,10 +93,20 @@ namespace AkkoBot.Services.Database.Entities
             set => _locale = value?.MaxLength(10);
         }
 
+        /// <summary>
+        /// Determines whether embeds should be used in responses or not.
+        /// </summary>
         public bool UseEmbed { get; set; } = true;
 
+        /// <summary>
+        /// Determines whether role mentions should be sanitized by hierarchy (<see langword="true"/>)
+        /// or by EveryoneServer permission (<see langword="false"/>).
+        /// </summary>
         public bool PermissiveRoleMention { get; set; } = false;
 
+        /// <summary>
+        /// The color to be used in response embeds.
+        /// </summary>
         [Required]
         [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
@@ -59,6 +116,9 @@ namespace AkkoBot.Services.Database.Entities
             set => _okColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
+        /// <summary>
+        /// The color to be used in error embeds.
+        /// </summary>
         [Required]
         [StringLength(6)]
         [Column(TypeName = "varchar(6)")]
@@ -68,18 +128,29 @@ namespace AkkoBot.Services.Database.Entities
             set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
 
-        [MaxLength(100)]
+        /// <summary>
+        /// The time zone of this guild.
+        /// </summary>
+        [MaxLength(128)]
         public string Timezone { get; set; }
 
+        /// <summary>
+        /// The ID of the mute role of this guild.
+        /// </summary>
         public ulong? MuteRoleId { get; set; }
 
+        /// <summary>
+        /// The time for warning expirations.
+        /// </summary>
         public TimeSpan WarnExpire { get; set; } = TimeSpan.FromDays(30 * 6);
 
+        /// <summary>
+        /// Defines the amount of time that an interactive command waits for user input.
+        /// </summary>
         public TimeSpan? InteractiveTimeout { get; set; }
 
         // Greet and Bye channels and messages
         // .asar - .iam/.iamnot roles
-        // .repeat
         // Xp notification
         // .rero messages
 
@@ -100,7 +171,7 @@ namespace AkkoBot.Services.Database.Entities
         /// Adds the default server punishments to this instance.
         /// </summary>
         /// <remarks>Kick at 3 warnings, ban at 5 warnings.</remarks>
-        /// <returns>This instance.</returns>
+        /// <returns>This <see cref="GuildConfigEntity"/>.</returns>
         public GuildConfigEntity AddDefaultWarnPunishments()
         {
             var defaultPunishments = new WarnPunishEntity[]
@@ -132,6 +203,6 @@ namespace AkkoBot.Services.Database.Entities
             result.Remove(nameof(GuildId).ToSnakeCase());
 
             return result;
-        }     
+        }
     }
 }

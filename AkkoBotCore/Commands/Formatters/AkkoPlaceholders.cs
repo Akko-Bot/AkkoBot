@@ -1,6 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
-using AkkoBot.Services;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -89,12 +88,14 @@ namespace AkkoBot.Commands.Formatters
 
             ["rng"] = (context, parameter) =>
             {
-                if (parameter is not string[] arguments || arguments.Length != 2
-                    || !int.TryParse(arguments[0], out var x) || !int.TryParse(arguments[1], out var y))
+                // If array is the wrong length or contains invalid arguments, quit
+                if (parameter is not string[] arguments || arguments.Length is < 1 or > 2
+                    | (!arguments.TryGetValue(0, out var first) & !arguments.TryGetValue(1, out var second))
+                    | (!int.TryParse(first, out var x) & !int.TryParse(second, out var y)))
                     return null;
 
                 if (x > y)
-                    GeneralService.Swap(ref x, ref y);
+                    (x, y) = (y, x);
 
                 return context.Services.GetService<Random>().Next(x, y);
             },
@@ -107,21 +108,13 @@ namespace AkkoBot.Commands.Formatters
             }
         };
 
-        /// <summary>
-        /// Parses a string placeholder to the value it represents.
-        /// </summary>
-        /// <param name="context">The command context.</param>
-        /// <param name="match">The regex match for the placeholder.</param>
-        /// <param name="result">The parsed placeholder, <see langword="null"/> if parsing fails.</param>
-        /// <remarks><paramref name="result"/> can return <see langword="null"/> even if this method returns <see langword="true"/>.</remarks>
-        /// <returns><see langword="true"/> if the placeholder was recognized, <see langword="false"/>.</returns>
         public bool TryParse(CommandContext context, Match match, out object result)
         {
             var groups = match.Groups.Values
                 .Where(x => !string.IsNullOrWhiteSpace(x.Value))    // This is needed because for some reason groups can contain empty values.
-                .ToArray();
+                .ToArray();                                         // Contains capture group + matches.
 
-            if (_placeholderActions.TryGetValue(groups[1].Value, out var action) && groups.Length <= 2)
+            if (groups.Length <= 2 && _placeholderActions.TryGetValue(groups[1].Value, out var action))
             {
                 result = action(context);
                 return true;

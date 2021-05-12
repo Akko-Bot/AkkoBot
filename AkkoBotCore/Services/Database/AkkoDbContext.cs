@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AkkoBot.Services.Database
 {
-    public class AkkoDbContext : DbContext
+    /// <summary>
+    /// Represents a session with Akko's core database and can be used to insert and retrieve data from it.
+    /// </summary>
+    public sealed class AkkoDbContext : DbContext
     {
         public DbSet<DiscordUserEntity> DiscordUsers { get; init; }
         public DbSet<BotConfigEntity> BotConfig { get; init; }
@@ -21,7 +24,7 @@ namespace AkkoBot.Services.Database
         public DbSet<FilteredContentEntity> FilteredContent { get; init; }
         public DbSet<ReminderEntity> Reminders { get; init; }
         public DbSet<RepeaterEntity> Repeaters { get; init; }
-        public DbSet<CommandEntity> AutoCommands { get; init; }
+        public DbSet<AutoCommandEntity> AutoCommands { get; init; }
         public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
         public DbSet<CommandCooldownEntity> CommandCooldown { get; init; }
         public DbSet<PollEntity> Polls { get; init; }
@@ -32,7 +35,7 @@ namespace AkkoBot.Services.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            #region Bot Configuration
+            #region Global Configuration
 
             modelBuilder.Entity<BotConfigEntity>()
                 .HasKey(x => x.Id);
@@ -49,7 +52,10 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<AliasEntity>()
                 .HasKey(x => x.Id);
 
-            #endregion Bot Configuration
+            modelBuilder.Entity<CommandCooldownEntity>()
+                .HasIndex(x => x.Id);
+
+            #endregion Global Configuration
 
             #region Guild Configuration
 
@@ -121,8 +127,7 @@ namespace AkkoBot.Services.Database
 
             #endregion Guild Configuration
 
-            modelBuilder.Entity<DiscordUserEntity>()
-                .HasAlternateKey(x => x.UserId);
+            #region Timer Entities
 
             modelBuilder.Entity<TimerEntity>()
                 .HasIndex(x => x.Id);
@@ -130,11 +135,17 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<ReminderEntity>()
                 .HasIndex(x => x.Id);
 
-            modelBuilder.Entity<CommandEntity>()
+            modelBuilder.Entity<AutoCommandEntity>()
                 .HasIndex(x => x.Id);
 
-            modelBuilder.Entity<CommandCooldownEntity>()
-                .HasIndex(x => x.Id);
+            #endregion Timer Entities
+
+            #region Miscellaneous
+
+            modelBuilder.Entity<DiscordUserEntity>()
+                .HasAlternateKey(x => x.UserId);
+
+            #endregion Miscellaneous
         }
     }
 }

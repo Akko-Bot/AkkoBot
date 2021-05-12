@@ -132,7 +132,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                     timers.Add((_dbCache.Timers.TryGetValue(repeater.TimerId, out var timer)) ? timer : null);
 
                 embed.WithTitle("repeater_list_title")
-                    .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold(x.Id.ToString() + ". ") + x.Content).MaxLength(50, "[...]"))), true)
+                    .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, "[...]"))), true)
                     .AddField("channel", string.Join("\n", repeaters.Select(x => $"<#{x.ChannelId}>")), true)
                     .AddField("triggers_in", string.Join("\n", timers.Select(x => x?.ElapseIn.ToString(@"%d\d\ %h\h\ %m\m\ %s\s") ?? context.FormatLocalized("repeat_over_24h"))), true);
 

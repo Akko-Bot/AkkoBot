@@ -28,7 +28,7 @@ namespace AkkoBot.Common
         public TimeOfDay(TimeSpan timeOfDay, TimeZoneInfo timezone)
             => _dateTime = DateTimeOffset.Now.StartOfDay(timezone.BaseUtcOffset).Add(timeOfDay);
 
-        public TimeOfDay(DateTimeOffset dateTime) 
+        public TimeOfDay(DateTimeOffset dateTime)
             => _dateTime = dateTime;
 
         /// <summary>
@@ -51,9 +51,12 @@ namespace AkkoBot.Common
                 : result;
         }
 
-        /// <inheritdoc />
-        public override string ToString() 
-            => Time.ToString();
+        /// <summary>
+        /// Converts the value of the current <see cref="TimeOfDay"/> object to its equivalent string representation.
+        /// </summary>
+        /// <returns>The string representation of the current <see cref="TimeOfDay"/> value.</returns>
+        public override string ToString()
+            => Time.ToString(@"hh\:mm");
 
         /// <summary>
         /// Converts the value of the current <see cref="TimeOfDay"/> object to its equivalent string representation by using the specified <paramref name="format"/>.

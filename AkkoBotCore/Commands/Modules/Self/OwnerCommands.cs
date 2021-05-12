@@ -1,7 +1,6 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Common;
-using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;

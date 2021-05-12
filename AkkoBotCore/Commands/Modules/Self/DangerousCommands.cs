@@ -5,9 +5,9 @@ using AkkoBot.Extensions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Npgsql;
 using System;
 using System.Threading.Tasks;
-using Npgsql;
 
 namespace AkkoBot.Commands.Modules.Self
 {

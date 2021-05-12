@@ -1,7 +1,7 @@
-using System.Globalization;
 using AkkoBot.Models;
-using System;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Globalization;
 
 namespace AkkoBot.Services.Logging
 {

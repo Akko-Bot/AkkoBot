@@ -336,7 +336,8 @@ namespace AkkoBot.Core.Common
 
             var servicesList = new ServiceDescriptor[]
             {
-                // Add subsystems in here as needed
+                /* Add subsystems in here as needed */
+
                 // > Database
                 ServiceDescriptor.Singleton<IDbCache, AkkoDbCache>(),
 

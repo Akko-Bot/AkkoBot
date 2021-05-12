@@ -17,27 +17,18 @@ namespace AkkoBot.Services.Timers
 
         private event ElapsedEventHandler ActionHandler;
 
-        /// <inheritdoc />
         public event EventHandler OnDispose;
 
-        /// <inheritdoc />
         public int Id { get; }
-
-        /// <inheritdoc />
         public TimeSpan Interval { get; }
-
-        /// <inheritdoc />
         public DateTimeOffset ElapseAt { get; private set; }
 
-        /// <inheritdoc />
         public TimeSpan ElapseIn
             => ElapseAt.Subtract(DateTimeOffset.Now);
 
-        /// <inheritdoc />
         public bool Enabled
             => _internalTimer.Enabled;
 
-        /// <inheritdoc />
         public bool AutoReset
             => _internalTimer.AutoReset;
 
@@ -97,7 +88,7 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private TimeSpan TimeFromExpiredEntity(TimerEntity entity)
         {
-            var result =  (entity.IsRepeatable && entity.TimeOfDay.HasValue)
+            var result = (entity.IsRepeatable && entity.TimeOfDay.HasValue)
                 ? TimeOfDay.GetInterval(entity.ElapseAt)
                 : (entity.IsRepeatable) ? TimeSpan.FromMinutes(entity.Interval.TotalMinutes) : TimeSpan.FromSeconds(10);
 
@@ -125,7 +116,6 @@ namespace AkkoBot.Services.Timers
                 Dispose();
         }
 
-        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);

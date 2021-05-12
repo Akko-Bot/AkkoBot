@@ -3,7 +3,6 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
-using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -39,33 +38,12 @@ namespace AkkoBot.Services.Timers
             _updateTimer.Start();
         }
 
-        /// <inheritdoc />
-        public async ValueTask<bool> CreateClientTimersAsync(DiscordClient client)
-        {
-            var cachedTimersAmount = _timers.Count;
-
-            if (_timerEntries.Length is 0 && _isFlushed)
-            {
-                _isFlushed = false;
-                await LoadDbEntriesCacheAsync();
-                _updateTimer.Elapsed += DeleteDbEntriesCache;
-            }
-
-            var timerEntries = _timerEntries.Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) <= TimeSpan.FromDays(_updateTimerDayAge));
-            GenerateTimers(timerEntries, client);
-
-            return _timers.Count > cachedTimersAmount;
-        }
-
-        /// <inheritdoc />
         public bool TryGetValue(int id, out IAkkoTimer timer)
             => _timers.TryGetValue(id, out timer);
 
-        /// <inheritdoc />
         public bool TryRemove(IAkkoTimer timer)
             => TryRemove(timer.Id);
 
-        /// <inheritdoc />
         public bool TryAdd(IAkkoTimer timer)
         {
             if (_timers.TryAdd(timer.Id, timer))
@@ -77,7 +55,6 @@ namespace AkkoBot.Services.Timers
             return false;
         }
 
-        /// <inheritdoc />
         public bool TryRemove(int id)
         {
             if (_timers.TryRemove(id, out var oldTimer))
@@ -90,7 +67,6 @@ namespace AkkoBot.Services.Timers
             return false;
         }
 
-        /// <inheritdoc />
         public bool TryUpdate(IAkkoTimer timer)
         {
             if (!_timers.TryGetValue(timer.Id, out var oldTimer))
@@ -107,7 +83,6 @@ namespace AkkoBot.Services.Timers
             return false;
         }
 
-        /// <inheritdoc />
         public bool AddOrUpdateByEntity(DiscordClient client, TimerEntity entity)
         {
             if (entity.ElapseAt.Subtract(DateTimeOffset.Now) > TimeSpan.FromDays(_updateTimerDayAge))
@@ -118,6 +93,23 @@ namespace AkkoBot.Services.Timers
             return (_timers.ContainsKey(entity.Id))
                 ? TryUpdate(timer)
                 : TryAdd(timer);
+        }
+
+        public async ValueTask<bool> CreateClientTimersAsync(DiscordClient client)
+        {
+            var cachedTimersAmount = _timers.Count;
+
+            if (_timerEntries.Length is 0 && _isFlushed)
+            {
+                _isFlushed = false;
+                await LoadDbEntriesCacheAsync();
+                _updateTimer.Elapsed += DeleteDbEntriesCache;
+            }
+
+            var timerEntries = _timerEntries.Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) <= TimeSpan.FromDays(_updateTimerDayAge));
+            GenerateTimers(timerEntries, client);
+
+            return _timers.Count > cachedTimersAmount;
         }
 
         /// <summary>

@@ -96,7 +96,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
             _dbCache.Polls.TryGetValue(poll.GuildIdFK, out var polls);
-            
+
             db.Remove(poll);
             polls.TryRemove(poll);
 
@@ -306,7 +306,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 var descriptionBuilder = new StringBuilder();
                 var newEmbed = new DiscordEmbedBuilder(oldMessage.Embeds[0])
                     .WithUrl(oldMessage.JumpLink.AbsoluteUri);
-                
+
                 var counter = 0;
                 var answers = new Dictionary<string, int>(poll.Answers.Length);
 

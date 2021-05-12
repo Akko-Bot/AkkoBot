@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
@@ -35,7 +34,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <returns>A collection of strings of the registered locales.</returns>
         public IEnumerable<string> GetLocales()
-            => _services.GetService<ILocalizer>().GetLocales();
+            => _services.GetService<ILocalizer>().Locales;
 
         /// <summary>
         /// Gets the bot's global settings.
@@ -60,7 +59,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             var localizer = _services.GetService<ILocalizer>();
             localizer.ReloadLocalizedStrings();
 
-            return localizer.GetLocales().Count();
+            return localizer.Locales.Count;
         }
 
         /// <summary>

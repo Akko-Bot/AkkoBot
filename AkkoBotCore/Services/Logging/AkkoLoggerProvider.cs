@@ -34,11 +34,6 @@ namespace AkkoBot.Services.Logging
             _fileLogger = fileLogger;
         }
 
-        /// <summary>
-        /// Creates an <see cref="ILogger"/> instance for the namespace specified in <paramref name="categoryName"/>.
-        /// </summary>
-        /// <param name="categoryName">Fullname of the namespace to create a log for.</param>
-        /// <returns>An <see cref="ILogger"/>.</returns>
         public ILogger CreateLogger(string categoryName)
         {
             ILogger logger = (categoryName.Equals(DbLoggerCategory.Database.Command.Name))
@@ -49,10 +44,6 @@ namespace AkkoBot.Services.Logging
             return logger;
         }
 
-        /// <summary>
-        /// Updates the loggers registered in this provider with the specified settings.
-        /// </summary>
-        /// <param name="logConfig">The log settings.</param>
         public void UpdateLoggers(LogConfigEntity logConfig)
         {
             _minLogLevel = logConfig.LogLevel;
@@ -63,11 +54,6 @@ namespace AkkoBot.Services.Logging
                 logger.BeginScope(logConfig);
         }
 
-        /// <summary>
-        /// Updates the file logger of all loggers registered in this provider with the specified instance.
-        /// </summary>
-        /// <param name="fileLogger">The new file logger, <see langword="null"/> to disable file logging.</param>
-        /// <remarks>Pass in <see langword="null"/> to disable file logging.</remarks>
         public void UpdateFileLogger(IFileLogger fileLogger)
         {
             _fileLogger = fileLogger;
@@ -80,12 +66,9 @@ namespace AkkoBot.Services.Logging
                 logger.BeginScope(fileLogger);
         }
 
-        /// <summary>
-        /// Releases the allocated resources for this logger provider.
-        /// </summary>
         public void Dispose()
         {
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 

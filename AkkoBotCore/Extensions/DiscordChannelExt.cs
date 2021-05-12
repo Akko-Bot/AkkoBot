@@ -1,8 +1,8 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
-using DSharpPlus.Exceptions;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions

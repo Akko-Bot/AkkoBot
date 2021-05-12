@@ -42,7 +42,7 @@ namespace AkkoBot.Core.Services
         );
 
         private readonly Regex _inviteRegex = new(
-            @"(?:discord\.(?:gg|io|me|li)|discord(?:.com|app.com)\/invite)\/(\w+)",
+            @"discord(?:\.gg|\.io|\.me|\.li|(?:app)?\.com\/invite)\/(\w+)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
 
@@ -269,7 +269,12 @@ namespace AkkoBot.Core.Services
                 if (alias is null)
                     return;
 
-                var cmd = cmdHandler.FindCommand(((parsedMsg.IsParsed && !alias.IsDynamic) ? alias.FullCommand : alias.ParseAliasInput(prefix, eventArgs.Message.Content)), out var args);
+                var cmd = cmdHandler.FindCommand(
+                    (parsedMsg.IsParsed && !alias.IsDynamic)
+                        ? alias.FullCommand
+                        : alias.ParseAliasInput(parsedMsg, eventArgs.Message.Content),
+                    out var args
+                );
 
                 if (cmd is null)
                     return;
@@ -424,14 +429,15 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task FilterContent(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
-            if (eventArgs.Author.IsBot || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
+            if (eventArgs.Guild is null || eventArgs.Author.IsBot
+                || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
                 || _dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                 return Task.CompletedTask;
 
             var filter = filters.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id);
 
-            if (filter is null || !filter.IsActive())
+            if (filter is null || !filter.IsActive)
                 return Task.CompletedTask;
 
             var prefix = _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
@@ -534,7 +540,7 @@ namespace AkkoBot.Core.Services
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
-                dbGuild = await _dbCache.GetGuildAsync(eventArgs.Guild.Id);
+                dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
                 var filteredWords = await db.FilteredWords.AsNoTracking()
                     .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
 

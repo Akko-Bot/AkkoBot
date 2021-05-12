@@ -1,17 +1,17 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using AkkoBot.Commands.Abstractions;
 
 namespace AkkoBot.Services.Database
 {
@@ -27,6 +27,7 @@ namespace AkkoBot.Services.Database
         public BotConfigEntity BotConfig { get; private set; }
         public LogConfigEntity LogConfig { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
+        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; private set; }
@@ -34,10 +35,9 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; private set; }
 
-        // Lazily instantiated
-        public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
+        /* Lazily instantiated */
 
-        public ITimerManager Timers { get; set; }
+        public ITimerManager Timers { get; set; }   // ITimerManager has TimerActions, which has IDbCache as a dependency.
         public ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
 
         public AkkoDbCache(IServiceProvider services)
@@ -67,18 +67,12 @@ namespace AkkoBot.Services.Database
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
 
-            Guilds = new(); // Guild configs are loaded into the cache as needed.
-            FilteredWords = new(); // Filtered words are loaded into the cache as needed
-            FilteredContent = new(); // Special filters are loaded into the cache as needed
+            Guilds = new();             // Guild configs are loaded into the cache as needed.
+            FilteredWords = new();      // Filtered words are loaded into the cache as needed
+            FilteredContent = new();    // Special filters are loaded into the cache as needed
         }
 
-        /// <summary>
-        /// Safely gets a database guild.
-        /// </summary>
-        /// <param name="sid">The GuildId of the database entry.</param>
-        /// <remarks>If the entry doesn't exist, it creates one.</remarks>
-        /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
-        public async ValueTask<GuildConfigEntity> GetGuildAsync(ulong sid)
+        public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid)
         {
             if (Guilds.TryGetValue(sid, out var dbGuild))
                 return dbGuild;
@@ -98,9 +92,6 @@ namespace AkkoBot.Services.Database
             return dbGuild;
         }
 
-        /// <summary>
-        /// Releases the allocated resources for this database cacher.
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -116,6 +107,7 @@ namespace AkkoBot.Services.Database
                     Blacklist?.Clear();
                     Guilds?.Clear();
                     Timers?.Dispose();
+                    CooldownCommands?.Dispose();
                     PlayingStatuses?.Clear();
                     PlayingStatuses?.TrimExcess();
                     FilteredWords?.Clear();

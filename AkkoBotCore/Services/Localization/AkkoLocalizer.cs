@@ -30,68 +30,32 @@ namespace AkkoBot.Services.Localization
         /// </summary>
         private readonly Regex _localeRegex = new(@"_(.*?)\.", RegexOptions.Compiled);
 
+        public Dictionary<string, IReadOnlyDictionary<string, string>>.KeyCollection Locales
+            => _localizedStrings.Keys;
+
         public AkkoLocalizer()
             => LoadLocalizedStrings();
 
-        /// <summary>
-        /// Gets all cached locales.
-        /// </summary>
-        /// <returns>A collection of the registered locale keys.</returns>
-        public IEnumerable<string> GetLocales()
-            => _localizedStrings.Keys;
-
-        /// <summary>
-        /// Gets the specified response string.
-        /// </summary>
-        /// <param name="locale">The desired locale.</param>
-        /// <param name="response">Key of the response string to be fetched.</param>
-        /// <returns>The localized response string, if it exists.</returns>
         public string GetResponseString(CultureInfo locale, string response)
             => GetResponseString(locale.Name, response);
 
-        /// <summary>
-        /// Gets a collection of the specified response strings.
-        /// </summary>
-        /// <param name="locale">The desired locale.</param>
-        /// <param name="responses">Keys of the response strings to be fetched.</param>
-        /// <returns>The localized response strings, if they exist.</returns>
         public string[] GetResponseStrings(CultureInfo locale, params string[] responses)
             => GetResponseStrings(locale.Name, responses);
 
-        /// <summary>
-        /// Checks if a given locale is registered.
-        /// </summary>
-        /// <param name="locale">Locale to be checked.</param>
-        /// <returns><see langword="true"/> if the locale is registered, <see langword="false"/> otherwise.</returns>
         public bool ContainsLocale(string locale)
             => _localizedStrings.ContainsKey(locale);
 
-        /// <summary>
-        /// Checks if the bot contains a valid response for a given response key.
-        /// </summary>
-        /// <param name="locale">Locale of the response string.</param>
-        /// <param name="response">Response string key to be checked.</param>
-        /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
         public bool ContainsResponse(string locale, string response)
             => _localizedStrings.ContainsKey(locale)
                 && (_localizedStrings[locale].ContainsKey(response)
                 || _localizedStrings[DefaultLanguage].ContainsKey(response));
 
-        /// <summary>
-        /// Clears the cache and loads all response strings again.
-        /// </summary>
         public void ReloadLocalizedStrings()
         {
             _localizedStrings.Clear();
             LoadLocalizedStrings();
         }
 
-        /// <summary>
-        /// Gets a collection of the specified response strings.
-        /// </summary>
-        /// <param name="locale">The desired locale.</param>
-        /// <param name="responses">Keys of the response strings to be fetched.</param>
-        /// <returns>The localized response strings, if they exist.</returns>
         public string[] GetResponseStrings(string locale, params string[] responses)
         {
             var result = new string[responses.Length];
@@ -103,15 +67,6 @@ namespace AkkoBot.Services.Localization
             return result;
         }
 
-        /// <summary>
-        /// Gets the specified response string.
-        /// </summary>
-        /// <param name="locale">The desired locale.</param>
-        /// <param name="response">Key of the response string to be fetched.</param>
-        /// <returns>
-        /// The localized response string, if it exists.
-        /// An empty string, if <paramref name="response"/> is <see langword="null"/>.
-        /// </returns>
         public string GetResponseString(string locale, string response)
         {
             if (string.IsNullOrWhiteSpace(response))

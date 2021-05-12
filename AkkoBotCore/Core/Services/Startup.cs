@@ -45,7 +45,7 @@ namespace AkkoBot.Core.Services
                 throw new InvalidOperationException("Bot core cannot be null.");
 
             // Create bot configs on ready, if there isn't one already
-            _botCore.BotShardedClient.Ready += LoadBotConfig;
+            _botCore.BotShardedClient.Ready += LoadInitialStateAsync;
 
             // Save visible guilds on ready
             _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuilds;
@@ -65,30 +65,10 @@ namespace AkkoBot.Core.Services
         /// <summary>
         /// Creates bot settings on startup, if there isn't one already.
         /// </summary>
-        private Task LoadBotConfig(DiscordClient client, ReadyEventArgs eventArgs)
+        private async Task LoadInitialStateAsync(DiscordClient client, ReadyEventArgs eventArgs)
         {
-            return Task.Run(async () =>
-            {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
-
-                #region Playing Status Initialization
-
-                // Initialize the custom status, if there is one
-                var pStatus = await db.PlayingStatuses.Fetch(x => x.RotationTime == TimeSpan.Zero)
-                    .FirstOrDefaultAsync();
-
-                if (pStatus is not null)
-                    await client.UpdateStatusAsync(pStatus.GetActivity());
-                else if (_dbCache.BotConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
-                {
-                    _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;
-                    await _services.GetService<StatusService>().RotateStatusesAsync();
-                }
-
-                #endregion Playing Status Initialization
-
-                await UnregisterCommands(client);
-            });
+            await InitializePlayingStatuses(client).ConfigureAwait(false);
+            await UnregisterCommands(client).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -138,13 +118,11 @@ namespace AkkoBot.Core.Services
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
-                var filteredWords = (await db.FilteredWords.AsNoTracking()
-                    .Where(x => x.Words.Count != 0)
+                var filteredWords = (await db.FilteredWords.Fetch(x => x.Words.Count != 0)
                     .ToArrayAsync())    // Query the database
                     .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
 
-                var filteredContent = (await db.FilteredContent.AsNoTracking()
-                    .Where(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
+                var filteredContent = (await db.FilteredContent.Fetch(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
                     .ToArrayAsync())    // Query the database
                     .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
 
@@ -166,7 +144,7 @@ namespace AkkoBot.Core.Services
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
                 var cmdHandler = client.GetCommandsNext();
-                var startupCmds = await db.AutoCommands.Fetch(x => x.Type == CommandType.Startup)
+                var startupCmds = await db.AutoCommands.Fetch(x => x.Type == AutoCommandType.Startup)
                     .ToArrayAsync();
 
                 foreach (var dbCmd in startupCmds.Where(x => eventArgs.Guilds.ContainsKey(x.GuildId)))
@@ -176,7 +154,7 @@ namespace AkkoBot.Core.Services
                     if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
                         continue;
 
-                    var prefix = (await _dbCache.GetGuildAsync(server.Id)).Prefix;
+                    var prefix = (await _dbCache.GetDbGuildAsync(server.Id)).Prefix;
 
                     var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
 
@@ -187,6 +165,26 @@ namespace AkkoBot.Core.Services
         }
 
         /* Utility Methods */
+
+        /// <summary>
+        /// Initializes the bot's playing statuses.
+        /// </summary>
+        /// <param name="client">The Discord client.</param>
+        private async Task InitializePlayingStatuses(DiscordClient client)
+        {
+            var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+            var pStatus = await db.PlayingStatuses
+                .Fetch(x => x.RotationTime == TimeSpan.Zero)
+                .FirstOrDefaultAsync();
+
+            if (pStatus is not null)
+                await client.UpdateStatusAsync(pStatus.GetActivity());
+            else if (_dbCache.BotConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
+            {
+                _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;
+                await _services.GetService<StatusService>().RotateStatusesAsync();
+            }
+        }
 
         /// <summary>
         /// Unregisters disabled commands from the command handler of the current client,

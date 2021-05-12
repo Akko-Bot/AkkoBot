@@ -71,19 +71,6 @@ namespace AkkoBot.Services
         }
 
         /// <summary>
-        /// Swaps the reference of two variables with each other.
-        /// </summary>
-        /// <typeparam name="T">The type of the data.</typeparam>
-        /// <param name="x">First <typeparamref name="T"/>.</param>
-        /// <param name="y">Second <typeparamref name="T"/>.</param>
-        public static void Swap<T>(ref T x, ref T y)
-        {
-            var temp = x;
-            x = y;
-            y = temp;
-        }
-
-        /// <summary>
         /// Checks if the specified time format is valid.
         /// </summary>
         /// <param name="timeFormat">The time format to be checked.</param>
