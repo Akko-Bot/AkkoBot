@@ -92,6 +92,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+
+            if (filteredWords is null)
+            {
+                await AddFilteredWordsAsync(sid);
+                filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+            }
+
             var result = action(filteredWords);
 
             // Update the cache
@@ -120,7 +127,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
             foreach (var word in words)
             {
-                filteredWords.Words.Remove(word);                         // Remove the word from the entry
+                filteredWords.Words.Remove(word);                   // Remove the word from the entry
                 _dbCache.FilteredWords[sid].Words.Remove(word);     // Remove the word from the cache
 
                 if (_dbCache.FilteredWords[sid].Words.Count == 0)

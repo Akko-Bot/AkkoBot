@@ -1,6 +1,6 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
-using AkkoBot.Commands.Modules.Self.Services;
+using AkkoBot.Commands.Modules.Diagnostics.Services;
 using AkkoBot.Extensions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -9,21 +9,21 @@ using Npgsql;
 using System;
 using System.Threading.Tasks;
 
-namespace AkkoBot.Commands.Modules.Self
+namespace AkkoBot.Commands.Modules.Diagnostics
 {
     [BotOwner]
-    public class DangerousCommands : AkkoCommandModule
+    public class DatabaseQueries : AkkoCommandModule
     {
         private readonly QueryService _service;
 
-        public DangerousCommands(QueryService service)
+        public DatabaseQueries(QueryService service)
             => _service = service;
 
         [Command("sql")]
         [Description("cmd_sql")]
         public async Task ExecuteQuery(CommandContext context, [RemainingText, Description("arg_sql")] string query)
         {
-            if (query.StartsWith("SELECT", StringComparison.InvariantCultureIgnoreCase))
+            if (query.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
                 await SqlSelectAsync(context, query);
             else
                 await SqlExecAsync(context, query);

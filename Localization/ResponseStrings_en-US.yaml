@@ -300,10 +300,10 @@ cmd_userid: Shows the ID of the specified user. Provide no parameter to show the
 cmd_userinfo: Shows basic information about the specified Discord user. Provide no parameter to show information about yourself.
 cmd_voicemute: Server mutes a user, preventing them from speaking in voice channels.
 cmd_voicerole: Groups commands for managing voice channel roles.
-cmd_voicerole_add: Adds a role to the specified voice channel. You can ommit the channel if you are connected to it. Users who join the channel will automatically be assigned the specified role.
+cmd_voicerole_add: Adds a role to the specified voice channel. You can omit the channel if you are connected to it. Users who join the channel will automatically be assigned the specified role.
 cmd_voicerole_list: Lists all voice roles in this Discord server.
-cmd_voicerole_remove: Removes a role from the specified voice channel. You can ommit the channel if you are connected to it.
-cmd_voicerole_removeall: Removes all roles from the specified voice channel. You can ommit the channel if you are connected to it.
+cmd_voicerole_remove: Removes a role from the specified voice channel. You can omit the channel if you are connected to it.
+cmd_voicerole_removeall: Removes all roles from the specified voice channel. You can omit the channel if you are connected to it.
 cmd_voiceunmute: Server unmutes a user, allowing them to speak in voice channels.
 cmd_warn: Warns a user.
 cmd_warnc: Clears all notices and warnings from a user or a specific one if the ID is provided.
@@ -534,7 +534,7 @@ timedmute: Expired Mute
 timedrole: Punishment Role
 timedunrole: Punishment Role Removal
 timezone_list: Time Zones
-total: '{0} total'
+total_of: '{0} total'
 triggers_at: Triggers At
 triggers_in: Triggers In
 type: Type
@@ -579,3 +579,9 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
+
+cmd_botstats: Shows an estimate on how many resources are being allocated to the bot.
+db_cache: Database Cache
+timers: Timers
+total: Total
+saved_logs: Saved Logs

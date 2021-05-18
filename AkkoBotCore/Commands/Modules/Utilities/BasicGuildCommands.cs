@@ -84,6 +84,10 @@ namespace AkkoBot.Commands.Modules.Utilities
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
+        [Command("setnickname"), HiddenOverload]
+        public async Task SetNickname(CommandContext context, string nickname = "")
+            => await SetNickname(context, context.Guild.CurrentMember, nickname);
+
         [Command("setnickname"), Aliases("setnick")]
         [Description("cmd_setnickname")]
         [RequirePermissions(Permissions.ManageNicknames)]
@@ -93,9 +97,6 @@ namespace AkkoBot.Commands.Modules.Utilities
             [Description("arg_discord_user")] DiscordMember user = null,
             [RemainingText, Description("arg_nickname")] string nickname = "")
         {
-            if (user is null)
-                user = context.Guild.CurrentMember;
-
             var success = context.Guild.CurrentMember.Hierarchy >= user.Hierarchy && context.Member.Hierarchy > user.Hierarchy;
 
             if (success)
@@ -131,12 +132,12 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var users = context.Guild.Members.Values.Where(x => x.Roles.Contains(role))
                 .OrderByDescending(x => x.Hierarchy)
-                .Select(x => $"� {x.GetFullname()}")
+                .Select(x => $"● {x.GetFullname()}")
                 .SplitInto(AkkoConstants.LinesPerPage);     // x users per page
 
             var title = context.FormatLocalized("inrole_title", role.Name);
             var embed = new DiscordEmbedBuilder()
-                .WithFooter(context.FormatLocalized("total", ((users.Count() - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault().Count()));
+                .WithFooter(context.FormatLocalized("total_of", ((users.Count - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault().Count));
 
             foreach (var userGroup in users)
                 embed.AddField(title, string.Join('\n', userGroup.ToArray()));

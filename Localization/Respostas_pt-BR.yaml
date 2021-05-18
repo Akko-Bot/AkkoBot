@@ -534,7 +534,7 @@ timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
 timezone_list: Fusos Horários
-total: 'Total de {0}'
+total_of: 'Total de {0}'
 triggers_at: Data de Execução
 triggers_in: Executa Em
 type: Tipo
@@ -579,3 +579,9 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
+
+cmd_botstats: Exibe uma estimativa da quantidade de recursos alocados para o bot.
+db_cache: Cache do Banco de Dados
+timers: Timers
+total: Total
+saved_logs: Logs Salvos

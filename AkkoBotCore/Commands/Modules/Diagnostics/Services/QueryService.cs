@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AkkoBot.Commands.Modules.Self.Services
+namespace AkkoBot.Commands.Modules.Diagnostics.Services
 {
     /// <summary>
     /// Groups utility methods for querying the database manually.
