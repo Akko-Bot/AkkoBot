@@ -1,4 +1,5 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Common;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -148,6 +149,17 @@ namespace AkkoBot.Services.Database.Entities
         /// Defines the amount of time that an interactive command waits for user input.
         /// </summary>
         public TimeSpan? InteractiveTimeout { get; set; }
+
+        /// <summary>
+        /// Determines whether names starting with symbols should be sanitized.
+        /// </summary>
+        public bool SanitizeNames { get; set; }
+
+        /// <summary>
+        /// Defines the replacement name to be assigned to users whose names should be sanitized.
+        /// </summary>
+        [MaxLength(AkkoConstants.MaxUsernameLength)]
+        public string CustomSanitizedName { get; set; }
 
         // Greet and Bye channels and messages
         // .asar - .iam/.iamnot roles

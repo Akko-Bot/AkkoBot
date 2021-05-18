@@ -65,6 +65,18 @@ namespace AkkoBot.Core.Services
             if (_botCore is null)
                 throw new InvalidOperationException("Bot core cannot be null.");
 
+            // Save guild on join
+            _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
+
+            // Decache guild on leave
+            _botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
+
+            // Sanitize username on join
+            _botCore.BotShardedClient.GuildMemberAdded += SanitizeNameOnJoinAsync;
+
+            // Sanitize nickname on update
+            _botCore.BotShardedClient.GuildMemberUpdated += SanitizeNameOnUpdateAsync;
+
             // Prevent mute evasion
             _botCore.BotShardedClient.GuildMemberAdded += Remute;
 
@@ -95,12 +107,6 @@ namespace AkkoBot.Core.Services
             // Assign role on channel join/leave
             _botCore.BotShardedClient.VoiceStateUpdated += VoiceRole;
 
-            // Save guild on join
-            _botCore.BotShardedClient.GuildCreated += SaveGuildOnJoin;
-
-            // Decache guild on leave
-            _botCore.BotShardedClient.GuildDeleted += DecacheGuildOnLeave;
-
             foreach (var cmdHandler in _botCore.CommandExt.Values)
             {
                 // Log command execution
@@ -113,6 +119,44 @@ namespace AkkoBot.Core.Services
         }
 
         /* Event Methods */
+
+        /// <summary>
+        /// Sanitizes user nickname on update.
+        /// </summary>
+        private async Task SanitizeNameOnUpdateAsync(DiscordClient _, GuildMemberUpdateEventArgs eventArgs)
+        {
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+
+            if (!dbGuild.SanitizeNames
+                || (!char.IsPunctuation(eventArgs.Member.DisplayName[0]) && !char.IsSymbol(eventArgs.Member.DisplayName[0]))
+                || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageNicknames)))
+                return;
+
+            await eventArgs.Member.ModifyAsync(user =>
+                    user.Nickname = (string.IsNullOrWhiteSpace(dbGuild.CustomSanitizedName))
+                        ? EnsureNameSanitization(eventArgs.Member)
+                        : dbGuild.CustomSanitizedName
+            );
+        }
+
+        /// <summary>
+        /// Sanitizes user name on join.
+        /// </summary>
+        private async Task SanitizeNameOnJoinAsync(DiscordClient _, GuildMemberAddEventArgs eventArgs)
+        {
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+
+            if (!dbGuild.SanitizeNames 
+                || (!char.IsPunctuation(eventArgs.Member.DisplayName[0]) && !char.IsSymbol(eventArgs.Member.DisplayName[0]))
+                || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageNicknames)))
+                return;
+
+            await eventArgs.Member.ModifyAsync(user =>
+                    user.Nickname = (string.IsNullOrWhiteSpace(dbGuild.CustomSanitizedName))
+                        ? EnsureNameSanitization(eventArgs.Member)
+                        : dbGuild.CustomSanitizedName
+            );
+        }
 
         /// <summary>
         /// Mutes a user that has been previously muted.
@@ -678,6 +722,23 @@ namespace AkkoBot.Core.Services
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns a valid display name for a user.
+        /// </summary>
+        /// <param name="user">The user to have its name sanitized.</param>
+        /// <returns>
+        /// The sanitized display name or "No Symbols Allowed" if their nickname AND username
+        /// are comprised of special characters only.
+        /// </returns>
+        private string EnsureNameSanitization(DiscordMember user)
+        {
+            var result = user.DisplayName.SanitizeUsername();            
+
+            return (string.IsNullOrWhiteSpace(result))
+                ? (user.Username.All(x => char.IsPunctuation(x) || char.IsSymbol(x))) ? "No Symbols Allowed" : user.Username.SanitizeUsername()
+                : result;
         }
     }
 }

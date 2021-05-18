@@ -15,7 +15,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 {
     [Group("voicerole"), Aliases("vcrole")]
     [Description("cmd_voicerole")]
-    [RequireGuild, RequirePermissions(Permissions.ManageRoles)]
+    [RequireGuild, RequirePermissions(Permissions.ManageRoles | Permissions.ManageChannels)]
     public class VoiceRoles : AkkoCommandModule
     {
         private readonly VoiceRoleService _service;

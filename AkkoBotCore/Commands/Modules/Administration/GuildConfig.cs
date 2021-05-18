@@ -1,5 +1,6 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
 using DSharpPlus;
@@ -156,6 +157,36 @@ namespace AkkoBot.Commands.Modules.Administration
                 await _service.GetOrSetPropertyAsync(context.Guild, x => x.Timezone = zone.StandardName);
 
             await context.RespondLocalizedAsync(embed, isError: zone is null);
+        }
+
+        [Command("sanitizenames"), Aliases("sanitizenicks")]
+        [Description("cmd_sanitizenames")]
+        public async Task SanitizeNicknames(CommandContext context)
+        {
+            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.SanitizeNames = !x.SanitizeNames);
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Description = context.FormatLocalized("guild_sanitizenames", (result) ? "enabled" : "disabled")
+            };
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("sanitizedname"), Aliases("sanitizednick")]
+        [Description("cmd_sanitizedname")]
+        public async Task SetCustomSanitizedNickname(CommandContext context, [RemainingText, Description("arg_nickname")] string nickname = "")
+        {
+            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.CustomSanitizedName = nickname.SanitizeUsername());
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Description = (string.IsNullOrWhiteSpace(result))
+                    ? "sanitizedname_reset"
+                    : context.FormatLocalized("sanitizedname_set", Formatter.InlineCode(result))
+            };
+
+            await context.RespondLocalizedAsync(embed);
         }
 
         [GroupCommand, Command("list")]

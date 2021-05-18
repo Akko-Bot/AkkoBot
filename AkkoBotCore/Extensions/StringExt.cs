@@ -248,5 +248,20 @@ namespace AkkoBot.Extensions
 
             return result.ToString().MaxLength(50);
         }
+
+        /// <summary>
+        /// Removes punctuation and symbol characters from the beginning of this username.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns>A sanitized username..</returns>
+        public static string SanitizeUsername(this string text)
+        {
+            var index = 0;
+
+            while (index != text.Length && (char.IsPunctuation(text[index]) || char.IsSymbol(text[index])))
+                index++;
+
+            return text[index..];
+        }
     }
 }
