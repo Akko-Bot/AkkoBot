@@ -101,17 +101,17 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_int")] int amount = 50,
             [Description("arg_prune_options")] string options = "")
         {
-            amount = Math.Abs(amount) + 1;
+            amount = Math.Abs(amount);
             var requestLimit = (int)Math.Ceiling(Math.Min(amount, 400) / 100.0) * 100;  // Limit it to 4 requests at most
 
-            Func<DiscordMessage, bool> userCheck = (user is null) ? (msg) => true : (msg) => msg.Author.Equals(user);
-            Func<DiscordMessage, bool> optionsCheck = (!options.Equals(StringComparison.InvariantCultureIgnoreCase, "-s", "--safe")) ? (msg) => true : (msg) => !msg.Pinned;
+            Predicate<DiscordMessage> userCheck = (user is null) ? (msg) => true : (msg) => msg.Author.Equals(user);
+            Predicate<DiscordMessage> optionsCheck = (!options.Equals(StringComparison.InvariantCultureIgnoreCase, "-s", "--safe")) ? (msg) => true : (msg) => !msg.Pinned;
 
-            var messages = (await context.Channel.GetMessagesAsync(requestLimit))
+            var messages = (await context.Channel.GetMessagesBeforeAsync(context.Message.Id, requestLimit))
                 .Where(msg => DateTimeOffset.Now.Subtract(msg.CreationTimestamp) < AkkoEntities.MaxMessageDeletionAge && userCheck(msg) && optionsCheck(msg))
                 .Take(amount);
 
-            if (!messages.Any(message => !message.Equals(context.Message)))
+            if (!messages.Any())
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription("prune_error");
@@ -119,7 +119,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
 
-            await context.Channel.DeleteMessagesAsync(messages);
+            await context.Channel.DeleteMessagesAsync(messages.Prepend(context.Message));
         }
 
         [Command("lockchannel"), Aliases("lockdown", "lock")]
@@ -138,7 +138,8 @@ namespace AkkoBot.Commands.Modules.Administration
                     .Except(modRoles)
                     .Select(role => role.Id)
                         .Contains(overwrite.Id)
-            ).ToArray();
+            )
+            .ToArray();
 
             // Lock the channel down to regular users
             for (var index = 0; index < toLock.Length; index++)
@@ -167,7 +168,8 @@ namespace AkkoBot.Commands.Modules.Administration
                     .Except(modRoles)
                     .Select(role => role.Id)
                         .Contains(overwrite.Id)
-            ).ToArray();
+            )
+            .ToArray();
 
             // Unlock the channel for regular users
             for (var index = 0; index < toUnlock.Length; index++)
