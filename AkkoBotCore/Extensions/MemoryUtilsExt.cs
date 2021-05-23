@@ -1,5 +1,4 @@
-﻿using AkkoBot.Services.Localization.Abstractions;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ namespace AkkoBot.Extensions
     {
         private static readonly int _pointerSize = Marshal.SizeOf<IntPtr>();
         private static readonly string[] _excludedNamespaces = new string[] { "System.Reflection", "System.Threading" };
+
         //private static readonly string[] _excludedNamespaces = new string[] { "System" };
         private static readonly HashSet<object> _gmeCache = new();
 
@@ -49,7 +49,7 @@ namespace AkkoBot.Extensions
                 return _pointerSize;
             else if (excludedTypes is null)
                 throw new ArgumentNullException(nameof(excludedTypes), $"{nameof(excludedTypes)} cannot be null.");
-            
+
             var result = 0L;
             var objType = obj.GetType();
 

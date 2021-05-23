@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
@@ -24,8 +25,8 @@ namespace AkkoBot.Services.Database
         private bool _isDisposed = false;
 
         public ConcurrentHashSet<ulong> Blacklist { get; private set; }
-        public BotConfigEntity BotConfig { get; private set; }
-        public LogConfigEntity LogConfig { get; private set; }
+        public BotConfig BotConfig { get; private set; }
+        public LogConfig LogConfig { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
@@ -45,8 +46,8 @@ namespace AkkoBot.Services.Database
             using var scope = services.GetScopedService<AkkoDbContext>(out var dbContext);
 
             _services = services;
-            BotConfig = dbContext.BotConfig.FirstOrDefault();
-            LogConfig = dbContext.LogConfig.FirstOrDefault();
+            BotConfig = services.GetService<BotConfig>();
+            LogConfig = services.GetService<LogConfig>();
             Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
             CooldownCommands = services.GetService<ICommandCooldown>().LoadFromEntities(dbContext.CommandCooldown.AsEnumerable());

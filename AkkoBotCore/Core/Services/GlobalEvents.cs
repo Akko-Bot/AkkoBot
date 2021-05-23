@@ -146,7 +146,7 @@ namespace AkkoBot.Core.Services
         {
             var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
 
-            if (!dbGuild.SanitizeNames 
+            if (!dbGuild.SanitizeNames
                 || (!char.IsPunctuation(eventArgs.Member.DisplayName[0]) && !char.IsSymbol(eventArgs.Member.DisplayName[0]))
                 || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageNicknames)))
                 return;
@@ -734,7 +734,7 @@ namespace AkkoBot.Core.Services
         /// </returns>
         private string EnsureNameSanitization(DiscordMember user)
         {
-            var result = user.DisplayName.SanitizeUsername();            
+            var result = user.DisplayName.SanitizeUsername();
 
             return (string.IsNullOrWhiteSpace(result))
                 ? (user.Username.All(x => char.IsPunctuation(x) || char.IsSymbol(x))) ? "No Symbols Allowed" : user.Username.SanitizeUsername()

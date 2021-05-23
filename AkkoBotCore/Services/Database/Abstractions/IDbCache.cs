@@ -1,4 +1,5 @@
 using AkkoBot.Commands.Abstractions;
+using AkkoBot.Config;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
@@ -23,12 +24,12 @@ namespace AkkoBot.Services.Database.Abstractions
         /// <summary>
         /// Contains settings that define how the bot should behave globally.
         /// </summary>
-        BotConfigEntity BotConfig { get; }
+        BotConfig BotConfig { get; }
 
         /// <summary>
         /// Contains settings that define how logging should be handled.
         /// </summary>
-        LogConfigEntity LogConfig { get; }
+        LogConfig LogConfig { get; }
 
         /// <summary>
         /// Contains the settings of all Discord guilds currently visible to the bot.

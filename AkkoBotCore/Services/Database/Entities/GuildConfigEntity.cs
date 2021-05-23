@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
@@ -170,7 +171,7 @@ namespace AkkoBot.Services.Database.Entities
         {
         }
 
-        public GuildConfigEntity(BotConfigEntity config)
+        public GuildConfigEntity(BotConfig config)
         {
             Prefix = config.BotPrefix;
             Locale = config.Locale;

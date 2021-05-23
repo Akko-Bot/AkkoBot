@@ -1,9 +1,10 @@
 ﻿using AkkoBot.Common;
-using AkkoBot.Credential;
+using AkkoBot.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace AkkoBot.Services.Database.Design
 {
@@ -12,6 +13,10 @@ namespace AkkoBot.Services.Database.Design
     /// </summary>
     public class AkkoDbContextFactory : IDesignTimeDbContextFactory<AkkoDbContext>
     {
+        private readonly IDeserializer _deserializer = new DeserializerBuilder()
+            .WithNamingConvention(UnderscoredNamingConvention.Instance)
+            .Build();
+
         public AkkoDbContext CreateDbContext(string[] args)
         {
             var creds = LoadCredentials(AkkoEnvironment.CredsPath);
@@ -22,8 +27,8 @@ namespace AkkoBot.Services.Database.Design
                         @"Server=127.0.0.1;" +
                         @"Port=5432;" +
                         @"Database=AkkoBotDb;" +
-                        $"User Id={creds.Database["Role"]};" +
-                        $"Password={creds.Database["Password"]};" +
+                        $"User Id={creds.Database["role"]};" +
+                        $"Password={creds.Database["password"]};" +
                         @"CommandTimeout=20;"
                 )
                 .Options;
@@ -38,7 +43,7 @@ namespace AkkoBot.Services.Database.Design
 
             // Open the file and deserialize it.
             using var reader = new StreamReader(File.OpenRead(filePath));
-            return new Deserializer().Deserialize<Credentials>(reader);
+            return _deserializer.Deserialize<Credentials>(reader);
         }
     }
 }

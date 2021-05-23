@@ -1,11 +1,10 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Common;
+using AkkoBot.Config;
 using AkkoBot.Core.Services;
-using AkkoBot.Credential;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging;
@@ -33,26 +32,19 @@ namespace AkkoBot.Core.Common
     /// </summary>
     public class BotCoreBuilder
     {
-        private Credentials _creds;
         private ILoggerFactory _loggerFactory;
+        private readonly Credentials _creds;
+        private readonly BotConfig _botConfig;
+        private readonly LogConfig _logConfig;
         private readonly IServiceCollection _cmdServices;
 
-        public BotCoreBuilder(Credentials creds = null, ILoggerFactory loggerFactory = null, IServiceCollection cmdServices = null)
+        public BotCoreBuilder(Credentials creds, BotConfig botConfig, LogConfig logConfig, ILoggerFactory loggerFactory = null, IServiceCollection cmdServices = null)
         {
-            _creds = creds;
+            _creds = creds ?? throw new ArgumentNullException(nameof(creds), "The credentials cannot be null.");
+            _botConfig = botConfig ?? throw new ArgumentNullException(nameof(botConfig), "Configuration objects cannot be null.");
+            _logConfig = logConfig ?? throw new ArgumentNullException(nameof(logConfig), "Configuration objects cannot be null.");
             _loggerFactory = loggerFactory;
             _cmdServices = cmdServices ?? new ServiceCollection();
-        }
-
-        /// <summary>
-        /// Adds the credentials to be used for authentication with Discord.
-        /// </summary>
-        /// <param name="creds">The credentials.</param>
-        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithCredentials(Credentials creds)
-        {
-            _creds = creds;
-            return WithSingletonServices(creds);
         }
 
         /// <summary>
@@ -62,13 +54,11 @@ namespace AkkoBot.Core.Common
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultLogging()
         {
-            var (_, logConfig) = GetBotSettings();
-
-            var fileLogger = (logConfig.IsLoggedToFile)
-                ? new AkkoFileLogger(logConfig.LogSizeMB, logConfig.LogTimeStamp)
+            var fileLogger = (_logConfig.IsLoggedToFile)
+                ? new AkkoFileLogger(_logConfig.LogSizeMb, _logConfig.LogTimeStamp)
                 : null;
 
-            return WithDefaultLogging(logConfig.LogLevel, fileLogger, logConfig.LogFormat, logConfig.LogTimeFormat);
+            return WithDefaultLogging(_logConfig.LogLevel, fileLogger, _logConfig.LogFormat, _logConfig.LogTimeFormat);
         }
 
         /// <summary>
@@ -79,15 +69,20 @@ namespace AkkoBot.Core.Common
         /// <param name="logFormat">The type of logging to be output. Default is "Default".</param>
         /// <param name="timeFormat">The format of the time stamp to be used in the logs. Default depends on <paramref name="logFormat"/>.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithDefaultLogging(LogLevel logLevel = LogLevel.Information, IFileLogger fileLogger = null, string logFormat = null, string timeFormat = null)
+        public BotCoreBuilder WithDefaultLogging(LogLevel logLevel = LogLevel.Information, IFileLogger fileLogger = default, string logFormat = "Default", string timeFormat = default)
         {
-            var logProvider = new AkkoLoggerProvider(logLevel, logFormat, timeFormat, fileLogger);
+            var logProvider = new AkkoLoggerProvider(
+                (logLevel is LogLevel.Information) ? _logConfig.LogLevel : logLevel,
+                fileLogger,
+                logFormat ?? _logConfig.LogFormat,
+                timeFormat ?? _logConfig.LogTimeFormat
+            );
 
             _loggerFactory = LoggerFactory.Create(builder =>
                 builder.AddProvider(logProvider)
                     .AddFilter((category, level) =>
-                        (category.Equals(DbLoggerCategory.Database.Command.Name) && level is LogLevel.Information)
-                        || category.Equals(typeof(BaseDiscordClient).FullName)
+                        (category.Equals(DbLoggerCategory.Database.Command.Name) && level is LogLevel.Information)  // Add EF Core queries
+                        || category.Equals(typeof(BaseDiscordClient).FullName)                                      // Add DiscordClient event logs
                     )
             );
 
@@ -113,7 +108,6 @@ namespace AkkoBot.Core.Common
         public BotCoreBuilder WithDefaultServices()
         {
             _cmdServices.AddSingletonServices(typeof(ICommandService));
-
             return this;
         }
 
@@ -243,10 +237,21 @@ namespace AkkoBot.Core.Common
         /// <summary>
         /// Adds the default <see cref="AkkoDbContext"/> as a service to this <see cref="BotCore"/>.
         /// </summary>
-        /// <remarks>This database context depends directly on EF Core and Npgsql.</remarks>
+        /// <remarks>This database context has a direct dependency with EF Core and Npgsql.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultDbContext()
         {
+            // Apply pending database migrations
+            using var dbContext = new AkkoDbContext(
+                new DbContextOptionsBuilder<AkkoDbContext>()
+                    .UseSnakeCaseNamingConvention()
+                    .UseNpgsql(GetConnectionString())
+                    .Options
+            );
+
+            dbContext.Database.Migrate();
+
+            // Register the database context
             _cmdServices.AddDbContext<AkkoDbContext>(options =>
                 options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(GetConnectionString())
@@ -273,20 +278,16 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Builds a <see cref="BotCore"/> from the provided settings passed to this builder,
-        /// assuming <see langword="abstract"/> default database is being used.
+        /// Builds a <see cref="BotCore"/> from the provided settings passed to this builder.
         /// </summary>
         /// <returns>A <see cref="BotCore"/>.</returns>
-        /// <exception cref="NullReferenceException">Occurs when no credentials file is provided to this builder.</exception>
         public async Task<BotCore> BuildDefaultAsync()
         {
-            var (botSettings, _) = GetBotSettings();
-
             return await BuildAsync(
-                botSettings.InteractiveTimeout.Value.TotalSeconds,
-                botSettings.CaseSensitiveCommands,
-                botSettings.RespondToDms,
-                botSettings.MentionPrefix
+                _botConfig.InteractiveTimeout.Value.TotalSeconds,
+                _botConfig.CaseSensitiveCommands,
+                _botConfig.RespondToDms,
+                _botConfig.MentionPrefix
             );
         }
 
@@ -297,12 +298,8 @@ namespace AkkoBot.Core.Common
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
-        /// <exception cref="InvalidOperationException">Occurs when no credentials object is provided to this builder.</exception>
         public async Task<BotCore> BuildAsync(double? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
-            if (_creds is null)
-                throw new InvalidOperationException("No 'Credentials' object was provided.");
-
             var botClients = await GetBotClientAsync(timeout); // Initialize the sharded clients
 
             RegisterFinalServices(botClients);                  // Add the last services needed
@@ -337,6 +334,10 @@ namespace AkkoBot.Core.Common
             var servicesList = new ServiceDescriptor[]
             {
                 /* Add subsystems in here as needed */
+                // > Base Settings
+                ServiceDescriptor.Singleton(_creds),
+                ServiceDescriptor.Singleton(_botConfig),
+                ServiceDescriptor.Singleton(_logConfig),
 
                 // > Database
                 ServiceDescriptor.Singleton<IDbCache, AkkoDbCache>(),
@@ -431,44 +432,6 @@ namespace AkkoBot.Core.Common
         }
 
         /// <summary>
-        /// Gets the settings stored in the default database, if there are any.
-        /// </summary>
-        /// <returns>The settings stored in the database, default ones if none is found.</returns>
-        /// <exception cref="NullReferenceException">Occurs when no dbContext is provided to this builder.</exception>
-        private (BotConfigEntity, LogConfigEntity) GetBotSettings()
-        {
-            using var dbContext = new AkkoDbContext(
-                new DbContextOptionsBuilder<AkkoDbContext>()
-                    .UseSnakeCaseNamingConvention()
-                    .UseNpgsql(GetConnectionString())
-                    .Options
-            );
-
-            dbContext.Database.Migrate();
-
-            // Create base config if it doesn't exist
-            var botConfig = dbContext.BotConfig.FirstOrDefault();
-            var logConfig = dbContext.LogConfig.FirstOrDefault();
-
-            if (botConfig is null)
-            {
-                botConfig = new BotConfigEntity();
-                dbContext.Add(botConfig);
-            }
-
-            if (logConfig is null)
-            {
-                logConfig = new LogConfigEntity();
-                dbContext.Add(logConfig);
-            }
-
-            dbContext.SaveChanges();
-            dbContext.Dispose();
-
-            return (botConfig, logConfig);
-        }
-
-        /// <summary>
         /// Gets the default database connection string.
         /// </summary>
         /// <returns>The connection string.</returns>
@@ -479,8 +442,8 @@ namespace AkkoBot.Core.Common
                 @"Server=127.0.0.1;" +
                 @"Port=5432;" +
                 @"Database=AkkoBotDb;" +
-                $"User Id={_creds.Database["Role"]};" +
-                $"Password={_creds.Database["Password"]};" +
+                $"User Id={_creds.Database["role"]};" +
+                $"Password={_creds.Database["password"]};" +
                 @"CommandTimeout=20;";
         }
     }

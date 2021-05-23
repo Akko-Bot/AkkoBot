@@ -1,16 +1,14 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
-using AkkoBot.Credential;
+using AkkoBot.Config;
+using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Commands.Modules.Self.Services
@@ -40,14 +38,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Gets the bot's global settings.
         /// </summary>
         /// <returns>The bot settings.</returns>
-        public BotConfigEntity GetConfig()
+        public BotConfig GetConfig()
             => _dbCache.BotConfig;
 
         /// <summary>
         /// Gets the bot's log settings.
         /// </summary>
         /// <returns>The log settings.</returns>
-        public LogConfigEntity GetLogConfig()
+        public LogConfig GetLogConfig()
             => _dbCache.LogConfig;
 
         /// <summary>
@@ -66,16 +64,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Gets or sets the specified bot configuration.
         /// </summary>
         /// <param name="selector">A method to get or set the property.</param>
-        public async Task<T> GetOrSetPropertyAsync<T>(Func<BotConfigEntity, T> selector)
+        /// <returns>The targeted property.</returns>
+        public T GetOrSetProperty<T>(Func<BotConfig, T> selector)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var configLoader = _services.GetService<ConfigLoader>();
 
             // Change the cached settings
             var result = selector(_dbCache.BotConfig);
-
-            // Set the database entry to the modified cached settings
-            db.BotConfig.Update(_dbCache.BotConfig);
-            await db.SaveChangesAsync();
+            configLoader.SaveConfig(_dbCache.BotConfig, AkkoEnvironment.BotConfigPath);
 
             return result;
         }
@@ -84,16 +80,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Gets or sets the specified bot configuration.
         /// </summary>
         /// <param name="selector">A method to get or set the property.</param>
-        public async Task<T> GetOrSetPropertyAsync<T>(Func<LogConfigEntity, T> selector)
+        /// <returns>The targeted property.</returns>
+        public T GetOrSetProperty<T>(Func<LogConfig, T> selector)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            var configLoader = _services.GetService<ConfigLoader>();
 
             // Change the cached settings
             var result = selector(_dbCache.LogConfig);
-
-            // Set the database entry to the modified cached settings
-            db.Update(_dbCache.LogConfig);
-            await db.SaveChangesAsync();
+            configLoader.SaveConfig(_dbCache.LogConfig, AkkoEnvironment.LogConfigPath);
 
             return result;
         }

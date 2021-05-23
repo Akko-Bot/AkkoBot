@@ -1,4 +1,5 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Common;
+using AkkoBot.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace AkkoBot.Services.Database.Abstractions
     /// <summary>
     /// Represents a database table.
     /// </summary>
-    public abstract class DbEntity
+    public abstract class DbEntity : Settings
     {
         /// <summary>
         /// The primary key of this entity.
@@ -28,7 +29,7 @@ namespace AkkoBot.Services.Database.Abstractions
         /// </summary>
         /// <remarks><see cref="Id"/>, <see cref="DateAdded"/>, relationship properties and collections are removed.</remarks>
         /// <returns>A dictionary of setting name/value pairs.</returns>
-        public virtual IReadOnlyDictionary<string, string> GetSettings()
+        public override IReadOnlyDictionary<string, string> GetSettings()
         {
             var props = this.GetType()
                 .GetProperties()

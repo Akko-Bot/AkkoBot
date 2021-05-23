@@ -1,4 +1,4 @@
-using AkkoBot.Services.Database.Entities;
+using AkkoBot.Config;
 using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Services.Logging.Abstractions
@@ -19,6 +19,6 @@ namespace AkkoBot.Services.Logging.Abstractions
         /// Updates the loggers registered in this provider with the specified settings.
         /// </summary>
         /// <param name="logConfig">The log settings.</param>
-        void UpdateLoggers(LogConfigEntity logConfig);
+        void UpdateLoggers(LogConfig logConfig);
     }
 }

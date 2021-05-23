@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace AkkoBot.Services.Database.Abstractions
 {
@@ -32,12 +31,5 @@ namespace AkkoBot.Services.Database.Abstractions
         /// Defines the amount of time an interactive command waits for user input.
         /// </summary>
         TimeSpan? InteractiveTimeout { get; }
-
-        /// <summary>
-        /// Gets all properties from this table.
-        /// </summary>
-        /// <remarks><c>Id</c>, <c>DateAdded</c>, relationship properties and collections are removed.</remarks>
-        /// <returns>A dictionary of setting name/value pairs.</returns>
-        IReadOnlyDictionary<string, string> GetSettings();
     }
 }

@@ -1,4 +1,4 @@
-using AkkoBot.Services.Database.Entities;
+using AkkoBot.Config;
 using AkkoBot.Services.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
 using System;
@@ -54,7 +54,7 @@ namespace AkkoBot.Services.Logging.Loggers
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            if (state is not null and LogConfigEntity logConfig)
+            if (state is not null and LogConfig logConfig)
             {
                 _minimumLevel = logConfig.LogLevel;
                 _logFormat = logConfig.LogFormat;

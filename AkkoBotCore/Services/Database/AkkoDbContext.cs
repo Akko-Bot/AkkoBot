@@ -9,9 +9,7 @@ namespace AkkoBot.Services.Database
     public sealed class AkkoDbContext : DbContext
     {
         public DbSet<DiscordUserEntity> DiscordUsers { get; init; }
-        public DbSet<BotConfigEntity> BotConfig { get; init; }
         public DbSet<GuildConfigEntity> GuildConfig { get; init; }
-        public DbSet<LogConfigEntity> LogConfig { get; init; }
         public DbSet<TimerEntity> Timers { get; init; }
         public DbSet<MutedUserEntity> MutedUsers { get; init; }
         public DbSet<WarnEntity> Warnings { get; init; }
@@ -36,12 +34,6 @@ namespace AkkoBot.Services.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region Global Configuration
-
-            modelBuilder.Entity<BotConfigEntity>()
-                .HasKey(x => x.Id);
-
-            modelBuilder.Entity<LogConfigEntity>()
-                .HasKey(x => x.Id);
 
             modelBuilder.Entity<BlacklistEntity>()
                 .HasAlternateKey(g => g.ContextId);

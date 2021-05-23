@@ -1,4 +1,4 @@
-﻿using AkkoBot.Services.Database.Entities;
+﻿using AkkoBot.Config;
 using AkkoBot.Services.Logging.Abstractions;
 using AkkoBot.Services.Logging.Loggers;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +26,8 @@ namespace AkkoBot.Services.Logging
         /// <param name="minLogLevel">Defines the minimum level of logging. Default is <see cref="LogLevel.Information"/>.</param>
         /// <param name="fileLogger">Defines the file logger for logging to a text file. Default is <see langword="null"/> for no logging.</param>
         /// <param name="logFormat">Defines the type of <see cref="ILogger"/> that should be created. Default is "Default".</param>
-        public AkkoLoggerProvider(LogLevel minLogLevel, string logFormat, string timeFormat, IFileLogger fileLogger = null)
+        /// <param name="timeFormat">The time format to be used on timestamps.</param>
+        public AkkoLoggerProvider(LogLevel minLogLevel, IFileLogger fileLogger = default, string logFormat = default, string timeFormat = default)
         {
             _minLogLevel = minLogLevel;
             _logFormat = logFormat;
@@ -44,7 +45,7 @@ namespace AkkoBot.Services.Logging
             return logger;
         }
 
-        public void UpdateLoggers(LogConfigEntity logConfig)
+        public void UpdateLoggers(LogConfig logConfig)
         {
             _minLogLevel = logConfig.LogLevel;
             _logFormat = logConfig.LogFormat;

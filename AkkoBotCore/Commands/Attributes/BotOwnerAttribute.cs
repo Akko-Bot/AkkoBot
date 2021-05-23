@@ -1,4 +1,4 @@
-using AkkoBot.Credential;
+using AkkoBot.Config;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.DependencyInjection;

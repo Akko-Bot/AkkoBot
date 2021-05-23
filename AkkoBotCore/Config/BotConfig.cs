@@ -1,36 +1,29 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Common;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
-using Microsoft.EntityFrameworkCore;
+using ConcurrentCollections;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AkkoBot.Services.Database.Entities
+namespace AkkoBot.Config
 {
     /// <summary>
     /// Stores settings related to the bot.
     /// </summary>
-    [Comment("Stores settings related to the bot.")]
-    public class BotConfigEntity : DbEntity, IMessageSettings
+    public class BotConfig : Settings, IMessageSettings
     {
         private string _locale = AkkoLocalizer.DefaultLanguage;
-        private string _botPrefix = "!";
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
 
         /// <summary>
         /// Groups the qualified name of all commands that have been disabled.
         /// </summary>
-        public List<string> DisabledCommands { get; init; } = new();
+        public ConcurrentHashSet<string> DisabledCommands { get; init; } = new();
 
         /// <summary>
         /// The default bot locale.
         /// </summary>
-        [Required]
-        [MaxLength(10)]
-        [Column(TypeName = "varchar(10)")]
         public string Locale
         {
             get => _locale;
@@ -40,20 +33,11 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The default bot prefix.
         /// </summary>
-        [Required]
-        [MaxLength(15)]
-        public string BotPrefix
-        {
-            get => _botPrefix;
-            set => _botPrefix = value?.MaxLength(15);
-        }
+        public string BotPrefix { get; set; } = "!";
 
         /// <summary>
         /// The default color for embeds.
         /// </summary>
-        [Required]
-        [StringLength(6)]
-        [Column(TypeName = "varchar(6)")]
         public string OkColor
         {
             get => _okColor;
@@ -63,9 +47,6 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The default color for error embeds.
         /// </summary>
-        [Required]
-        [StringLength(6)]
-        [Column(TypeName = "varchar(6)")]
         public string ErrorColor
         {
             get => _errorColor;
@@ -115,10 +96,6 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// Defines the maximum amount of time that an interactive command waits for user input.
         /// </summary>
-        [Required]
         public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(30);
-
-        // Implement forward dms to owners?
-        // Might be an issue for "message staff" type of features
     }
 }

@@ -36,7 +36,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
             var logFolderSize = new DirectoryInfo(AkkoEnvironment.LogsDirectory)
                 .EnumerateFiles("*.txt", SearchOption.AllDirectories)
                 .Sum(x => x.Length);
-            
+
             var embed = new DiscordEmbedBuilder()
                 .AddField("db_cache", $"{dbCache / MB:0.00} MB", true)
                 .AddField("timers", $"{timers / MB:0.00} MB", true)

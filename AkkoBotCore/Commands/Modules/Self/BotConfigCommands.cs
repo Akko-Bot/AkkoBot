@@ -3,10 +3,9 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
-using AkkoBot.Credential;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
-using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Logging;
 using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus.CommandsNext;
@@ -23,12 +22,12 @@ namespace AkkoBot.Commands.Modules.Self
     [BotOwner]
     [Group("botconfig"), Aliases("self", "bot")]
     [Description("cmd_config")]
-    public class BotConfig : AkkoCommandModule
+    public class BotConfigCommands : AkkoCommandModule
     {
         private readonly BotConfigService _botService;
         private readonly GuildConfigService _guildService;
 
-        public BotConfig(BotConfigService botService, GuildConfigService guildService)
+        public BotConfigCommands(BotConfigService botService, GuildConfigService guildService)
         {
             _botService = botService;
             _guildService = guildService;
@@ -152,19 +151,19 @@ namespace AkkoBot.Commands.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
-        private async Task ChangeProperty<T>(CommandContext context, Func<BotConfigEntity, T> selector)
+        private async Task ChangeProperty<T>(CommandContext context, Func<BotConfig, T> selector)
         {
-            await _botService.GetOrSetPropertyAsync(selector);
+            _botService.GetOrSetProperty(selector);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }
 
         [Group("log"), Aliases("logs", "logging")]
         [Description("cmd_config_log")]
-        public class LogConfig : AkkoCommandModule
+        public class LogConfigCommands : AkkoCommandModule
         {
             private readonly BotConfigService _service;
 
-            public LogConfig(BotConfigService service)
+            public LogConfigCommands(BotConfigService service)
                 => _service = service;
 
             [Command("level")]
@@ -229,7 +228,7 @@ namespace AkkoBot.Commands.Modules.Self
                 if (isEnabled && isEnabled != wasEnabled)
                 {
                     var logConfig = _service.GetLogConfig();
-                    var fileLogger = new AkkoFileLogger(logConfig.LogSizeMB, logConfig.LogTimeStamp);
+                    var fileLogger = new AkkoFileLogger(logConfig.LogSizeMb, logConfig.LogTimeStamp);
                     context.Services.GetService<IAkkoLoggerProvider>().UpdateFileLogger(fileLogger);
                 }
                 else if (!isEnabled)
@@ -240,15 +239,15 @@ namespace AkkoBot.Commands.Modules.Self
             [Description("cmd_config_log_size")]
             public async Task SetFileMaxSize(CommandContext context, [Description("arg_double")] double size)
             {
-                await ChangeProperty(context, x => x.LogSizeMB = size);
+                await ChangeProperty(context, x => x.LogSizeMb = size);
 
                 if (context.Client.Logger.BeginScope(null) is IFileLogger fileLogger)
                     fileLogger.FileSizeLimitMB = size;
             }
 
-            private async Task ChangeProperty<T>(CommandContext context, Func<LogConfigEntity, T> selector)
+            private async Task ChangeProperty<T>(CommandContext context, Func<LogConfig, T> selector)
             {
-                await _service.GetOrSetPropertyAsync(selector);
+                _service.GetOrSetProperty(selector);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
             }
         }
@@ -279,11 +278,11 @@ namespace AkkoBot.Commands.Modules.Self
                     await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
             }
 
-            [Command("remove"), Aliases("rem")]
+            [Command("remove"), Aliases("rm")]
             [Description("cmd_config_owner_rem")]
             public async Task RemoveOwner(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
             {
-                if (_creds.OwnerIds.Remove(user.Id))
+                if (_creds.OwnerIds.TryRemove(user.Id))
                 {
                     using var writer = _service.SerializeCredentials(_creds);
                     await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);

@@ -195,7 +195,7 @@ namespace AkkoBot.Commands.Modules.Administration
         private async Task CheckPrefixAsync(CommandContext context)
         {
             var prefix = await _guildService.GetOrSetPropertyAsync(context.Guild, x => x?.Prefix)
-                ?? await _botService.GetOrSetPropertyAsync(x => x.BotPrefix);
+                ?? _botService.GetOrSetProperty(x => x.BotPrefix);
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
             var embed = new DiscordEmbedBuilder()

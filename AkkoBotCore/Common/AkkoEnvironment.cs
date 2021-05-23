@@ -40,6 +40,16 @@ namespace AkkoBot.Common
         public static string CredsPath { get; } = CredsDirectory + "credentials.yaml";
 
         /// <summary>
+        /// Gets the fully qualified path for the bot's configuration file.
+        /// </summary>
+        public static string BotConfigPath { get; } = CredsDirectory + "bot_config.yaml";
+
+        /// <summary>
+        /// Gets the fully qualified path for the log configuration file.
+        /// </summary>
+        public static string LogConfigPath { get; } = CredsDirectory + "log_config.yaml";
+
+        /// <summary>
         /// Gets either the absolute or relative path for <paramref name="filePath"/>.
         /// </summary>
         /// <param name="filePath">Relative or absolute directory path to the file.</param>
