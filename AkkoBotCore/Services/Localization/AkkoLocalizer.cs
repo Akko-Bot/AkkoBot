@@ -1,6 +1,7 @@
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -125,6 +126,20 @@ namespace AkkoBot.Services.Localization
                 _localizedStrings.TryAdd(GetFileLocale(file), lStrings);
                 reader.Dispose();
             }
+        }
+
+        public void Dispose()
+        {
+            foreach (var stringGroup in _localizedStrings.Values.Cast<Dictionary<string, string>>())
+            {
+                stringGroup.Clear();
+                stringGroup.TrimExcess();
+            }
+
+            _localizedStrings.Clear();
+            _localizedStrings.TrimExcess();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

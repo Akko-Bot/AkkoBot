@@ -1,9 +1,7 @@
 ﻿using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Core.Common;
-using AkkoBot.Services.Logging.Abstractions;
 using DSharpPlus;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -11,11 +9,25 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Core
 {
-    public class Bot
+    /// <summary>
+    /// Represents a bot that connects to Discord.
+    /// </summary>
+    public class Bot : IDisposable
     {
-        public static CancellationTokenSource ShutdownToken { get; } = new();
+        private BotCore _botCore;
+        private readonly CancellationToken _cToken;
 
-        public async Task MainAsync()
+        /// <summary>
+        /// Initializes a Discord bot.
+        /// </summary>
+        /// <param name="cToken">Cancellation token to signal the bot to stop running.</param>
+        public Bot(CancellationToken cToken)
+            => _cToken = cToken;
+
+        /// <summary>
+        /// Initializes a bot and connects it to Discord.
+        /// </summary>
+        public async Task RunAsync()
         {
             // Load up credentials
             var configLoader = new ConfigLoader();
@@ -24,29 +36,45 @@ namespace AkkoBot.Core
             var logConfig = configLoader.GetConfig<LogConfig>(AkkoEnvironment.LogConfigPath);
 
             // Initialize bot configuration
-            var botCore = await new BotCoreBuilder(creds, botConfig, logConfig)
+            _botCore = await new BotCoreBuilder(creds, botConfig, logConfig)
                 .WithSingletonServices(configLoader)
                 .WithDefaultLogging()
                 .WithDefaultServices()
                 .WithDefaultDbContext()
                 .BuildDefaultAsync();
 
+            await ConnectAsync(_cToken);
+        }
+
+        /// <summary>
+        /// Connects this bot to Discord.
+        /// </summary>
+        /// <param name="cToken">Cancellation token to signal the bot to stop running.</param>
+        private async Task ConnectAsync(CancellationToken cToken)
+        {
             try
             {
                 // Connect to Discord
-                await botCore.BotShardedClient.StartAsync();
+                await _botCore.BotShardedClient.StartAsync();
 
                 // Block the program until it is closed.
-                await Task.Delay(Timeout.Infinite, ShutdownToken.Token);
+                await Task.Delay(Timeout.Infinite, cToken);
             }
             catch (TaskCanceledException)
             {
-                botCore.CommandExt[0].Services.GetService<IAkkoLoggerProvider>()?.Dispose();
                 Console.WriteLine();
+
+                if (Program.RestartBot)
+                {
+                    _botCore.BotShardedClient.Logger.LogWarning(
+                        new EventId(LoggerEvents.ConnectionClose.Id, "Restart"),
+                        @"A restart has been requested."
+                    );
+                }
             }
             catch (Exception ex)
             {
-                botCore.BotShardedClient.Logger.LogError(
+                _botCore.BotShardedClient.Logger.LogError(
                     new EventId(LoggerEvents.ConnectionFailure.Id, "Startup"),
                     @"An error has occurred while attempting to connect to Discord. " +
                     @"Make sure your credentials are correct and that you don't have " +
@@ -56,6 +84,12 @@ namespace AkkoBot.Core
 
                 Console.ReadLine();
             }
+        }
+
+        public void Dispose()
+        {
+            _botCore?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

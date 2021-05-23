@@ -1,6 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
-using AkkoBot.Core;
 using AkkoBot.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -38,12 +37,27 @@ namespace AkkoBot.Commands.Modules.Basic
 
             // Clean-up
             foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
-            {
                 await client.DisconnectAsync();
-                client.Dispose();
-            }
 
-            Bot.ShutdownToken.Cancel();
+            Program.RestartBot = false;
+            Program.ShutdownToken.Cancel();
+        }
+
+        [BotOwner]
+        [Command("restart")]
+        [Description("Restarts the bot.")]
+        public async Task Restart(CommandContext context)
+        {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription("restart");
+
+            await context.RespondLocalizedAsync(embed);
+
+            // Clean-up
+            foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
+                await client.DisconnectAsync();
+
+            Program.ShutdownToken.Cancel();
         }
 
         [Command("uptime")]
