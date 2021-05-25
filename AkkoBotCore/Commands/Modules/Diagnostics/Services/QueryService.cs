@@ -49,7 +49,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
         /// <param name="query">The SQL query to be run.</param>
         /// <returns>A collection of columns from the resulting query.</returns>
         /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
-        public async Task<List<SerializableEmbedField>> RunSelectQueryAsync(string query)
+        public async Task<IReadOnlyCollection<SerializableEmbedField>> RunSelectQueryAsync(string query)
         {
             var result = new List<SerializableEmbedField>();
             var fieldBuilders = new List<StringBuilder>();

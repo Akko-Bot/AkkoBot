@@ -3,6 +3,7 @@ using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -116,7 +117,18 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_repeat_list")]
         public async Task ListRepeaters(CommandContext context)
         {
-            var repeaters = await _service.GetRepeatersAsync(context.Guild);
+            var repeaters = await _service.GetRepeatersAsync(
+                context.Guild,
+                null,
+                x => new RepeaterEntity()
+                {
+                    Id = x.Id,
+                    TimerId = x.TimerId,
+                    Content = x.Content,
+                    ChannelId = x.ChannelId
+                }
+            );
+
             var embed = new DiscordEmbedBuilder();
 
             if (repeaters.Count is 0)

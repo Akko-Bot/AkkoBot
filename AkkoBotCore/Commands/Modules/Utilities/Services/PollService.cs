@@ -130,7 +130,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// </summary>
         /// <param name="server">The Discord guild.</param>
         /// <returns>A collection of polls.</returns>
-        public ConcurrentHashSet<PollEntity> GetPolls(DiscordGuild server)
+        public IReadOnlyCollection<PollEntity> GetPolls(DiscordGuild server)
         {
             _dbCache.Polls.TryGetValue(server.Id, out var polls);
             return polls ?? new(1, 0);
@@ -253,19 +253,23 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 throw new ArgumentException("Numeric polls must have at least 2 options.", nameof(result));
 
             msgBuilder.Content = oldMessage.Content;
+            var descriptionBuilder = new StringBuilder(
+                (oldMessage.Embeds.Count >= 1)
+                    ? string.Empty
+                    : oldMessage.Content[..(oldMessage.Content.IndexOf(poll.Question) + poll.Question.Length + 2)] + "\n\n"
+            );
+
+            foreach (var reaction in result.OrderByDescending(x => x.Count))
+            {
+                var answerIndex = GetNumericEmojiValue(reaction.Emoji) - 1;
+                descriptionBuilder.AppendLine($"{poll.Answers[answerIndex]} {context.FormatLocalized("with_votes", reaction.Count - 1)}");
+            }
 
             if (oldMessage.Embeds.Count >= 1)
             {
                 // Message with embed
-                var descriptionBuilder = new StringBuilder();
                 var newEmbed = new DiscordEmbedBuilder(oldMessage.Embeds[0])
                     .WithUrl(oldMessage.JumpLink.AbsoluteUri);
-
-                foreach (var reaction in result.OrderByDescending(x => x.Count))
-                {
-                    var answerIndex = GetNumericEmojiValue(reaction.Emoji) - 1;
-                    descriptionBuilder.AppendLine($"{poll.Answers[answerIndex]} {context.FormatLocalized("with_votes", reaction.Count - 1)}");
-                }
 
                 newEmbed.Description = descriptionBuilder.ToString();
                 msgBuilder.Embed = newEmbed;
@@ -273,14 +277,6 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             else
             {
                 // Message without embed
-                var descriptionBuilder = new StringBuilder(oldMessage.Content[..(oldMessage.Content.IndexOf(poll.Question) + poll.Question.Length + 2)] + "\n\n");
-
-                foreach (var reaction in result.OrderByDescending(x => x.Count))
-                {
-                    var answerIndex = GetNumericEmojiValue(reaction.Emoji) - 1;
-                    descriptionBuilder.AppendLine($"{poll.Answers[answerIndex]} {context.FormatLocalized("with_votes", reaction.Count - 1)}");
-                }
-
                 descriptionBuilder.AppendLine(oldMessage.JumpLink.AbsoluteUri);
                 msgBuilder.Content = descriptionBuilder.ToString();
             }
@@ -299,47 +295,34 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         private DiscordMessageBuilder GenerateAnonymousPollResult(CommandContext context, DiscordMessageBuilder msgBuilder, DiscordMessage oldMessage, PollEntity poll)
         {
             msgBuilder.Content = oldMessage.Content;
+            var counter = 0;
+            var answers = poll.Answers.ToDictionary(x => x, y => poll.Votes[counter++]);
+            var descriptionBuilder = new StringBuilder(
+                (oldMessage.Embeds.Count >= 1)
+                    ? string.Empty
+                    : oldMessage.Content[..(oldMessage.Content.IndexOf(poll.Question) + poll.Question.Length + 2)] + "\n\n"
+            );
+
+            foreach (var answer in answers.OrderByDescending(x => x.Value))
+                descriptionBuilder.AppendLine($"{answer.Key} {context.FormatLocalized("with_votes", answer.Value)}");
 
             if (oldMessage.Embeds.Count >= 1)
             {
                 // Message with embed
-                var descriptionBuilder = new StringBuilder();
                 var newEmbed = new DiscordEmbedBuilder(oldMessage.Embeds[0])
                     .WithUrl(oldMessage.JumpLink.AbsoluteUri);
 
-                var counter = 0;
-                var answers = new Dictionary<string, int>(poll.Answers.Length);
-
-                foreach (var answer in poll.Answers)
-                    answers.TryAdd(answer, poll.Votes[counter++]);
-
-                foreach (var answer in answers.OrderByDescending(x => x.Value))
-                    descriptionBuilder.AppendLine($"{answer.Key} {context.FormatLocalized("with_votes", answer.Value)}");
-
                 newEmbed.Description = descriptionBuilder.ToString();
                 msgBuilder.Embed = newEmbed;
-
-                answers.Clear();
             }
             else
             {
                 // Message without embed
-                var descriptionBuilder = new StringBuilder(oldMessage.Content[..(oldMessage.Content.IndexOf(poll.Question) + poll.Question.Length + 2)] + "\n\n");
-
-                var counter = 0;
-                var answers = new Dictionary<string, int>(poll.Answers.Length);
-
-                foreach (var answer in poll.Answers)
-                    answers.TryAdd(answer, poll.Votes[counter++]);
-
-                foreach (var answer in answers.OrderByDescending(x => x.Value))
-                    descriptionBuilder.AppendLine($"{answer.Key} {context.FormatLocalized("with_votes", answer.Value)}");
-
                 descriptionBuilder.AppendLine(oldMessage.JumpLink.AbsoluteUri);
                 msgBuilder.Content = descriptionBuilder.ToString();
-
-                answers.Clear();
             }
+
+            answers.Clear();
 
             return msgBuilder;
         }

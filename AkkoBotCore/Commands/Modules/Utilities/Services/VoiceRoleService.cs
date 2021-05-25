@@ -76,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// </summary>
         /// <param name="server">The Discord guild the roles are from.</param>
         /// <returns>A collection of voice roles.</returns>
-        public async Task<List<VoiceRoleEntity>> GetVoiceRolesAsync(DiscordGuild server)
+        public async Task<IReadOnlyCollection<VoiceRoleEntity>> GetVoiceRolesAsync(DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
             var dbGuild = await db.GuildConfig.GetGuildWithVoiceRolesAsync(server.Id);

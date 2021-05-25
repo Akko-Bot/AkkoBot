@@ -9,7 +9,9 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Utilities.Services
@@ -117,12 +119,24 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="user">The user to get the reminders for.</param>
         /// <remarks>The list is ordered by elapse time, in ascending order.</remarks>
         /// <returns>A collection of reminders."/></returns>
-        public async Task<ReminderEntity[]> GetRemindersAsync(DiscordUser user)
+        public async Task<IReadOnlyCollection<ReminderEntity>> GetRemindersAsync(DiscordUser user)
+            => await GetRemindersAsync(user, x => x);
+
+        /// <summary>
+        /// Gets a collection of <typeparamref name="T"/> from the reminder entries in the database.
+        /// </summary>
+        /// <typeparam name="T">The selected returning type.</typeparam>
+        /// <param name="user">The user to get the reminders for.</param>
+        /// <param name="selector">Expression tree to select the columns to be returned.</param>
+        /// <returns>A collection of <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
+        public async Task<IReadOnlyCollection<T>> GetRemindersAsync<T>(DiscordUser user, Expression<Func<ReminderEntity, T>> selector)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             return await db.Reminders.Fetch(x => x.AuthorId == user.Id)
                 .OrderBy(x => x.ElapseAt)
+                .Select(selector)
                 .ToArrayAsync();
         }
     }

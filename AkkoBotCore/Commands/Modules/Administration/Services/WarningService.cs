@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -127,7 +128,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">Discord guild to get the punishments from.</param>
         /// <returns>A collection of server punishments.</returns>
-        public async Task<WarnPunishEntity[]> GetServerPunishmentsAsync(DiscordGuild server)
+        public async Task<IReadOnlyCollection<WarnPunishEntity>> GetServerPunishmentsAsync(DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
             var punishments = await db.WarnPunishments.AsNoTracking()
@@ -269,8 +270,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id, type);
-            var dbUser = await db.DiscordUsers.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var dbUser = await db.DiscordUsers.Fetch(x => x.UserId == user.Id)
+                .FirstOrDefaultAsync();
 
             return (dbGuild, dbUser);
         }
@@ -286,8 +287,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await db.GuildConfig.GetGuildWithWarningsAsync(server.Id, user.Id);
-            var dbUser = await db.DiscordUsers.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var dbUser = await db.DiscordUsers.Fetch(x => x.UserId == user.Id)
+                .FirstOrDefaultAsync();
 
             return (dbGuild, dbUser);
         }

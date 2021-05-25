@@ -9,6 +9,8 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Self
             [Description("arg_ulong_id")] ulong id,
             [RemainingText] string reason = null)
         {
-            var (entry, success) = await _service.AddOrUpdateAsync(context, type, id, reason);
+            var (entry, success) = await _service.AddBlacklistAsync(context, type, id, reason);
 
             var entryName = (string.IsNullOrEmpty(entry.Name))
                 ? context.FormatLocalized("unknown")
@@ -70,10 +72,10 @@ namespace AkkoBot.Commands.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
-        [Command("add")]
+        [Command("addmany")]
         public async Task MassBlacklist(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
-            var amount = await _service.AddRangeAsync(ids);
+            var amount = await _service.AddBlacklistsAsync(ids);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("bl_added_range", amount));
@@ -86,7 +88,7 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_blacklist_rem")]
         public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
-            var (entry, success) = await _service.TryRemoveAsync(id);
+            var (entry, success) = await _service.RemoveBlacklistAsync(id);
 
             var entryName = (string.IsNullOrEmpty(entry?.Name))
                 ? context.FormatLocalized("unknown")
@@ -98,19 +100,19 @@ namespace AkkoBot.Commands.Modules.Self
                 .WithDescription(
                     context.FormatLocalized(
                         (success) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓
-                        entry?.Type.ToString().ToSnakeCase(),        // User, Channel, Server or Unspecified
+                        entry?.Type.ToString().ToSnakeCase(),       // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),                  // Name or Unknown
-                        Formatter.InlineCode(id.ToString())    // ID
+                        Formatter.InlineCode(id.ToString())         // ID
                     )
                 );
 
             await context.RespondLocalizedAsync(embed);
         }
 
-        [Command("remove")]
+        [Command("removemany")]
         public async Task MassRemove(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
-            var amount = await _service.RemoveRangeAsync(ids);
+            var amount = await _service.RemoveBlacklistsAsync(ids);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("bl_removed_range", amount));
@@ -123,9 +125,10 @@ namespace AkkoBot.Commands.Modules.Self
         public async Task BlacklistList(CommandContext context, [Description("arg_bltype")] BlacklistType? type = null)
         {
             // Get the blacklist. Returns an empty collection if there is nothing there.
-            var blacklist = (type is null)
-                ? await _service.GetAsync()
-                : await _service.GetAsync(b => b.Type == type.Value);
+            var blacklist = await _service.GetBlacklistAsync(
+                (type is null) ? null : x => x.Type == type.Value,
+                y => new BlacklistEntity() { ContextId = y.ContextId, Type = y.Type, Name = y.Name }
+            );
 
             var unknown = context.FormatLocalized("unknown");
             var fields = new List<SerializableEmbedField>();
@@ -134,7 +137,7 @@ namespace AkkoBot.Commands.Modules.Self
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("bl_title");
 
-            if (blacklist.Length == 0)
+            if (blacklist.Count == 0)
                 embed.WithDescription("bl_empty");
             else
             {
@@ -154,7 +157,7 @@ namespace AkkoBot.Commands.Modules.Self
         public async Task BlacklistClear(CommandContext context)
         {
             // If blacklist is empty, return error
-            if ((await _service.GetAsync()).Length == 0)
+            if (!_service.HasBlacklists)
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription("bl_empty");
@@ -175,7 +178,7 @@ namespace AkkoBot.Commands.Modules.Self
             // Send the interactive message and perform the action if user confirms it
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
-                var rows = await _service.ClearAsync();
+                var rows = await _service.ClearBlacklistsAsync();
 
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription(context.FormatLocalized("bl_clear", rows));
@@ -188,7 +191,8 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_bl_check")]
         public async Task BlacklistCheck(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
-            var entity = (await _service.GetAsync(x => x.ContextId == id)).FirstOrDefault();
+            var entity = (await _service.GetBlacklistAsync(x => x.ContextId == id))
+                .FirstOrDefault();
 
             if (entity is null)
             {
@@ -200,7 +204,7 @@ namespace AkkoBot.Commands.Modules.Self
             else
             {
                 var embed = new DiscordEmbedBuilder()
-                    .AddField("name", entity.Name.ToString(), true)
+                    .AddField("name", entity.Name?.ToString() ?? context.FormatLocalized("unknown"), true)
                     .AddField("type", entity.Type.ToString(), true)
                     .AddField("id", entity.ContextId.ToString(), true)
                     .AddField("reason", string.IsNullOrWhiteSpace(entity.Reason) ? "-" : entity.Reason, false);

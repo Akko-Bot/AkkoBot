@@ -12,7 +12,7 @@ namespace AkkoBot.Services.Localization.Abstractions
         /// <summary>
         /// Gets all registered locale keys.
         /// </summary>
-        Dictionary<string, IReadOnlyDictionary<string, string>>.KeyCollection Locales { get; }
+        IReadOnlyCollection<string> Locales { get; }
 
         /// <summary>
         /// Checks if a given locale is registered.

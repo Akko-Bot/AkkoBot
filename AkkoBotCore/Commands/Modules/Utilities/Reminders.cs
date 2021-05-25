@@ -2,6 +2,7 @@
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -88,11 +89,20 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_remind_list")]
         public async Task ListReminders(CommandContext context)
         {
-            var reminders = await _service.GetRemindersAsync(context.User);
+            var reminders = await _service.GetRemindersAsync(
+                context.User,
+                x => new ReminderEntity() 
+                { 
+                    Id = x.Id,
+                    ChannelId = x.ChannelId,
+                    Content = x.Content,
+                    ElapseAt = x.ElapseAt 
+                }
+            );
 
             var embed = new DiscordEmbedBuilder();
 
-            if (reminders.Length == 0)
+            if (reminders.Count == 0)
             {
                 embed.WithDescription("reminder_list_empty");
                 await context.RespondLocalizedAsync(embed, isError: true);

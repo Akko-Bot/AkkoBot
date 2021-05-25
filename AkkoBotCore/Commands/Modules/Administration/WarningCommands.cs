@@ -259,7 +259,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("warnpl_title");
 
-            if (punishments.Length == 0)
+            if (punishments.Count == 0)
             {
                 embed.WithDescription("warnpl_empty");
                 await context.RespondLocalizedAsync(embed, false, true);

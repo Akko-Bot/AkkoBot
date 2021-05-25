@@ -78,7 +78,8 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_autocommand_list")]
         public async Task ListAutoCommands(CommandContext context)
         {
-            var reminders = await _service.GetAutoCommandsAsync(context.User);
+            var reminders = (await _service.GetAutoCommandsAsync(context.User))
+                .OrderBy(x => _service.GetElapseTime(x));
 
             var embed = new DiscordEmbedBuilder();
 

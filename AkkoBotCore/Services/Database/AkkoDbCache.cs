@@ -3,6 +3,7 @@ using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Services.Database
 {
     /// <summary>
-    /// This class acts as a singleton cache for UoW objects.
+    /// This class caches entries retrieved from the database.
     /// </summary>
     public class AkkoDbCache : IDbCache
     {
@@ -48,22 +49,24 @@ namespace AkkoBot.Services.Database
             _services = services;
             BotConfig = services.GetService<BotConfig>();
             LogConfig = services.GetService<LogConfig>();
-            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
-            PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
-            CooldownCommands = services.GetService<ICommandCooldown>().LoadFromEntities(dbContext.CommandCooldown.AsEnumerable());
+            Blacklist = dbContext.Blacklist.AsNoTracking().Select(x => x.ContextId).ToConcurrentHashSet();
+            PlayingStatuses = dbContext.PlayingStatuses.Fetch(x => x.RotationTime != TimeSpan.Zero).ToList();
+            CooldownCommands = services.GetService<ICommandCooldown>().LoadFromEntities(dbContext.CommandCooldown.Fetch());
 
             Aliases = dbContext.Aliases
+                .AsNoTracking()
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
 
             Polls = dbContext.Polls
+                .AsNoTracking()
                 .SplitBy(x => x.GuildIdFK)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
 
             Repeaters = dbContext.Repeaters
-                .Where(x => x.Interval <= TimeSpan.FromDays(1))
+                .Fetch(x => x.Interval <= TimeSpan.FromDays(1))
                 .SplitBy(x => x.GuildIdFK)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);

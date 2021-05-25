@@ -7,6 +7,7 @@ using ConcurrentCollections;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -111,7 +112,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord guild.</param>
         /// <returns>A collection of content filters.</returns>
-        public ConcurrentHashSet<FilteredContentEntity> GetContentFilters(DiscordGuild server)
+        public IReadOnlyCollection<FilteredContentEntity> GetContentFilters(DiscordGuild server)
         {
             _dbCache.FilteredContent.TryGetValue(server.Id, out var filters);
             return filters ?? new(1, 0);

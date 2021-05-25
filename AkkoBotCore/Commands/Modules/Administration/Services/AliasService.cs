@@ -9,6 +9,7 @@ using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -123,7 +124,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             db.RemoveRange(aliases);
             aliases.Clear();
 
-            return (await db.SaveChangesAsync()) is not 0;
+            return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="sid">The ID of the Discord server, <see langword="null"/> to get global aliases.</param>
         /// <returns>A collection of aliases.</returns>
-        public ConcurrentHashSet<AliasEntity> GetAliases(ulong? sid)
+        public IReadOnlyCollection<AliasEntity> GetAliases(ulong? sid)
         {
             _dbCache.Aliases.TryGetValue(sid ?? default, out var aliases);
             return aliases ?? new(1, 0);

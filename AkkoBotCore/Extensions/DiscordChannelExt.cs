@@ -82,7 +82,10 @@ namespace AkkoBot.Extensions
         /// <param name="channel">This Discord channel.</param>
         /// <param name="client">The Discord client that contains the cached messages.</param>
         /// <param name="amount">The amount of messages to fetch.</param>
-        /// <remarks>This method gets messages from the cache and only calls the API if they are enough to satisfy <paramref name="amount"/>.</remarks>
+        /// <remarks>
+        /// This method gets messages from the cache and only calls the API if they are enough to satisfy <paramref name="amount"/>.
+        /// Messages that get deleted on Discord persist on the cache until they are overwritten by newer messages.
+        /// </remarks>
         /// <returns>A collection of Discord messages, sorted from most recent to oldest.</returns>
         /// <exception cref="UnauthorizedException">Occurs when the client has no permission to see the content of this Discord channel.</exception>
         /// <exception cref="NotFoundException">Occurs when the client has no access to this Discord channel or when the channel has no messages.</exception>
@@ -104,7 +107,7 @@ namespace AkkoBot.Extensions
             else
             {
                 return messages.Concat(
-                    (await channel.GetMessagesBeforeAsync(messages.FirstOrDefault().Id, amount - messagesCount))
+                    (await channel.GetMessagesBeforeAsync(messages.LastOrDefault().Id, amount - messagesCount))
                         .OrderByDescending(x => x.Id)
                 );
             }

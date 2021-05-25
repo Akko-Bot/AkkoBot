@@ -92,7 +92,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// Gets all cached rotating statuses.
         /// </summary>
         /// <returns>A collection of statuses.</returns>
-        public List<PlayingStatusEntity> GetStatuses()
+        public IReadOnlyCollection<PlayingStatusEntity> GetStatuses()
             => _dbCache.PlayingStatuses;
 
         /// <summary>
@@ -103,13 +103,10 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db); ;
 
-            var dbEntries = await db.PlayingStatuses.Fetch().ToArrayAsync();
-            db.RemoveRange(dbEntries);
+            db.RemoveRange(db.PlayingStatuses.Fetch());
             _dbCache.PlayingStatuses.Clear();
 
-            await db.SaveChangesAsync();
-
-            return dbEntries.Length;
+            return await db.SaveChangesAsync();
         }
 
         /// <summary>

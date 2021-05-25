@@ -31,7 +31,7 @@ namespace AkkoBot.Services.Localization
         /// </summary>
         private readonly Regex _localeRegex = new(@"_(.*?)\.", RegexOptions.Compiled);
 
-        public Dictionary<string, IReadOnlyDictionary<string, string>>.KeyCollection Locales
+        public IReadOnlyCollection<string> Locales
             => _localizedStrings.Keys;
 
         public AkkoLocalizer()

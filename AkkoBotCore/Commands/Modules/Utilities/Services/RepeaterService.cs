@@ -175,15 +175,30 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// Gets the active repeaters for the specified Discord guild.
         /// </summary>
         /// <param name="server">The Discord guild.</param>
-        /// <param name="predicate">A method to filter the results.</param>
+        /// <param name="predicate">Expression tree to filter the result.</param>
+        /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it returns all guild repeaters.</remarks>
         /// <returns>A collection of repeaters.</returns>
         public async Task<IReadOnlyCollection<RepeaterEntity>> GetRepeatersAsync(DiscordGuild server, Expression<Func<RepeaterEntity, bool>> predicate = null)
+            => await GetRepeatersAsync(server, predicate, x => x);
+
+        /// <summary>
+        /// Gets a collection of <typeparamref name="T"/> from the repeater entries in the database.
+        /// </summary>
+        /// <typeparam name="T">The selected returning type.</typeparam>
+        /// <param name="server">The Discord guild.</param>
+        /// <param name="predicate">Expression tree to filter the result.</param>
+        /// <param name="selector">Expression tree to select the columns to be returned.</param>
+        /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it returns all guild repeaters.</remarks>
+        /// <returns>A collection of <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
+        public async Task<IReadOnlyCollection<T>> GetRepeatersAsync<T>(DiscordGuild server, Expression<Func<RepeaterEntity, bool>> predicate, Expression<Func<RepeaterEntity, T>> selector)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             return await db.Repeaters.Fetch(x => x.GuildIdFK == server.Id)
                 .Where(predicate ?? (x => true))
                 .OrderBy(x => x.DateAdded)
+                .Select(selector)
                 .ToArrayAsync();
         }
     }

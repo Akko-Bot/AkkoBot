@@ -40,7 +40,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// Gets all registered localed.
         /// </summary>
         /// <returns>A collection of registered locales.</returns>
-        public IEnumerable<string> GetLocales()
+        public IReadOnlyCollection<string> GetLocales()
             => _localizer.Locales;
 
         /// <summary>

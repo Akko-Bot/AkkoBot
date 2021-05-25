@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Self.Services
@@ -134,17 +135,27 @@ namespace AkkoBot.Commands.Modules.Self.Services
         }
 
         /// <summary>
-        /// Gets all autocommands under the specified user.
+        /// Gets all autocommands created by the specified user.
         /// </summary>
         /// <param name="user">The Discord user who created the autocommands.</param>
         /// <returns>A collection of autocommands.</returns>
-        public async Task<IEnumerable<AutoCommandEntity>> GetAutoCommandsAsync(DiscordUser user)
+        public async Task<IReadOnlyCollection<AutoCommandEntity>> GetAutoCommandsAsync(DiscordUser user)
+            => await GetAutoCommandsAsync(user, x => x);
+
+        /// <summary>
+        /// Gets all autocommands created by the specified user.
+        /// </summary>
+        /// <param name="user">The Discord user who created the autocommands.</param>
+        /// <param name="selector"></param>
+        /// <returns>A collection of <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
+        public async Task<IReadOnlyCollection<T>> GetAutoCommandsAsync<T>(DiscordUser user, Expression<Func<AutoCommandEntity, T>> selector)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            return (await db.AutoCommands.Fetch(x => x.AuthorId == user.Id)
-                .ToArrayAsync())
-                .OrderBy(x => GetElapseTime(x));
+            return await db.AutoCommands.Fetch(x => x.AuthorId == user.Id)
+                .Select(selector)
+                .ToArrayAsync();
         }
 
         /// <summary>

@@ -22,6 +22,11 @@ namespace AkkoBot.Commands.Modules.Self.Services
         private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
 
+        /// <summary>
+        /// Checks whether there are entries in the blacklist.
+        /// </summary>
+        public bool HasBlacklists => _dbCache.Blacklist.Count is not 0;
+
         public BlacklistService(IServiceProvider services, IDbCache dbCache)
         {
             _services = services;
@@ -39,7 +44,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// A tuple with the database entry and a boolean indicating whether the entry was
         /// added (<see langword="true"/>) or updated (<see langword="false"/>).
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> AddOrUpdateAsync(CommandContext context, BlacklistType type, ulong id, string reason)
+        public async Task<(BlacklistEntity, bool)> AddBlacklistAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
@@ -64,7 +69,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <param name="ids">IDs to be added.</param>
         /// <remarks>The entries will be added as <see cref="BlacklistType.Unspecified"/>.</remarks>
         /// <returns>The amount of entries that have been added to the database.</returns>
-        public async Task<int> AddRangeAsync(ulong[] ids)
+        public async Task<int> AddBlacklistsAsync(ulong[] ids)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
@@ -87,7 +92,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="ids">IDs to be removed.</param>
         /// <returns>The amount of entries that have been removed from the database.</returns>
-        public async Task<int> RemoveRangeAsync(ulong[] ids)
+        public async Task<int> RemoveBlacklistsAsync(ulong[] ids)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
             var dbEntries = (await db.Blacklist.Fetch().ToArrayAsync())
@@ -108,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// The entry and <see langword="true"/>, if the removal was successful,
         /// <see langword="null"/> and <see langword="false"/> otherwise.
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> TryRemoveAsync(ulong contextId)
+        public async Task<(BlacklistEntity, bool)> RemoveBlacklistAsync(ulong contextId)
         {
             if (!_dbCache.Blacklist.Contains(contextId))
                 return (null, false);
@@ -116,6 +121,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var entry = await db.Blacklist.FirstOrDefaultAsync(x => x.ContextId == contextId);
+
             _dbCache.Blacklist.TryRemove(contextId);
             db.Remove(entry);
 
@@ -123,31 +129,44 @@ namespace AkkoBot.Commands.Modules.Self.Services
         }
 
         /// <summary>
+        /// Removes all blacklist entries from the database.
+        /// </summary>
+        /// <returns>The amount of entries removed.</returns>
+        public async Task<int> ClearBlacklistsAsync()
+        {
+            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+
+            _dbCache.Blacklist.Clear();
+            db.RemoveRange(db.Blacklist.Select(x => new BlacklistEntity() { Id = x.Id }));
+
+            return await db.SaveChangesAsync();
+        }
+
+        /// <summary>
         /// Gets all blacklist entries from the database that meet the criteria of the <paramref name="predicate"/>.
         /// </summary>
         /// <param name="predicate">Expression tree to filter the result.</param>
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all blacklist entries.</remarks>
-        /// <returns>A collection of database entries that match the criteria of <paramref name="predicate"/>.</returns>
-        public async Task<BlacklistEntity[]> GetAsync(Expression<Func<BlacklistEntity, bool>> predicate = null)
-        {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
-            return await db.Blacklist.Fetch(predicate).ToArrayAsync();
-        }
+        /// <returns>A collection of blacklist entries that match the criteria of <paramref name="predicate"/>.</returns>
+        public async Task<IReadOnlyCollection<BlacklistEntity>> GetBlacklistAsync(Expression<Func<BlacklistEntity, bool>> predicate = null)
+            => await GetBlacklistAsync(predicate, x => x);
 
         /// <summary>
-        /// Removes all blacklist entries from the database.
+        /// Gets a collection of <typeparamref name="T"/> from the blacklist entries in the database that meet the criteria of the <paramref name="predicate"/>.
         /// </summary>
-        /// <returns>The amount of entries removed.</returns>
-        public async Task<int> ClearAsync()
+        /// <typeparam name="T">The selected returning type.</typeparam>
+        /// <param name="predicate">Expression tree to filter the result.</param>
+        /// <param name="selector">Expression tree to select the columns to be returned.</param>
+        /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all blacklist entries.</remarks>
+        /// <returns>A collection of <typeparamref name="T"/> whose entries match the criteria of <paramref name="predicate"/>.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
+        public async Task<IReadOnlyCollection<T>> GetBlacklistAsync<T>(Expression<Func<BlacklistEntity, bool>> predicate, Expression<Func<BlacklistEntity, T>> selector)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
-            var blacklist = _dbCache.Blacklist;
 
-            db.RemoveRange(_dbCache.Blacklist);
-            var result = await db.SaveChangesAsync();
-
-            blacklist.Clear();
-            return result;
+            return await db.Blacklist.Fetch(predicate)
+                .Select(selector)
+                .ToArrayAsync();
         }
 
         /// <summary>
