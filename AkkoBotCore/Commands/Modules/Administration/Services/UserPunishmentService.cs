@@ -191,8 +191,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             // Create the new database entry
             var newEntry = new TimerEntity()
             {
-                GuildId = context.Guild.Id,
-                UserId = userId,
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = userId,
                 IsRepeatable = false,
                 Interval = time,
                 Type = TimerType.TimedBan,
@@ -245,8 +245,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             // Create the new database entry
             var newEntry = new TimerEntity()
             {
-                GuildId = context.Guild.Id,
-                UserId = user.Id,
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = user.Id,
                 RoleId = role.Id,
                 IsRepeatable = false,
                 Interval = time,

@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
 {
@@ -19,5 +20,17 @@ namespace AkkoBot.Extensions
         /// <returns>The cached Discord messages.</returns>
         public static RingBuffer<DiscordMessage> GetMessageCache(this DiscordClient client)
             => _messageCacheProp.GetValue(client) as RingBuffer<DiscordMessage>;
+
+        /// <summary>
+        /// Safely gets the the member with the specified ID.
+        /// </summary>
+        /// <param name="client">This Discord client.</param>
+        /// <param name="uid">The Discord user ID.</param>
+        /// <returns>The member with the specified ID, <see langword="null"/> if the user does not exist.</returns>
+        public static async Task<DiscordUser> GetUserSafelyAsync(this DiscordClient client, ulong uid)
+        {
+            try { return await client.GetUserAsync(uid); }
+            catch { return null; }
+        }
     }
 }

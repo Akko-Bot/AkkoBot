@@ -222,30 +222,6 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         }
 
         /// <summary>
-        /// Adds an emoji to the context guild.
-        /// </summary>
-        /// <param name="context">The command context.</param>
-        /// <param name="imageStream">The image stream to be added as an emoji.</param>
-        /// <param name="name">The name of the emoji.</param>
-        /// <returns><see langword="true"/> if the emoji got added, <see langword="false"/> otherwise.</returns>
-        private async Task<bool> AddEmojiAsync(CommandContext context, Stream imageStream, string name)
-        {
-            // Emojis must have less than 256Kb
-            var isStreamValid = imageStream is not null && imageStream.Length < 256000;
-
-            if (isStreamValid)
-            {
-                try { await context.Guild.CreateEmojiAsync(name.SanitizeEmojiName(), imageStream); }
-                catch { isStreamValid = false; }
-            }
-
-            if (imageStream is not null)
-                await imageStream.DisposeAsync();
-
-            return isStreamValid;
-        }
-
-        /// <summary>
         /// Gets basic information about the specified Discord channel.
         /// </summary>
         /// <param name="embed">Embed to add the information to.</param>
@@ -280,6 +256,30 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             }
 
             return embed;
+        }
+
+        /// <summary>
+        /// Adds an emoji to the context guild.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="imageStream">The image stream to be added as an emoji.</param>
+        /// <param name="name">The name of the emoji.</param>
+        /// <returns><see langword="true"/> if the emoji got added, <see langword="false"/> otherwise.</returns>
+        private async Task<bool> AddEmojiAsync(CommandContext context, Stream imageStream, string name)
+        {
+            // Emojis must have less than 256Kb
+            var isStreamValid = imageStream is not null && imageStream.Length < 256000;
+
+            if (isStreamValid)
+            {
+                try { await context.Guild.CreateEmojiAsync(name.SanitizeEmojiName(), imageStream); }
+                catch { isStreamValid = false; }
+            }
+
+            if (imageStream is not null)
+                await imageStream.DisposeAsync();
+
+            return isStreamValid;
         }
     }
 }

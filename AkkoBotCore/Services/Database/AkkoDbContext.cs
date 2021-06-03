@@ -39,10 +39,10 @@ namespace AkkoBot.Services.Database
                 .HasAlternateKey(g => g.ContextId);
 
             modelBuilder.Entity<PlayingStatusEntity>()
-                .HasKey(x => x.Id);
+                .HasIndex(x => x.Id);
 
             modelBuilder.Entity<AliasEntity>()
-                .HasKey(x => x.Id);
+                .HasIndex(x => x.Id);
 
             modelBuilder.Entity<CommandCooldownEntity>()
                 .HasIndex(x => x.Id);
@@ -54,6 +54,7 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<GuildConfigEntity>()
                 .HasAlternateKey(x => x.GuildId);
 
+            // Guild -> Muted User
             modelBuilder.Entity<MutedUserEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.MutedUserRel)
@@ -61,6 +62,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Infractions
             modelBuilder.Entity<WarnEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.WarnRel)
@@ -68,6 +70,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Punishments
             modelBuilder.Entity<WarnPunishEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.WarnPunishRel)
@@ -75,6 +78,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Occurrences
             modelBuilder.Entity<OccurrenceEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.OccurrenceRel)
@@ -82,6 +86,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Filtered Words
             modelBuilder.Entity<FilteredWordsEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithOne(x => x.FilteredWordsRel)
@@ -89,6 +94,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Filtered Content
             modelBuilder.Entity<FilteredContentEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.FilteredContentRel)
@@ -96,6 +102,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Voice Roles
             modelBuilder.Entity<VoiceRoleEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.VoiceRolesRel)
@@ -103,6 +110,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Polls
             modelBuilder.Entity<PollEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.PollRel)
@@ -110,9 +118,18 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Repeaters
             modelBuilder.Entity<RepeaterEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.RepeaterRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Guild -> Timers
+            modelBuilder.Entity<TimerEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.TimerRel)
                 .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -124,11 +141,37 @@ namespace AkkoBot.Services.Database
             modelBuilder.Entity<TimerEntity>()
                 .HasIndex(x => x.Id);
 
-            modelBuilder.Entity<ReminderEntity>()
-                .HasIndex(x => x.Id);
+            // Timer -> Repeater
+            modelBuilder.Entity<RepeaterEntity>()
+                .HasOne(x => x.TimerRel)
+                .WithOne()
+                .HasForeignKey<RepeaterEntity>(x => x.TimerIdFK)
+                .HasPrincipalKey<TimerEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // Timer -> Reminder
+            modelBuilder.Entity<ReminderEntity>()
+                .HasOne(x => x.TimerRel)
+                .WithOne()
+                .HasForeignKey<ReminderEntity>(x => x.TimerIdFK)
+                .HasPrincipalKey<TimerEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Timer -> Autocommand
             modelBuilder.Entity<AutoCommandEntity>()
-                .HasIndex(x => x.Id);
+                .HasOne(x => x.TimerRel)
+                .WithOne()
+                .HasForeignKey<AutoCommandEntity>(x => x.TimerIdFK)
+                .HasPrincipalKey<TimerEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Timer -> Warning
+            modelBuilder.Entity<WarnEntity>()
+                .HasOne(x => x.TimerRel)
+                .WithOne(x => x.WarnRel)
+                .HasForeignKey<WarnEntity>(x => x.TimerIdFK)
+                .HasPrincipalKey<TimerEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #endregion Timer Entities
 
@@ -136,6 +179,22 @@ namespace AkkoBot.Services.Database
 
             modelBuilder.Entity<DiscordUserEntity>()
                 .HasAlternateKey(x => x.UserId);
+
+            // User -> Timers
+            modelBuilder.Entity<TimerEntity>()
+                .HasOne(x => x.UserRel)
+                .WithMany(x => x.TimerRel)
+                .HasForeignKey(x => x.UserIdFK)
+                .HasPrincipalKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // User -> Warnings
+            modelBuilder.Entity<WarnEntity>()
+                .HasOne(x => x.UserRel)
+                .WithMany(x => x.WarnRel)
+                .HasForeignKey(x => x.UserIdFK)
+                .HasPrincipalKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #endregion Miscellaneous
         }

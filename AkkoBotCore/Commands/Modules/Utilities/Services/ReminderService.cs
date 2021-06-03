@@ -49,18 +49,19 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             var userReminders = await db.Reminders
                 .Where(x => x.AuthorId == context.User.Id)
+                .Select(x => x.GuildId)
                 .ToArrayAsync();
 
             // Limit of 20 reminders per user, 3 reminders per guild if user doesn't have permission to manage messages
             if (userReminders.Length >= 20
-                || (userReminders.Count(x => x.GuildId == context.Guild.Id) >= 3) && !context.Member.PermissionsIn(channel).HasPermission(Permissions.ManageMessages))
+                || (context.Guild is not null && userReminders.Count(sid => sid == context.Guild.Id) >= 3) && !context.Member.PermissionsIn(channel).HasPermission(Permissions.ManageMessages))
                 return false;
 
             var newTimer = new TimerEntity()
             {
-                GuildId = context.Guild?.Id,
+                GuildIdFK = context.Guild?.Id,
                 ChannelId = channel.Id,
-                UserId = context.User.Id,
+                UserIdFK = context.User.Id,
                 IsRepeatable = false,
                 Interval = time,
                 Type = TimerType.Reminder,
@@ -73,7 +74,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             var newReminder = new ReminderEntity()
             {
                 Content = content,
-                TimerId = newTimer.Id,
+                TimerIdFK = newTimer.Id,
                 AuthorId = context.User.Id,
                 ChannelId = channel.Id,
                 GuildId = context.Guild?.Id,
@@ -98,17 +99,17 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         public async Task<bool> RemoveReminderAsync(DiscordUser user, int id)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
-            var dbEntry = await db.Reminders.FindAsync(id);
+            var dbReminder = await db.Reminders
+                .Select(x => new ReminderEntity() { Id = x.Id, AuthorId = x.AuthorId, TimerIdFK = x.TimerIdFK, TimerRel = new() { Id = x.TimerIdFK } })
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (dbEntry is null || user.Id != dbEntry.AuthorId)
+            if (dbReminder is null || user.Id != dbReminder.AuthorId)
                 return false;
 
-            var dbTimer = await db.Timers.FindAsync(dbEntry.TimerId);
+            db.Remove(dbReminder);
+            db.Remove(dbReminder.TimerRel);
 
-            db.Remove(dbEntry);
-            db.Remove(dbTimer);
-
-            _dbCache.Timers.TryRemove(dbTimer.Id);
+            _dbCache.Timers.TryRemove(dbReminder.TimerIdFK);
 
             return await db.SaveChangesAsync() is not 0;
         }
@@ -134,7 +135,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            return await db.Reminders.Fetch(x => x.AuthorId == user.Id)
+            return await db.Reminders
+                .Fetch(x => x.AuthorId == user.Id)
                 .OrderBy(x => x.ElapseAt)
                 .Select(selector)
                 .ToArrayAsync();

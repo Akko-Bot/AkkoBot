@@ -3,7 +3,7 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
-using Microsoft.EntityFrameworkCore;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
@@ -35,6 +35,7 @@ namespace AkkoBot.Services.Timers
 
             // Initialize the internal update timer
             _updateTimer.Elapsed += UpdateFromDb;
+            _updateTimer.Elapsed += RemoveLongRunningTimers;
             _updateTimer.Start();
         }
 
@@ -69,10 +70,7 @@ namespace AkkoBot.Services.Timers
 
         public bool TryUpdate(IAkkoTimer timer)
         {
-            if (!_timers.TryGetValue(timer.Id, out var oldTimer))
-                return false;
-
-            if (_timers.TryUpdate(timer.Id, timer, oldTimer))
+            if (!_timers.TryGetValue(timer.Id, out var oldTimer) && _timers.TryUpdate(timer.Id, timer, oldTimer))
             {
                 timer.OnDispose += TimerAutoRemoval;
                 oldTimer.OnDispose -= TimerAutoRemoval;
@@ -85,7 +83,7 @@ namespace AkkoBot.Services.Timers
 
         public bool AddOrUpdateByEntity(DiscordClient client, TimerEntity entity)
         {
-            if (entity.ElapseAt.Subtract(DateTimeOffset.Now) > TimeSpan.FromDays(_updateTimerDayAge))
+            if (!entity.IsActive || entity.ElapseAt.Subtract(DateTimeOffset.Now) > TimeSpan.FromDays(_updateTimerDayAge))
                 return false;
 
             var timer = GetTimer(client, entity);
@@ -121,13 +119,13 @@ namespace AkkoBot.Services.Timers
         {
             var guildEntities = entities.Where(entity =>
                 !_timers.ContainsKey(entity.Id)
-                && entity.GuildId.HasValue
-                && client.Guilds.ContainsKey(entity.GuildId.Value)
+                && entity.GuildIdFK.HasValue
+                && client.Guilds.ContainsKey(entity.GuildIdFK.Value)
             );
 
             var nonGuildEntities = entities.Where(entity =>
                 !_timers.ContainsKey(entity.Id)
-                && !entity.GuildId.HasValue
+                && !entity.GuildIdFK.HasValue
             );
 
             foreach (var entity in guildEntities)
@@ -145,15 +143,15 @@ namespace AkkoBot.Services.Timers
         /// <returns>An active <see cref="AkkoTimer"/>.</returns>
         private IAkkoTimer GetTimer(DiscordClient client, TimerEntity entity)
         {
-            client.Guilds.TryGetValue(entity.GuildId ?? default, out var server);
+            client.Guilds.TryGetValue(entity.GuildIdFK ?? default, out var server);
 
             var timer = entity.Type switch
             {
-                TimerType.TimedBan => new AkkoTimer(entity, () => _action.UnbanAsync(entity.Id, server, entity.UserId.Value)),
-                TimerType.TimedMute => new AkkoTimer(entity, () => _action.UnmuteAsync(entity.Id, server, entity.UserId.Value)),
-                TimerType.TimedWarn => new AkkoTimer(entity, () => _action.RemoveOldWarningAsync(entity.Id, server, entity.UserId.Value)),
-                TimerType.TimedRole => new AkkoTimer(entity, () => _action.AddPunishRoleAsync(entity.Id, server, entity.UserId.Value)),
-                TimerType.TimedUnrole => new AkkoTimer(entity, () => _action.RemovePunishRoleAsync(entity.Id, server, entity.UserId.Value)),
+                TimerType.TimedBan => new AkkoTimer(entity, () => _action.UnbanAsync(entity.Id, server, entity.UserIdFK)),
+                TimerType.TimedMute => new AkkoTimer(entity, () => _action.UnmuteAsync(entity.Id, server, entity.UserIdFK)),
+                TimerType.TimedWarn => new AkkoTimer(entity, () => _action.RemoveOldWarningAsync(entity.Id, server, entity.UserIdFK)),
+                TimerType.TimedRole => new AkkoTimer(entity, () => _action.AddPunishRoleAsync(entity.Id, server, entity.UserIdFK)),
+                TimerType.TimedUnrole => new AkkoTimer(entity, () => _action.RemovePunishRoleAsync(entity.Id, server, entity.UserIdFK)),
                 TimerType.Reminder => new AkkoTimer(entity, () => _action.SendReminderAsync(entity.Id, client, server)),
                 TimerType.Repeater => new AkkoTimer(entity, () => _action.SendRepeaterAsync(entity.Id, client, server)),
                 TimerType.Command => new AkkoTimer(entity, () => _action.ExecuteCommandAsync(entity.Id, client, server)),
@@ -200,8 +198,9 @@ namespace AkkoBot.Services.Timers
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             _timerEntries = _timerEntries.AddRange(
-                (await db.Timers.ToArrayAsync()) // Query the database
-                    .Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) <= TimeSpan.FromDays(_updateTimerDayAge))
+                await db.Timers
+                    .Where(x => x.IsActive && x.ElapseAt - DateTimeOffset.Now <= TimeSpan.FromDays(_updateTimerDayAge))
+                    .ToArrayAsyncLinqToDB()
             );
         }
 
@@ -213,11 +212,22 @@ namespace AkkoBot.Services.Timers
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
             var clients = _services.GetService<DiscordShardedClient>();
 
-            var nextEntries = db.Timers.ToArray()
-                .Where(x => x.ElapseAt.Subtract(DateTimeOffset.Now) <= TimeSpan.FromDays(_updateTimerDayAge));
+            var nextEntries = db.Timers
+                .ToLinqToDB()
+                .Where(x => x.IsActive && x.ElapseAt - DateTimeOffset.Now <= TimeSpan.FromDays(_updateTimerDayAge))
+                .ToArray();
 
             foreach (var client in clients.ShardClients.Values)
                 GenerateTimers(nextEntries, client);
+        }
+
+        /// <summary>
+        /// Ensures that no long-running timer remains in the cache.
+        /// </summary>
+        private void RemoveLongRunningTimers(object obj, ElapsedEventArgs args)
+        {
+            foreach (var timer in _timers.Values.Where(x => x.ElapseIn > TimeSpan.FromDays(_updateTimerDayAge)))
+                this.TryRemove(timer);
         }
 
         /// <summary>
@@ -245,14 +255,13 @@ namespace AkkoBot.Services.Timers
             _timers.TryRemove(timer.Id, out _);
         }
 
-        /// <inheritdoc />
         public void Dispose()
         {
             // Clear the timer cache
-            foreach (var timer in _timers)
+            foreach (var timer in _timers.Values)
             {
-                timer.Value.OnDispose -= TimerAutoRemoval;
-                timer.Value.Dispose();
+                timer.OnDispose -= TimerAutoRemoval;
+                timer.Dispose();
             }
 
             _timers.Clear();
@@ -260,6 +269,7 @@ namespace AkkoBot.Services.Timers
 
             // Dispose the internal timer
             _updateTimer.Elapsed -= UpdateFromDb;
+            _updateTimer.Elapsed -= RemoveLongRunningTimers;
             _updateTimer.Stop();
             _updateTimer.Dispose();
 

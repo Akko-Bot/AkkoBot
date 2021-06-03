@@ -192,7 +192,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
             // Remove from the database
             var muteEntry = await db.MutedUsers.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.UserId == user.Id);
-            var timerEntry = await db.Timers.FirstOrDefaultAsync(x => x.GuildId == server.Id && x.UserId == user.Id);
+            var timerEntry = await db.Timers.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id);
 
             if (muteEntry is not null)
                 db.MutedUsers.Remove(muteEntry);

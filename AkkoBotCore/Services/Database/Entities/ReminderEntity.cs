@@ -16,9 +16,14 @@ namespace AkkoBot.Services.Database.Entities
         private string _content;
 
         /// <summary>
+        /// The timer this reminder is associated with.
+        /// </summary>
+        public TimerEntity TimerRel { get; init; }
+
+        /// <summary>
         /// The database ID of the timer this reminder is associated with.
         /// </summary>
-        public int TimerId { get; init; }
+        public int TimerIdFK { get; init; }
 
         /// <summary>
         /// The content of this reminder.

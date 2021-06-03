@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Config;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Logging.Abstractions;
 using AkkoBot.Services.Logging.Loggers;
 using Microsoft.EntityFrameworkCore;
@@ -37,8 +38,8 @@ namespace AkkoBot.Services.Logging
 
         public ILogger CreateLogger(string categoryName)
         {
-            ILogger logger = (categoryName.Equals(DbLoggerCategory.Database.Command.Name))
-                ? new DebugLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat)   // Log EF Core queries as debug logs
+            ILogger logger = (categoryName.EqualsAny(DbLoggerCategory.Database.Command.Name, "LinqToDB"))
+                ? new DebugLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat)   // Log database queries as debug logs
                 : new AkkoLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat);   // Log everything else as normal
 
             _loggers.Add(logger);

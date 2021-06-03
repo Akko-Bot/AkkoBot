@@ -4,7 +4,6 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System;
@@ -106,19 +105,19 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <summary>
         /// Registers a vote for an anonymous poll.
         /// </summary>
-        /// <param name="voter">The Discord user that cast their vote.</param>
+        /// <param name="user">The Discord user that cast their vote.</param>
         /// <param name="poll">The database poll.</param>
         /// <param name="vote">The vote.</param>
         /// <returns><see langword="true"/> if the vote was successfully cast, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> VoteAsync(DiscordUser voter, PollEntity poll, int vote)
+        public async Task<bool> VoteAsync(DiscordUser user, PollEntity poll, int vote)
         {
-            if (poll is null || poll.Type is not PollType.Anonymous || vote > poll.Votes.Length || poll.Voters.Contains((long)voter.Id))
+            if (poll is null || poll.Type is not PollType.Anonymous || vote > poll.Votes.Length || poll.Voters.Contains((long)user.Id))
                 return false;
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             poll.Votes[vote - 1]++;
-            poll.Voters.Add((long)voter.Id);
+            poll.Voters.Add((long)user.Id);
 
             db.Update(poll);
 

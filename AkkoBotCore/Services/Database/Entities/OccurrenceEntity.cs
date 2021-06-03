@@ -1,5 +1,6 @@
 using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -53,6 +54,14 @@ namespace AkkoBot.Services.Database.Entities
         /// The amount of bans.
         /// </summary>
         public int Bans { get; set; }
+
+        /// <summary>
+        /// The sum of all occurrences.
+        /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
+        [NotMapped]
+        public int Total
+            => Notices + Warnings + Mutes + Kicks + Softbans + Bans;
 
         public static OccurrenceEntity operator +(OccurrenceEntity x, OccurrenceEntity y)
         {

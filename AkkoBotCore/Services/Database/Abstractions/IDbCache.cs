@@ -17,6 +17,11 @@ namespace AkkoBot.Services.Database.Abstractions
     public interface IDbCache : IDisposable
     {
         /// <summary>
+        /// Contains all users that have interacted with the bot.
+        /// </summary>
+        public ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; }
+
+        /// <summary>
         /// Contains all blacklisted IDs (guilds, channels and users).
         /// </summary>
         ConcurrentHashSet<ulong> Blacklist { get; }
@@ -62,7 +67,7 @@ namespace AkkoBot.Services.Database.Abstractions
         /// </summary>
         /// <remarks>
         /// The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/>
-        /// is the collection of content filters of a guild.
+        /// is the collection of content filters of the guild.
         /// </remarks>
         ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; }
 
@@ -89,14 +94,23 @@ namespace AkkoBot.Services.Database.Abstractions
         /// <summary>
         /// Contains all active polls.
         /// </summary>
-        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of polls of a guild.</remarks>
+        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of polls of the guild.</remarks>
         ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; }
 
         /// <summary>
         /// Stores all repeaters with an interval lower than 1 day.
         /// </summary>
-        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of repeaters of a guild.</remarks>
+        /// <remarks>
+        /// The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of repeaters of the guild.
+        /// Long-running repeaters are not cached.
+        /// </remarks>
         ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; }
+
+        /// <summary>
+        /// Stores all voice roles.
+        /// </summary>
+        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of voice roles of the guild.</remarks>
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; }
 
         /// <summary>
         /// Safely gets a database guild.

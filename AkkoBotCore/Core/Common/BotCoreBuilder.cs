@@ -5,6 +5,8 @@ using AkkoBot.Core.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Events;
+using AkkoBot.Services.Events.Abstractions;
 using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging;
@@ -81,8 +83,8 @@ namespace AkkoBot.Core.Common
             _loggerFactory = LoggerFactory.Create(builder =>
                 builder.AddProvider(logProvider)
                     .AddFilter((category, level) =>
-                        (category.Equals(DbLoggerCategory.Database.Command.Name) && level is LogLevel.Information)  // Add EF Core queries
-                        || category.Equals(typeof(BaseDiscordClient).FullName)                                      // Add DiscordClient event logs
+                        (category.EqualsAny(DbLoggerCategory.Database.Command.Name, "LinqToDB") && level is LogLevel.Information)   // Add database queries
+                        || category.Equals(typeof(BaseDiscordClient).FullName)                                                      // Add DiscordClient event logs
                     )
             );
 
@@ -252,7 +254,7 @@ namespace AkkoBot.Core.Common
             dbContext.Database.Migrate();
 
             // Register the database context
-            _cmdServices.AddDbContext<AkkoDbContext>(options =>
+            _cmdServices.AddDbContextPool<AkkoDbContext>(options =>
                 options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(GetConnectionString())
                     .UseLoggerFactory(_loggerFactory)
@@ -269,7 +271,7 @@ namespace AkkoBot.Core.Common
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDbContext<T>(string connectionString) where T : DbContext
         {
-            _cmdServices.AddDbContext<T>(options =>
+            _cmdServices.AddDbContextPool<T>(options =>
                 options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(connectionString)
             );
@@ -354,7 +356,10 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton(new Random()),
 
                 // > Commands
-                ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>()
+                ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>(),
+
+                // > Event Handlers
+                ServiceDescriptor.Singleton<IVoiceRoleConnectionHandler, VoiceRoleConnectionHandler>()
             };
 
             foreach (var service in servicesList)
@@ -387,7 +392,7 @@ namespace AkkoBot.Core.Common
                 IgnoreExtraArguments = false,                               // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                                        // Sets the dependencies used by the command modules
                 EnableDefaultHelp = false,                                  // Sets whether the bot should use the default help command from the library
-                PrefixResolver = (msg) => pResolver.ResolvePrefixAsync(msg) // Sets the prefix, defined by the users
+                PrefixResolver = pResolver.ResolvePrefixAsync               // Sets the prefix, defined by the users
             };
 
             // Initialize the command handlers

@@ -36,10 +36,16 @@ namespace AkkoBot.Services.Database.Entities
         private readonly string _commandString;
 
         /// <summary>
+        /// The timer this autocommand is associated with.
+        /// </summary>
+        /// <remarks>This property is <see langword="null"/> if this autocommand is of type <see cref="AutoCommandType.Startup"/>.</remarks>
+        public TimerEntity TimerRel { get; init; }
+
+        /// <summary>
         /// The database ID of the timer associated with this autocommand.
         /// </summary>
         /// <remarks>This property is <see langword="null"/> if this autocommand is of type <see cref="AutoCommandType.Startup"/>.</remarks>
-        public int? TimerId { get; init; }
+        public int? TimerIdFK { get; init; }
 
         /// <summary>
         /// The qualified command name with its arguments.

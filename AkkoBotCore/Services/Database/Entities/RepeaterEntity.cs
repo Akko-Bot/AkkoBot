@@ -21,9 +21,14 @@ namespace AkkoBot.Services.Database.Entities
         public GuildConfigEntity GuildConfigRel { get; init; }
 
         /// <summary>
+        /// The timer this reminder is associated with.
+        /// </summary>
+        public TimerEntity TimerRel { get; init; }
+
+        /// <summary>
         /// The database ID of the timer this repeater is associated with.
         /// </summary>
-        public int TimerId { get; init; }
+        public int TimerIdFK { get; init; }
 
         /// <summary>
         /// The content of this repeater.

@@ -39,14 +39,16 @@ namespace AkkoBot.Services.Logging.Loggers
                 ChangeConsoleTextColor(logLevel);
 
                 // Add the header
-                var log = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
+                var logBuilder = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
+                logBuilder.Append(formatter(state, exception));
 
-                log.Append(formatter(state, exception));
-                Console.WriteLine(log.ToString());
+                var log = logBuilder.ToString();
+
+                Console.WriteLine(log);
 
                 // Create the log file
                 if (_fileLogger is not null && !_fileLogger.IsDisposed)
-                    _fileLogger.CacheLogging(log.ToString());
+                    _fileLogger.CacheLogging(log);
 
                 Console.ResetColor();
             }

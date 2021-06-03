@@ -91,12 +91,12 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var reminders = await _service.GetRemindersAsync(
                 context.User,
-                x => new ReminderEntity() 
-                { 
+                x => new ReminderEntity()
+                {
                     Id = x.Id,
                     ChannelId = x.ChannelId,
                     Content = x.Content,
-                    ElapseAt = x.ElapseAt 
+                    ElapseAt = x.ElapseAt
                 }
             );
 

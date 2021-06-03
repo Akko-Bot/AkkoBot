@@ -28,11 +28,11 @@ namespace AkkoBot.Core.Common
         /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
         /// <remarks>This method loops until a valid credentials file is provided.</remarks>
         /// <returns>A valid <see cref="Credentials"/> object.</returns>
-        public Credentials GetCredentials(string filePath)
+        public Credentials LoadCredentials(string filePath)
         {
             while (!IsValidCredential(filePath)) ;
 
-            return LoadCredentials(filePath);
+            return GetCredentials(filePath);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace AkkoBot.Core.Common
         /// <param name="filePath">Path to the configuration file, with its name and extension.</param>
         /// <remarks>If the file doesn't exist, it creates one.</remarks>
         /// <returns>A <typeparamref name="T"/> object.</returns>
-        public T GetConfig<T>(string filePath) where T : new()
+        public T LoadConfig<T>(string filePath) where T : new()
         {
             // Load the config file
             if (!File.Exists(filePath))
@@ -92,7 +92,7 @@ namespace AkkoBot.Core.Common
         private bool IsValidCredential(string filePath)
         {
             // Open the file and deserialize it.
-            var creds = LoadCredentials(filePath);
+            var creds = GetCredentials(filePath);
 
             // Check if token and database password are remotely valid.
             if (creds.Token.Length < 50)
@@ -122,7 +122,7 @@ namespace AkkoBot.Core.Common
         /// </summary>
         /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
         /// <returns>A <see cref="Credentials"/> object.</returns>
-        private Credentials LoadCredentials(string filePath)
+        private Credentials GetCredentials(string filePath)
         {
             // If directory or file don't exist, return false
             if (!Directory.Exists(AkkoEnvironment.GetFileDirectoryPath(filePath)) || !File.Exists(filePath))

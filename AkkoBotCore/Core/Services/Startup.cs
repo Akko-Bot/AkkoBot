@@ -8,6 +8,8 @@ using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -88,13 +90,15 @@ namespace AkkoBot.Core.Services
                     .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
                     .ToArray();
 
-                // Save the new guilds to the database
-                db.GuildConfig.AddRange(newGuilds);
-                await db.SaveChangesAsync();
+                if (newGuilds.Length is not 0)
+                {
+                    // Save the new guilds to the database
+                    await db.BulkCopyAsync(100, newGuilds);
 
-                // Cache the new guilds
-                foreach (var guild in newGuilds)
-                    _dbCache.Guilds.TryAdd(guild.GuildId, guild);
+                    // Cache the new guilds
+                    foreach (var guild in newGuilds)
+                        _dbCache.Guilds.TryAdd(guild.GuildId, guild);
+                }
             });
         }
 
@@ -118,13 +122,13 @@ namespace AkkoBot.Core.Services
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
-                var filteredWords = (await db.FilteredWords.Fetch(x => x.Words.Count != 0)
-                    .ToArrayAsync())    // Query the database
-                    .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
+                var filteredWords = await db.FilteredWords.Fetch(x => x.Words.Count != 0)
+                    .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
+                    .ToArrayAsyncEF();
 
-                var filteredContent = (await db.FilteredContent.Fetch(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
-                    .ToArrayAsync())    // Query the database
-                    .Where(x => client.Guilds.ContainsKey(x.GuildIdFK));
+                var filteredContent = await db.FilteredContent.Fetch(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
+                    .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
+                    .ToArrayAsyncEF();
 
                 foreach (var entry in filteredWords)
                     _dbCache.FilteredWords.TryAdd(entry.GuildIdFK, entry);
@@ -145,9 +149,11 @@ namespace AkkoBot.Core.Services
 
                 var cmdHandler = client.GetCommandsNext();
                 var startupCmds = await db.AutoCommands.Fetch(x => x.Type == AutoCommandType.Startup)
-                    .ToArrayAsync();
+                    .Where(x => eventArgs.Guilds.Keys.Contains(x.GuildId))
+                    .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
+                    .ToArrayAsyncEF();
 
-                foreach (var dbCmd in startupCmds.Where(x => eventArgs.Guilds.ContainsKey(x.GuildId)))
+                foreach (var dbCmd in startupCmds)
                 {
                     var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
 
@@ -175,10 +181,11 @@ namespace AkkoBot.Core.Services
             var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
             var pStatus = await db.PlayingStatuses
                 .Fetch(x => x.RotationTime == TimeSpan.Zero)
-                .FirstOrDefaultAsync();
+                .Select(x => new PlayingStatusEntity() { Message = x.Message, Type = x.Type, StreamUrl = x.StreamUrl })
+                .FirstOrDefaultAsyncEF();
 
             if (pStatus is not null)
-                await client.UpdateStatusAsync(pStatus.GetActivity());
+                await client.UpdateStatusAsync(pStatus.Activity);
             else if (_dbCache.BotConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
             {
                 _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;

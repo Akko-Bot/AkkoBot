@@ -8,11 +8,14 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
+using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,6 +34,7 @@ namespace AkkoBot.Core.Services
     {
         private readonly IServiceScope _scope;
         private readonly IDbCache _dbCache;
+        private readonly IVoiceRoleConnectionHandler _voiceRoleHandler;
         private readonly AliasService _aliasService;
         private readonly WarningService _warningService;
         private readonly RoleService _roleService;
@@ -50,6 +54,7 @@ namespace AkkoBot.Core.Services
         {
             _scope = services.CreateScope();
             _dbCache = services.GetService<IDbCache>();
+            _voiceRoleHandler = services.GetService<IVoiceRoleConnectionHandler>();
             _aliasService = services.GetService<AliasService>();
             _warningService = services.GetService<WarningService>();
             _roleService = services.GetService<RoleService>();
@@ -105,16 +110,13 @@ namespace AkkoBot.Core.Services
             _botCore.BotShardedClient.MessageCreated += FilterContent;
 
             // Assign role on channel join/leave
-            _botCore.BotShardedClient.VoiceStateUpdated += VoiceRole;
+            _botCore.BotShardedClient.VoiceStateUpdated += _voiceRoleHandler.VoiceRoleAsync;
 
             foreach (var cmdHandler in _botCore.CommandExt.Values)
             {
                 // Log command execution
                 cmdHandler.CommandExecuted += LogCmdExecution;
                 cmdHandler.CommandErrored += LogCmdError;
-
-                // Save user on command
-                cmdHandler.CommandExecuted += SaveUserOnCmd;
             }
         }
 
@@ -169,24 +171,20 @@ namespace AkkoBot.Core.Services
                 var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasPermission(Permissions.ManageRoles));
 
                 // Check if user is in the database
-                var dbGuild = await db.GuildConfig.GetGuildWithMutesAsync(eventArgs.Guild.Id);
-                var mutedUser = dbGuild.MutedUserRel.FirstOrDefault(x => x.UserId == eventArgs.Member.Id);
+                var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+                var mutedUserExists = await db.MutedUsers.AnyAsyncEF(x => x.UserId == eventArgs.Member.Id);
 
-                if (mutedUser is not null && botHasManageRoles)
+                if (mutedUserExists && botHasManageRoles)
                 {
-                    if (eventArgs.Guild.Roles.TryGetValue(dbGuild.MuteRoleId ?? 0, out var muteRole))
+                    if (eventArgs.Guild.Roles.TryGetValue(dbGuild.MuteRoleId ?? default, out var muteRole))
                     {
                         // If mute role exists, apply to the user
-                        muteRole = eventArgs.Guild.GetRole(dbGuild.MuteRoleId.Value);
                         await eventArgs.Member.GrantRoleAsync(muteRole);
                     }
                     else
                     {
                         // If mute role doesn't exist anymore, delete the mute from the database
-                        dbGuild.MutedUserRel.Remove(mutedUser);
-
-                        db.GuildConfig.Update(dbGuild);
-                        await db.SaveChangesAsync();
+                        await db.MutedUsers.DeleteAsync(x => x.UserId == eventArgs.Member.Id);
                     }
                 }
             });
@@ -229,12 +227,13 @@ namespace AkkoBot.Core.Services
             {
                 var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
 
+                // Update the poll
                 poll.Votes[vote - 1]++;
                 poll.Voters.Add((long)eventArgs.Author.Id);
 
-                db.Polls.Update(poll);
-                await db.SaveChangesAsync();
+                await db.Polls.UpdateAsync(x => x.Id == poll.Id, _ => new PollEntity() { Votes = poll.Votes, Voters = poll.Voters });
 
+                // Delete the vote, if it was cast in the server
                 if (eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                     await eventArgs.Message.DeleteAsync();
 
@@ -279,8 +278,8 @@ namespace AkkoBot.Core.Services
         /// </summary>
         private Task HandleCommandAlias(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
-            var aliasExists = _dbCache.Aliases.TryGetValue(eventArgs.Guild?.Id ?? default, out var aliases);
-            aliasExists &= _dbCache.Aliases.TryGetValue(default, out var globalAliases);
+            var aliasExists = _dbCache.Aliases.TryGetValue(eventArgs.Guild?.Id ?? default, out var aliases)
+                & _dbCache.Aliases.TryGetValue(default, out var globalAliases);
 
             // If message is from a bot or there aren't any global or server aliases, quit.
             if (eventArgs.Author.IsBot && !aliasExists)
@@ -340,7 +339,7 @@ namespace AkkoBot.Core.Services
             if (eventArgs.Author.IsBot
                 || !_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || filteredWords.Words.Count == 0
-                || !filteredWords.Enabled
+                || !filteredWords.IsActive
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                 return Task.FromResult(false);
 
@@ -501,78 +500,6 @@ namespace AkkoBot.Core.Services
         }
 
         /// <summary>
-        /// Saves a user to the database on command execution.
-        /// </summary>
-        /// <remarks>
-        /// Users who are cached by EF Core but have been manually deleted from
-        /// the database won't get re-added until the bot is restarted.
-        /// </remarks>
-        private Task SaveUserOnCmd(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
-        {
-            var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
-
-            // Track the user who triggered the command
-            var isUnchanged = db.Upsert(eventArgs.Context.User).State is EntityState.Unchanged;
-
-            // Track the mentioned users in the message, if any
-            foreach (var mentionedUser in eventArgs.Context.Message.MentionedUsers)
-                isUnchanged &= db.Upsert(mentionedUser).State is EntityState.Unchanged;
-
-            // Save if there is at least one user being tracked
-            return (!isUnchanged)
-                ? db.SaveChangesAsync()
-                : Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Assigns or revokes a role upon voice channel connection/disconnection
-        /// </summary>
-        private Task VoiceRole(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
-        {
-            // Check for role hierarchy, not just role perm
-            if (eventArgs.Before == eventArgs.After || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasFlag(Permissions.ManageRoles)))
-                return Task.CompletedTask;
-
-            return Task.Run(async () =>
-            {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
-                var user = eventArgs.User as DiscordMember;
-
-                var voiceRoles = await db.VoiceRoles.Where(
-                    (user.VoiceState.Channel is null)
-                            ? x => x.GuildIdFk == eventArgs.Guild.Id
-                            : x => x.GuildIdFk == eventArgs.Guild.Id && x.ChannelId == eventArgs.Channel.Id
-                )
-                .ToArrayAsync();
-
-                if (user.VoiceState.Channel is not null)
-                {
-                    // Connection
-                    foreach (var voiceRole in voiceRoles.DistinctBy(x => x.RoleId))
-                    {
-                        if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role))
-                            await user.GrantRoleAsync(role);
-                        else if (role is null)
-                            db.Remove(voiceRole);
-                    }
-                }
-                else
-                {
-                    // Disconnection
-                    foreach (var voiceRole in voiceRoles)
-                    {
-                        if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role))
-                            await user.RevokeRoleAsync(role);
-                        else if (role is null)
-                            db.Remove(voiceRole);
-                    }
-                }
-
-                await db.SaveChangesAsync();
-            });
-        }
-
-        /// <summary>
         /// Saves default guild settings to the database and caches when the bot joins a guild.
         /// </summary>
         private Task SaveGuildOnJoin(DiscordClient client, GuildCreateEventArgs eventArgs)
@@ -586,11 +513,11 @@ namespace AkkoBot.Core.Services
 
                 dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
                 var filteredWords = await db.FilteredWords.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
+                    .FirstOrDefaultAsyncEF(x => x.GuildIdFK == eventArgs.Guild.Id);
 
                 var filteredContent = await db.FilteredContent.AsNoTracking()
                     .Where(x => x.GuildIdFK == eventArgs.Guild.Id)
-                    .ToArrayAsync();
+                    .ToArrayAsyncEF();
 
                 _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
 
@@ -635,7 +562,7 @@ namespace AkkoBot.Core.Services
                 and not CommandNotFoundException     // Ignore commands that do not exist
                 and not InvalidOperationException)   // Ignore groups that are not commands themselves
             {
-                // Log common errors
+                //Log common errors
                 cmdHandler.Client.Logger.LogCommand(
                     LogLevel.Error,
                     eventArgs.Context,

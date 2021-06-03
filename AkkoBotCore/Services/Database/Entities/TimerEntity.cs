@@ -58,14 +58,30 @@ namespace AkkoBot.Services.Database.Entities
     public class TimerEntity : DbEntity
     {
         /// <summary>
+        /// The Discord user associated with this timer.
+        /// </summary>
+        public DiscordUserEntity UserRel { get; init; }
+
+        /// <summary>
+        /// The Discord guild this timer is associated with.
+        /// </summary>
+        /// <remarks>This property is <see langword="null"/> if this timer is not associated with a Discord guild (triggers in direct message).</remarks>
+        public GuildConfigEntity GuildConfigRel { get; init; }
+
+        /// <summary>
+        /// The infraction this timer is associated with.
+        /// </summary>
+        public WarnEntity WarnRel { get; init; }
+
+        /// <summary>
         /// The ID of the Discord user this timer is associated with.
         /// </summary>
-        public ulong? UserId { get; init; }
+        public ulong UserIdFK { get; init; }
 
         /// <summary>
         /// The ID of the Discord guild this timer is associated with.
         /// </summary>
-        public ulong? GuildId { get; init; }
+        public ulong? GuildIdFK { get; init; }
 
         /// <summary>
         /// The ID of the Discord channel this timer is associated with.
@@ -81,6 +97,11 @@ namespace AkkoBot.Services.Database.Entities
         /// Determines whether this timer is supposed to trigger multiple times.
         /// </summary>
         public bool IsRepeatable { get; init; }
+
+        /// <summary>
+        /// Determines whether this timer is active or not.
+        /// </summary>
+        public bool IsActive { get; set; } = true;
 
         /// <summary>
         /// The type of this timer.
@@ -118,8 +139,8 @@ namespace AkkoBot.Services.Database.Entities
         {
             Id = timer.Id;
             DateAdded = timer.DateAdded;
-            UserId = timer.UserId;
-            GuildId = timer.GuildId;
+            UserIdFK = timer.UserIdFK;
+            GuildIdFK = timer.GuildIdFK;
             ChannelId = timer.ChannelId;
             RoleId = timer.RoleId;
             Interval = timer.Interval;
@@ -130,8 +151,8 @@ namespace AkkoBot.Services.Database.Entities
 
         public TimerEntity(MutedUserEntity muteUser, TimeSpan time)
         {
-            UserId = muteUser.UserId;
-            GuildId = muteUser.GuildIdFK;
+            UserIdFK = muteUser.UserId;
+            GuildIdFK = muteUser.GuildIdFK;
             ChannelId = null;
             RoleId = null;
             Interval = time;
@@ -142,12 +163,13 @@ namespace AkkoBot.Services.Database.Entities
 
         public TimerEntity(WarnEntity warning, TimeSpan time)
         {
-            UserId = warning.UserId;
-            GuildId = warning.GuildIdFK;
+            UserIdFK = warning.UserIdFK;
+            GuildIdFK = warning.GuildIdFK;
             ChannelId = null;
             RoleId = null;
             Interval = time;
             IsRepeatable = false;
+            IsActive = time != TimeSpan.Zero;
             Type = TimerType.TimedWarn;
             ElapseAt = warning.DateAdded.Add(time);
         }
@@ -155,7 +177,7 @@ namespace AkkoBot.Services.Database.Entities
         /* Overrides */
 
         public static bool operator ==(TimerEntity x, TimerEntity y)
-            => (x.UserId == y.UserId && x.GuildId == y.GuildId && x.ChannelId == y.ChannelId && x.RoleId == y.RoleId && x.Interval == y.Interval)
+            => (x.UserIdFK == y.UserIdFK && x.GuildIdFK == y.GuildIdFK && x.ChannelId == y.ChannelId && x.RoleId == y.RoleId && x.Interval == y.Interval)
             && (x.IsRepeatable == y.IsRepeatable && x.Type == y.Type);
 
         public static bool operator !=(TimerEntity x, TimerEntity y)

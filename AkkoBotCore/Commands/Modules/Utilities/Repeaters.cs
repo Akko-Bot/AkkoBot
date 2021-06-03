@@ -97,7 +97,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             }
             else
             {
-                _dbCache.Timers.TryGetValue(repeater.TimerId, out var timer);
+                _dbCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer);
                 var member = await context.Guild.GetMemberSafelyAsync(repeater.AuthorId);
                 var (dbTimer, dbUser) = await _service.GetRepeaterExtraInfoAsync(timer, repeater, member);
 
@@ -123,7 +123,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 x => new RepeaterEntity()
                 {
                     Id = x.Id,
-                    TimerId = x.TimerId,
+                    TimerIdFK = x.TimerIdFK,
                     Content = x.Content,
                     ChannelId = x.ChannelId
                 }
@@ -141,7 +141,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 var timers = new List<IAkkoTimer>(repeaters.Count);
 
                 foreach (var repeater in repeaters)
-                    timers.Add((_dbCache.Timers.TryGetValue(repeater.TimerId, out var timer)) ? timer : null);
+                    timers.Add((_dbCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer)) ? timer : null);
 
                 embed.WithTitle("repeater_list_title")
                     .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, "[...]"))), true)

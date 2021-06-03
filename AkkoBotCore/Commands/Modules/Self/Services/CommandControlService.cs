@@ -20,6 +20,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class CommandControlService : ICommandService
     {
+        private readonly MethodInfo _registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
         private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
         private readonly DiscordShardedClient _clients;
@@ -128,7 +129,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public async Task<bool> EnableGlobalCommandsAsync(string module)
         {
             var configLoader = _services.GetService<ConfigLoader>();
-            var registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
+            var cmdHandlers = (await _clients.GetCommandsNextAsync()).Values;
             var cmds = _dbCache.DisabledCommandCache.Values.Where(x => x.Module.ModuleType.FullName.Contains(module, StringComparison.InvariantCultureIgnoreCase));
             var botConfig = _dbCache.BotConfig;
             var result = false;
@@ -139,8 +140,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 {
                     result |= botConfig.DisabledCommands.TryRemove(cachedCommand.QualifiedName);
 
-                    foreach (var cmdHandler in (await _clients.GetCommandsNextAsync()).Values)
-                        registrationMethod?.Invoke(cmdHandler, new object[] { cmd });
+                    foreach (var cmdHandler in cmdHandlers)
+                        _registrationMethod?.Invoke(cmdHandler, new object[] { cmd });
                 }
             }
 

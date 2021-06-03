@@ -11,8 +11,11 @@ using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -25,15 +28,18 @@ namespace AkkoBot.Services.Timers
     /// </summary>
     public class TimerActions : ITimerActions
     {
+        private readonly EventId _timerLogEvent = new(99, nameof(TimerActions));
         private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
+        private readonly ILogger _logger;
 
         public TimerActions(IServiceProvider services, IDbCache dbCache, ILocalizer localizer)
         {
             _services = services;
             _dbCache = dbCache;
             _localizer = localizer;
+            _logger = _services.GetService<DiscordShardedClient>().Logger;
         }
 
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
@@ -43,22 +49,28 @@ namespace AkkoBot.Services.Timers
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedban_title");
 
-            // Unban the user - they might have been unbanned in the meantime
-            if ((await server.GetBansAsync()).FirstOrDefault(x => x.User.Id == userId) is not null)
-                await server.UnbanMemberAsync(userId, localizedReason);
-
-            // Remove the entry
-            var dbEntity = await db.Timers.FindAsync(entryId);
-            db.Remove(dbEntity);
-
-            await db.SaveChangesAsync();
+            try
+            {
+                // Unban the user - they might have been unbanned in the meantime
+                if ((await server.GetBansAsync()).FirstOrDefault(x => x.User.Id == userId) is not null)
+                    await server.UnbanMemberAsync(userId, localizedReason);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when running a timed unban. [{ex.Message}]");
+            }
+            finally
+            {
+                // Remove the entry
+                await db.Timers.DeleteAsync(x => x.Id == entryId);
+            }
         }
 
         public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbGuild = await db.GuildConfig.GetGuildWithMutesAsync(server.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedmute");
 
             try
@@ -75,20 +87,15 @@ namespace AkkoBot.Services.Timers
                 if (muteRole is not null)
                     await user.RevokeRoleAsync(muteRole, localizedReason);
             }
-            catch
+            catch (Exception ex)
             {
-                return;
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when running a timed unmute. [{ex.Message}]");
             }
             finally
             {
                 // Remove the entries from the database
-                var timerEntry = await db.Timers.FindAsync(entryId);
-                var muteEntry = dbGuild.MutedUserRel.FirstOrDefault(x => x.UserId == userId);
-
-                db.Remove(timerEntry);
-                db.Remove(muteEntry);
-
-                await db.SaveChangesAsync();
+                await db.Timers.DeleteAsync(x => x.Id == entryId);
+                await db.MutedUsers.DeleteAsync(x => x.UserId == userId);
             }
         }
 
@@ -97,7 +104,10 @@ namespace AkkoBot.Services.Timers
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
-            var timerEntry = await db.Timers.FindAsync(entryId);
+            var timerEntry = await db.Timers
+                .AsNoTracking()
+                .Select(x => new TimerEntity() { Id = x.Id, RoleId = x.RoleId })
+                .FirstOrDefaultAsyncEF(x => x.Id == entryId);
 
             try
             {
@@ -107,14 +117,13 @@ namespace AkkoBot.Services.Timers
 
                 await user.GrantRoleAsync(punishRole, localizedReason);
             }
-            catch
+            catch (Exception ex)
             {
-                return;
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when adding a punishment role. [{ex.Message}]");
             }
             finally
             {
-                db.Remove(timerEntry);
-                await db.SaveChangesAsync();
+                await db.Timers.DeleteAsync(x => x.Id == entryId);
             }
         }
 
@@ -123,7 +132,10 @@ namespace AkkoBot.Services.Timers
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
-            var timerEntry = await db.Timers.FindAsync(entryId);
+            var timerEntry = await db.Timers
+                .AsNoTracking()
+                .Select(x => new TimerEntity() { Id = x.Id, RoleId = x.RoleId })
+                .FirstOrDefaultAsyncEF(x => x.Id == entryId);
 
             try
             {
@@ -133,14 +145,13 @@ namespace AkkoBot.Services.Timers
 
                 await user.RevokeRoleAsync(punishRole, localizedReason);
             }
-            catch
+            catch (Exception ex)
             {
-                return;
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when removing a punishment role. [{ex.Message}]");
             }
             finally
             {
-                db.Remove(timerEntry);
-                await db.SaveChangesAsync();
+                await db.Timers.DeleteAsync(x => x.Id == entryId);
             }
         }
 
@@ -148,38 +159,36 @@ namespace AkkoBot.Services.Timers
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var timer = await db.Timers.FindAsync(entryId);
-            var guildSettings = await db.GuildConfig
-                .Include(x => x.WarnRel.Where(x => x.UserId == userId))
-                .FirstOrDefaultAsync(x => x.GuildId == server.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
+            var warnings = await db.Warnings
+                .Fetch(x => x.GuildIdFK == server.Id && x.UserIdFK == userId)
+                .Select(x => new WarnEntity() { Id = x.Id, DateAdded = x.DateAdded })
+                .ToListAsyncEF();
 
-            guildSettings.WarnRel.RemoveAll(x => x.DateAdded.Add(guildSettings.WarnExpire).Subtract(DateTimeOffset.Now) <= TimeSpan.Zero);
+            // Don't delete warnings that are not old enough
+            warnings.RemoveAll(x => x.DateAdded.Add(dbGuild.WarnExpire).Subtract(DateTimeOffset.Now) > TimeSpan.Zero);
 
-            // Update the entries
-            db.Update(guildSettings);
-            db.Remove(timer);
-
-            await db.SaveChangesAsync();
+            await db.Warnings.DeleteAsync(x => warnings.Select(x => x.Id).Contains(x.Id));
+            await db.Timers.DeleteAsync(x => x.Id == entryId);
         }
 
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbReminder = await db.Reminders.FirstOrDefaultAsync(x => x.TimerId == entryId);
-            var dbTimer = await db.Timers.FindAsync(entryId);
+            var dbReminder = await db.Reminders.FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
             var cmdHandler = client.GetCommandsNext();
 
             try
             {
-                var dbGuild = await _dbCache.GetDbGuildAsync(dbReminder.GuildId.Value);
+                _dbCache.Guilds.TryGetValue(dbReminder.GuildId ?? default, out var dbGuild);
                 var user = FindMember(dbReminder.AuthorId, server);
 
                 var channel = (dbReminder.IsPrivate)
                         ? await user.CreateDmChannelAsync()
                         : server.GetChannel(dbReminder.ChannelId);
 
-                if (!HasPermissionTo(server.CurrentMember, channel, Permissions.SendMessages))
+                if (server is not null && !HasPermissionTo(server.CurrentMember, channel, Permissions.SendMessages))
                     return;
 
                 var fakeContext = cmdHandler.CreateFakeContext(
@@ -206,16 +215,14 @@ namespace AkkoBot.Services.Timers
 
                 await channel.SendMessageAsync(dmsg);
             }
-            catch
+            catch (Exception ex)
             {
-                return;
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to send a reminder. [User: {dbReminder.AuthorId}] [Server: {dbReminder.GuildId}] [{ex.Message}]");
             }
             finally
             {
-                db.Remove(dbReminder);
-                db.Remove(dbTimer);
-
-                await db.SaveChangesAsync();
+                await db.Reminders.DeleteAsync(dbReminder);
+                await db.Timers.DeleteAsync(x => x.Id == entryId);
             }
         }
 
@@ -223,9 +230,10 @@ namespace AkkoBot.Services.Timers
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbCmd = await db.AutoCommands.FirstOrDefaultAsync(x => x.TimerId == entryId);
-            var dbTimer = await db.FindAsync<TimerEntity>(entryId);
             var cmdHandler = client.GetCommandsNext();
+            var dbCmd = await db.AutoCommands
+                .AsNoTracking()
+                .FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
 
             try
             {
@@ -244,18 +252,16 @@ namespace AkkoBot.Services.Timers
                 if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
                     await cmd.ExecuteAsync(fakeContext);
             }
-            catch
+            catch (Exception ex)
             {
-                return;
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run an autocommand. [User: {dbCmd.AuthorId}] [Command: {dbCmd.CommandString}] [{ex.Message}]");
             }
             finally
             {
                 if (dbCmd.Type is AutoCommandType.Scheduled)
                 {
-                    db.Remove(dbCmd);
-                    db.Remove(dbTimer);
-
-                    await db.SaveChangesAsync();
+                    await db.AutoCommands.DeleteAsync(dbCmd);
+                    await db.Timers.DeleteAsync(x => x.Id == entryId);
                 }
             }
         }
@@ -266,8 +272,8 @@ namespace AkkoBot.Services.Timers
 
             _dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache);
             var cmdHandler = client.GetCommandsNext();
-            var dbRepeater = repeaterCache.FirstOrDefault(x => x.TimerId == entryId)
-                ?? await db.Repeaters.Fetch(x => x.TimerId == entryId).FirstOrDefaultAsync();
+            var dbRepeater = repeaterCache?.FirstOrDefault(x => x.TimerIdFK == entryId)
+                ?? await db.Repeaters.Fetch(x => x.TimerIdFK == entryId).FirstOrDefaultAsyncEF();
 
             try
             {
@@ -298,17 +304,17 @@ namespace AkkoBot.Services.Timers
                 if (HasPermissionTo(server.CurrentMember, channel, Permissions.AddReactions))
                     await discordMessage.CreateReactionAsync(AkkoEntities.RepeaterEmoji);
             }
-            catch
+            catch (Exception ex)
             {
                 // If an error occurs, remove the repeater
-                var dbTimer = await db.Timers.FindAsync(entryId);
+                if (dbRepeater is not null)
+                    await db.Repeaters.DeleteAsync(dbRepeater);
 
-                db.Remove(dbRepeater);
-                db.Remove(dbTimer);
+                await db.Timers.DeleteAsync(x => x.Id == entryId);
 
-                await db.SaveChangesAsync();
+                _dbCache.Timers.TryRemove(entryId);
 
-                _dbCache.Timers.TryRemove(dbTimer.Id);
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run an autocommand. [User: {dbRepeater?.AuthorId}] [Server: {dbRepeater?.GuildIdFK}] [{ex.Message}]");
             }
         }
 

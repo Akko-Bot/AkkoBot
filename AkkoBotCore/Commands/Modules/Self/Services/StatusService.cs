@@ -1,4 +1,6 @@
 using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
+using AkkoBot.Core.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
@@ -6,6 +8,8 @@ using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,12 +31,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
         private readonly DiscordShardedClient _clients;
+        private readonly ConfigLoader _configLoader;
 
-        public StatusService(IServiceProvider services, IDbCache dbCache, DiscordShardedClient clients)
+        public StatusService(IServiceProvider services, IDbCache dbCache, DiscordShardedClient clients, ConfigLoader configLoader)
         {
             _services = services;
             _dbCache = dbCache;
             _clients = clients;
+            _configLoader = configLoader;
         }
 
         /// <summary>
@@ -78,14 +84,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public async Task<bool> RemoveStatusesAsync(Expression<Func<PlayingStatusEntity, bool>> predicate)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
-            var entries = await db.Fetch(predicate).ToArrayAsync();
+            var entries = await db.Fetch(predicate)
+                .Select(x => x.Id)
+                .ToArrayAsyncEF();
 
-            db.RemoveRange(entries);
+            _dbCache.PlayingStatuses.RemoveAll(x => entries.Contains(x.Id));
 
-            foreach (var entry in entries)
-                _dbCache.PlayingStatuses.Remove(entry);
-
-            return await db.SaveChangesAsync() is not 0;
+            return await db.PlayingStatuses.DeleteAsync(x => entries.Contains(x.Id)) is not 0;
         }
 
         /// <summary>
@@ -102,11 +107,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public async Task<int> ClearStatusesAsync()
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db); ;
-
-            db.RemoveRange(db.PlayingStatuses.Fetch());
             _dbCache.PlayingStatuses.Clear();
 
-            return await db.SaveChangesAsync();
+            return await db.PlayingStatuses.DeleteAsync();
         }
 
         /// <summary>
@@ -119,7 +122,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
             // Update the database entry
             _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;
-            db.Update(_dbCache.BotConfig);
+            _configLoader.SaveConfig(_dbCache.BotConfig, AkkoEnvironment.BotConfigPath);
 
             if (_dbCache.BotConfig.RotateStatus)
             {
@@ -130,7 +133,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
                     return false;
 
                 foreach (var client in _clients.ShardClients.Values)
-                    await client.UpdateStatusAsync(firstStatus.GetActivity());
+                    await client.UpdateStatusAsync(firstStatus.Activity);
 
                 _rotationTimer.Interval = firstStatus.RotationTime.TotalMilliseconds;
                 _rotationTimer.Elapsed += async (x, y) => await SetNextStatusAsync();
@@ -145,12 +148,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 _rotationTimer.Stop();
 
                 var staticStatus = await db.PlayingStatuses.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.RotationTime == TimeSpan.Zero);
+                    .FirstOrDefaultAsyncEF(x => x.RotationTime == TimeSpan.Zero);
 
                 if (staticStatus is not null)
                 {
                     foreach (var client in _clients.ShardClients.Values)
-                        await client.UpdateStatusAsync(staticStatus.GetActivity());
+                        await client.UpdateStatusAsync(staticStatus.Activity);
                 }
             }
 
@@ -171,7 +174,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             _rotationTimer.Interval = nextStatus.RotationTime.TotalMilliseconds;
 
             foreach (var client in _clients.ShardClients.Values)
-                await client.UpdateStatusAsync(nextStatus.GetActivity());
+                await client.UpdateStatusAsync(nextStatus.Activity);
         }
     }
 }

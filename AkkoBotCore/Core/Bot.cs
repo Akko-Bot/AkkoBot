@@ -31,9 +31,9 @@ namespace AkkoBot.Core
         {
             // Load up credentials
             var configLoader = new ConfigLoader();
-            var creds = configLoader.GetCredentials(AkkoEnvironment.CredsPath);
-            var botConfig = configLoader.GetConfig<BotConfig>(AkkoEnvironment.BotConfigPath);
-            var logConfig = configLoader.GetConfig<LogConfig>(AkkoEnvironment.LogConfigPath);
+            var creds = configLoader.LoadCredentials(AkkoEnvironment.CredsPath);
+            var botConfig = configLoader.LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath);
+            var logConfig = configLoader.LoadConfig<LogConfig>(AkkoEnvironment.LogConfigPath);
 
             // Initialize bot configuration
             _botCore = await new BotCoreBuilder(creds, botConfig, logConfig)
@@ -89,6 +89,8 @@ namespace AkkoBot.Core
         public void Dispose()
         {
             _botCore?.Dispose();
+            _botCore = null;
+
             GC.SuppressFinalize(this);
         }
     }

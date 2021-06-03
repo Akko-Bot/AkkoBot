@@ -18,6 +18,8 @@ namespace AkkoBot.Commands.Modules.Administration
     [RequireGuild]
     public class WarningCommands : AkkoCommandModule
     {
+        private const string _pencil = ":pencil:";
+        private const string _warning = "\u26A0";
         private readonly WarningService _warnService;
         private readonly RoleService _roleService;
         private readonly BotConfigService _botService;
@@ -142,28 +144,27 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             if (!context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.KickMembers) && user is not null)
                 return;
-            else if (user is null)
-                user = context.User;
 
-            var (guildSettings, dbUser) = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
+            user ??= context.User;
+            var infractions = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
 
-            foreach (var warn in guildSettings.WarnRel.OrderByDescending(x => x.Id))
+            foreach (var (modName, infraction) in infractions)
             {
-                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
+                var position = "#" + Formatter.InlineCode(infraction.Id.ToString());
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
-                    $"{position} {warn.DateAdded.Date.ToShortDateString()}",
-                    $"{warn.DateAdded.Hour:00.}:{warn.DateAdded.Minute:00.}",
-                    dbUser.ToString()
+                    $"{position} {infraction.DateAdded.Date.ToShortDateString()}",
+                    infraction.DateAdded.ToString(@"HH:mm"),
+                    modName
                 );
 
-                embed.AddField(fieldName, warn.WarningText);
+                embed.AddField(fieldName, infraction.WarningText);
             }
 
-            if (guildSettings.WarnRel.Count == 0)
+            if (infractions.Count is 0)
                 embed.WithDescription("infractions_empty");
 
             await context.RespondPaginatedByFieldsAsync(embed);
@@ -174,11 +175,9 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.KickMembers)]
         public async Task ModLog(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
         {
-            if (user is null)
-                user = context.User;
-
-            var (dbGuild, dbUser) = await _warnService.GetInfractionsAsync(context.Guild, user);
-            var occurrence = dbGuild.OccurrenceRel.FirstOrDefault() ?? new OccurrenceEntity();
+            user ??= context.User;
+            var infractions = await _warnService.GetInfractionsAsync(context.Guild, user);
+            var occurrence = await _warnService.GetUserOccurrencesAsync(context.Guild, user);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()))
@@ -190,21 +189,21 @@ namespace AkkoBot.Commands.Modules.Administration
                     )
                 );
 
-            foreach (var warn in dbGuild.WarnRel.OrderBy(x => x.Type).ThenByDescending(x => x.Id))
+            foreach (var (modName, infraction) in infractions.OrderBy(x => x.Item2.Type))
             {
-                var emote = (warn.Type == WarnType.Notice) ? "📝" : "⚠️";
-                var position = "#" + Formatter.InlineCode(warn.Id.ToString());
+                var emote = (infraction.Type is WarnType.Notice) ? _pencil : _warning;
+                var position = "#" + Formatter.InlineCode(infraction.Id.ToString());
                 var fieldName = context.FormatLocalized(
                     "infractions_field",
-                    $"{emote} {position} {warn.DateAdded.Date.ToShortDateString()}",
-                    $"{warn.DateAdded.Hour:00.}:{warn.DateAdded.Minute:00.}",
-                    dbUser.ToString()
+                    $"{emote} {position} {infraction.DateAdded.Date.ToShortDateString()}",
+                    infraction.DateAdded.ToString(@"HH:mm"),
+                    modName.ToString()
                 );
 
-                embed.AddField(fieldName, warn.WarningText);
+                embed.AddField(fieldName, infraction.WarningText);
             }
 
-            if (dbGuild.WarnRel.Count == 0)
+            if (infractions.Count is 0)
                 embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
             await context.RespondPaginatedByFieldsAsync(embed);

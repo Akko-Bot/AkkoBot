@@ -50,8 +50,8 @@ namespace AkkoBot.Services.Database.Queries
             return table.AsNoTracking()
                 .FirstOrDefault(x =>
                     x.Type == referenceEntity.Type
-                    && x.GuildId == referenceEntity.GuildId
-                    && x.UserId == referenceEntity.UserId
+                    && x.GuildIdFK == referenceEntity.GuildIdFK
+                    && x.UserIdFK == referenceEntity.UserIdFK
                     && x.ChannelId == referenceEntity.ChannelId
                     && x.RoleId == referenceEntity.RoleId
                 );

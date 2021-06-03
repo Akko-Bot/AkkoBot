@@ -4,6 +4,7 @@ using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -51,8 +52,10 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// Gets the <see cref="DiscordActivity"/> this entity represents.
         /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
         /// <returns>A <see cref="DiscordActivity"/>.</returns>
-        public DiscordActivity GetActivity()
+        [NotMapped]
+        public DiscordActivity Activity
             => new(Message, Type) { StreamUrl = this.StreamUrl };
 
         /* Overrides */

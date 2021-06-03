@@ -28,6 +28,11 @@ namespace AkkoBot.Services.Database.Entities
         public FilteredWordsEntity FilteredWordsRel { get; init; }
 
         /// <summary>
+        /// The timers associated with this Discord guild.
+        /// </summary>
+        public List<TimerEntity> TimerRel { get; init; }
+
+        /// <summary>
         /// The list of content filters.
         /// </summary>
         public List<FilteredContentEntity> FilteredContentRel { get; init; }
@@ -45,7 +50,7 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The list of warn punishments.
         /// </summary>
-        public List<WarnPunishEntity> WarnPunishRel { get; private set; }
+        public List<WarnPunishEntity> WarnPunishRel { get; init; }
 
         /// <summary>
         /// The list of user occurrences.
@@ -178,36 +183,6 @@ namespace AkkoBot.Services.Database.Entities
             UseEmbed = config.UseEmbed;
             OkColor = config.OkColor;
             ErrorColor = config.ErrorColor;
-        }
-
-        /// <summary>
-        /// Adds the default server punishments to this instance.
-        /// </summary>
-        /// <remarks>Kick at 3 warnings, ban at 5 warnings.</remarks>
-        /// <returns>This <see cref="GuildConfigEntity"/>.</returns>
-        public GuildConfigEntity AddDefaultWarnPunishments()
-        {
-            var defaultPunishments = new WarnPunishEntity[]
-            {
-                new WarnPunishEntity()
-                {
-                    GuildIdFK = GuildId,
-                    WarnAmount = 3,
-                    Type = WarnPunishType.Kick
-                },
-                new WarnPunishEntity()
-                {
-                    GuildIdFK = GuildId,
-                    WarnAmount = 5,
-                    Type = WarnPunishType.Ban
-                }
-            };
-
-            if (WarnPunishRel is null)
-                WarnPunishRel = new(2);
-
-            WarnPunishRel.AddRange(defaultPunishments);
-            return this;
         }
 
         public override IReadOnlyDictionary<string, string> GetSettings()

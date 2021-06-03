@@ -8,7 +8,8 @@ using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,14 +50,14 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             // Limit of 5 repeaters per guild
-            if (await db.Repeaters.CountAsync(x => x.GuildIdFK == context.Guild.Id) >= 5)
+            if (await db.Repeaters.CountAsyncEF(x => x.GuildIdFK == context.Guild.Id) >= 5)
                 return false;
 
             var newTimer = new TimerEntity()
             {
-                GuildId = context.Guild?.Id,
+                GuildIdFK = context.Guild?.Id,
                 ChannelId = channel.Id,
-                UserId = context.User.Id,
+                UserIdFK = context.User.Id,
                 IsRepeatable = true,
                 Interval = time,
                 Type = TimerType.Repeater,
@@ -67,10 +68,14 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             db.Add(newTimer);
             await db.SaveChangesAsync();
 
+            // Stop tracking the db timer, so the db repeater doesn't get cached with it
+            // in the navigation property
+            db.ChangeTracker.Clear();
+
             var newRepeater = new RepeaterEntity()
             {
                 Content = content,
-                TimerId = newTimer.Id,
+                TimerIdFK = newTimer.Id,
                 GuildIdFK = context.Guild.Id,
                 AuthorId = context.User.Id,
                 ChannelId = channel.Id,
@@ -104,18 +109,21 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (!_dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache))
                 return false;
 
-            var dbRepeater = repeaterCache?.FirstOrDefault(x => x.Id == id)
-                ?? await db.Repeaters.Fetch(x => x.Id == id).FirstOrDefaultAsync();
-            var dbTimer = await db.Timers.FindAsync(dbRepeater.TimerId);
+            var dbRepeater = repeaterCache.FirstOrDefault(x => x.Id == id)
+                ?? await db.Repeaters
+                    .Fetch(x => x.Id == id)
+                    .Select(x => new RepeaterEntity() { Id = x.Id, TimerIdFK = x.TimerIdFK, TimerRel = new() { Id = x.TimerIdFK } })
+                    .FirstOrDefaultAsyncEF();
 
             db.Remove(dbRepeater);
-            db.Remove(dbTimer);
+            db.Remove(dbRepeater.TimerRel);
             var result = await db.SaveChangesAsync() is not 0;
 
             // Remove from the cache after removing from the database,
             // so daily repeaters don't get re-added to the cache
             _dbCache.Repeaters[server.Id].TryRemove(dbRepeater);
-            _dbCache.Timers.TryRemove(dbTimer.Id);
+            _dbCache.Timers.TryRemove(dbRepeater.TimerIdFK);
+
             return result;
         }
 
@@ -130,25 +138,25 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (!_dbCache.Repeaters.TryRemove(server.Id, out var repeaterCache))
                 return false;
 
-            var dbRepeaters = await db.Repeaters.Where(x => x.GuildIdFK == server.Id)
-                .ToArrayAsync();
+            var dbRepeaters = await db.Repeaters
+                .Where(x => x.GuildIdFK == server.Id)
+                .Select(x => new RepeaterEntity() { TimerIdFK = x.TimerIdFK })
+                .ToArrayAsyncEF();
 
-            var dbTimers = await db.Timers.Where(x => x.GuildId == server.Id && x.Type == TimerType.Repeater)
-                .ToArrayAsync();
+            var result = await db.Timers
+                .DeleteAsync(x => x.GuildIdFK == server.Id && x.Type == TimerType.Repeater);
 
-            db.RemoveRange(dbRepeaters);
-            db.RemoveRange(dbTimers);
-
-            var result = await db.SaveChangesAsync() is not 0;
+            // Deleting the db timers deletes the db repeaters in cascade
+            //await db.Repeaters.DeleteAsync(x => x.GuildIdFK == server.Id);
 
             // Remove from the cache after removing from the database,
             // so daily repeaters don't get re-added to the cache
             repeaterCache.Clear();
 
-            foreach (var dbTimer in dbTimers)
-                _dbCache.Timers.TryRemove(dbTimer.Id);
+            foreach (var dbRepeater in dbRepeaters)
+                _dbCache.Timers.TryRemove(dbRepeater.TimerIdFK);
 
-            return result;
+            return result is not 0;
         }
 
         /// <summary>
@@ -165,8 +173,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbTimer = (timer?.Id is null) ? await db.Timers.Fetch(x => x.Id == dbRepeater.TimerId).FirstOrDefaultAsync() : null;
-            var dbUser = (user is null) ? await db.DiscordUsers.Fetch(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsync() : null;
+            var dbTimer = (timer?.Id is null) ? await db.Timers.Fetch(x => x.Id == dbRepeater.TimerIdFK).FirstOrDefaultAsyncEF() : null;
+            var dbUser = (user is null) ? await db.DiscordUsers.Fetch(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsyncEF() : null;
 
             return (dbTimer, dbUser);
         }
@@ -199,7 +207,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 .Where(predicate ?? (x => true))
                 .OrderBy(x => x.DateAdded)
                 .Select(selector)
-                .ToArrayAsync();
+                .ToArrayAsyncEF();
         }
     }
 }

@@ -33,18 +33,23 @@ namespace AkkoBot.Services.Logging.Loggers
             if (!IsEnabled(logLevel))
                 return;
 
+            if (eventId == default) // For some reason, LinqToDB doesn't emit EventIds
+                eventId = new(20101, "LinqToDB");
+
             lock (_lock)
             {
                 ChangeConsoleTextColor((logLevel is LogLevel.Information) ? LogLevel.Debug : logLevel);
 
-                var log = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
+                var logBuilder = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
+                logBuilder.AppendLine(formatter(state, exception));
 
-                log.AppendLine(formatter(state, exception));
-                Console.WriteLine(log.ToString());
+                var log = logBuilder.ToString();
+
+                Console.WriteLine(log);
 
                 // Create the log file
                 if (_fileLogger is not null && !_fileLogger.IsDisposed)
-                    _fileLogger.CacheLogging(log.ToString());
+                    _fileLogger.CacheLogging(log);
 
                 Console.ResetColor();
             }

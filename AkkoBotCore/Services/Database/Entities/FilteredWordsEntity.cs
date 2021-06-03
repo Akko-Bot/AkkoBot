@@ -48,7 +48,7 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// Defines whether this filter is active or not.
         /// </summary>
-        public bool Enabled { get; set; } = true;
+        public bool IsActive { get; set; } = true;
 
         /// <summary>
         /// Determines whether stickers should be filtered.

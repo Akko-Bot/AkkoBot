@@ -25,6 +25,7 @@ namespace AkkoBot.Services.Database
         private readonly IServiceProvider _services;
         private bool _isDisposed = false;
 
+        public ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; private set; }
         public ConcurrentHashSet<ulong> Blacklist { get; private set; }
         public BotConfig BotConfig { get; private set; }
         public LogConfig LogConfig { get; private set; }
@@ -36,6 +37,7 @@ namespace AkkoBot.Services.Database
         public ICommandCooldown CooldownCommands { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; private set; }
 
         /* Lazily instantiated */
 
@@ -49,6 +51,7 @@ namespace AkkoBot.Services.Database
             _services = services;
             BotConfig = services.GetService<BotConfig>();
             LogConfig = services.GetService<LogConfig>();
+            Users = dbContext.DiscordUsers.ToConcurrentDictionary(x => x.UserId);
             Blacklist = dbContext.Blacklist.AsNoTracking().Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Fetch(x => x.RotationTime != TimeSpan.Zero).ToList();
             CooldownCommands = services.GetService<ICommandCooldown>().LoadFromEntities(dbContext.CommandCooldown.Fetch());
@@ -70,6 +73,11 @@ namespace AkkoBot.Services.Database
                 .SplitBy(x => x.GuildIdFK)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
+
+            VoiceRoles = dbContext.VoiceRoles
+                .SplitBy(x => x.GuildIdFk)
+                .Select(x => x.ToConcurrentHashSet())
+                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFk);
 
             Guilds = new();             // Guild configs are loaded into the cache as needed.
             FilteredWords = new();      // Filtered words are loaded into the cache as needed
@@ -108,6 +116,7 @@ namespace AkkoBot.Services.Database
             {
                 if (isDisposing)
                 {
+                    Users?.Clear();
                     Blacklist?.Clear();
                     Guilds?.Clear();
                     Timers?.Dispose();
@@ -141,6 +150,14 @@ namespace AkkoBot.Services.Database
 
                         Repeaters.Clear();
                     }
+
+                    if (VoiceRoles is not null)
+                    {
+                        foreach (var group in VoiceRoles.Values)
+                            group.Clear();
+
+                        VoiceRoles.Clear();
+                    }
                 }
 
                 Blacklist = null;
@@ -156,6 +173,7 @@ namespace AkkoBot.Services.Database
                 CooldownCommands = null;
                 Polls = null;
                 Repeaters = null;
+                VoiceRoles = null;
 
                 _isDisposed = true;
             }

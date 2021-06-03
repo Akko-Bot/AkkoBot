@@ -453,7 +453,7 @@ medium: Médio
 members: Membros
 message: Mensagem
 minutes: Minutos
-modlog_description: '{0} anotações, {1} infrações, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
+modlog_description: '{0} anotações, {1} advertências, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
 modroles: Cargos de Moderador
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.

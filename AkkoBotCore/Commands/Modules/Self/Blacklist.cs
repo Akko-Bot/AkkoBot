@@ -9,8 +9,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,7 +86,7 @@ namespace AkkoBot.Commands.Modules.Self
         [Description("cmd_blacklist_rem")]
         public async Task BlacklistRemove(CommandContext context, [Description("arg_ulong_id")] ulong id)
         {
-            var (entry, success) = await _service.RemoveBlacklistAsync(id);
+            var entry = await _service.RemoveBlacklistAsync(id);
 
             var entryName = (string.IsNullOrEmpty(entry?.Name))
                 ? context.FormatLocalized("unknown")
@@ -99,7 +97,7 @@ namespace AkkoBot.Commands.Modules.Self
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(
                     context.FormatLocalized(
-                        (success) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓
+                        (entry is not null) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓
                         entry?.Type.ToString().ToSnakeCase(),       // User, Channel, Server or Unspecified
                         Formatter.Bold(entryName),                  // Name or Unknown
                         Formatter.InlineCode(id.ToString())         // ID

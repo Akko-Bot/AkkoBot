@@ -3,7 +3,8 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using Microsoft.EntityFrameworkCore;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -33,8 +34,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid)
+            _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
+
+            filteredWords ??= await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid)
                 ?? new() { GuildIdFK = sid };
+
+            var amount = filteredWords.Words.Count;
 
             // Add the new words to the db entry
             foreach (var word in words)
@@ -43,12 +48,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                     filteredWords.Words.Add(word);
             }
 
-            // Update the cache
-            _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
+            // If a word got added
+            if (amount != filteredWords.Words.Count)
+            {
+                // Update the cache
+                _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
 
-            // Save to the database
-            db.Update(filteredWords);
-            return await db.SaveChangesAsync() is not 0;
+                // Save to the database
+                db.Update(filteredWords);
+                await db.SaveChangesAsync();
+            }
+
+            return amount != filteredWords.Words.Count;
         }
 
         /// <summary>
@@ -61,7 +72,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+            _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
+
+            filteredWords ??= await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid)
+                ?? new() { GuildIdFK = sid };
+
             var amount = filteredWords.IgnoredIds.Count;
 
             foreach (var id in ids)
@@ -70,14 +85,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                     filteredWords.IgnoredIds.Add((long)id);
             }
 
-            // Update the cache
-            _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
+            // If an ID got added
+            if (amount != filteredWords.IgnoredIds.Count)
+            {
+                // Update the cache
+                _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
 
-            // Save to the database
-            db.Update(filteredWords);
-            await db.SaveChangesAsync();
+                // Save to the database
+                db.Update(filteredWords);
+                await db.SaveChangesAsync();
+            }
 
-            return !(amount == filteredWords.IgnoredIds.Count);
+            return amount != filteredWords.IgnoredIds.Count;
         }
 
         /// <summary>
@@ -91,19 +110,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+            _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
 
-            if (filteredWords is null)
-            {
-                await AddFilteredWordsAsync(sid);
-                filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
-            }
+            filteredWords ??= await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid)
+                ?? new() { GuildIdFK = sid };
 
             var result = action(filteredWords);
 
             // Update the cache
             _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
 
+            // I don't know which property has been changed,
+            // so I need to use EF Core here
             db.Update(filteredWords);
             await db.SaveChangesAsync();
 
@@ -115,27 +133,30 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="sid">The Discord server ID.</param>
         /// <param name="words">The words to be removed.</param>
-        /// <returns><see langword="true"/> if at least one word got added, <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if at least one word got removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveFilteredWordsAsync(ulong sid, params string[] words)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            if (!_dbCache.FilteredWords.TryGetValue(sid, out _))
+            if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
                 return false;
 
-            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+            var amount = filteredWords.Words.Count;
 
             foreach (var word in words)
             {
-                filteredWords.Words.Remove(word);                   // Remove the word from the entry
-                _dbCache.FilteredWords[sid].Words.Remove(word);     // Remove the word from the cache
+                filteredWords.Words.Remove(word);
 
-                if (_dbCache.FilteredWords[sid].Words.Count == 0)
+                if (filteredWords.Words.Count is 0)
                     _dbCache.FilteredWords.TryRemove(sid, out _);
             }
 
-            db.Update(filteredWords);
-            return await db.SaveChangesAsync() is not 0;
+            await db.FilteredWords.UpdateAsync(
+                x => x.Id == filteredWords.Id,
+                _ => new FilteredWordsEntity() { Words = filteredWords.Words }
+            );
+
+            return amount != filteredWords.Words.Count;
         }
 
         /// <summary>
@@ -147,20 +168,21 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            if (!_dbCache.FilteredWords.TryGetValue(sid, out _))
+            if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
                 return false;
 
-            var filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid);
+            var amount = filteredWords.Words.Count;
 
-            // Remove the words from the entry
+            // Remove the cached words
             filteredWords.Words.Clear();
-
-            // Remove the cached list
-            _dbCache.FilteredWords[sid].Words.Clear();
             _dbCache.FilteredWords.TryRemove(sid, out _);
 
-            db.Update(filteredWords);
-            return (await db.SaveChangesAsync()) is not 0;
+            await db.FilteredWords.UpdateAsync(
+                x => x.Id == filteredWords.Id,
+                _ => new FilteredWordsEntity() { Words = filteredWords.Words }
+            );
+
+            return amount != filteredWords.Words.Count;
         }
 
         /// <summary>

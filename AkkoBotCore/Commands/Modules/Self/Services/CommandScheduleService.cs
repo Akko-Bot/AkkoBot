@@ -48,9 +48,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
             var newTimer = new TimerEntity()
             {
-                GuildId = context.Guild?.Id,
+                GuildIdFK = context.Guild?.Id,
                 ChannelId = context.Channel.Id,
-                UserId = context.User.Id,
+                UserIdFK = context.User.Id,
                 IsRepeatable = cmdType is AutoCommandType.Repeated,
                 Interval = time,
                 Type = TimerType.Command,
@@ -62,7 +62,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
             var newCmd = new AutoCommandEntity()
             {
-                TimerId = newTimer.Id,
+                TimerIdFK = newTimer.Id,
                 CommandString = cmd.QualifiedName + ((string.IsNullOrWhiteSpace(cmdArgs)) ? string.Empty : " " + cmdArgs),
                 GuildId = context.Guild.Id,
                 AuthorId = context.User.Id,
@@ -116,17 +116,26 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbCmd = await db.FindAsync<AutoCommandEntity>(id);
+            var dbCmd = await db.AutoCommands
+                .Include(x => x.TimerRel)
+                .Select(x =>
+                    new AutoCommandEntity()
+                    {
+                        TimerRel = (x.TimerRel == null) ? null : new TimerEntity() { Id = x.TimerRel.Id },
+                        Id = x.Id,
+                        TimerIdFK = x.TimerIdFK,
+                        AuthorId = x.AuthorId
+                    }
+                )
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (dbCmd is null || user.Id != dbCmd.AuthorId)
                 return false;
 
-            var dbTimer = await db.FindAsync<TimerEntity>(dbCmd.TimerId);
-
-            if (dbTimer is not null)
+            if (dbCmd.TimerRel is not null)
             {
-                db.Remove(dbTimer);
-                _dbCache.Timers.TryRemove(dbTimer.Id);
+                db.Remove(dbCmd.TimerRel);
+                _dbCache.Timers.TryRemove(dbCmd.TimerRel.Id);
             }
 
             db.Remove(dbCmd);
@@ -172,7 +181,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
                 case AutoCommandType.Scheduled:
                 case AutoCommandType.Repeated:
-                    _dbCache.Timers.TryGetValue(dbEntry.TimerId.Value, out var timer);
+                    _dbCache.Timers.TryGetValue(dbEntry.TimerIdFK.Value, out var timer);
                     return timer.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m");
 
                 default:

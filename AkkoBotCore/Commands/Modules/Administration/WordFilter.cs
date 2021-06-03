@@ -120,7 +120,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task Enable(CommandContext context)
         {
-            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.Enabled = !x.Enabled);
+            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.IsActive = !x.IsActive);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("fw_toggle", (success) ? "enabled" : "disabled"));

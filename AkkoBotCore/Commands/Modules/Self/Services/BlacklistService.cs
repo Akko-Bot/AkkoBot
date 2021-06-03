@@ -5,7 +5,9 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
-using Microsoft.EntityFrameworkCore;
+using LinqToDB;
+using LinqToDB.Data;
+using LinqToDB.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,18 +75,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
-            var newEntries = ids.Distinct().Select(id => new BlacklistEntity()
-            {
-                ContextId = id,
-                Type = BlacklistType.Unspecified,
-                Name = null
-            });
+            var newEntries = ids.Distinct()
+                .Select(id => new BlacklistEntity() { ContextId = id, Type = BlacklistType.Unspecified });
 
             foreach (var blacklist in newEntries)
                 _dbCache.Blacklist.Add(blacklist.ContextId);
 
-            db.AddRange(newEntries);
-            return await db.SaveChangesAsync();
+            return (int)(await db.BulkCopyAsync(newEntries)).RowsCopied;
         }
 
         /// <summary>
@@ -95,14 +92,11 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public async Task<int> RemoveBlacklistsAsync(ulong[] ids)
         {
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
-            var dbEntries = (await db.Blacklist.Fetch().ToArrayAsync())
-                .Where(x => ids.Contains(x.ContextId));
 
-            foreach (var blacklist in dbEntries)
-                _dbCache.Blacklist.TryRemove(blacklist.ContextId);
+            foreach (var id in ids)
+                _dbCache.Blacklist.TryRemove(id);
 
-            db.RemoveRange(dbEntries);
-            return await db.SaveChangesAsync();
+            return await db.Blacklist.DeleteAsync(x => ids.Contains(x.ContextId));
         }
 
         /// <summary>
@@ -110,13 +104,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <param name="contextId">The context (user/channel/server) ID of the entry.</param>
         /// <returns>
-        /// The entry and <see langword="true"/>, if the removal was successful,
-        /// <see langword="null"/> and <see langword="false"/> otherwise.
+        /// The entry if the removal was successful, <see langword="null"/> otherwise.
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> RemoveBlacklistAsync(ulong contextId)
+        public async Task<BlacklistEntity> RemoveBlacklistAsync(ulong contextId)
         {
             if (!_dbCache.Blacklist.Contains(contextId))
-                return (null, false);
+                return null;
 
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
@@ -125,7 +118,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
             _dbCache.Blacklist.TryRemove(contextId);
             db.Remove(entry);
 
-            return (entry, await db.SaveChangesAsync() is not 0);
+            await db.SaveChangesAsync();
+
+            return entry;
         }
 
         /// <summary>
@@ -137,9 +132,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
 
             _dbCache.Blacklist.Clear();
-            db.RemoveRange(db.Blacklist.Select(x => new BlacklistEntity() { Id = x.Id }));
-
-            return await db.SaveChangesAsync();
+            return await db.Blacklist.DeleteAsync();
         }
 
         /// <summary>

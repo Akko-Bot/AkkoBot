@@ -3,7 +3,6 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using ConcurrentCollections;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;

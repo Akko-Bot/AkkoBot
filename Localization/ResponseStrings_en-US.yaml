@@ -453,7 +453,7 @@ medium: Medium
 members: Members
 message: Message
 minutes: Minutes
-modlog_description: '{0} notices, {1} infractions, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
+modlog_description: '{0} notices, {1} warnings, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
 modroles: Moderator Roles
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.

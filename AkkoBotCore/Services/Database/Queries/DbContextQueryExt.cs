@@ -1,8 +1,11 @@
 ﻿using AkkoBot.Services.Database.Abstractions;
+using LinqToDB;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Queries
@@ -13,6 +16,7 @@ namespace AkkoBot.Services.Database.Queries
         /// Gets all database entries that match the criteria of the <paramref name="predicate"/> without tracking.
         /// </summary>
         /// <typeparam name="T">The type of the database entity.</typeparam>
+        /// <param name="dbContext">This database context.</param>
         /// <param name="predicate">Predicate to select the entries that should be included in the resulting query.</param>
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all <typeparamref name="T"/> entries.</remarks>
         /// <returns>A database query.</returns>
@@ -23,6 +27,7 @@ namespace AkkoBot.Services.Database.Queries
         /// Gets all database entries that match the criteria of the <paramref name="predicate"/> without tracking.
         /// </summary>
         /// <typeparam name="T">The type of the database entity.</typeparam>
+        /// <param name="table">This database table.</param>
         /// <param name="predicate">Predicate to select the entries that should be included in the resulting query.</param>
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all <typeparamref name="T"/> entries.</remarks>
         /// <returns>A database query.</returns>
@@ -34,17 +39,27 @@ namespace AkkoBot.Services.Database.Queries
         }
 
         /// <summary>
-        /// Gets the amount of database entries that match the criteria of the <paramref name="predicate"/> without tracking.
+        /// Deletes the specified entry from the table.
         /// </summary>
         /// <typeparam name="T">The type of the database entity.</typeparam>
-        /// <param name="predicate">Predicate to select the entries to be counted in the query.</param>
-        /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets the total count of <typeparamref name="T"/> entries.</remarks>
-        /// <returns>The amount of matching entries.</returns>
-        public static Task<int> CountAsync<T>(this DbContext dbContext, Expression<Func<T, bool>> predicate = null) where T : DbEntity
-        {
-            return (predicate is null)
-                ? dbContext.Set<T>().AsNoTracking().CountAsync()
-                : dbContext.Set<T>().AsNoTracking().CountAsync(predicate);
-        }
+        /// <param name="table">This database table.</param>
+        /// <param name="dbEntity">The entry to be removed.</param>
+        /// <param name="token">Token to cancel the operation.</param>
+        /// <remarks>The entry is removed based on the value of its primary key.</remarks>
+        /// <returns>The amount of deleted entries.</returns>
+        public static Task<int> DeleteAsync<T>(this DbSet<T> table, T dbEntity, CancellationToken token = default) where T : DbEntity
+            => table.DeleteAsync(x => x.Id == dbEntity.Id, token);
+
+        /// <summary>
+        /// Deletes the specified entries from the table.
+        /// </summary>
+        /// <typeparam name="T">The type of the database entity.</typeparam>
+        /// <param name="table">This database table.</param>
+        /// <param name="dbEntities">A collection of entries to be removed.</param>
+        /// <param name="token">Token to cancel the operation.</param>
+        /// <remarks>The entries are removed based on the value of their primary key.</remarks>
+        /// <returns>The amount of deleted entries.</returns>
+        public static Task<int> DeleteAsync<T>(this DbSet<T> table, IEnumerable<T> dbEntities, CancellationToken token = default) where T : DbEntity
+            => table.DeleteAsync(x => dbEntities.Select(x => x.Id).Contains(x.Id), token);
     }
 }

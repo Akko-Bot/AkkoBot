@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +13,19 @@ namespace AkkoBot.Services.Database.Entities
     [Comment("Stores data related to individual Discord users.")]
     public class DiscordUserEntity : DbEntity
     {
+        private string _username = "Unknown";
+        private string _discriminator = "0000";
+
+        /// <summary>
+        /// The infractions associated with this user.
+        /// </summary>
+        public List<WarnEntity> WarnRel { get; init; }
+
+        /// <summary>
+        /// The timers this associated with this user.
+        /// </summary>
+        public List<TimerEntity> TimerRel { get; init; }
+
         /// <summary>
         /// The ID of the Discord user.
         /// </summary>
@@ -22,7 +36,11 @@ namespace AkkoBot.Services.Database.Entities
         /// </summary>
         [Required]
         [MaxLength(32)]
-        public string Username { get; set; }
+        public string Username
+        {
+            get => _username;
+            set => _username = value ?? "Unknown";
+        }
 
         /// <summary>
         /// The discriminator of the Discord user.
@@ -30,7 +48,11 @@ namespace AkkoBot.Services.Database.Entities
         [Required]
         [StringLength(4)]
         [Column(TypeName = "varchar(4)")]
-        public string Discriminator { get; set; }
+        public string Discriminator
+        {
+            get => _discriminator;
+            set => _discriminator = value ?? "0000";
+        }
 
         /// <summary>
         /// The username and discriminator of the Discord user.
