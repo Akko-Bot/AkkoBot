@@ -7,6 +7,7 @@ using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class CommandScheduleService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public CommandScheduleService(IServiceProvider services, IDbCache dbCache)
+        public CommandScheduleService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -44,7 +45,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is AutoCommandType.Startup)
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var newTimer = new TimerEntity()
             {
@@ -89,7 +90,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null)
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var newCmd = new AutoCommandEntity()
             {
@@ -114,7 +115,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if the autocommand was successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveAutoCommandAsync(DiscordUser user, int id)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbCmd = await db.AutoCommands
                 .Include(x => x.TimerRel)
@@ -160,7 +161,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
         public async Task<IReadOnlyCollection<T>> GetAutoCommandsAsync<T>(DiscordUser user, Expression<Func<AutoCommandEntity, T>> selector)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             return await db.AutoCommands.Fetch(x => x.AuthorId == user.Id)
                 .Select(selector)

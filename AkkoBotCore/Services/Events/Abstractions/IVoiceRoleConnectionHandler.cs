@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Events.Abstractions
 {
+    /// <summary>
+    /// Represents an object that handles role assignment or removal voice state changes.
+    /// </summary>
     public interface IVoiceRoleConnectionHandler
     {
         /// <summary>
-        /// Assigns or revokes a role upon voice channel connection/disconnection
+        /// Assigns or revokes a role upon voice channel connection/disconnection.
         /// </summary>
-        /// <param name="client">The Discord client.</param>
-        /// <param name="eventArgs">The voice state event.</param>
         Task VoiceRoleAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
     }
 }

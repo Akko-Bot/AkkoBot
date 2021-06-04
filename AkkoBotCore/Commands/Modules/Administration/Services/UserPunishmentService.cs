@@ -7,6 +7,7 @@ using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -17,12 +18,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class UserPunishmentService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public UserPunishmentService(IServiceProvider services, IDbCache dbCache)
+        public UserPunishmentService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -82,7 +83,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task KickUser(DiscordGuild server, DiscordMember user, string reason)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             await user.RemoveAsync(reason);
 
@@ -116,7 +117,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task SoftbanUser(DiscordGuild server, ulong userId, int days, string reason)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
             await server.BanMemberAsync(userId, days, reason);
@@ -154,7 +155,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task BanUser(DiscordGuild server, ulong userId, int days, string reason)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
             await server.BanMemberAsync(userId, days, reason);
@@ -179,7 +180,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the ban.</param>
         public async Task TimedBanAsync(CommandContext context, TimeSpan time, ulong userId, string reason = null)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // If time is less than a minute, set it to a minute.
             if (time < TimeSpan.FromMinutes(1))
@@ -228,7 +229,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
         public async Task TimedRolePunish(CommandContext context, WarnPunishType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // If time is less than a minute, set it to a minute.
             if (time < TimeSpan.FromMinutes(1))

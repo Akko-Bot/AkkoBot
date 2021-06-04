@@ -6,6 +6,7 @@ using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class CooldownService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommandCooldown _cmdCooldown;
 
-        public CooldownService(IServiceProvider services, ICommandCooldown cmdCooldown)
+        public CooldownService(IServiceScopeFactory scopeFactory, ICommandCooldown cmdCooldown)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _cmdCooldown = cmdCooldown;
         }
 
@@ -36,7 +37,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the cooldown was successfully added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddCommandCooldownAsync(Command cmd, TimeSpan time, DiscordGuild server = null)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var newEntry = new CommandCooldownEntity()
             {
@@ -62,7 +63,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the cooldown was successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveCommandCooldownAsync(string qualifiedCommand, DiscordGuild server = null)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbEntry = (server is null)
                 ? await db.CommandCooldown.FirstOrDefaultAsync(x => x.Command == qualifiedCommand)

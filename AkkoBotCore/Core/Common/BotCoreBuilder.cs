@@ -1,7 +1,9 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Common;
 using AkkoBot.Config;
+using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Core.Services;
+using AkkoBot.Core.Services.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
@@ -247,7 +249,7 @@ namespace AkkoBot.Core.Common
             using var dbContext = new AkkoDbContext(
                 new DbContextOptionsBuilder<AkkoDbContext>()
                     .UseSnakeCaseNamingConvention()
-                    .UseNpgsql(GetConnectionString())
+                    .UseNpgsql(GetDefaultConnectionString())
                     .Options
             );
 
@@ -256,7 +258,7 @@ namespace AkkoBot.Core.Common
             // Register the database context
             _cmdServices.AddDbContextPool<AkkoDbContext>(options =>
                 options.UseSnakeCaseNamingConvention()
-                    .UseNpgsql(GetConnectionString())
+                    .UseNpgsql(GetDefaultConnectionString())
                     .UseLoggerFactory(_loggerFactory)
             );
 
@@ -302,36 +304,32 @@ namespace AkkoBot.Core.Common
         /// <returns>A <see cref="BotCore"/>.</returns>
         public async Task<BotCore> BuildAsync(double? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
-            var botClients = await GetBotClientAsync(timeout); // Initialize the sharded clients
+            var shardedClient = await GetBotClientAsync(timeout);   // Initialize the sharded clients
 
-            RegisterFinalServices(botClients);                  // Add the last services needed
-            var services = _cmdServices.BuildServiceProvider(); // Initialize the IoC container
+            RegisterFinalServices(shardedClient);                   // Add the last services needed
+            var services = _cmdServices.BuildServiceProvider();     // Initialize the IoC container
 
             // Initialize the command handlers
-            var cmdHandlers = await GetCommandHandlers(botClients, services, isCaseSensitive, withDms, withMentionPrefix);
+            var cmdHandlers = await GetCommandHandlers(shardedClient, services, isCaseSensitive, withDms, withMentionPrefix);
+
+            // Register the events
+            var events = services.GetService<IDiscordEventManager>();
+            events.RegisterStartupEvents();
+            events.RegisterEvents();
 
             // Build the bot
-            var bot = new BotCore(botClients, cmdHandlers);
-
-            // Register core events
-            var startup = new Startup(bot, services);
-            startup.RegisterEvents();
-
-            var globalEvents = new GlobalEvents(bot, services);
-            globalEvents.RegisterEvents();
-
-            return bot;
+            return new BotCore(shardedClient, cmdHandlers);
         }
 
         /// <summary>
         /// Adds the last default services needed for the bot to function.
         /// </summary>
-        /// <param name="client">The bot's sharded clients.</param>
+        /// <param name="shardedClient">The bot's sharded clients.</param>
         /// <remarks>It won't add services whose interface type has already been registered to <see cref="_cmdServices"/>.</remarks>
-        private void RegisterFinalServices(DiscordShardedClient client)
+        private void RegisterFinalServices(DiscordShardedClient shardedClient)
         {
             // Add the clients to the IoC container
-            _cmdServices.AddSingleton(client);
+            _cmdServices.AddSingleton(shardedClient);
 
             var servicesList = new ServiceDescriptor[]
             {
@@ -352,14 +350,22 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<ITimerManager, TimerManager>(),
 
                 // > Utilities
+                ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
                 ServiceDescriptor.Singleton(new HttpClient()),
                 ServiceDescriptor.Singleton(new Random()),
 
                 // > Commands
+                ServiceDescriptor.Singleton<IPrefixResolver, PrefixResolver>(),
                 ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>(),
 
                 // > Event Handlers
-                ServiceDescriptor.Singleton<IVoiceRoleConnectionHandler, VoiceRoleConnectionHandler>()
+                ServiceDescriptor.Singleton<IDiscordEventManager, DiscordEventManager>(),
+                ServiceDescriptor.Singleton<IStartupEventHandler, StartupEventHandler>(),
+                ServiceDescriptor.Singleton<IVoiceRoleConnectionHandler, VoiceRoleConnectionHandler>(),
+                ServiceDescriptor.Singleton<IGuildLoadHandler, GuildLoadHandler>(),
+                ServiceDescriptor.Singleton<IGuildEventsHandler, GuildEventsHandler>(),
+                ServiceDescriptor.Singleton<IGlobalEventsHandler, GlobalEventsHandler>(),
+                ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>()
             };
 
             foreach (var service in servicesList)
@@ -381,18 +387,16 @@ namespace AkkoBot.Core.Common
         /// <returns>A collection of command handlers.</returns>
         private async Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlers(DiscordShardedClient botClients, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
         {
-            var pResolver = new PrefixResolver(services.GetService<IDbCache>());
-
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()
             {
-                CaseSensitive = isCaseSensitive,                            // Sets whether commands are case-sensitive
-                EnableDms = withDms,                                        // Sets whether the bot responds in dm or not
-                EnableMentionPrefix = withMentionPrefix,                    // Sets whether the bot accepts its own mention as a prefix for commands
-                IgnoreExtraArguments = false,                               // Sets whether the bot ignores extra arguments on commands or not
-                Services = services,                                        // Sets the dependencies used by the command modules
-                EnableDefaultHelp = false,                                  // Sets whether the bot should use the default help command from the library
-                PrefixResolver = pResolver.ResolvePrefixAsync               // Sets the prefix, defined by the users
+                CaseSensitive = isCaseSensitive,                // Sets whether commands are case-sensitive
+                EnableDms = withDms,                            // Sets whether the bot responds in dm or not
+                EnableMentionPrefix = withMentionPrefix,        // Sets whether the bot accepts its own mention as a prefix for commands
+                IgnoreExtraArguments = false,                   // Sets whether the bot ignores extra arguments on commands or not
+                Services = services,                            // Sets the dependencies used by the command modules
+                EnableDefaultHelp = false,                      // Sets whether the bot should use the default help command from the library
+                PrefixResolver = services.GetService<IPrefixResolver>().ResolvePrefixAsync   // Sets the prefix, defined by the users
             };
 
             // Initialize the command handlers
@@ -441,7 +445,7 @@ namespace AkkoBot.Core.Common
         /// </summary>
         /// <returns>The connection string.</returns>
         /// <exception cref="NullReferenceException">Occurs when no credentials object is provided to this builder.</exception>
-        private string GetConnectionString()
+        private string GetDefaultConnectionString()
         {
             return
                 @"Server=127.0.0.1;" +

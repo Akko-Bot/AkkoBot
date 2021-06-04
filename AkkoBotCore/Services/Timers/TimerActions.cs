@@ -29,22 +29,26 @@ namespace AkkoBot.Services.Timers
     public class TimerActions : ITimerActions
     {
         private readonly EventId _timerLogEvent = new(99, nameof(TimerActions));
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
         private readonly ILogger _logger;
+        private readonly DiscordShardedClient _shardedClient;
+        private readonly UtilitiesService _utilitiesService;
 
-        public TimerActions(IServiceProvider services, IDbCache dbCache, ILocalizer localizer)
+        public TimerActions(IServiceScopeFactory scopeFactory, IDbCache dbCache, ILocalizer localizer, DiscordShardedClient shardedClient, UtilitiesService utilitiesService)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
             _localizer = localizer;
-            _logger = _services.GetService<DiscordShardedClient>().Logger;
+            _shardedClient = shardedClient;
+            _logger = shardedClient.Logger;
+            _utilitiesService = utilitiesService;
         }
 
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedban_title");
@@ -68,7 +72,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedmute");
@@ -101,7 +105,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers
@@ -129,7 +133,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers
@@ -157,7 +161,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var warnings = await db.Warnings
@@ -174,7 +178,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbReminder = await db.Reminders.FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
             var cmdHandler = client.GetCommandsNext();
@@ -200,7 +204,7 @@ namespace AkkoBot.Services.Timers
                 );
 
                 var message = new SmartString(fakeContext, dbReminder.Content);
-                var wasDeserialized = _services.GetService<UtilitiesService>().DeserializeEmbed(message.Content, out var dmsg);
+                var wasDeserialized = _utilitiesService.DeserializeEmbed(message.Content, out var dmsg);
                 dmsg ??= new();
 
                 var localizedDate = (server is null)
@@ -228,7 +232,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var cmdHandler = client.GetCommandsNext();
             var dbCmd = await db.AutoCommands
@@ -268,7 +272,7 @@ namespace AkkoBot.Services.Timers
 
         public async Task SendRepeaterAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             _dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache);
             var cmdHandler = client.GetCommandsNext();
@@ -288,7 +292,7 @@ namespace AkkoBot.Services.Timers
                 var fakeContext = cmdHandler.CreateFakeContext(user, channel, dbRepeater.Content, dbGuild.Prefix, null);
 
                 var message = new SmartString(fakeContext, dbRepeater.Content);
-                var wasDeserialized = _services.GetService<UtilitiesService>().DeserializeEmbed(message.Content, out var dmsg);
+                var wasDeserialized = _utilitiesService.DeserializeEmbed(message.Content, out var dmsg);
 
                 // If last message is the same repeated message, do nothing
                 if (lastMessage.Author == server.CurrentMember
@@ -345,9 +349,7 @@ namespace AkkoBot.Services.Timers
             if (server is not null && server.Members.TryGetValue(uid, out var member))
                 return member;
 
-            var clients = _services.GetService<DiscordShardedClient>();
-
-            foreach (var client in clients.ShardClients.Values)
+            foreach (var client in _shardedClient.ShardClients.Values)
             {
                 server = client.Guilds.Values.FirstOrDefault(x => x.Members.Any(x => x.Key == uid));
 

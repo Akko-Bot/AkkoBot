@@ -22,7 +22,7 @@ namespace AkkoBot.Services.Database
     /// </summary>
     public class AkkoDbCache : IDbCache
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private bool _isDisposed = false;
 
         public ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; private set; }
@@ -44,17 +44,17 @@ namespace AkkoBot.Services.Database
         public ITimerManager Timers { get; set; }   // ITimerManager has TimerActions, which has IDbCache as a dependency.
         public ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
 
-        public AkkoDbCache(IServiceProvider services)
+        public AkkoDbCache(IServiceScopeFactory scopeFactory, ICommandCooldown cmdCooldown, BotConfig botConfig, LogConfig logConfig)
         {
-            using var scope = services.GetScopedService<AkkoDbContext>(out var dbContext);
+            using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var dbContext);
 
-            _services = services;
-            BotConfig = services.GetService<BotConfig>();
-            LogConfig = services.GetService<LogConfig>();
+            _scopeFactory = scopeFactory;
+            BotConfig = botConfig;
+            LogConfig = logConfig;
             Users = dbContext.DiscordUsers.ToConcurrentDictionary(x => x.UserId);
             Blacklist = dbContext.Blacklist.AsNoTracking().Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Fetch(x => x.RotationTime != TimeSpan.Zero).ToList();
-            CooldownCommands = services.GetService<ICommandCooldown>().LoadFromEntities(dbContext.CommandCooldown.Fetch());
+            CooldownCommands = cmdCooldown.LoadFromEntities(dbContext.CommandCooldown.Fetch());
 
             Aliases = dbContext.Aliases
                 .AsNoTracking()
@@ -89,7 +89,7 @@ namespace AkkoBot.Services.Database
             if (Guilds.TryGetValue(sid, out var dbGuild))
                 return dbGuild;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             dbGuild = await db.GuildConfig.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
 

@@ -1,11 +1,10 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Config;
-using AkkoBot.Core.Common;
+using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,13 +17,15 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class BotConfigService : ICommandService
     {
-        private readonly IServiceProvider _services;
         private readonly IDbCache _dbCache;
+        private readonly ILocalizer _localizer;
+        private readonly IConfigLoader _configLoader;
 
-        public BotConfigService(IServiceProvider services, IDbCache dbCache)
+        public BotConfigService(IDbCache dbCache, ILocalizer localizer, IConfigLoader configLoader)
         {
-            _services = services;
             _dbCache = dbCache;
+            _localizer = localizer;
+            _configLoader = configLoader;
         }
 
         /// <summary>
@@ -32,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <returns>A collection of strings of the registered locales.</returns>
         public IEnumerable<string> GetLocales()
-            => _services.GetService<ILocalizer>().Locales;
+            => _localizer.Locales;
 
         /// <summary>
         /// Gets the bot's global settings.
@@ -54,10 +55,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of locales stored in memory.</returns>
         public int ReloadLocales()
         {
-            var localizer = _services.GetService<ILocalizer>();
-            localizer.ReloadLocalizedStrings();
-
-            return localizer.Locales.Count;
+            _localizer.ReloadLocalizedStrings();
+            return _localizer.Locales.Count;
         }
 
         /// <summary>
@@ -67,11 +66,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The targeted property.</returns>
         public T GetOrSetProperty<T>(Func<BotConfig, T> selector)
         {
-            var configLoader = _services.GetService<ConfigLoader>();
-
-            // Change the cached settings
             var result = selector(_dbCache.BotConfig);
-            configLoader.SaveConfig(_dbCache.BotConfig, AkkoEnvironment.BotConfigPath);
+            _configLoader.SaveConfig(_dbCache.BotConfig, AkkoEnvironment.BotConfigPath);
 
             return result;
         }
@@ -83,11 +79,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The targeted property.</returns>
         public T GetOrSetProperty<T>(Func<LogConfig, T> selector)
         {
-            var configLoader = _services.GetService<ConfigLoader>();
-
-            // Change the cached settings
             var result = selector(_dbCache.LogConfig);
-            configLoader.SaveConfig(_dbCache.LogConfig, AkkoEnvironment.LogConfigPath);
+            _configLoader.SaveConfig(_dbCache.LogConfig, AkkoEnvironment.LogConfigPath);
 
             return result;
         }

@@ -1,5 +1,5 @@
 using AkkoBot.Commands.Modules.Self.Services;
-using AkkoBot.Core.Common;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
@@ -17,70 +17,32 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoBot.Core.Services
+namespace AkkoBot.Services.Events
 {
     /// <summary>
-    /// Manages the behavior the bot should have for specific Discord events on startup.
+    /// Handles the behavior the bot should have for specific Discord events on startup.
     /// </summary>
-    internal class Startup
+    internal class StartupEventHandler : IStartupEventHandler
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
-        private readonly IServiceScope _scope;
-        private readonly BotCore _botCore;
+        private readonly StatusService _statusService;
 
-        internal Startup(BotCore botCore, IServiceProvider services)
+        public StartupEventHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, StatusService statusService)
         {
-            _botCore = botCore;
-            _services = services;
-            _dbCache = services.GetService<IDbCache>();
-            _scope = services.CreateScope();
+            _scopeFactory = scopeFactory;
+            _dbCache = dbCache;
+            _statusService = statusService;
         }
 
-        /// <summary>
-        /// Registers events the bot should listen to once it connects to Discord.
-        /// </summary>
-        /// <exception cref="InvalidOperationException"/>
-        internal void RegisterEvents()
-        {
-            if (_botCore is null)
-                throw new InvalidOperationException("Bot core cannot be null.");
+        public Task LoadInitialStateAsync(DiscordClient client, ReadyEventArgs eventArgs)
+            => Task.CompletedTask;
 
-            // Create bot configs on ready, if there isn't one already
-            _botCore.BotShardedClient.Ready += LoadInitialStateAsync;
-
-            // Save visible guilds on ready
-            _botCore.BotShardedClient.GuildDownloadCompleted += SaveNewGuilds;
-
-            // Initialize the timers stored in the database
-            _botCore.BotShardedClient.GuildDownloadCompleted += InitializeTimers;
-
-            // Caches guild filtered words
-            _botCore.BotShardedClient.GuildDownloadCompleted += CacheFilteredElements;
-
-            // Executes startup commands
-            _botCore.BotShardedClient.GuildDownloadCompleted += ExecuteStartupCommands;
-        }
-
-        /* Event Methods */
-
-        /// <summary>
-        /// Creates bot settings on startup, if there isn't one already.
-        /// </summary>
-        private async Task LoadInitialStateAsync(DiscordClient client, ReadyEventArgs eventArgs)
-        {
-            await InitializePlayingStatuses(client).ConfigureAwait(false);
-            await UnregisterCommands(client).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Saves new guilds to the database on startup and caches them.
-        /// </summary>
-        private Task SaveNewGuilds(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             return Task.Run(async () =>
             {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
                 var botConfig = _dbCache.BotConfig;
 
@@ -102,10 +64,7 @@ namespace AkkoBot.Core.Services
             });
         }
 
-        /// <summary>
-        /// Initializes the timers.
-        /// </summary>
-        private Task<bool> InitializeTimers(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public Task InitializeTimersAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             var cmdHandler = client.GetCommandsNext();
             _dbCache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
@@ -113,14 +72,11 @@ namespace AkkoBot.Core.Services
             return _dbCache.Timers.CreateClientTimersAsync(client).AsTask();
         }
 
-        /// <summary>
-        /// Caches the filtered words of all guilds available to this client.
-        /// </summary>
-        private Task CacheFilteredElements(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public Task CacheFilteredElementsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             return Task.Run(async () =>
             {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
                 var filteredWords = await db.FilteredWords.Fetch(x => x.Words.Count != 0)
                     .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
@@ -138,18 +94,15 @@ namespace AkkoBot.Core.Services
             });
         }
 
-        /// <summary>
-        /// Executes startup commands.
-        /// </summary>
-        private Task ExecuteStartupCommands(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             return Task.Run(async () =>
             {
-                var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
                 var cmdHandler = client.GetCommandsNext();
-                var startupCmds = await db.AutoCommands.Fetch(x => x.Type == AutoCommandType.Startup)
-                    .Where(x => eventArgs.Guilds.Keys.Contains(x.GuildId))
+                var startupCmds = await db.AutoCommands
+                    .Fetch(x => x.Type == AutoCommandType.Startup && eventArgs.Guilds.Keys.Contains(x.GuildId))
                     .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
                     .ToArrayAsyncEF();
 
@@ -170,15 +123,10 @@ namespace AkkoBot.Core.Services
             });
         }
 
-        /* Utility Methods */
-
-        /// <summary>
-        /// Initializes the bot's playing statuses.
-        /// </summary>
-        /// <param name="client">The Discord client.</param>
-        private async Task InitializePlayingStatuses(DiscordClient client)
+        public async Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs _)
         {
-            var db = _scope.ServiceProvider.GetService<AkkoDbContext>();
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
             var pStatus = await db.PlayingStatuses
                 .Fetch(x => x.RotationTime == TimeSpan.Zero)
                 .Select(x => new PlayingStatusEntity() { Message = x.Message, Type = x.Type, StreamUrl = x.StreamUrl })
@@ -189,16 +137,11 @@ namespace AkkoBot.Core.Services
             else if (_dbCache.BotConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
             {
                 _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;
-                await _services.GetService<StatusService>().RotateStatusesAsync();
+                await _statusService.RotateStatusesAsync();
             }
         }
 
-        /// <summary>
-        /// Unregisters disabled commands from the command handler of the current client,
-        /// then sets up the cache for disabled commands if it hasn't been already.
-        /// </summary>
-        /// <param name="client">The current Discord client.</param>
-        private Task UnregisterCommands(DiscordClient client)
+        public Task UnregisterCommandsAsync(DiscordClient client, ReadyEventArgs eventArgs)
         {
             var disabledCommands = new ConcurrentDictionary<string, Command>(); // Initialize the cache
             var cmdHandler = client.GetCommandsNext();                          // Initialize the command handler

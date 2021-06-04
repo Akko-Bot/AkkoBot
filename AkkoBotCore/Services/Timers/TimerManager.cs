@@ -21,17 +21,19 @@ namespace AkkoBot.Services.Timers
     public class TimerManager : ITimerManager
     {
         private const int _updateTimerDayAge = 1;
-        private readonly IServiceProvider _services;
-        private readonly ITimerActions _action;
         private readonly Timer _updateTimer = new(TimeSpan.FromDays(_updateTimerDayAge).TotalMilliseconds);
         private readonly ConcurrentDictionary<int, IAkkoTimer> _timers = new();
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly ITimerActions _action;
+        private readonly DiscordShardedClient _shardedClient;
         private ImmutableArray<TimerEntity> _timerEntries = ImmutableArray.Create<TimerEntity>();
         private bool _isFlushed = true;
 
-        public TimerManager(IServiceProvider services, ITimerActions action)
+        public TimerManager(IServiceScopeFactory scopeFactory, ITimerActions action, DiscordShardedClient shardedClient)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _action = action;
+            _shardedClient = shardedClient;
 
             // Initialize the internal update timer
             _updateTimer.Elapsed += UpdateFromDb;
@@ -174,7 +176,7 @@ namespace AkkoBot.Services.Timers
         /// <param name="client">The Discord client that fetched the database entry</param>
         private async Task UpdateDailyTimer(IAkkoTimer oldTimer, DiscordClient client)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             var dbTimer = await db.Timers.FindAsync(oldTimer.Id);
 
             // Update database
@@ -195,7 +197,7 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private async Task LoadDbEntriesCacheAsync()
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             _timerEntries = _timerEntries.AddRange(
                 await db.Timers
@@ -209,15 +211,14 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         private void UpdateFromDb(object obj, ElapsedEventArgs args)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
-            var clients = _services.GetService<DiscordShardedClient>();
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var nextEntries = db.Timers
                 .ToLinqToDB()
                 .Where(x => x.IsActive && x.ElapseAt - DateTimeOffset.Now <= TimeSpan.FromDays(_updateTimerDayAge))
                 .ToArray();
 
-            foreach (var client in clients.ShardClients.Values)
+            foreach (var client in _shardedClient.ShardClients.Values)
                 GenerateTimers(nextEntries, client);
         }
 

@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class BlacklistService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
         /// <summary>
@@ -29,9 +30,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         public bool HasBlacklists => _dbCache.Blacklist.Count is not 0;
 
-        public BlacklistService(IServiceProvider services, IDbCache dbCache)
+        public BlacklistService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -48,7 +49,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </returns>
         public async Task<(BlacklistEntity, bool)> AddBlacklistAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Generate the database entry
             var entry = new BlacklistEntity()
@@ -73,7 +74,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been added to the database.</returns>
         public async Task<int> AddBlacklistsAsync(ulong[] ids)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var newEntries = ids.Distinct()
                 .Select(id => new BlacklistEntity() { ContextId = id, Type = BlacklistType.Unspecified });
@@ -91,7 +92,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been removed from the database.</returns>
         public async Task<int> RemoveBlacklistsAsync(ulong[] ids)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             foreach (var id in ids)
                 _dbCache.Blacklist.TryRemove(id);
@@ -111,7 +112,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (!_dbCache.Blacklist.Contains(contextId))
                 return null;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var entry = await db.Blacklist.FirstOrDefaultAsync(x => x.ContextId == contextId);
 
@@ -129,7 +130,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The amount of entries removed.</returns>
         public async Task<int> ClearBlacklistsAsync()
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             _dbCache.Blacklist.Clear();
             return await db.Blacklist.DeleteAsync();
@@ -155,7 +156,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
         public async Task<IReadOnlyCollection<T>> GetBlacklistAsync<T>(Expression<Func<BlacklistEntity, bool>> predicate, Expression<Func<BlacklistEntity, T>> selector)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             return await db.Blacklist.Fetch(predicate)
                 .Select(selector)

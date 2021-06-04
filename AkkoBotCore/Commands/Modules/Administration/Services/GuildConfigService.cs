@@ -5,6 +5,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,13 +17,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class GuildConfigService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCacher;
         private readonly ILocalizer _localizer;
 
-        public GuildConfigService(IServiceProvider services, IDbCache dbCacher, ILocalizer localizer)
+        public GuildConfigService(IServiceScopeFactory scopeFactory, IDbCache dbCacher, ILocalizer localizer)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCacher = dbCacher;
             _localizer = localizer;
         }
@@ -57,7 +58,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
             if (dbGuild is not null)
             {
-                using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
                 db.GuildConfig.Update(dbGuild);
                 await db.SaveChangesAsync();

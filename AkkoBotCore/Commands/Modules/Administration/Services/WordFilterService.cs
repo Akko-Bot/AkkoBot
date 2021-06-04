@@ -5,6 +5,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -15,12 +16,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class WordFilterService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public WordFilterService(IServiceProvider services, IDbCache dbCache)
+        public WordFilterService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -32,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one word got added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddFilteredWordsAsync(ulong sid, params string[] words)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
 
@@ -70,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one ID was added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddIgnoredIdsAsync(ulong sid, params ulong[] ids)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
 
@@ -108,7 +109,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The setting returned by <paramref name="action"/>.</returns>
         public async Task<T> SetWordFilterSettingsAsync<T>(ulong sid, Func<FilteredWordsEntity, T> action)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
 
@@ -136,7 +137,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one word got removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveFilteredWordsAsync(ulong sid, params string[] words)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
                 return false;
@@ -166,7 +167,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if at least one word got removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> ClearFilteredWordsAsync(ulong sid)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
                 return false;

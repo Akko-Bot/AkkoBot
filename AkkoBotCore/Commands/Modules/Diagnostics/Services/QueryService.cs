@@ -4,8 +4,8 @@ using AkkoBot.Extensions;
 using AkkoBot.Models;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,10 +20,10 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
     public class QueryService : ICommandService
     {
         // TODO: I may need to, in the future, specify which database needs to be queried
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public QueryService(IServiceProvider services)
-            => _services = services;
+        public QueryService(IServiceScopeFactory scopeFactory)
+            => _scopeFactory = scopeFactory;
 
         /// <summary>
         /// Runs any non-SELECT query on the database.
@@ -33,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
         /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
         public async Task<(int, long)> RunExecQueryAsync(string query)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             var clock = new Stopwatch();
 
             clock.Start();
@@ -55,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
             var fieldBuilders = new List<StringBuilder>();
 
             // Open database connection for manual read
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             using var connection = db.Database.GetDbConnection();
             await connection.OpenAsync();

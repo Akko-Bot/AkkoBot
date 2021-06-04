@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Common;
 using AkkoBot.Config;
+using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Extensions;
 using System;
 using System.IO;
@@ -11,7 +12,7 @@ namespace AkkoBot.Core.Common
     /// <summary>
     /// Saves and loads Yaml configuration files.
     /// </summary>
-    public class ConfigLoader
+    public class ConfigLoader : IConfigLoader
     {
         private readonly ISerializer _serializer;
         private readonly IDeserializer _deserializer;
@@ -22,12 +23,6 @@ namespace AkkoBot.Core.Common
             _deserializer = deserializer ?? new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
         }
 
-        /// <summary>
-        /// Prepare the credentials for bot startup.
-        /// </summary>
-        /// <param name="filePath">Path to the credentials file, with its name and extension.</param>
-        /// <remarks>This method loops until a valid credentials file is provided.</remarks>
-        /// <returns>A valid <see cref="Credentials"/> object.</returns>
         public Credentials LoadCredentials(string filePath)
         {
             while (!IsValidCredential(filePath)) ;
@@ -35,13 +30,6 @@ namespace AkkoBot.Core.Common
             return GetCredentials(filePath);
         }
 
-        /// <summary>
-        /// Gets a <typeparamref name="T"/> from the specified path.
-        /// </summary>
-        /// <typeparam name="T">The type of the configuration object.</typeparam>
-        /// <param name="filePath">Path to the configuration file, with its name and extension.</param>
-        /// <remarks>If the file doesn't exist, it creates one.</remarks>
-        /// <returns>A <typeparamref name="T"/> object.</returns>
         public T LoadConfig<T>(string filePath) where T : new()
         {
             // Load the config file
@@ -52,12 +40,6 @@ namespace AkkoBot.Core.Common
             return reader.FromYaml<T>(_deserializer);
         }
 
-        /// <summary>
-        /// Serializes a <typeparamref name="T"/> object to a file in the specified path.
-        /// </summary>
-        /// <typeparam name="T">The type of the object being serialized.</typeparam>
-        /// <param name="config">The object to be serialized.</param>
-        /// <param name="filePath">Path to the configuration file, with its name and extension.</param>
         public void SaveConfig<T>(T config, string filePath)
         {
             using var writer = File.CreateText(filePath);

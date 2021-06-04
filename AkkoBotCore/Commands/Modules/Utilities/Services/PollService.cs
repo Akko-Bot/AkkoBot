@@ -6,6 +6,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,12 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     /// </summary>
     public class PollService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public PollService(IServiceProvider services, IDbCache dbCache)
+        public PollService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -38,7 +39,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the poll was successfully created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddPollAsync(DiscordMessage message, string question, PollType type, params string[] answers)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var newEntry = new PollEntity()
             {
@@ -75,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (poll is null)
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             db.Remove(poll);
             polls.TryRemove(poll);
@@ -93,7 +94,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (poll is null)
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             _dbCache.Polls.TryGetValue(poll.GuildIdFK, out var polls);
 
             db.Remove(poll);
@@ -114,7 +115,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (poll is null || poll.Type is not PollType.Anonymous || vote > poll.Votes.Length || poll.Voters.Contains((long)user.Id))
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             poll.Votes[vote - 1]++;
             poll.Voters.Add((long)user.Id);

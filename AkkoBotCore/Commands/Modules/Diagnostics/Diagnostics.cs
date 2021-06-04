@@ -8,6 +8,7 @@ using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
@@ -31,8 +32,8 @@ namespace AkkoBot.Commands.Modules.Diagnostics
             if (!Directory.Exists(AkkoEnvironment.LogsDirectory))
                 Directory.CreateDirectory(AkkoEnvironment.LogsDirectory);
 
-            var timers = await Task.Run(() => _dbCache.Timers.GetMemoryEstimate(typeof(IDbCache), typeof(IServiceProvider), typeof(ILocalizer)));
-            var dbCache = await Task.Run(() => _dbCache.GetMemoryEstimate(typeof(ITimerManager), typeof(IServiceProvider)));
+            var timers = await Task.Run(() => _dbCache.Timers.GetMemoryEstimate(typeof(IDbCache), typeof(IServiceScopeFactory), typeof(ILocalizer)));
+            var dbCache = await Task.Run(() => _dbCache.GetMemoryEstimate(typeof(ITimerManager), typeof(IServiceScopeFactory)));
             var logFolderSize = new DirectoryInfo(AkkoEnvironment.LogsDirectory)
                 .EnumerateFiles("*.txt", SearchOption.AllDirectories)
                 .Sum(x => x.Length);

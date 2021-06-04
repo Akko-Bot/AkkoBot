@@ -21,10 +21,16 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     /// </summary>
     public class UtilitiesService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly DiscordShardedClient _shardedClient;
+        private readonly HttpClient _httpClient;
 
-        public UtilitiesService(IServiceProvider services)
-            => _services = services;
+        public UtilitiesService(IServiceScopeFactory scopeFactory, DiscordShardedClient shardedClient, HttpClient httpClient)
+        {
+            _scopeFactory = scopeFactory;
+            _shardedClient = shardedClient;
+            _httpClient = httpClient;
+        }
 
         /// <summary>
         /// Deserializes user input in Yaml to a Discord message.
@@ -60,7 +66,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             else if (!server.CurrentMember.PermissionsIn(channel).HasFlag(Permissions.UseExternalEmojis))
                 return false;
 
-            var servers = _services.GetService<DiscordShardedClient>().ShardClients.Values
+            var servers = _shardedClient.ShardClients.Values
                 .SelectMany(x => x.Guilds.Values);
 
             foreach (var guild in servers)
@@ -83,10 +89,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <returns>A <see cref="Stream"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
         public async Task<Stream> GetOnlineStreamAsync(string url)
         {
-            var http = _services.GetService<HttpClient>();
-
             // Stream needs to be seekable
-            try { return await (await http.GetAsync(url)).Content.ReadAsStreamAsync(); }
+            try { return await (await _httpClient.GetAsync(url)).Content.ReadAsStreamAsync(); }
             catch { return null; }
         }
 

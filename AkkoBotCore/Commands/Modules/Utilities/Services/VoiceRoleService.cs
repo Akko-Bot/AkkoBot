@@ -6,6 +6,7 @@ using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,12 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     /// </summary>
     public class VoiceRoleService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public VoiceRoleService(IServiceProvider services, IDbCache dbCache)
+        public VoiceRoleService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -42,7 +43,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                 && voiceRoles.Select(x => x.RoleId).Contains(role.Id)))
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Add to the database
             var newEntry = new VoiceRoleEntity()
@@ -75,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             if (!_dbCache.VoiceRoles.TryGetValue(server.Id, out var voiceRoles))
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Remove from the cache
             var matches = voiceRoles

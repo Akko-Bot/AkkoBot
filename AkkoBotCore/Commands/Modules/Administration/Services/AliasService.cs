@@ -8,6 +8,7 @@ using AkkoBot.Services.Database.Queries;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class AliasService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public AliasService(IServiceProvider services, IDbCache dbCache)
+        public AliasService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -50,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (cmd is null)
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Save the new entry to the database
             var newEntry = new AliasEntity()
@@ -90,7 +91,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.Aliases.TryGetValue(context.Guild?.Id ?? default, out var aliases))
                 return false;
@@ -116,7 +117,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.Aliases.TryGetValue(context.Guild?.Id ?? default, out var aliases))
                 return false;

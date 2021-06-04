@@ -5,6 +5,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +18,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class ContentFilterService : ICommandService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public ContentFilterService(IServiceProvider services, IDbCache dbCache)
+        public ContentFilterService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
-            _services = services;
+            _scopeFactory = scopeFactory;
             _dbCache = dbCache;
         }
 
@@ -36,7 +37,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The updated property.</returns>
         public async Task<T> SetContentFilterAsync<T>(DiscordGuild server, DiscordChannel channel, Func<FilteredContentEntity, T> selector)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.FilteredContent.TryGetValue(server.Id, out var filters))
             {
@@ -74,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (!_dbCache.FilteredContent.TryGetValue(server.Id, out var filters) || !filters.Any(x => x.Id == id))
                 return false;
 
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var filter = filters.FirstOrDefault(x => x.Id == id);
 
@@ -93,7 +94,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if all filters were successfully removed, <see langword="false"/> if there was no filter to remove.</returns>
         public async Task<bool> ClearContentFiltersAsync(DiscordGuild server)
         {
-            using var scope = _services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.FilteredContent.TryRemove(server.Id, out var filters) || filters.Count is 0)
                 return false;
