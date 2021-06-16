@@ -7,8 +7,6 @@ using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using LinqToDB;
-using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;

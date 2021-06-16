@@ -28,6 +28,7 @@ namespace AkkoBot.Services.Events
         /// </summary>
         /// <remarks>The first <see langword="ulong"/> is the ID of the Discord guild, the second is the ID of the Discord user.</remarks>
         private readonly ConcurrentDictionary<(ulong, ulong), CancellationTokenSource> _recentConnections = new();
+
         private readonly TimeSpan _waitTime = TimeSpan.FromSeconds(1.5);
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
