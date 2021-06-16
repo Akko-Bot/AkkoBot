@@ -25,7 +25,7 @@ namespace AkkoBot.Core
             => _cToken = cToken;
 
         /// <summary>
-        /// Initializes a bot and connects it to Discord.
+        /// Initializes the bot and connects it to Discord.
         /// </summary>
         public async Task RunAsync()
         {

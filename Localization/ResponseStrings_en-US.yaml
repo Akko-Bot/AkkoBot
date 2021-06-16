@@ -595,4 +595,3 @@ restart: Restarting.
 auto_punish: Punishment | {0} | {1}
 add_role: Add Role
 remove_role: Remove Role
-warnp_trigger: Too Many Infractions
