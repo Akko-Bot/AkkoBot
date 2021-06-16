@@ -7,9 +7,11 @@ using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration.Services
@@ -96,7 +98,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
 
-            if (!server.Roles.TryGetValue(dbGuild.MuteRoleId ?? 0, out var muteRole))
+            if (!server.Roles.TryGetValue(dbGuild.MuteRoleId ?? default, out var muteRole))
             {
                 using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
@@ -105,8 +107,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
                 // Save it to the database
                 dbGuild.MuteRoleId = muteRole.Id;
-                db.GuildConfig.Update(dbGuild);
-                await db.SaveChangesAsync();
+                await db.GuildConfig.UpdateAsync(
+                    x => x.GuildId == server.Id,
+                    _ => new GuildConfigEntity() { MuteRoleId = muteRole.Id }
+                );
             }
 
             return muteRole;
@@ -145,15 +149,26 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             };
 
             // If user is already muted, do nothing
-            if (!await db.MutedUsers.AnyAsync(x => x.GuildIdFK == context.Guild.Id && x.UserId == user.Id))
+            if (!await db.MutedUsers.AnyAsyncEF(x => x.GuildIdFK == context.Guild.Id && x.UserId == user.Id))
             {
+                var notice = new WarnEntity()
+                {
+                    GuildIdFK = context.Guild.Id,
+                    UserIdFK = user.Id,
+                    AuthorId = context.User.Id,
+                    Type = WarnType.Notice,
+                    WarningText = context.FormatLocalized("auto_punish", "mute", time.ToString(@"%d\d\ %h\h\ %m\m\ %s\s"))
+                };
+
                 var occurrence = new OccurrenceEntity()
                 {
                     GuildIdFK = context.Guild.Id,
                     UserId = user.Id,
+                    Notices = 1,
                     Mutes = 1
                 };
 
+                db.Add(notice);
                 db.Add(muteEntry);
                 db.Upsert(occurrence);
             }
@@ -192,19 +207,17 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 await user.SetMuteAsync(false);
 
             // Remove from the database
-            var muteEntry = await db.MutedUsers.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.UserId == user.Id);
-            var timerEntry = await db.Timers.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id);
+            await db.MutedUsers.DeleteAsync(x => x.GuildIdFK == server.Id && x.UserId == user.Id);
+            var timerId = await db.Timers
+                .Where(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id && x.Type == TimerType.TimedMute)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsyncEF();
 
-            if (muteEntry is not null)
-                db.MutedUsers.Remove(muteEntry);
-
-            if (timerEntry is not null)
+            if (timerId is not default(int))
             {
-                db.Timers.Remove(timerEntry);
-                _dbCache.Timers.TryRemove(timerEntry.Id);
+                await db.Timers.DeleteAsync(x => x.Id == timerId);
+                _dbCache.Timers.TryRemove(timerId);
             }
-
-            await db.SaveChangesAsync();
         }
 
         /// <summary>

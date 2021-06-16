@@ -22,15 +22,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
-        private readonly RoleService _roleService;
-        private readonly UserPunishmentService _punishService;
 
-        public WarningService(IServiceScopeFactory scopeFactory, IDbCache dbCache, RoleService roleService, UserPunishmentService punishService)
+        public WarningService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
             _scopeFactory = scopeFactory;
             _dbCache = dbCache;
-            _roleService = roleService;
-            _punishService = punishService;
         }
 
         /// <summary>
@@ -87,8 +83,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 await db.Occurrences.UpdateAsync(
                     x => x.Id == dbOccurrence.Id,
                     (type == WarnType.Notice)
-                        ? _ => new OccurrenceEntity() { Notices = dbOccurrence.Notices + 1 }
-                        : _ => new OccurrenceEntity() { Warnings = dbOccurrence.Warnings + 1 }
+                        ? y => new OccurrenceEntity() { Notices = y.Notices + 1 }
+                        : y => new OccurrenceEntity() { Warnings = y.Warnings + 1 }
                 );
             }
 
@@ -116,8 +112,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 .Select(x => new WarnPunishEntity() { Id = x.Id, Type = x.Type, PunishRoleId = x.PunishRoleId, Interval = x.Interval })
                 .FirstOrDefaultAsyncEF();
 
+            context.Guild.Roles.TryGetValue(punishment?.PunishRoleId ?? default, out var punishRole);
+
             // If punishment role doesn't exist anymore, delete the punishment from the database
-            if (punishment?.PunishRoleId is not null && !context.Guild.Roles.TryGetValue(punishment.PunishRoleId.Value, out _))
+            if (punishment?.PunishRoleId is not null && punishRole is null)
             {
                 await db.WarnPunishments.DeleteAsync(punishment);
                 return null;
@@ -231,6 +229,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         public async Task<int> RemoveInfractionAsync(DiscordGuild server, DiscordUser user, int? id)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            int result;
 
             if (id.HasValue)
             {
@@ -239,16 +238,18 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                     .Select(x => x.TimerIdFK)
                     .FirstOrDefaultAsyncEF();
 
-                await db.Timers.DeleteAsync(x => x.Id == timerId);
+                result = await db.Warnings.DeleteAsync(x => x.Id == id);
 
-                return await db.Warnings.DeleteAsync(x => x.Id == id);
+                await db.Timers.DeleteAsync(x => x.Id == timerId);
             }
             else
             {
-                await db.Timers.DeleteAsync(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id && x.Type == TimerType.TimedWarn);
+                result = await db.Warnings.DeleteAsync(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id);
 
-                return await db.Warnings.DeleteAsync(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id);
+                await db.Timers.DeleteAsync(x => x.GuildIdFK == server.Id && x.UserIdFK == user.Id && x.Type == TimerType.TimedWarn);
             }
+
+            return result;
         }
 
         /// <summary>
@@ -401,31 +402,36 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <exception cref="NotImplementedException">Occurs when the specified punishment has no implementation.</exception>
         private async Task ApplyPunishmentAsync(CommandContext context, DiscordUser user, WarnPunishEntity punishment, string reason)
         {
+            using var scope = _scopeFactory.CreateScope();
+            var punishService = scope.ServiceProvider.GetService<UserPunishmentService>();
             var warnString = context.FormatLocalized("infraction");
-            var member = (DiscordMember)user;
+            var member = user as DiscordMember;
 
             switch (punishment.Type)
             {
                 case WarnPunishType.Mute:
                     if (member is null) break;
-                    var muteRole = await _roleService.FetchMuteRoleAsync(context.Guild);
-                    await _roleService.MuteUserAsync(context, muteRole, member, punishment.Interval ?? TimeSpan.Zero, warnString + " | " + reason);
+
+                    var roleService = scope.ServiceProvider.GetService<RoleService>();
+                    var muteRole = await roleService.FetchMuteRoleAsync(context.Guild);
+                    await roleService.MuteUserAsync(context, muteRole, member, punishment.Interval ?? TimeSpan.Zero, warnString + " | " + reason);
                     break;
 
                 case WarnPunishType.Kick:
                     if (member is null) break;
-                    await _punishService.KickUser(context.Guild, member, warnString + " | " + reason);
+
+                    await punishService.KickUserAsync(context, member, warnString + " | " + reason);
                     break;
 
                 case WarnPunishType.Softban:
-                    await _punishService.SoftbanUser(context.Guild, user.Id, 1, warnString + " | " + reason);
+                    await punishService.SoftbanUserAsync(context, user.Id, 1, warnString + " | " + reason);
                     break;
 
                 case WarnPunishType.Ban:
                     if (punishment.Interval.HasValue)
-                        await _punishService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
+                        await punishService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
                     else
-                        await _punishService.BanUser(context.Guild, user.Id, 1, warnString + " | " + reason);
+                        await punishService.BanUserAsync(context, user.Id, 1, warnString + " | " + reason);
 
                     break;
 
@@ -435,7 +441,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                         break;
 
                     if (punishment.Interval.HasValue)
-                        await _punishService.TimedRolePunish(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
+                        await punishService.TimedRolePunishAsync(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
                     else if (punishment.Type == WarnPunishType.AddRole)
                         await member.GrantRoleAsync(punishRole, warnString + " | " + reason);
                     else

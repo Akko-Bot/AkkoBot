@@ -40,7 +40,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "kick_notification", reason);
 
             // Kick the user
-            await _punishService.KickUser(context.Guild, user, context.Member.GetFullname() + " | " + reason);
+            await _punishService.KickUserAsync(context, user, $"{context.Member.GetFullname()} | {reason}");
 
             // Send kick message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, string.Empty, "kick_title");
@@ -75,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "sban_notification", reason);
 
             // Softban the user
-            await _punishService.SoftbanUser(context.Guild, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+            await _punishService.SoftbanUser(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send soft-ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
@@ -109,7 +109,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "ban_notification", reason);
 
             // Ban the user
-            await _punishService.BanUser(context.Guild, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+            await _punishService.BanUser(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
@@ -157,7 +157,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var fails = 0;
             foreach (var userId in nonBanned)
             {
-                try { await _punishService.BanUser(context.Guild, userId, 1, context.Member.GetFullname() + " | " + context.FormatLocalized("massban")); }
+                try { await _punishService.BanUserAsync(context, userId, 1, context.Member.GetFullname() + " | " + context.FormatLocalized("massban")); }
                 catch { fails += 1; }
 
                 // Safety delay

@@ -7,6 +7,8 @@ using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -69,105 +71,141 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <summary>
         /// Kicks a user and registers the occurrence in the database.
         /// </summary>
-        /// <param name="server">The Discord guild where the punishment took place.</param>
+        /// <param name="context">The command context.</param>
         /// <param name="userId">The ID of the Discord user that got punished.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task KickUser(DiscordGuild server, ulong userId, string reason)
-            => await KickUser(server, await server.GetMemberAsync(userId), reason);
+        public async Task KickUserAsync(CommandContext context, ulong userId, string reason)
+            => await KickUserAsync(context, await context.Guild.GetMemberAsync(userId), reason);
 
         /// <summary>
         /// Kicks a user and registers the occurrence in the database.
         /// </summary>
-        /// <param name="server">The Discord guild where the punishment took place.</param>
+        /// <param name="context">The command context.</param>
         /// <param name="user">The Discord user that got punished.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task KickUser(DiscordGuild server, DiscordMember user, string reason)
+        public async Task KickUserAsync(CommandContext context, DiscordMember user, string reason)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             await user.RemoveAsync(reason);
 
+            var notice = new WarnEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = user.Id,
+                AuthorId = context.User.Id,
+                Type = WarnType.Notice,
+                WarningText = context.FormatLocalized("auto_punish", "kick", reason)
+            };
+
             var occurrence = new OccurrenceEntity()
             {
-                GuildIdFK = server.Id,
+                GuildIdFK = context.Guild.Id,
                 UserId = user.Id,
+                Notices = 1,
                 Kicks = 1
             };
 
+            db.Add(notice);
             db.Upsert(occurrence);
+
             await db.SaveChangesAsync();
         }
 
         /// <summary>
         /// Soft-bans a user and registers the occurrence in the database.
         /// </summary>
-        /// <param name="server">The Discord guild where the punishment took place.</param>
+        /// <param name="context">The command context.</param>
         /// <param name="user">The Discord user that got punished.</param>
         /// <param name="days">Days to remove the messages from.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task SoftbanUser(DiscordGuild server, DiscordMember user, int days, string reason)
-            => await SoftbanUser(server, user.Id, days, reason);
+        public async Task SoftbanUser(CommandContext context, DiscordMember user, int days, string reason)
+            => await SoftbanUserAsync(context, user.Id, days, reason);
 
         /// <summary>
         /// Soft-bans a user and registers the occurrence in the database.
         /// </summary>
-        /// <param name="server">The Discord guild where the punishment took place.</param>
+        /// <param name="context">The command context.</param>
         /// <param name="userId">The ID of the Discord user that got punished.</param>
         /// <param name="days">Days to remove the messages from.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task SoftbanUser(DiscordGuild server, ulong userId, int days, string reason)
+        public async Task SoftbanUserAsync(CommandContext context, ulong userId, int days, string reason)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
-            await server.BanMemberAsync(userId, days, reason);
+            await context.Guild.BanMemberAsync(userId, days, reason);
 
             // Unban the user
-            await server.UnbanMemberAsync(userId);
+            await context.Guild.UnbanMemberAsync(userId);
+
+            var notice = new WarnEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = userId,
+                AuthorId = context.User.Id,
+                Type = WarnType.Notice,
+                WarningText = context.FormatLocalized("auto_punish", "softban", reason)
+            };
 
             var occurrence = new OccurrenceEntity()
             {
-                GuildIdFK = server.Id,
+                GuildIdFK = context.Guild.Id,
                 UserId = userId,
+                Notices = 1,
                 Softbans = 1
             };
 
+            db.Add(notice);
             db.Upsert(occurrence);
+
             await db.SaveChangesAsync();
         }
 
         /// <summary>
         /// Soft-bans a user and registers the occurrence in the database.
         /// </summary>
-        /// <param name="server">The Discord guild where the punishment took place.</param>
+        /// <param name="context">The command context.</param>
         /// <param name="user">The Discord user that got punished.</param>
         /// <param name="days">Days to remove the messages from.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task BanUser(DiscordGuild server, DiscordMember user, int days, string reason)
-            => await BanUser(server, user.Id, days, reason);
+        public async Task BanUser(CommandContext context, DiscordMember user, int days, string reason)
+            => await BanUserAsync(context, user.Id, days, reason);
 
         /// <summary>
         /// Soft-bans a user and registers the occurrence in the database.
         /// </summary>
-        /// <param name="server">The Discord guild where the punishment took place.</param>
+        /// <param name="context">The command context.</param>
         /// <param name="userId">The ID of the Discord user that got punished.</param>
         /// <param name="days">Days to remove the messages from.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task BanUser(DiscordGuild server, ulong userId, int days, string reason)
+        public async Task BanUserAsync(CommandContext context, ulong userId, int days, string reason)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
-            await server.BanMemberAsync(userId, days, reason);
+            await context.Guild.BanMemberAsync(userId, days, reason);
+
+            var notice = new WarnEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = userId,
+                AuthorId = context.User.Id,
+                Type = WarnType.Notice,
+                WarningText = context.FormatLocalized("auto_punish", "ban", reason)
+            };
 
             var occurrence = new OccurrenceEntity()
             {
-                GuildIdFK = server.Id,
+                GuildIdFK = context.Guild.Id,
                 UserId = userId,
+                Notices = 1,
                 Bans = 1
             };
 
+            db.Add(notice);
             db.Upsert(occurrence);
+
             await db.SaveChangesAsync();
         }
 
@@ -187,10 +225,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 time = TimeSpan.FromMinutes(1);
 
             // Ban the user
-            await BanUser(context.Guild, userId, 1, context.Member.GetFullname() + " | " + reason);
+            await context.Guild.BanMemberAsync(userId, time.Days, context.Member.GetFullname() + " | " + reason);
 
             // Create the new database entry
-            var newEntry = new TimerEntity()
+            var dbTimer = new TimerEntity()
             {
                 GuildIdFK = context.Guild.Id,
                 UserIdFK = userId,
@@ -200,21 +238,31 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
+            var notice = new WarnEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = userId,
+                AuthorId = context.User.Id,
+                Type = WarnType.Notice,
+                WarningText = context.FormatLocalized("auto_punish", "ban", $"{time:%d\\d\\ %h\\h\\ %m\\m\\ %s\\s} | {reason}")
+            };
+
             var occurrence = new OccurrenceEntity()
             {
                 GuildIdFK = context.Guild.Id,
                 UserId = userId,
+                Notices = 1,
                 Bans = 1
             };
 
+            db.Add(notice);
             db.Upsert(occurrence);
+            db.Update(dbTimer);
 
-            // Upsert the entry
-            db.Timers.Update(newEntry);
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newEntry);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, dbTimer);
         }
 
         /// <summary>
@@ -227,7 +275,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="role">The Discord role to be added/removed.</param>
         /// <param name="reason">The reason for the punishment.</param>
         /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
-        public async Task TimedRolePunish(CommandContext context, WarnPunishType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
+        public async Task TimedRolePunishAsync(CommandContext context, WarnPunishType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
@@ -244,25 +292,42 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 throw new ArgumentException(@"Only punishment types of type ""AddRole"" and ""RemoveRole"" are supported.");
 
             // Create the new database entry
-            var newEntry = new TimerEntity()
+            var dbTimer = new TimerEntity()
             {
                 GuildIdFK = context.Guild.Id,
                 UserIdFK = user.Id,
                 RoleId = role.Id,
                 IsRepeatable = false,
                 Interval = time,
-                Type = (type == WarnPunishType.AddRole) ? TimerType.TimedUnrole : TimerType.TimedRole,
+                Type = (type is WarnPunishType.AddRole) ? TimerType.TimedUnrole : TimerType.TimedRole,
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 
-            // *Not sure if I should support occurrences here* //
+            var notice = new WarnEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserIdFK = user.Id,
+                AuthorId = context.User.Id,
+                Type = WarnType.Notice,
+                WarningText = context.FormatLocalized("auto_punish", type.ToString().ToSnakeCase(), $"{role.Name} | {time:%d\\d\\ %h\\h\\ %m\\m\\ %s\\s}")
+            };
+
+            var occurrence = new OccurrenceEntity()
+            {
+                GuildIdFK = context.Guild.Id,
+                UserId = user.Id,
+                Notices = 1,
+            };
 
             // Upsert the entry
-            db.Timers.Upsert(newEntry);
+            db.Add(notice);
+            db.Upsert(occurrence);
+            db.Upsert(dbTimer);
+
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newEntry);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, dbTimer);
         }
     }
 }

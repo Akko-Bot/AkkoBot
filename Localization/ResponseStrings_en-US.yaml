@@ -585,12 +585,14 @@ db_cache: Database Cache
 timers: Timers
 total: Total
 saved_logs: Saved Logs
-
 cmd_sanitizenames: Toggles whether nicknames should have special characters removed from the beginning.
 guild_sanitizenames: Nickname sanitization has been {0}.
 cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Providing no parameter to sanitize the original nickname.
 sanitizedname_reset: Nicknames starting with special characters will now be sanitized.
 sanitizedname_set: Nicknames starting with special characters will now be replaced with {0}.
-
-
 restart: Restarting.
+
+auto_punish: Punishment | {0} | {1}
+add_role: Add Role
+remove_role: Remove Role
+warnp_trigger: Too Many Infractions

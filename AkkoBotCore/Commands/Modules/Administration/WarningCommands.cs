@@ -4,12 +4,14 @@ using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -147,6 +149,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             user ??= context.User;
             var infractions = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
+            var fields = new List<SerializableEmbedField>(infractions.Count);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
@@ -161,13 +164,13 @@ namespace AkkoBot.Commands.Modules.Administration
                     modName
                 );
 
-                embed.AddField(fieldName, infraction.WarningText);
+                fields.Add(new(fieldName, infraction.WarningText));
             }
 
             if (infractions.Count is 0)
                 embed.WithDescription("infractions_empty");
 
-            await context.RespondPaginatedByFieldsAsync(embed);
+            await context.RespondPaginatedByFieldsAsync(embed, fields);
         }
 
         [Command("modlog")]
@@ -178,6 +181,7 @@ namespace AkkoBot.Commands.Modules.Administration
             user ??= context.User;
             var infractions = await _warnService.GetInfractionsAsync(context.Guild, user);
             var occurrence = await _warnService.GetUserOccurrencesAsync(context.Guild, user);
+            var fields = new List<SerializableEmbedField>(infractions.Count);
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()))
@@ -200,13 +204,13 @@ namespace AkkoBot.Commands.Modules.Administration
                     modName.ToString()
                 );
 
-                embed.AddField(fieldName, infraction.WarningText);
+                fields.Add(new(fieldName, infraction.WarningText));
             }
 
             if (infractions.Count is 0)
                 embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
-            await context.RespondPaginatedByFieldsAsync(embed);
+            await context.RespondPaginatedByFieldsAsync(embed, fields);
         }
 
         [Command("warnpunishment"), HiddenOverload]
