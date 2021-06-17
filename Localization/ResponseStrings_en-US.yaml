@@ -1,3 +1,4 @@
+add_role: Add Role
 addrole: Add Role
 addrole_enum: received a punishment role
 alias: Alias
@@ -11,6 +12,7 @@ arg_alias_remove: The alias to be removed.
 arg_autocommand_id: The ID of the autocommand.
 arg_autocommand_time: Time until the command activation.
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
+arg_bantemplate: The template for the ban notification.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
 arg_bool: __true__ to enable, __false__ to disable.
 arg_channel_id: The ID of a Discord channel.
@@ -87,6 +89,7 @@ arg_warnp_role: A role to be added or removed from the user, if applicable.
 arg_warnp_time: For how long the punishment should last. Leave it empty to make it permanent.
 arg_warnp_type: The type of punishment to be applied.
 author: Author
+auto_punish: Punishment | {0} | {1}
 autocommand_empty: No autocommands were found.
 autocommand_title: List of Autocommands
 ban: Ban
@@ -94,6 +97,8 @@ ban_enum: banned
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
 banned_for: Banned for
+bantemplate_reset: The ban template has been successfully removed.
+bantemplate_set: The ban template has been successfully set.
 bitrate: Bitrate
 bl_added: Successfully added {0} {1} {2} to the blacklist.
 bl_added_range: '{0} IDs were added to the blacklist.'
@@ -125,12 +130,14 @@ cmd_autocommand_list: Lists all autocommands you have created.
 cmd_autocommand_remove: Removes an autocommand with the specified ID.
 cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
 cmd_ban: Bans a user.
+cmd_bantemplate: Sets a customized notification message to be sent to users when they are banned from the server. Provide no parameter to use the default ban notification message.
 cmd_bl_check: Checks if the specified ID is blacklisted.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
 cmd_blacklist_clear: Clears the blacklist.
 cmd_blacklist_list: Shows the blacklist. Provide no parameter to show all entry types.
 cmd_blacklist_rem: Removes an entry from the blacklist.
+cmd_botstats: Shows an estimate on how many resources are being allocated to the bot.
 cmd_channelid: Shows the ID of the specified channel. Provide no parameter to show the ID of the current channel.
 cmd_channelinfo: Shows basic information about the specified Discord channel. Provide no parameter to show information about the current channel.
 cmd_chatmute: Server mutes a user, preventing them from messaging on text channels.
@@ -275,6 +282,8 @@ cmd_rolecolor: Sets the color of a role. Provide no color to see the current col
 cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_roleid: Shows the ID of the specified role.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
+cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Providing no parameter to sanitize the original nickname.
+cmd_sanitizenames: Toggles whether nicknames should have special characters removed from the beginning.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_search: Searches for a command with the specified keyword.
@@ -325,6 +334,7 @@ cooldown_title_server: Server Cooldowns
 created_at: Created at
 days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'
+db_cache: Database Cache
 deafen_success: User {0} can no longer hear other users speaking in voice channels.
 deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
@@ -376,6 +386,7 @@ guild_okcolor: OkColor has been changed to {0}.
 guild_prefix_change: The prefix on this server has been changed to {0}
 guild_prefix_check: The prefix on this server is {0}
 guild_role_mention: Permissive role mentions have been {0}.
+guild_sanitizenames: Nickname sanitization has been {0}.
 guild_settings_title: Server Settings
 guild_timeout_changed: Command timeout on this server has been set to {0} seconds.
 guild_timeout_reset: Command timeout on this server has been reset.
@@ -500,6 +511,7 @@ reason: Reason
 region: Region
 reminder_list_empty: No reminder was found.
 reminder_list_title: List of Reminders
+remove_role: Remove Role
 removeallroles: '{0} roles were successfully removed from {1}.'
 removerole: Remove Role
 removerole_enum: had a role removed
@@ -509,9 +521,13 @@ repeater: Repeater
 repeater_list_title: Server Repeaters
 repeater_not_found: Repeater of ID {0} was not found.
 requires: Requires
+restart: Restarting.
 role: Role
 roles: Roles
 roles_title: Roles on this server
+sanitizedname_reset: Nicknames starting with special characters will now be sanitized.
+sanitizedname_set: Nicknames starting with special characters will now be replaced with {0}.
+saved_logs: Saved Logs
 sban_notification: You have been soft-banned from the {0} server.
 sban_title: User Soft-banned
 search_result_description: Search result for {0}.
@@ -533,7 +549,9 @@ timedban_title: Temporary Ban
 timedmute: Expired Mute
 timedrole: Punishment Role
 timedunrole: Punishment Role Removal
+timers: Timers
 timezone_list: Time Zones
+total: Total
 total_of: '{0} total'
 triggers_at: Triggers At
 triggers_in: Triggers In
@@ -579,19 +597,3 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
-
-cmd_botstats: Shows an estimate on how many resources are being allocated to the bot.
-db_cache: Database Cache
-timers: Timers
-total: Total
-saved_logs: Saved Logs
-cmd_sanitizenames: Toggles whether nicknames should have special characters removed from the beginning.
-guild_sanitizenames: Nickname sanitization has been {0}.
-cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Providing no parameter to sanitize the original nickname.
-sanitizedname_reset: Nicknames starting with special characters will now be sanitized.
-sanitizedname_set: Nicknames starting with special characters will now be replaced with {0}.
-restart: Restarting.
-
-auto_punish: Punishment | {0} | {1}
-add_role: Add Role
-remove_role: Remove Role

@@ -188,6 +188,22 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("bantemplate")]
+        [Description("cmd_bantemplate")]
+        public async Task SetBanTemplate(CommandContext context, [RemainingText, Description("arg_bantemplate")] string banTemplate = "")
+        {
+            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.BanTemplate = banTemplate);
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Description = (string.IsNullOrWhiteSpace(result))
+                    ? "bantemplate_reset"
+                    : context.FormatLocalized("bantemplate_set", Formatter.InlineCode(result))
+            };
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [GroupCommand, Command("list")]
         [Description("cmd_guild_list")]
         public async Task ListGuildConfigs(CommandContext context)

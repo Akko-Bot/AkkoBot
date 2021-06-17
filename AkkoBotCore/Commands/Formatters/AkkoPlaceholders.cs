@@ -13,6 +13,9 @@ namespace AkkoBot.Commands.Formatters
 {
     public class AkkoPlaceholders : IPlaceholderFormatter, ICommandService
     {
+        /// <summary>
+        /// Stores actions for placeholders with no parameters.
+        /// </summary>
         private readonly IReadOnlyDictionary<string, Func<CommandContext, object>> _placeholderActions = new Dictionary<string, Func<CommandContext, object>>()
         {
             /* Bot Placeholders */
@@ -77,9 +80,43 @@ namespace AkkoBot.Commands.Formatters
             ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name,
 
             /* Miscelaneous */
-            ["rng"] = (context) => context.Services.GetService<Random>().Next()
+
+            ["rng"] = (context) => context.Services.GetService<Random>().Next(),
+            ["cmd.argument"] = (context) => context.RawArgumentString,
+
+            /* Ban Template Placeholders - Only work on ban templates */
+
+            ["ban.mod"] = (context) => !context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase) ? null : context.User.GetFullname(),
+
+            ["ban.user"] = (context) =>
+            {
+                if (!context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase))
+                    return null;
+
+                // This will break if DiscordMember is not the first argument
+                if (!ulong.TryParse(context.RawArguments[0], out var userId))
+                    ulong.TryParse(context.RawArguments[0].GetDigits(), out userId);
+
+                context.Guild.Members.TryGetValue(userId, out var user);
+
+                return user?.GetFullname();
+            },
+
+            ["ban.reason"] = (context) =>
+            {
+                if (!context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase))
+                    return null;
+
+                var cmdArguments = new List<CommandArgument>(context.Overload.Arguments);
+                var index = cmdArguments.FindIndex(x => x.Name.Equals("reason", StringComparison.Ordinal));
+
+                return context.RawArguments[index];
+            }
         };
 
+        /// <summary>
+        /// Stores actions for placeholders with parameters.
+        /// </summary>
         private readonly IReadOnlyDictionary<string, Func<CommandContext, object, object>> _parameterizedActions = new Dictionary<string, Func<CommandContext, object, object>>()
         {
             /* Miscelaneous */
@@ -105,6 +142,15 @@ namespace AkkoBot.Commands.Formatters
                 return (parameter is not string[] arguments || arguments.Length == 0)
                     ? null
                     : arguments[context.Services.GetService<Random>().Next(0, arguments.Length)].Trim();
+            },
+
+            ["cmd.argument"] = (context, parameter) =>
+            {
+                return (parameter is not string[] arguments || arguments.Length != 1
+                || !int.TryParse(arguments[0], out var index)
+                || context.RawArguments.Count <= index)
+                    ? null
+                    : context.RawArguments[index];
             }
         };
 
@@ -122,8 +168,8 @@ namespace AkkoBot.Commands.Formatters
             else if (_parameterizedActions.TryGetValue(groups[1].Value, out var pAction))
             {
                 object parameter = (groups.Length <= 2)
-                    ? match.Index + match.Length
-                    : groups[2].Value.Split(',');
+                    ? match.Index + match.Length    // int
+                    : groups[2].Value.Split(',');   // string[]
 
                 result = pAction(context, parameter);
                 return true;

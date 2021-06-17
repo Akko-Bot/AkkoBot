@@ -34,11 +34,11 @@ namespace AkkoBot.Services.Database.Entities
         /// The command alias.
         /// </summary>
         [Required]
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string Alias
         {
             get => _alias;
-            init => _alias = value?.MaxLength(AkkoConstants.MessageMaxLength);
+            init => _alias = value?.MaxLength(AkkoConstants.MaxMessageLength);
         }
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The arguments of the command alias, if any.
         /// </summary>
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string Arguments
         {
             get => _arguments;
-            set => _arguments = value?.MaxLength(AkkoConstants.MessageMaxLength);
+            set => _arguments = value?.MaxLength(AkkoConstants.MaxMessageLength);
         }
 
         /// <summary>

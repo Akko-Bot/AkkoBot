@@ -1,3 +1,4 @@
+add_role: Adicionar Cargo
 addrole: Adicionar Cargo
 addrole_enum: recebeu um cargo de punição
 alias: Atalho
@@ -11,6 +12,7 @@ arg_alias_remove: O atalho de comando a ser removido.
 arg_autocommand_id: O ID do comando automático.
 arg_autocommand_time: Tempo até a ativação do comando.
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
+arg_bantemplate: O modelo de notificação de banimento.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
 arg_bool: __true__ para ativar, __false__ para desativar.
 arg_channel_id: O ID de um canal do Discord.
@@ -87,6 +89,7 @@ arg_warnp_role: Um cargo a ser adicionado ou removido do usuário, se aplicável
 arg_warnp_time: Por quanto tempo a punição deve durar. Deixe em branco para torná-la permanente.
 arg_warnp_type: O tipo de punição a ser aplicada.
 author: Autor
+auto_punish: Punição | {0} | {1}
 autocommand_empty: Nenhum comando automático foi encontrado.
 autocommand_title: Lista de Comandos Automáticos
 ban: Banir
@@ -94,6 +97,8 @@ ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
 ban_title: Usuário Banido
 banned_for: Banido por
+bantemplate_reset: O modelo de notificação foi removido com sucesso.
+bantemplate_set: O modelo de notificação foi definido com sucesso.
 bitrate: Bitrate
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
 bl_added_range: '{0} IDs foram adicionados à lista negra.'
@@ -125,12 +130,14 @@ cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
 cmd_autocommand_remove: Remove um comando automático com o ID especificado.
 cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
 cmd_ban: Bane um usuário.
+cmd_bantemplate: Define o modelo de notificação de banimento a ser enviado a usuários que forem banidos do servidor. Forneça nenhum parâmetro para utilizar a notificação de banimento padrão.
 cmd_bl_check: Checa se o ID especificado está na lista negra.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
 cmd_blacklist_clear: Limpa a lista negra.
 cmd_blacklist_list: Exibe a lista negra. Mostra a lista completa se nenhum parâmetro for fornecido.
 cmd_blacklist_rem: Remove um registro da lista negra.
+cmd_botstats: Exibe uma estimativa da quantidade de recursos alocados para o bot.
 cmd_channelid: Exibe of ID do canal especificado. Forneça nenhum parâmetro para exibir o ID do canal atual.
 cmd_channelinfo: Exibe informações básicas sobre o canal especificado. Forneça nenhum parâmetro para exibir informações sobre o canal atual.
 cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
@@ -275,6 +282,8 @@ cmd_rolecolor: Define a cor de um cargo. Forneça nenhuma cor para exibir a cor 
 cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do servidor.
 cmd_roleid: Exibe od ID do cargo especificado.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
+cmd_sanitizedname: Define o apelido a ser designado a usuários que tiverem caracteres especiais no início de seu apelido. Forneça nenhum parâmetro para sanitizar o apelido original.
+cmd_sanitizenames: Ativa ou desativa a sanitização de apelidos que começam com caracteres especiais.
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
 cmd_search: Busca por um comando com a palavra-chave especificada.
@@ -325,6 +334,7 @@ cooldown_title_server: Cooldowns do Servidor
 created_at: Criado em
 days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
+db_cache: Cache do Banco de Dados
 deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de voz.
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
@@ -376,6 +386,7 @@ guild_okcolor: OkColor foi alterada para {0}.
 guild_prefix_change: O prefixo nesse servidor foi alterado para {0}
 guild_prefix_check: O prefixo nesse servidor é {0}
 guild_role_mention: Menções permissivas de cargos foram {0}s.
+guild_sanitizenames: Sanitização de apelidos foi {0}.
 guild_settings_title: Configurações do Servidor
 guild_timeout_changed: Tempo de espera de comandos interativos foi definido para {0} segundos.
 guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para o valor padrão.
@@ -500,6 +511,7 @@ reason: Motivo
 region: Região
 reminder_list_empty: Nenhum lembrete foi encontrado.
 reminder_list_title: Lista de Lembretes
+remove_role: Remover Cargo
 removeallroles: '{0} cargos foram removidos do {1} com sucesso.'
 removerole: Remover Cargo
 removerole_enum: teve um cargo removido
@@ -509,9 +521,13 @@ repeater: Repetidor
 repeater_list_title: Repetidores do Servidor
 repeater_not_found: Repetidor de ID {0} não foi encontrado.
 requires: Requer
+restart: Reiniciando.
 role: Cargo
 roles: Cargos
 roles_title: Cargos nesse servidor
+sanitizedname_reset: Apelidos que contém caracteres especiais no início serão sanitizados.
+sanitizedname_set: Apelidos que contém caracteres especiais no início serão substituídos por {0}.
+saved_logs: Logs Salvos
 sban_notification: Você foi expulso do servidor {0}.
 sban_title: Usuário Expulso
 search_result_description: Resultado da busca por {0}.
@@ -533,7 +549,9 @@ timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
+timers: Timers
 timezone_list: Fusos Horários
+total: Total
 total_of: 'Total de {0}'
 triggers_at: Data de Execução
 triggers_in: Executa Em
@@ -579,19 +597,3 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
-
-cmd_botstats: Exibe uma estimativa da quantidade de recursos alocados para o bot.
-db_cache: Cache do Banco de Dados
-timers: Timers
-total: Total
-saved_logs: Logs Salvos
-cmd_sanitizenames: Ativa ou desativa a sanitização de apelidos que começam com caracteres especiais.
-guild_sanitizenames: Sanitização de apelidos foi {0}.
-cmd_sanitizedname: Define o apelido a ser designado a usuários que tiverem caracteres especiais no início de seu apelido. Forneça nenhum parâmetro para sanitizar o apelido original.
-sanitizedname_reset: Apelidos que contém caracteres especiais no início serão sanitizados.
-sanitizedname_set: Apelidos que contém caracteres especiais no início serão substituídos por {0}.
-restart: Reiniciando.
-
-auto_punish: Punição | {0} | {1}
-add_role: Adicionar Cargo
-remove_role: Remover Cargo

@@ -38,11 +38,11 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The notification to be sent when a user sends a message with a filtered word.
         /// </summary>
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string NotificationMessage
         {
             get => _notificationMessage;
-            set => _notificationMessage = value?.MaxLength(AkkoConstants.MessageMaxLength);
+            set => _notificationMessage = value?.MaxLength(AkkoConstants.MaxMessageLength);
         }
 
         /// <summary>

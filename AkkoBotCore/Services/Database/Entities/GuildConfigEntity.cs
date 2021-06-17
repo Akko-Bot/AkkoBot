@@ -21,6 +21,8 @@ namespace AkkoBot.Services.Database.Entities
         private string _locale = AkkoLocalizer.DefaultLanguage;
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
+        private string _customSanitizedName;
+        private string _banTemplate;
 
         /// <summary>
         /// The settings of the word filter and the words it is keeping track of.
@@ -165,7 +167,21 @@ namespace AkkoBot.Services.Database.Entities
         /// Defines the replacement name to be assigned to users whose names should be sanitized.
         /// </summary>
         [MaxLength(AkkoConstants.MaxUsernameLength)]
-        public string CustomSanitizedName { get; set; }
+        public string CustomSanitizedName
+        {
+            get => _customSanitizedName;
+            set => _customSanitizedName = value?.MaxLength(AkkoConstants.MaxUsernameLength);
+        }
+
+        /// <summary>
+        /// Defines the template to be used on the notification message for permanent bans.
+        /// </summary>
+        [MaxLength(AkkoConstants.MaxMessageLength)]
+        public string BanTemplate
+        {
+            get => _banTemplate;
+            set => _banTemplate = value?.MaxLength(AkkoConstants.MaxMessageLength);
+        }
 
         // Greet and Bye channels and messages
         // .asar - .iam/.iamnot roles

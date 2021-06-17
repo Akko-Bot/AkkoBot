@@ -106,7 +106,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             // This returns null if it fails
-            var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "ban_notification", reason);
+            var dmMsg = await _punishService.SendBanDmAsync(context, user, reason);
 
             // Ban the user
             await _punishService.BanUser(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);

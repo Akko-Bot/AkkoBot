@@ -29,11 +29,11 @@ namespace AkkoBot.Services.Database.Entities
         /// The content of this reminder.
         /// </summary>
         [Required]
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string Content
         {
             get => _content;
-            init => _content = value?.MaxLength(AkkoConstants.MessageMaxLength) ?? "-";
+            init => _content = value?.MaxLength(AkkoConstants.MaxMessageLength) ?? "-";
         }
 
         /// <summary>

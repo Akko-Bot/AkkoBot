@@ -263,5 +263,23 @@ namespace AkkoBot.Extensions
 
             return text[index..];
         }
+
+        /// <summary>
+        /// Returns a string with all digits present in this string.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <returns>A string with all digits of this string, <see cref="string.Empty"/> if none is found.</returns>
+        public static string GetDigits(this string text)
+        {
+            var result = new StringBuilder();
+
+            foreach (var character in text)
+            {
+                if (char.IsDigit(character))
+                    result.Append(character);
+            }
+
+            return result.ToString();
+        }
     }
 }

@@ -83,7 +83,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
                 while (row < reader.FieldCount)
                     fieldBuilders[row].AppendLine(objs[row++].ToString());
 
-                if (fieldBuilders.Any(x => x.Length >= AkkoConstants.EmbedFieldMaxLength))
+                if (fieldBuilders.Any(x => x.Length >= AkkoConstants.MaxEmbedFieldLength))
                     break;
             }
 

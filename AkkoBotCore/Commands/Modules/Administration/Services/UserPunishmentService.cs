@@ -1,4 +1,6 @@
 using AkkoBot.Commands.Abstractions;
+using AkkoBot.Commands.Common;
+using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
@@ -20,11 +22,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
+        private readonly UtilitiesService _utilitiesService;
 
-        public UserPunishmentService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+        public UserPunishmentService(IServiceScopeFactory scopeFactory, IDbCache dbCache, UtilitiesService utilitiesService)
         {
             _scopeFactory = scopeFactory;
             _dbCache = dbCache;
+            _utilitiesService = utilitiesService;
         }
 
         /// <summary>
@@ -48,6 +52,28 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
             // This returns null if it fails
             return await context.SendLocalizedDmAsync(user, dm, true);
+        }
+
+        /// <summary>
+        /// Sends a direct message to the specified user with the guild's template ban notification or
+        /// with the default notification if the guild has no ban template.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="user">The user that's being punished.</param>
+        /// <param name="reason">The reason of the punishment.</param>
+        /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
+        public async Task<DiscordMessage> SendBanDmAsync(CommandContext context, DiscordMember user, string reason)
+        {
+            if (!_dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild))
+                return null;
+
+            var template = new SmartString(context, dbGuild.BanTemplate);
+
+            return (_utilitiesService.DeserializeEmbed(template.Content, out var message) || message is not null)
+                ? await user.SendMessageSafelyAsync(message)                                    // Send database ban notification
+                : string.IsNullOrWhiteSpace(template.Content)                                   // If template is not serializable
+                    ? await SendPunishmentDmAsync(context, user, "ban_notification", reason)        // Send default ban notification
+                    : await user.SendMessageSafelyAsync(template.Content);                          // Send database ban notification (no embed)
         }
 
         /// <summary>

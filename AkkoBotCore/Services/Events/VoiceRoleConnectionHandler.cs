@@ -75,7 +75,7 @@ namespace AkkoBot.Services.Events
         /// <exception cref="TaskCanceledException">Occurs when the cancellation token is cancelled.</exception>
         private async Task AssignVoiceRoleAsync(ConcurrentHashSet<VoiceRoleEntity> voiceRoles, VoiceStateUpdateEventArgs eventArgs, CancellationToken cToken)
         {
-            await Task.Delay(_waitTime, cToken);
+            await Task.Delay(_waitTime, cToken).ConfigureAwait(false);
 
             var user = eventArgs.User as DiscordMember;
             var toRemove = new List<VoiceRoleEntity>();
@@ -85,7 +85,7 @@ namespace AkkoBot.Services.Events
                 // Disconnection
                 foreach (var voiceRole in voiceRoles)
                 {
-                    if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role))
+                    if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
                         await user.RevokeRoleAsync(role);
                     else if (role is null)
                         toRemove.Add(voiceRole);
@@ -98,9 +98,9 @@ namespace AkkoBot.Services.Events
                 {
                     eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role);
 
-                    if (voiceRole.ChannelId != user.VoiceState.Channel.Id && user.Roles.Contains(role))
+                    if (voiceRole.ChannelId != user.VoiceState.Channel.Id && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
                         await user.RevokeRoleAsync(role);
-                    else if (voiceRole.ChannelId == user.VoiceState.Channel.Id && !user.Roles.Contains(role))
+                    else if (voiceRole.ChannelId == user.VoiceState.Channel.Id && !user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
                         await user.GrantRoleAsync(role);
                     else if (role is null)
                         toRemove.Add(voiceRole);
@@ -111,7 +111,7 @@ namespace AkkoBot.Services.Events
                 // Connection
                 foreach (var voiceRole in voiceRoles.Where(x => x.ChannelId == eventArgs.Channel.Id))
                 {
-                    if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role))
+                    if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
                         await user.GrantRoleAsync(role);
                     else if (role is null)
                         toRemove.Add(voiceRole);
@@ -128,8 +128,8 @@ namespace AkkoBot.Services.Events
                 voiceRoles.TryRemove(role);
 
             // Remove and dispose the cancellation token.
-            _recentConnections.TryRemove((eventArgs.Guild.Id, eventArgs.User.Id), out var tokenSource);
-            tokenSource?.Dispose();
+            if (_recentConnections.TryRemove((eventArgs.Guild.Id, eventArgs.User.Id), out var tokenSource))
+                tokenSource.Dispose();
         }
     }
 }

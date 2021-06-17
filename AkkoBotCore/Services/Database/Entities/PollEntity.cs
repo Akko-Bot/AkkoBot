@@ -64,7 +64,7 @@ namespace AkkoBot.Services.Database.Entities
         /// The question of this poll.
         /// </summary>
         [Required]
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string Question { get; init; }
 
         /// <summary>

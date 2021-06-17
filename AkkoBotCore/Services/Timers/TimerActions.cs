@@ -214,8 +214,8 @@ namespace AkkoBot.Services.Timers
                 var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
 
                 dmsg.Content = (dmsg.Content is null)
-                    ? (header + ((wasDeserialized) ? string.Empty : message.Content)).MaxLength(AkkoConstants.MessageMaxLength, "[...]")
-                    : dmsg.Content.Insert(0, header).MaxLength(AkkoConstants.MessageMaxLength, "[...]");
+                    ? (header + ((wasDeserialized) ? string.Empty : message.Content)).MaxLength(AkkoConstants.MaxMessageLength, "[...]")
+                    : dmsg.Content.Insert(0, header).MaxLength(AkkoConstants.MaxMessageLength, "[...]");
 
                 await channel.SendMessageAsync(dmsg);
             }

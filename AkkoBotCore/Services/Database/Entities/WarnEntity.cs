@@ -75,11 +75,11 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The content of the infraction.
         /// </summary>
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string WarningText
         {
             get => _note;
-            init => _note = value?.MaxLength(AkkoConstants.MessageMaxLength) ?? "-";
+            init => _note = value?.MaxLength(AkkoConstants.MaxMessageLength) ?? "-";
         }
     }
 }

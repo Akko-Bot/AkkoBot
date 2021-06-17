@@ -129,7 +129,7 @@ namespace AkkoBot.Models
         public string Name
         {
             get => _author;
-            set => _author = value?.MaxLength(AkkoConstants.EmbedTitleMaxLength);
+            set => _author = value?.MaxLength(AkkoConstants.MaxEmbedTitleLength);
         }
 
         public string Url { get; set; }
@@ -197,7 +197,7 @@ namespace AkkoBot.Models
         public string Description
         {
             get => _description;
-            set => _description = value?.MaxLength(AkkoConstants.EmbedPropMaxLength, "[...]");
+            set => _description = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength, "[...]");
         }
 
         public string ImageUrl { get; set; }
@@ -225,13 +225,13 @@ namespace AkkoBot.Models
         public string Title
         {
             get => _title;
-            set => _title = value?.MaxLength(AkkoConstants.EmbedTitleMaxLength);
+            set => _title = value?.MaxLength(AkkoConstants.MaxEmbedTitleLength);
         }
 
         public string Text
         {
             get => _text;
-            set => _text = value?.MaxLength(AkkoConstants.EmbedFieldMaxLength, "[...]");
+            set => _text = value?.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]");
         }
 
         public bool Inline { get; set; }
@@ -258,7 +258,7 @@ namespace AkkoBot.Models
         public string Text
         {
             get => _text;
-            set => _text = value?.MaxLength(AkkoConstants.EmbedPropMaxLength);
+            set => _text = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength);
         }
 
         public string ImageUrl { get; set; }

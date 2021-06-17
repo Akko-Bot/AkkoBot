@@ -16,9 +16,10 @@ namespace AkkoBot.Commands.Common
     public class SmartString
     {
         private readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
-        private readonly StringBuilder _parsedContent;
+        private readonly StringBuilder _contentBuilder;
         private readonly CommandContext _context;
         private readonly IPlaceholderFormatter _formatter;
+        private string _parsedContent;
 
         /// <summary>
         /// Defines the regex to match the placeholders.
@@ -42,15 +43,26 @@ namespace AkkoBot.Commands.Common
                     ParsePlaceholders();
                     SanitizeRoleMentions();
                     IsParsed = true;
+
+                    // Save the final result, then clear the builder.
+                    _parsedContent = _contentBuilder.ToString();
+                    _contentBuilder.Clear();
                 }
 
-                return _parsedContent.ToString();
+                return _parsedContent;
             }
 
             set
             {
-                _parsedContent.Clear();
-                _parsedContent.Append(value ?? string.Empty);
+                _contentBuilder.Clear();
+
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    _parsedContent = value;
+                    return;
+                }
+
+                _contentBuilder.Append(value);
                 IsParsed = false;
             }
         }
@@ -65,7 +77,7 @@ namespace AkkoBot.Commands.Common
         public SmartString(CommandContext context, string content, Regex regex = null, IPlaceholderFormatter formatter = null)
         {
             _context = context;
-            _parsedContent = new(content ?? context.RawArgumentString);
+            _contentBuilder = new(content ?? context.RawArgumentString);
             ParseRegex = regex ?? new Regex(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
             _formatter = formatter ?? context.CommandsNext.Services.GetService<AkkoPlaceholders>();
         }
@@ -85,7 +97,7 @@ namespace AkkoBot.Commands.Common
         /// <returns><see langword="true"/> if a placeholder was found in the user input, <see langword="false"/> otherwise.</returns>
         private bool ParsePlaceholders()
         {
-            var matches = ParseRegex.Matches(_parsedContent.ToString());
+            var matches = ParseRegex.Matches(_contentBuilder.ToString());
 
             if (matches.Count == 0)
                 return false;
@@ -93,7 +105,7 @@ namespace AkkoBot.Commands.Common
             foreach (Match match in matches)
             {
                 if (_formatter.TryParse(_context, match, out var result) && result is not null)
-                    _parsedContent.Replace(match.ToString(), result.ToString());
+                    _contentBuilder.Replace(match.ToString(), result.ToString());
             }
 
             return true;
@@ -105,7 +117,7 @@ namespace AkkoBot.Commands.Common
         /// <returns><see langword="true"/> if a role mention was found, <see langword="false"/> otherwise.</returns>
         private bool SanitizeRoleMentions()
         {
-            var matches = _roleRegex.Matches(_parsedContent.ToString());
+            var matches = _roleRegex.Matches(_contentBuilder.ToString());
 
             if (_context.Guild is null || matches.Count == 0)
                 return false;
@@ -115,8 +127,8 @@ namespace AkkoBot.Commands.Common
             // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
             if (_context.Member.Hierarchy != int.MaxValue && !canMentionAll)
             {
-                _parsedContent.Replace("@everyone", Formatter.InlineCode("@everyone"));
-                _parsedContent.Replace("@here", Formatter.InlineCode("@here"));
+                _contentBuilder.Replace("@everyone", Formatter.InlineCode("@everyone"));
+                _contentBuilder.Replace("@here", Formatter.InlineCode("@here"));
             }
 
             if (_context.Services.GetService<IDbCache>().Guilds[_context.Guild.Id].PermissiveRoleMention)
@@ -128,7 +140,7 @@ namespace AkkoBot.Commands.Common
                         && _context.Guild.Roles.TryGetValue(rid, out var role)
                         && !role.IsMentionable
                         && _context.Member.Hierarchy <= role.Position)
-                        _parsedContent.Replace(match.Groups[0].Value, $"@{role.Name}");
+                        _contentBuilder.Replace(match.Groups[0].Value, $"@{role.Name}");
                 }
             }
             else
@@ -140,7 +152,7 @@ namespace AkkoBot.Commands.Common
                         && _context.Guild.Roles.TryGetValue(rid, out var role)
                         && !role.IsMentionable
                         && !canMentionAll)
-                        _parsedContent.Replace(match.Groups[0].Value, $"@{role.Name}");
+                        _contentBuilder.Replace(match.Groups[0].Value, $"@{role.Name}");
                 }
             }
 

@@ -357,7 +357,7 @@ namespace AkkoBot.Extensions
 
             var result = new List<Page>();
             var serializableFields = fields.ToArray();
-            var sanitizedContent = content.MaxLength(AkkoConstants.MessageMaxLength);
+            var sanitizedContent = content.MaxLength(AkkoConstants.MaxMessageLength);
 
             var (localizedMessage, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, sanitizedContent, embed, false);
             var footerPrepend = GeneralService.GetLocalizedResponse(localizer, settings.Locale, "pages");
@@ -420,7 +420,7 @@ namespace AkkoBot.Extensions
             var localizer = context.Services.GetService<ILocalizer>();
 
             var result = new List<Page>();
-            var sanitizedContent = content.MaxLength(AkkoConstants.MessageMaxLength);
+            var sanitizedContent = content.MaxLength(AkkoConstants.MaxMessageLength);
             var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
 
             var (localizedMessage, localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, sanitizedContent, embed, false);
@@ -451,7 +451,7 @@ namespace AkkoBot.Extensions
         {
             foreach (var page in pages)
             {
-                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(AkkoConstants.MessageMaxLength);
+                page.Content += ("\n\n" + GeneralService.DeconstructEmbed(page.Embed)).MaxLength(AkkoConstants.MaxMessageLength);
                 page.Embed = null;
             }
 

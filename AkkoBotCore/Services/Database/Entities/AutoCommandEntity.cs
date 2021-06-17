@@ -51,11 +51,11 @@ namespace AkkoBot.Services.Database.Entities
         /// The qualified command name with its arguments.
         /// </summary>
         [Required]
-        [MaxLength(AkkoConstants.MessageMaxLength)]
+        [MaxLength(AkkoConstants.MaxMessageLength)]
         public string CommandString
         {
             get => _commandString;
-            init => _commandString = value?.MaxLength(AkkoConstants.MessageMaxLength);
+            init => _commandString = value?.MaxLength(AkkoConstants.MaxMessageLength);
         }
 
         /// <summary>
