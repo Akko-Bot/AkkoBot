@@ -97,8 +97,8 @@ ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
 ban_title: Usuário Banido
 banned_for: Banido por
-bantemplate_reset: O modelo de notificação foi removido com sucesso.
-bantemplate_set: O modelo de notificação foi definido com sucesso.
+bantemplate_reset: O modelo de notificação de banimento foi removido com sucesso.
+bantemplate_set: O modelo de notificação de banimento foi definido com sucesso.
 bitrate: Bitrate
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
 bl_added_range: '{0} IDs foram adicionados à lista negra.'
@@ -597,3 +597,10 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
+
+cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
+joinrole_error: Cargos de integração não podem ser adicionados.
+joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
+joinrole_removed: O cargo {0} foi removido da lista de cargos de entrada.
+joinrole_list_empty: Não há cargos de entrada.
+joinrole_list_title: Lista de Cargos de Entrada

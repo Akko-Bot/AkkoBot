@@ -56,10 +56,6 @@ namespace AkkoBot.Services.Events
                 {
                     // Save the new guilds to the database
                     await db.BulkCopyAsync(100, newGuilds);
-
-                    // Cache the new guilds
-                    foreach (var guild in newGuilds)
-                        _dbCache.Guilds.TryAdd(guild.GuildId, guild);
                 }
             });
         }

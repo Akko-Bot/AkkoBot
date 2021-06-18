@@ -51,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="server">The target guild.</param>
         /// <param name="selector">A method to get or set the property.</param>
         /// <returns>The requested setting, <see langword="null"/> if the context is from a private context.</returns>
-        public async Task<T> GetOrSetPropertyAsync<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
+        public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
         {
             _dbCacher.Guilds.TryGetValue(server.Id, out var dbGuild);
             var result = selector(dbGuild);
@@ -71,11 +71,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// Returns the settings of the specified Discord guild.
         /// </summary>
         /// <param name="server">The Discord guild.</param>
-        /// <returns>A collection of settings.</returns>
-        public IReadOnlyDictionary<string, string> GetGuildSettings(DiscordGuild server)
+        /// <returns>The guild settings.</returns>
+        public GuildConfigEntity GetGuildSettings(DiscordGuild server)
         {
             _dbCacher.Guilds.TryGetValue(server.Id, out var dbGuild);
-            return dbGuild.GetSettings();
+            return dbGuild;
         }
     }
 }

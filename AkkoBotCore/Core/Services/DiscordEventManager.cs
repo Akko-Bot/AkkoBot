@@ -79,6 +79,9 @@ namespace AkkoBot.Core.Services
             // Prevent mute evasion
             _shardedClient.GuildMemberAdded += _guildEventsHandler.RemuteAsync;
 
+            // Add join roles
+            _shardedClient.GuildMemberAdded += _guildEventsHandler.AddJoinRolesAsync;
+
             // Prevent events from running for blacklisted users, channels and servers
             _shardedClient.MessageCreated += _globalEventsHandler.BlockBlacklistedAsync;
 

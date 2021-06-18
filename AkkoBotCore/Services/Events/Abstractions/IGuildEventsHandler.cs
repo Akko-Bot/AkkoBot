@@ -10,6 +10,11 @@ namespace AkkoBot.Services.Events.Abstractions
     public interface IGuildEventsHandler
     {
         /// <summary>
+        /// Adds roles to a user when they join a guild.
+        /// </summary>
+        Task AddJoinRolesAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
+
+        /// <summary>
         /// Deletes a message that doesn't contain a certain type of content.
         /// </summary>
         Task FilterContentAsync(DiscordClient client, MessageCreateEventArgs eventArgs);

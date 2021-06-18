@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
@@ -13,6 +14,7 @@ using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -103,6 +105,47 @@ namespace AkkoBot.Services.Events
                         // If mute role doesn't exist anymore, delete the mute from the database
                         await db.MutedUsers.DeleteAsync(x => x.UserId == eventArgs.Member.Id);
                     }
+                }
+            });
+        }
+
+        public async Task AddJoinRolesAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+        {
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+
+            if (dbGuild.JoinRoles.Count is 0
+                || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageRoles)))
+                return;
+
+            _ = Task.Run(async () =>
+            {
+                var toRemove = new HashSet<ulong>();
+
+                foreach (ulong roleId in dbGuild.JoinRoles)
+                {
+                    if (!eventArgs.Guild.Roles.TryGetValue(roleId, out var role))
+                    {
+                        toRemove.Add(roleId);
+                        continue;
+                    }
+
+                    if (eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
+                    {
+                        await eventArgs.Member.GrantRoleAsync(role);
+                        await Task.Delay(AkkoEntities.SafetyDelay);
+                    }
+                }
+
+                if (toRemove.Count is not 0)
+                {
+                    using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
+                    dbGuild.JoinRoles.RemoveAll(x => toRemove.Contains((ulong)x));
+
+                    await db.GuildConfig.UpdateAsync(
+                        x => x.Id == dbGuild.Id,
+                        _ => new GuildConfigEntity() { JoinRoles = dbGuild.JoinRoles }
+                    );
                 }
             });
         }

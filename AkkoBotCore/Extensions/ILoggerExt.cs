@@ -1,5 +1,5 @@
+using AkkoBot.Config;
 using AkkoBot.Models;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Logging;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -21,12 +21,11 @@ namespace AkkoBot.Extensions
         /// <param name="exception">The excetion that occurred during command execution.</param>
         public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = "", Exception exception = null)
         {
-            var logConfig = context.Services.GetService<IDbCache>().LogConfig;
-            var commandId = new EventId(LoggerEvents.Misc.Id, "Command");
+            var logConfig = context.Services.GetService<LogConfig>();
 
             logger.Log(
                 level,
-                commandId,
+                new EventId(LoggerEvents.Misc.Id, "Command"),
                 new LogData(context, message),
                 exception,
                 LogStrategy.GetLogStrategy(logConfig.LogFormat)

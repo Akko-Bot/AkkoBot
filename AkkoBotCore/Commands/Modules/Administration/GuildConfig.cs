@@ -1,4 +1,5 @@
 using AkkoBot.Commands.Abstractions;
+using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
@@ -26,7 +27,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_embed")]
         public async Task ChangeEmbed(CommandContext context)
         {
-            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.UseEmbed = !x.UseEmbed);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.UseEmbed = !x.UseEmbed);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_embed_change", (result) ? "enabled" : "disabled"));
@@ -48,7 +49,7 @@ namespace AkkoBot.Commands.Modules.Administration
             };
 
             if (color.HasValue)
-                await _service.GetOrSetPropertyAsync(context.Guild, x => x.OkColor = newColor);
+                await _service.SetPropertyAsync(context.Guild, x => x.OkColor = newColor);
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -67,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Administration
             };
 
             if (color.HasValue)
-                await _service.GetOrSetPropertyAsync(context.Guild, x => x.ErrorColor = newColor);
+                await _service.SetPropertyAsync(context.Guild, x => x.ErrorColor = newColor);
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -76,7 +77,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_timeout")]
         public async Task ChangeTimeout(CommandContext context, [Description("arg_timeout")] uint? seconds = null)
         {
-            var result = await _service.GetOrSetPropertyAsync(
+            var result = await _service.SetPropertyAsync(
                 context.Guild,
                 settings => settings.InteractiveTimeout = (seconds is null or < 10 or > 120)
                     ? null
@@ -95,9 +96,10 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("permissivemention"), Aliases("rolemention")]
         [Description("cmd_guild_rolemention")]
+        [RequireUserPermissions(Permissions.ManageRoles)]
         public async Task ChangeRoleMentionability(CommandContext context)
         {
-            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.PermissiveRoleMention = !x.PermissiveRoleMention);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.PermissiveRoleMention = !x.PermissiveRoleMention);
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("guild_role_mention", (result) ? "enabled" : "disabled"));
@@ -127,7 +129,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             // Change the locale
             if (success)
-                await _service.GetOrSetPropertyAsync(context.Guild, x => x.Locale = responseKey);
+                await _service.SetPropertyAsync(context.Guild, x => x.Locale = responseKey);
 
             // Send the message
             var embed = new DiscordEmbedBuilder()
@@ -153,16 +155,17 @@ namespace AkkoBot.Commands.Modules.Administration
             };
 
             if (zone is not null)
-                await _service.GetOrSetPropertyAsync(context.Guild, x => x.Timezone = zone.StandardName);
+                await _service.SetPropertyAsync(context.Guild, x => x.Timezone = zone.StandardName);
 
             await context.RespondLocalizedAsync(embed, isError: zone is null);
         }
 
         [Command("sanitizenames"), Aliases("sanitizenicks")]
         [Description("cmd_sanitizenames")]
+        [RequireUserPermissions(Permissions.ManageNicknames)]
         public async Task SanitizeNicknames(CommandContext context)
         {
-            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.SanitizeNames = !x.SanitizeNames);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.SanitizeNames = !x.SanitizeNames);
 
             var embed = new DiscordEmbedBuilder()
             {
@@ -174,9 +177,10 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("sanitizedname"), Aliases("sanitizednick")]
         [Description("cmd_sanitizedname")]
+        [RequireUserPermissions(Permissions.ManageNicknames)]
         public async Task SetCustomSanitizedNickname(CommandContext context, [RemainingText, Description("arg_nickname")] string nickname = "")
         {
-            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.CustomSanitizedName = nickname.SanitizeUsername());
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.CustomSanitizedName = nickname.SanitizeUsername());
 
             var embed = new DiscordEmbedBuilder()
             {
@@ -190,9 +194,10 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("bantemplate")]
         [Description("cmd_bantemplate")]
+        [RequireUserPermissions(Permissions.BanMembers)]
         public async Task SetBanTemplate(CommandContext context, [RemainingText, Description("arg_bantemplate")] string banTemplate = "")
         {
-            var result = await _service.GetOrSetPropertyAsync(context.Guild, x => x.BanTemplate = banTemplate);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.BanTemplate = banTemplate);
 
             var embed = new DiscordEmbedBuilder()
             {
@@ -204,11 +209,66 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("joinrole"), Aliases("jr")]
+        [Description("cmd_joinrole")]
+        [RequireUserPermissions(Permissions.ManageRoles)]
+        public async Task AddJoinRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+        {
+            var embed = new DiscordEmbedBuilder();
+
+            if (role.IsManaged)
+                embed.WithDescription("joinrole_error");
+            else
+            {
+                var result = await _service.SetPropertyAsync(
+                    context.Guild,
+                    x =>
+                    {
+                        var amount = x.JoinRoles.Count;
+
+                        if (x.JoinRoles.Contains((long)role.Id))
+                            x.JoinRoles.Remove((long)role.Id);
+                        else
+                            x.JoinRoles.Add((long)role.Id);
+
+                        return amount < x.JoinRoles.Count;
+                    }
+                );
+
+                embed.WithDescription(context.FormatLocalized((result) ? "joinrole_added" : "joinrole_removed", Formatter.Bold(role.Name)));
+            }
+
+            await context.RespondLocalizedAsync(embed, true, role.IsManaged);
+        }
+
+        [Command("joinrole"), HiddenOverload]
+        public async Task AddJoinRoleList(CommandContext context)
+        {
+            var dbGuild = _service.GetGuildSettings(context.Guild);
+            var embed = new DiscordEmbedBuilder();
+            var isEmpty = dbGuild.JoinRoles.Count is 0;
+
+            if (isEmpty)
+                embed.WithDescription("joinrole_list_empty");
+            else
+            {
+                var roles = dbGuild.JoinRoles
+                    .Where(x => context.Guild.Roles.ContainsKey((ulong)x))
+                    .Select(x => context.Guild.GetRole((ulong)x))
+                    .OrderByDescending(x => x.Position);
+
+                embed.WithTitle("joinrole_list_title")
+                    .WithDescription(string.Join("\n", roles.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} - {Formatter.Bold(x.Name)}")));
+            }
+
+            await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);
+        }
+
         [GroupCommand, Command("list")]
         [Description("cmd_guild_list")]
         public async Task ListGuildConfigs(CommandContext context)
         {
-            var settings = _service.GetGuildSettings(context.Guild);
+            var settings = _service.GetGuildSettings(context.Guild).GetSettings();
 
             var embed = new DiscordEmbedBuilder()
                 .WithTitle("guild_settings_title")

@@ -75,6 +75,11 @@ namespace AkkoBot.Services.Database.Entities
         public List<RepeaterEntity> RepeaterRel { get; init; }
 
         /// <summary>
+        /// The IDs of the roles that should be assigned to a Discord user when they join the guild.
+        /// </summary>
+        public List<long> JoinRoles { get; init; } = new();
+
+        /// <summary>
         /// The ID of the Discord guild these settings are associated with.
         /// </summary>
         public ulong GuildId { get; init; }
