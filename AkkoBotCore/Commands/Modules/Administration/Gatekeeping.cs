@@ -141,6 +141,34 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
+        [Command("greetdelete"), Aliases("greetdel")]
+        [Description("cmd_greetdel")]
+        public async Task SetGreetDeleteTime(CommandContext context, [Description("arg_greetdel_time")] TimeSpan time = default)
+        {
+            if (time > TimeSpan.FromMinutes(2))
+                time = TimeSpan.FromMinutes(2);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized((time == TimeSpan.Zero) ? "greetdel_disable" : "greetdel_enable", time.TotalSeconds));
+
+            await _service.SetPropertyAsync(context.Guild, x => x.GreetDeleteTime = time);
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("farewelldelete"), Aliases("farewelldel", "byedel")]
+        [Description("cmd_farewelldel")]
+        public async Task SetFarewellDeleteTime(CommandContext context, [Description("arg_greetdel_time")] TimeSpan time = default)
+        {
+            if (time > TimeSpan.FromMinutes(2))
+                time = TimeSpan.FromMinutes(2);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(context.FormatLocalized((time == TimeSpan.Zero) ? "farewelldel_disable" : "farewelldel_enable", time.TotalSeconds));
+
+            await _service.SetPropertyAsync(context.Guild, x => x.FarewellDeleteTime = time);
+            await context.RespondLocalizedAsync(embed);
+        }
+
         /// <summary>
         /// Sends a guild setting to the context Discord channel.
         /// </summary>

@@ -620,3 +620,11 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
+
+cmd_greetdel: Define o tempo para exclusão automática de mensagens de boas-vindas. Forneça nenhum parâmetro para desativar.
+arg_greetdel_time: O tempo de exclusão. Máximo de `2m`.
+greetdel_disable: Exclusão automática de mensagens de boas-vindas foi desativada.
+greetdel_enable: Mensagens de boas-vindas serão automaticamente excluídas em {0} segundos.
+cmd_farewelldel: Define o tempo para a exclusão automática de mensagens de despedida. Forneça nenhum parâmetro para desativar.
+farewelldel_disable: Exclusão automática de mensagens de despedida foi desativada.
+farewelldel_enable: Mensagens de despedida serão automaticamente excluídas em {0} segundos.

@@ -7,6 +7,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -91,10 +92,18 @@ namespace AkkoBot.Services.Events
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
             var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
-            if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
-                await channel.SendMessageAsync(message);
-            else
-                await channel.SendMessageAsync(parsedString);
+            var discordMessage = (_utilitiesService.DeserializeEmbed(parsedString, out var message))
+                ? await channel.SendMessageAsync(message)
+                : await channel.SendMessageAsync(parsedString);
+
+            if (gatekeeper.GreetDeleteTime > TimeSpan.Zero)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(gatekeeper.GreetDeleteTime).ConfigureAwait(false);
+                    await discordMessage.DeleteAsync();
+                });
+            }
         }
 
         public async Task SendFarewellMessageAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
@@ -112,10 +121,18 @@ namespace AkkoBot.Services.Events
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.FarewellMessage, dbGuild.Prefix, null);
             var parsedString = new SmartString(fakeContext, gatekeeper.FarewellMessage);
 
-            if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
-                await channel.SendMessageAsync(message);
-            else
-                await channel.SendMessageAsync(parsedString);
+            var discordMessage = (_utilitiesService.DeserializeEmbed(parsedString, out var message))
+                ? await channel.SendMessageAsync(message)
+                : await channel.SendMessageAsync(parsedString);
+
+            if (gatekeeper.FarewellDeleteTime > TimeSpan.Zero)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(gatekeeper.FarewellDeleteTime).ConfigureAwait(false);
+                    await discordMessage.DeleteAsync();
+                });
+            }
         }
 
         /// <summary>

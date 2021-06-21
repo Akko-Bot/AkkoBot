@@ -2,6 +2,7 @@
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -76,6 +77,16 @@ namespace AkkoBot.Services.Database.Entities
         /// Defines whether greet messages should be sent in direct message.
         /// </summary>
         public bool GreetDm { get; set; }
+
+        /// <summary>
+        /// Defines how long the greet message should last before it gets deleted.
+        /// </summary>
+        public TimeSpan GreetDeleteTime { get; set; } = TimeSpan.Zero;
+
+        /// <summary>
+        /// Defines how long the farewell message should last before it gets deleted.
+        /// </summary>
+        public TimeSpan FarewellDeleteTime { get; set; } = TimeSpan.Zero;
 
         /// <summary>
         /// Defines whether gatekeeping is active for this guild.

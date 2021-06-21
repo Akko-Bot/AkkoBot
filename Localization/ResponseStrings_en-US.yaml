@@ -620,3 +620,11 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
+
+cmd_greetdel: Sets the time for the automatic deletion of greet messages. Provide no parameter to disable.
+arg_greetdel_time: The deletion time. Maximum of `2m`.
+greetdel_disable: Automatic deletion of greet messages has been disabled.
+greetdel_enable: Greet messages will be automatically deleted in {0} seconds.
+cmd_farewelldel: Sets the time for the automatic deletion of farewell messages. Provide no parameter to disable.
+farewelldel_disable: Automatic deletion of farewell messages has been disabled.
+farewelldel_enable: Farewell messages will be automatically deleted in {0} seconds.

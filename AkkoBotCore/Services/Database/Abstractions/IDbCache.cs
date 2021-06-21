@@ -115,6 +115,7 @@ namespace AkkoBot.Services.Database.Abstractions
         /// <summary>
         /// Stores all guild gatekeeping settings.
         /// </summary>
+        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild.</remarks>
         public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; }
 
         /// <summary>
