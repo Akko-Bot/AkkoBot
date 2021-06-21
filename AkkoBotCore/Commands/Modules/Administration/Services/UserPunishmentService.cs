@@ -69,11 +69,11 @@ namespace AkkoBot.Commands.Modules.Administration.Services
 
             var template = new SmartString(context, dbGuild.BanTemplate);
 
-            return (_utilitiesService.DeserializeEmbed(template.Content, out var message) || message is not null)
+            return (_utilitiesService.DeserializeEmbed(template, out var message) || message is not null)
                 ? await user.SendMessageSafelyAsync(message)                                    // Send database ban notification
-                : string.IsNullOrWhiteSpace(template.Content)                                   // If template is not serializable
+                : string.IsNullOrWhiteSpace(template)                                   // If template is not serializable
                     ? await SendPunishmentDmAsync(context, user, "ban_notification", reason)        // Send default ban notification
-                    : await user.SendMessageSafelyAsync(template.Content);                          // Send database ban notification (no embed)
+                    : await user.SendMessageSafelyAsync(template);                          // Send database ban notification (no embed)
         }
 
         /// <summary>

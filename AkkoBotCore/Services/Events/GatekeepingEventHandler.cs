@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace AkkoBot.Services.Events
 {
     /// <summary>
-    /// Handles events related to gatekeeping
+    /// Handles events related to gatekeeping.
     /// </summary>
     public class GatekeepingEventHandler : IGatekeepingEventHandler
     {
@@ -59,7 +59,7 @@ namespace AkkoBot.Services.Events
         public async Task SendGreetDmMessageAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
-                || !gatekeeper.GreetDm || string.IsNullOrWhiteSpace(gatekeeper.GreetMessage) /*|| eventArgs.Member.IsBot*/)
+                || !gatekeeper.GreetDm || eventArgs.Member.IsBot || string.IsNullOrWhiteSpace(gatekeeper.GreetMessage))
                 return;
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
@@ -70,16 +70,16 @@ namespace AkkoBot.Services.Events
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
             var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
-            if (_utilitiesService.DeserializeEmbed(parsedString.Content, out var message))
+            if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
                 await eventArgs.Member.SendMessageSafelyAsync(message);
             else
-                await eventArgs.Member.SendMessageSafelyAsync(parsedString.Content);
+                await eventArgs.Member.SendMessageSafelyAsync(parsedString);
         }
 
         public async Task SendGreetMessageAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
-                || !gatekeeper.GreetChannelId.HasValue || gatekeeper.GreetDm /*|| eventArgs.Member.IsBot*/
+                || !gatekeeper.GreetChannelId.HasValue || gatekeeper.GreetDm || eventArgs.Member.IsBot
                 || string.IsNullOrWhiteSpace(gatekeeper.GreetMessage)
                 || !eventArgs.Guild.Channels.TryGetValue(gatekeeper.GreetChannelId.Value, out var channel)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels | Permissions.SendMessages))
@@ -91,16 +91,17 @@ namespace AkkoBot.Services.Events
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
             var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
-            if (_utilitiesService.DeserializeEmbed(parsedString.Content, out var message))
+            if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
                 await channel.SendMessageAsync(message);
             else
-                await channel.SendMessageAsync(parsedString.Content);
+                await channel.SendMessageAsync(parsedString);
         }
 
         public async Task SendFarewellMessageAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
-                || !gatekeeper.FarewellChannelId.HasValue || string.IsNullOrWhiteSpace(gatekeeper.FarewellMessage) /*|| eventArgs.Member.IsBot*/
+                || !gatekeeper.FarewellChannelId.HasValue || eventArgs.Member.IsBot
+                || string.IsNullOrWhiteSpace(gatekeeper.FarewellMessage)
                 || !eventArgs.Guild.Channels.TryGetValue(gatekeeper.FarewellChannelId.Value, out var channel)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels | Permissions.SendMessages))
                 return;
@@ -111,10 +112,10 @@ namespace AkkoBot.Services.Events
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.FarewellMessage, dbGuild.Prefix, null);
             var parsedString = new SmartString(fakeContext, gatekeeper.FarewellMessage);
 
-            if (_utilitiesService.DeserializeEmbed(parsedString.Content, out var message))
+            if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
                 await channel.SendMessageAsync(message);
             else
-                await channel.SendMessageAsync(parsedString.Content);
+                await channel.SendMessageAsync(parsedString);
         }
 
         /// <summary>

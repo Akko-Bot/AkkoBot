@@ -88,7 +88,7 @@ namespace AkkoBot.Services.Database.Entities
         public string ParseAliasInput(SmartString smartString, string aliasInput)
         {
             smartString.Content = Alias;
-            var args = aliasInput.Replace(smartString.Content, string.Empty).Trim();
+            var args = aliasInput.Replace(smartString, string.Empty).Trim();
             return (string.IsNullOrWhiteSpace(args)) ? FullCommand : $"{Command} {args}";
         }
 

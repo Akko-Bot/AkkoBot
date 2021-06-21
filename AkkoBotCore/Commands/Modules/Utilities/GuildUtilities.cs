@@ -34,12 +34,12 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Priority(1)]
         public async Task Say(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
         {
-            if (string.IsNullOrWhiteSpace(message?.Content))    // If command only contains a channel name
+            if (string.IsNullOrWhiteSpace(message))    // If command only contains a channel name
                 await context.RespondAsync(channel.Name);
-            else if (_service.DeserializeEmbed(message.Content, out var parsedMessage)) // If command contains an embed in yaml format
+            else if (_service.DeserializeEmbed(message, out var parsedMessage)) // If command contains an embed in yaml format
                 await channel.SendMessageAsync(parsedMessage);
             else    // If command is just plain text
-                await channel.SendMessageAsync(message.Content);
+                await channel.SendMessageAsync(message);
         }
 
         [Command("serverinfo"), Aliases("sinfo")]
@@ -111,9 +111,9 @@ namespace AkkoBot.Commands.Modules.Utilities
                 await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
                 return;
             }
-            _ = (_service.DeserializeEmbed(newMessage.Content, out var dMsg))
+            _ = (_service.DeserializeEmbed(newMessage, out var dMsg))
                 ? await message.ModifyAsync(dMsg)
-                : await message.ModifyAsync(newMessage.Content, null);
+                : await message.ModifyAsync(newMessage, null);
 
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }

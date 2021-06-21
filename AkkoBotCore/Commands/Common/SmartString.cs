@@ -3,6 +3,7 @@ using AkkoBot.Commands.Formatters;
 using AkkoBot.Services.Database.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Text;
@@ -15,6 +16,7 @@ namespace AkkoBot.Commands.Common
     /// </summary>
     public class SmartString
     {
+        private readonly bool _sanitizeRoles;
         private readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
         private readonly StringBuilder _contentBuilder;
         private readonly CommandContext _context;
@@ -41,7 +43,10 @@ namespace AkkoBot.Commands.Common
                 if (!IsParsed)
                 {
                     ParsePlaceholders();
-                    SanitizeRoleMentions();
+
+                    if (_sanitizeRoles)
+                        SanitizeRoleMentions();
+
                     IsParsed = true;
 
                     // Save the final result, then clear the builder.
@@ -72,12 +77,14 @@ namespace AkkoBot.Commands.Common
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <param name="content">The text with placeholders in it.</param>
+        /// <param name="sanitizeRoles">Defines whether role mentions should be sanitized or not.</param>
         /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\.]+)\((.+?)\)}|{([\w\.]+)}".</param>
         /// <param name="formatter">The object responsible for converting the placeholders to the values they represent. Default is <see cref="AkkoPlaceholders"/>.</param>
-        public SmartString(CommandContext context, string content, Regex regex = null, IPlaceholderFormatter formatter = null)
+        public SmartString(CommandContext context, string content, bool sanitizeRoles = false, Regex regex = null, IPlaceholderFormatter formatter = null)
         {
             _context = context;
             _contentBuilder = new(content ?? context.RawArgumentString);
+            _sanitizeRoles = sanitizeRoles;
             ParseRegex = regex ?? new Regex(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
             _formatter = formatter ?? context.CommandsNext.Services.GetService<AkkoPlaceholders>();
         }
@@ -188,6 +195,10 @@ namespace AkkoBot.Commands.Common
         public static bool operator ==(SmartString x, SmartString y) => x.Content == y.Content;
 
         public static bool operator !=(SmartString x, SmartString y) => x.Content != y.Content;
+
+        public static implicit operator string(SmartString x) => x?.Content;
+
+        public static implicit operator Optional<string>(SmartString x) => x?.Content;
 
         /* Overrides */
 

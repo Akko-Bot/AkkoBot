@@ -98,8 +98,8 @@ namespace AkkoBot.Services.Events
                 {
                     parsedMsg.Content = alias.Alias;
 
-                    return (alias.IsDynamic && eventArgs.Message.Content.StartsWith(parsedMsg.Content, StringComparison.InvariantCultureIgnoreCase))
-                        || (!alias.IsDynamic && eventArgs.Message.Content.Equals(parsedMsg.Content, StringComparison.InvariantCultureIgnoreCase));
+                    return (alias.IsDynamic && eventArgs.Message.Content.StartsWith(parsedMsg, StringComparison.InvariantCultureIgnoreCase))
+                        || (!alias.IsDynamic && eventArgs.Message.Content.Equals(parsedMsg, StringComparison.InvariantCultureIgnoreCase));
                 }
 
                 // Find the command represented by the alias

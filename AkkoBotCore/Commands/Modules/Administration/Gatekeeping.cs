@@ -74,29 +74,35 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_greetchannel")]
         public async Task SetGreetChannel(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
+            var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
             var embed = new DiscordEmbedBuilder()
             {
                 Description = (channel is null)
                     ? "greet_channel_removed"
-                    : context.FormatLocalized("greet_channel_set", channel.Mention)
+                    : context.FormatLocalized((isValid) ? "greet_channel_set" : "channel_invalid", channel.Mention)
             };
 
-            await _service.SetPropertyAsync(context.Guild, x => x.GreetChannelId = channel?.Id);
-            await context.RespondLocalizedAsync(embed);
+            if (isValid)
+                await _service.SetPropertyAsync(context.Guild, x => x.GreetChannelId = channel?.Id);
+
+            await context.RespondLocalizedAsync(embed, isError: !isValid);
         }
 
         [Command("farewellchannel")]
         [Description("cmd_farewellchannel")]
         public async Task SetFarewellChannel(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
+            var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
             var embed = new DiscordEmbedBuilder()
             {
                 Description = (channel is null)
                     ? "farewell_channel_removed"
-                    : context.FormatLocalized("farewell_channel_set", channel.Mention)
+                    : context.FormatLocalized((isValid) ? "farewell_channel_set" : "channel_invalid", channel.Mention)
             };
 
-            await _service.SetPropertyAsync(context.Guild, x => x.FarewellChannelId = channel?.Id);
+            if (isValid)
+                await _service.SetPropertyAsync(context.Guild, x => x.FarewellChannelId = channel?.Id);
+
             await context.RespondLocalizedAsync(embed);
         }
 
@@ -147,12 +153,12 @@ namespace AkkoBot.Commands.Modules.Administration
             var property = selector(_service.GetGatekeepSettings(context.Guild) ?? new())?.ToString();
             var parsedMessage = new SmartString(context, property);
 
-            if (string.IsNullOrWhiteSpace(parsedMessage.Content))
+            if (string.IsNullOrWhiteSpace(parsedMessage))
                 await context.RespondLocalizedAsync(new DiscordEmbedBuilder() { Description = context.FormatLocalized("guild_prop_null", propName) }, isError: true);
-            else if (_utilitiesService.DeserializeEmbed(parsedMessage.Content, out var message))
+            else if (_utilitiesService.DeserializeEmbed(parsedMessage, out var message))
                 await context.Channel.SendMessageAsync(message);
             else
-                await context.Channel.SendMessageAsync(parsedMessage.Content);
+                await context.Channel.SendMessageAsync(parsedMessage);
         }
     }
 }

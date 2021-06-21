@@ -114,6 +114,7 @@ bot_prefix_check: The global prefix is {0}
 bot_settings_title: Global Settings
 category: Category
 channel: Channel
+channel_invalid: I have no permission to send messages to the {0} channel.
 channels: Channels
 chatmute_success: User {0} can no longer message on text channels.
 chatunmute_success: User {0} can now message on text channels.
@@ -191,6 +192,8 @@ cmd_emoji_removerole: Makes the specified emoji available to all users in the se
 cmd_emoji_rename: Renames a server emoji.
 cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
 cmd_emoji_showemoji: Shows the name and URL of the specified emojis.
+cmd_farewellchannel: Sets the channel where the farewell message should be sent to. Provide no parameter to remove.
+cmd_farewellmessage: Sets the message to be sent when users leave the server. Provide no parameter to visualize the current farewell message.
 cmd_fc: Groups commands that filter out messages that don't contain a certain type of content.
 cmd_fc_att: Toggles deletion of any message that doesn't contain an attachment in the specified channel. Provide no parameter to toggle deletion in the current channel.
 cmd_fc_clear: Removes all content filters from this server.
@@ -217,6 +220,9 @@ cmd_fw_stickers: Toggles the automatic deletion of messages containing stickers 
 cmd_fw_warn: Toggles whether filtered messages should automatically issue a warning to the offending user.
 cmd_globalcmd: Toggles activation of a command.
 cmd_globalmodule: Toggles activation of all commands in the specified module.
+cmd_greetchannel: Sets the channel where the greet message should be sent to. Provide no parameter to remove.
+cmd_greetdm: Toggles whether greet messages should be sent in the server or to the user's direct message. Note that users who disallow direct messages from non-friends won't get the greeting message.
+cmd_greetmessage: Sets the message to be sent when users join the server. Provide no parameter to visualize the current greet message.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
@@ -230,6 +236,7 @@ cmd_guild_timezone: Sets this server's time zone.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
 cmd_inrole: Lists all users on this server with the specified role.
+cmd_joinrole: Adds or removes a role to the list of roles that should be automatically assigned to a user when they join the server. Provide no parameter to see the list of join roles.
 cmd_kick: Kicks a user from the server.
 cmd_ldc: Lists all commands that have been disabled globally.
 cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
@@ -348,6 +355,10 @@ error_hierarchy: This command can only be used on users with a role lower to min
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
+farewell_channel_removed: The farewell channel has been successfully removed.
+farewell_channel_set: The farewell message will be sent to the {0} channel.
+farewell_message: farewell message
+farewell_message_set: The farewell message has been successfully set.
 fc_allow: Allows Only
 fc_att_toggle: Attachment filter has been {0} on {1}.
 fc_command_toggle: Command filter has been {0} on {1}.
@@ -377,6 +388,12 @@ gcmd_error: The command {0} could not be found.
 gcmd_toggle: The command {0} has been successfully {1}.
 gmod_error: The module {0} could not be found.
 gmod_toggle: Commands in the {0} module have been successfully {1}.
+greet_channel_removed: The greet channel has been successfully removed.
+greet_channel_set: The greet message will be sent to the {0} channel.
+greet_message: greet message
+greet_message_set: The greet message has been successfully set.
+greetdm_disabled: Greet messages will now be sent in the server.
+greetdm_enabled: Greet messages will now be sent in direct message.
 group: Group
 guild_embed_change: Embed usage has been {0} on this server.
 guild_errorcolor: ErrorColor has been changed to {0}.
@@ -385,6 +402,7 @@ guild_locale_unavailable: This language is not available. Use {0} to see the lis
 guild_okcolor: OkColor has been changed to {0}.
 guild_prefix_change: The prefix on this server has been changed to {0}
 guild_prefix_check: The prefix on this server is {0}
+guild_prop_null: No {0} has been set.
 guild_role_mention: Permissive role mentions have been {0}.
 guild_sanitizenames: Nickname sanitization has been {0}.
 guild_settings_title: Server Settings
@@ -443,6 +461,11 @@ is_invite_only: Invites
 is_mod: Is a Moderator
 is_url_only: URLs
 joined_at: Joined At
+joinrole_added: The {0} role has been added to the list of join roles.
+joinrole_error: Integration roles cannot be added.
+joinrole_list_empty: There are no join roles.
+joinrole_list_title: List of Join Roles
+joinrole_removed: The {0} role has been removed from the list of join roles.
 kick: Kick
 kick_enum: kicked
 kick_notification: You have been kicked from the {0} server.
@@ -597,23 +620,3 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
-
-cmd_joinrole: Adds or removes a role to the list of roles that should be automatically assigned to a user when they join the server. Provide no parameter to see the list of join roles.
-joinrole_error: Integration roles cannot be added.
-joinrole_added: The {0} role has been added to the list of join roles.
-joinrole_removed: The {0} role has been removed from the list of join roles.
-joinrole_list_empty: There are no join roles.
-joinrole_list_title: List of Join Roles
-
-cmd_greetchannel: Sets the channel where the greet message should be sent to. Provide no parameter to remove.
-cmd_farewellchannel: Sets the channel where the farewell message should be sent to. Provide no parameter to remove.
-guild_prop_null: No {0} has been set.
-cmd_greetmessage: Sets the message to be sent when users join the server. Provide no parameter to visualize the current greet message.
-greet_message: greet message
-greet_message_set: The greet message has been successfully set.
-cmd_farewellmessage: Sets the message to be sent when users leave the server. Provide no parameter to visualize the current farewell message.
-farewell_message: farewell message
-farewell_message_set: The farewell message has been successfully set.
-greetdm_enabled: Greet messages will now be sent in direct message.
-greetdm_enabled: Greet messages will now be sent in the server.
-cmd_greetdm: Toggles whether greet messages should be sent in the server or to the user's direct message. Note that users who disallow direct messages from non-friends won't get the greeting message.

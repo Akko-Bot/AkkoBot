@@ -38,9 +38,9 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            var dm = (_utilities.DeserializeEmbed(message.Content, out var dMsg))
+            var dm = (_utilities.DeserializeEmbed(message, out var dMsg))
                 ? await member.SendMessageSafelyAsync(dMsg)
-                : await member.SendMessageSafelyAsync(message.Content);
+                : await member.SendMessageSafelyAsync(message);
 
             await context.Message.CreateReactionAsync((dm is not null) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
@@ -59,9 +59,9 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            var dm = (_utilities.DeserializeEmbed(message.Content, out var dMsg))
+            var dm = (_utilities.DeserializeEmbed(message, out var dMsg))
                 ? await channel.SendMessageSafelyAsync(dMsg)
-                : await channel.SendMessageSafelyAsync(message.Content);
+                : await channel.SendMessageSafelyAsync(message);
 
             await context.Message.CreateReactionAsync((dm is not null) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }

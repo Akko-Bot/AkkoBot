@@ -203,8 +203,8 @@ namespace AkkoBot.Services.Timers
                     null
                 );
 
-                var message = new SmartString(fakeContext, dbReminder.Content);
-                var wasDeserialized = _utilitiesService.DeserializeEmbed(message.Content, out var dmsg);
+                var message = new SmartString(fakeContext, dbReminder.Content, true);
+                var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
                 dmsg ??= new();
 
                 var localizedDate = (server is null)
@@ -214,7 +214,7 @@ namespace AkkoBot.Services.Timers
                 var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
 
                 dmsg.Content = (dmsg.Content is null)
-                    ? (header + ((wasDeserialized) ? string.Empty : message.Content)).MaxLength(AkkoConstants.MaxMessageLength, "[...]")
+                    ? (header + ((wasDeserialized) ? string.Empty : message)).MaxLength(AkkoConstants.MaxMessageLength, "[...]")
                     : dmsg.Content.Insert(0, header).MaxLength(AkkoConstants.MaxMessageLength, "[...]");
 
                 await channel.SendMessageAsync(dmsg);
@@ -292,18 +292,18 @@ namespace AkkoBot.Services.Timers
                 var fakeContext = cmdHandler.CreateFakeContext(user, channel, dbRepeater.Content, dbGuild.Prefix, null);
 
                 var message = new SmartString(fakeContext, dbRepeater.Content);
-                var wasDeserialized = _utilitiesService.DeserializeEmbed(message.Content, out var dmsg);
+                var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
 
                 // If last message is the same repeated message, do nothing
                 if (lastMessage.Author == server.CurrentMember
                     && (wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
-                    || (!wasDeserialized && lastMessage.Content == message.Content))
+                    || (!wasDeserialized && lastMessage.Content == message))
                     return;
 
                 // Send the repeater
                 var discordMessage = (wasDeserialized)
                     ? await channel.SendMessageAsync(dmsg)
-                    : await channel.SendMessageAsync(message.Content);
+                    : await channel.SendMessageAsync(message);
 
                 if (HasPermissionTo(server.CurrentMember, channel, Permissions.AddReactions))
                     await discordMessage.CreateReactionAsync(AkkoEntities.RepeaterEmoji);

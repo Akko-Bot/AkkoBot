@@ -114,6 +114,7 @@ bot_prefix_check: O prefixo global é {0}
 bot_settings_title: Configurações Globais
 category: Categoria
 channel: Canal
+channel_invalid: Não tenho permissão para enviar mensagens no canal {0}.
 channels: Canais
 chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
 chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
@@ -191,6 +192,8 @@ cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos 
 cmd_emoji_rename: Renomeia um emoji do servidor.
 cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
 cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
+cmd_farewellchannel: Define o canal onde a mensagem de despedica deve ser enviada. Forneça nenhum parâmetro para remover.
+cmd_farewellmessage: Define a mensagem a ser enviada quando usuários deixam o servidor. Forneça nenhum parâmetro para visualizar a mensagem de despedida atual.
 cmd_fc: Agrupa comandos que filtram mensagens que não contenham um determinado tipo de conteúdo.
 cmd_fc_att: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um anexo no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_clear: Remove todos os filtros de conteúdo desse servidor.
@@ -217,6 +220,9 @@ cmd_fw_stickers: Ativa ou desativa a exclusão automática de mensagens que cont
 cmd_fw_warn: Ativa ou desativa a advertência automática a usuários que enviarem mensagens com palavras proibidas.
 cmd_globalcmd: Ativa ou desativa um comando.
 cmd_globalmodule: Ativa ou desativa todos os comandos do módulo especificado.
+cmd_greetchannel: Define o canal onde a mensagem de boas-vindas deve ser enviada. Forneça nenhum parâmetro para remover.
+cmd_greetdm: Define se mensagens de boas-vindas serão enviadas no servidor ou em mensagem direta com o usuário. Note que usuários que tiverem mensagens diretas bloqueadas não receberão a mensagem de boas-vindas.
+cmd_greetmessage: Define a mensagem a ser enviada quando usuários entram no servidor. Forneça nenhum parâmetro para exibir a mensagem de boas-vindas atual.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
@@ -230,6 +236,7 @@ cmd_guild_timezone: Define o fuso horário desse servidor.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especificado.
+cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
 cmd_kick: Expulsa um usuário do servidor.
 cmd_ldc: Exibe todos os comandos desativados.
 cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
@@ -348,6 +355,10 @@ error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
+farewell_channel_removed: O canal de despedida foi removido com sucesso.
+farewell_channel_set: A mensagem de despedida será enviada no canal {0}.
+farewell_message: mensagem de despedida
+farewell_message_set: Mensagem de despedida definida com sucesso.
 fc_allow: Permite Apenas
 fc_att_toggle: O filtro de anexos foi {0} no canal {1}.
 fc_command_toggle: O filtro de comandos foi {0} no canal {1}.
@@ -377,6 +388,12 @@ gcmd_error: O comando {0} não foi encontrado.
 gcmd_toggle: O comando {0} foi {1} com sucesso.
 gmod_error: O módulo {0} não foi encontrado.
 gmod_toggle: Comandos do módulo {0} foram {1}s com sucesso.
+greet_channel_removed: Canal de boas-vindas removido com sucesso.
+greet_channel_set: A mensagem de boas-vindas será enviada no canal {0}.
+greet_message: mensagem de boas-vindas
+greet_message_set: Mensagem de boas-vindas definida com sucesso.
+greetdm_enabled: A mensagem de boas-vindas será enviada em mensagem direta.
+greetdm_enabled: A mensagem de boas-vindas será enviada no servidor.
 group: Grupo
 guild_embed_change: O uso de embeds nesse servidor foi {0}.
 guild_errorcolor: ErrorColor foi alterada para {0}.
@@ -385,6 +402,7 @@ guild_locale_unavailable: Esse idioma não está disponível. Use {0} para ver a
 guild_okcolor: OkColor foi alterada para {0}.
 guild_prefix_change: O prefixo nesse servidor foi alterado para {0}
 guild_prefix_check: O prefixo nesse servidor é {0}
+guild_prop_null: Nenhuma {0} foi definina.
 guild_role_mention: Menções permissivas de cargos foram {0}s.
 guild_sanitizenames: Sanitização de apelidos foi {0}.
 guild_settings_title: Configurações do Servidor
@@ -443,6 +461,11 @@ is_invite_only: Convites
 is_mod: É Moderador
 is_url_only: URLs
 joined_at: Entrou Em
+joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
+joinrole_error: Cargos de integração não podem ser adicionados.
+joinrole_list_empty: Não há cargos de entrada.
+joinrole_list_title: Lista de Cargos de Entrada
+joinrole_removed: O cargo {0} foi removido da lista de cargos de entrada.
 kick: Expulsar
 kick_enum: expulso
 kick_notification: Você foi expulso do servidor {0}.
@@ -597,23 +620,3 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
-
-cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
-joinrole_error: Cargos de integração não podem ser adicionados.
-joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
-joinrole_removed: O cargo {0} foi removido da lista de cargos de entrada.
-joinrole_list_empty: Não há cargos de entrada.
-joinrole_list_title: Lista de Cargos de Entrada
-
-cmd_greetchannel: Define o canal onde a mensagem de boas-vindas deve ser enviada. Forneça nenhum parâmetro para remover.
-cmd_farewellchannel: Define o canal onde a mensagem de despedica deve ser enviada. Forneça nenhum parâmetro para remover.
-guild_prop_null: Nenhuma {0} foi definina.
-cmd_greetmessage: Define a mensagem a ser enviada quando usuários entram no servidor. Forneça nenhum parâmetro para exibir a mensagem de boas-vindas atual.
-greet_message: mensagem de boas-vindas
-greet_message_set: Mensagem de boas-vindas definida com sucesso.
-cmd_farewellmessage: Define a mensagem a ser enviada quando usuários deixam o servidor. Forneça nenhum parâmetro para visualizar a mensagem de despedida atual.
-farewell_message: mensagem de despedida
-farewell_message_set: Mensagem de despedida definida com sucesso.
-greetdm_enabled: A mensagem de boas-vindas será enviada em mensagem direta.
-greetdm_enabled: A mensagem de boas-vindas será enviada no servidor.
-cmd_greetdm: Define se mensagens de boas-vindas serão enviadas no servidor ou em mensagem direta com o usuário. Note que usuários que tiverem mensagens diretas bloqueadas não receberão a mensagem de boas-vindas.
