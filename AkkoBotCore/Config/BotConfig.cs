@@ -4,6 +4,7 @@ using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization;
 using ConcurrentCollections;
 using System;
+using System.Collections.Generic;
 
 namespace AkkoBot.Config
 {
@@ -97,5 +98,13 @@ namespace AkkoBot.Config
         /// Defines the maximum amount of time that an interactive command waits for user input.
         /// </summary>
         public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(30);
+
+        public override IReadOnlyDictionary<string, string> GetSettings()
+        {
+            var result = base.GetSettings() as Dictionary<string, string>;
+            result[nameof(DisabledCommands).ToSnakeCase()] = string.Join(", ", DisabledCommands);
+
+            return result;
+        }
     }
 }

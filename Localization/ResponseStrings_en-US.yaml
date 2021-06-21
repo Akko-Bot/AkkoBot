@@ -604,3 +604,16 @@ joinrole_added: The {0} role has been added to the list of join roles.
 joinrole_removed: The {0} role has been removed from the list of join roles.
 joinrole_list_empty: There are no join roles.
 joinrole_list_title: List of Join Roles
+
+cmd_greetchannel: Sets the channel where the greet message should be sent to. Provide no parameter to remove.
+cmd_farewellchannel: Sets the channel where the farewell message should be sent to. Provide no parameter to remove.
+guild_prop_null: No {0} has been set.
+cmd_greetmessage: Sets the message to be sent when users join the server. Provide no parameter to visualize the current greet message.
+greet_message: greet message
+greet_message_set: The greet message has been successfully set.
+cmd_farewellmessage: Sets the message to be sent when users leave the server. Provide no parameter to visualize the current farewell message.
+farewell_message: farewell message
+farewell_message_set: The farewell message has been successfully set.
+greetdm_enabled: Greet messages will now be sent in direct message.
+greetdm_enabled: Greet messages will now be sent in the server.
+cmd_greetdm: Toggles whether greet messages should be sent in the server or to the user's direct message. Note that users who disallow direct messages from non-friends won't get the greeting message.

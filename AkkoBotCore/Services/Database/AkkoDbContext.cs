@@ -26,6 +26,7 @@ namespace AkkoBot.Services.Database
         public DbSet<VoiceRoleEntity> VoiceRoles { get; init; }
         public DbSet<CommandCooldownEntity> CommandCooldown { get; init; }
         public DbSet<PollEntity> Polls { get; init; }
+        public DbSet<GatekeepEntity> Gatekeeping { get; init; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
         {
@@ -134,6 +135,14 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Guild -> Gatekeeping
+            modelBuilder.Entity<GatekeepEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithOne(x => x.GatekeepRel)
+                .HasForeignKey<GatekeepEntity>(x => x.GuildIdFK)
+                .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             #endregion Guild Configuration
 
             #region Timer Entities
@@ -165,7 +174,7 @@ namespace AkkoBot.Services.Database
                 .HasPrincipalKey<TimerEntity>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Timer -> Warning
+            // Timer -> Infraction
             modelBuilder.Entity<WarnEntity>()
                 .HasOne(x => x.TimerRel)
                 .WithOne(x => x.WarnRel)

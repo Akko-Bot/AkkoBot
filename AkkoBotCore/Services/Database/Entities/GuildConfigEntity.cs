@@ -21,13 +21,17 @@ namespace AkkoBot.Services.Database.Entities
         private string _locale = AkkoLocalizer.DefaultLanguage;
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
-        private string _customSanitizedName;
         private string _banTemplate;
 
         /// <summary>
         /// The settings of the word filter and the words it is keeping track of.
         /// </summary>
         public FilteredWordsEntity FilteredWordsRel { get; init; }
+
+        /// <summary>
+        /// The gatekeeping settings of this Discord guild.
+        /// </summary>
+        public GatekeepEntity GatekeepRel { get; init; }
 
         /// <summary>
         /// The timers associated with this Discord guild.
@@ -108,17 +112,6 @@ namespace AkkoBot.Services.Database.Entities
         }
 
         /// <summary>
-        /// Determines whether embeds should be used in responses or not.
-        /// </summary>
-        public bool UseEmbed { get; set; } = true;
-
-        /// <summary>
-        /// Determines whether role mentions should be sanitized by hierarchy (<see langword="true"/>)
-        /// or by EveryoneServer permission (<see langword="false"/>).
-        /// </summary>
-        public bool PermissiveRoleMention { get; set; } = false;
-
-        /// <summary>
         /// The color to be used in response embeds.
         /// </summary>
         [Required]
@@ -143,10 +136,31 @@ namespace AkkoBot.Services.Database.Entities
         }
 
         /// <summary>
+        /// Defines the template to be used on the notification message for permanent bans.
+        /// </summary>
+        [MaxLength(AkkoConstants.MaxMessageLength)]
+        public string BanTemplate
+        {
+            get => _banTemplate;
+            set => _banTemplate = value?.MaxLength(AkkoConstants.MaxMessageLength);
+        }
+
+        /// <summary>
         /// The time zone of this guild.
         /// </summary>
         [MaxLength(128)]
         public string Timezone { get; set; }
+
+        /// <summary>
+        /// Determines whether embeds should be used in responses or not.
+        /// </summary>
+        public bool UseEmbed { get; set; } = true;
+
+        /// <summary>
+        /// Determines whether role mentions should be sanitized by hierarchy (<see langword="true"/>)
+        /// or by EveryoneServer permission (<see langword="false"/>).
+        /// </summary>
+        public bool PermissiveRoleMention { get; set; } = false;
 
         /// <summary>
         /// The ID of the mute role of this guild.
@@ -162,36 +176,6 @@ namespace AkkoBot.Services.Database.Entities
         /// Defines the amount of time that an interactive command waits for user input.
         /// </summary>
         public TimeSpan? InteractiveTimeout { get; set; }
-
-        /// <summary>
-        /// Determines whether names starting with symbols should be sanitized.
-        /// </summary>
-        public bool SanitizeNames { get; set; }
-
-        /// <summary>
-        /// Defines the replacement name to be assigned to users whose names should be sanitized.
-        /// </summary>
-        [MaxLength(AkkoConstants.MaxUsernameLength)]
-        public string CustomSanitizedName
-        {
-            get => _customSanitizedName;
-            set => _customSanitizedName = value?.MaxLength(AkkoConstants.MaxUsernameLength);
-        }
-
-        /// <summary>
-        /// Defines the template to be used on the notification message for permanent bans.
-        /// </summary>
-        [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string BanTemplate
-        {
-            get => _banTemplate;
-            set => _banTemplate = value?.MaxLength(AkkoConstants.MaxMessageLength);
-        }
-
-        // Greet and Bye channels and messages
-        // .asar - .iam/.iamnot roles
-        // Xp notification
-        // .rero messages
 
         public GuildConfigEntity()
         {
@@ -209,7 +193,9 @@ namespace AkkoBot.Services.Database.Entities
         public override IReadOnlyDictionary<string, string> GetSettings()
         {
             var result = base.GetSettings() as Dictionary<string, string>;
+            
             result.Remove(nameof(GuildId).ToSnakeCase());
+            result.Remove(nameof(BanTemplate).ToSnakeCase());
 
             return result;
         }

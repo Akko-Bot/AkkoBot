@@ -38,6 +38,7 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; private set; }
+        public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; private set; }
 
         /* Lazily instantiated */
 
@@ -82,6 +83,7 @@ namespace AkkoBot.Services.Database
             Guilds = new();             // Guild configs are loaded into the cache as needed.
             FilteredWords = new();      // Filtered words are loaded into the cache as needed
             FilteredContent = new();    // Special filters are loaded into the cache as needed
+            Gatekeeping = new();        // Gatekeep settings are loaded into the cache as needed
         }
 
         public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid)
@@ -90,17 +92,24 @@ namespace AkkoBot.Services.Database
                 return dbGuild;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            dbGuild = await db.GuildConfig.AsNoTracking()
+            dbGuild = await db.GuildConfig
+                .AsNoTracking()
+                .Include(x => x.GatekeepRel)
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
 
             if (dbGuild is null)
             {
                 dbGuild = new GuildConfigEntity(BotConfig) { GuildId = sid };
                 db.Add(dbGuild);
+
                 await db.SaveChangesAsync();
             }
 
+            if (dbGuild.GatekeepRel is not null)
+                Gatekeeping.TryAdd(dbGuild.GuildId, dbGuild.GatekeepRel);
+
             Guilds.TryAdd(dbGuild.GuildId, dbGuild);
+
             return dbGuild;
         }
 
@@ -126,6 +135,7 @@ namespace AkkoBot.Services.Database
                     FilteredWords?.Clear();
                     FilteredContent?.Clear();
                     DisabledCommandCache?.Clear();
+                    Gatekeeping?.Clear();
 
                     if (Aliases is not null)
                     {
@@ -174,6 +184,7 @@ namespace AkkoBot.Services.Database
                 Polls = null;
                 Repeaters = null;
                 VoiceRoles = null;
+                Gatekeeping = null;
 
                 _isDisposed = true;
             }

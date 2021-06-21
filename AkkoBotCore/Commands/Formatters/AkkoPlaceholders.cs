@@ -41,6 +41,7 @@ namespace AkkoBot.Commands.Formatters
             ["server.id"] = (context) => context.Guild?.Id,
             ["server.name"] = (context) => context.Guild?.Name,
             ["server.members"] = (context) => context.Guild?.MemberCount,
+            ["server.defaultchannel"] = (context) => context.Guild?.GetDefaultChannel().Mention,
             ["server.prefix"] = (context) => context.Prefix,
             ["p"] = (context) => context.Prefix,
 
@@ -84,7 +85,7 @@ namespace AkkoBot.Commands.Formatters
             ["rng"] = (context) => context.Services.GetService<Random>().Next(),
             ["cmd.argument"] = (context) => context.RawArgumentString,
 
-            /* Ban Template Placeholders - Only work on ban templates */
+            /* Ban Template Placeholders - Only works on ban templates */
 
             ["ban.mod"] = (context) => !context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase) ? null : context.User.GetFullname(),
 

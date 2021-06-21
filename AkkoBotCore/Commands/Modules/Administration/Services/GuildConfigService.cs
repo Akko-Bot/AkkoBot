@@ -18,13 +18,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     public class GuildConfigService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IDbCache _dbCacher;
+        private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
 
         public GuildConfigService(IServiceScopeFactory scopeFactory, IDbCache dbCacher, ILocalizer localizer)
         {
             _scopeFactory = scopeFactory;
-            _dbCacher = dbCacher;
+            _dbCache = dbCacher;
             _localizer = localizer;
         }
 
@@ -49,20 +49,16 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         /// <typeparam name="T">The type of the setting to be returned.</typeparam>
         /// <param name="server">The target guild.</param>
-        /// <param name="selector">A method to get or set the property.</param>
-        /// <returns>The requested setting, <see langword="null"/> if the context is from a private context.</returns>
+        /// <param name="selector">A method to set the property.</param>
+        /// <returns>The modified setting.</returns>
         public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
         {
-            _dbCacher.Guilds.TryGetValue(server.Id, out var dbGuild);
-            var result = selector(dbGuild);
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            var dbGuild = _dbCache.Guilds.GetOrAdd(server.Id, sid => new GuildConfigEntity() { GuildId = sid });
+            var result = selector(dbGuild);           
 
-            if (dbGuild is not null)
-            {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-
-                db.GuildConfig.Update(dbGuild);
-                await db.SaveChangesAsync();
-            }
+            db.GuildConfig.Update(dbGuild);
+            await db.SaveChangesAsync();
 
             return result;
         }
@@ -74,7 +70,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns>The guild settings.</returns>
         public GuildConfigEntity GetGuildSettings(DiscordGuild server)
         {
-            _dbCacher.Guilds.TryGetValue(server.Id, out var dbGuild);
+            _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
             return dbGuild;
         }
     }

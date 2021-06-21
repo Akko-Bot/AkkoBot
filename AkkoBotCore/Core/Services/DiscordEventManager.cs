@@ -20,10 +20,11 @@ namespace AkkoBot.Core.Services
         private readonly IGuildEventsHandler _guildEventsHandler;
         private readonly IGlobalEventsHandler _globalEventsHandler;
         private readonly ICommandLogHandler _cmdLogHandler;
+        private readonly IGatekeepingEventHandler _gatekeeper;
         private readonly DiscordShardedClient _shardedClient;
 
         public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
-            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, DiscordShardedClient shardedClient)
+            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepingEventHandler gatekeeper, DiscordShardedClient shardedClient)
         {
             _startup = startup;
             _voiceRoleHandler = vcRoleHandler;
@@ -31,6 +32,7 @@ namespace AkkoBot.Core.Services
             _guildEventsHandler = guildEventsHandler;
             _globalEventsHandler = globalEventsHandler;
             _cmdLogHandler = cmdLogHandler;
+            _gatekeeper = gatekeeper;
             _shardedClient = shardedClient;
         }
 
@@ -71,10 +73,19 @@ namespace AkkoBot.Core.Services
             _shardedClient.GuildDeleted += _guildLoader.RemoveGuildOnLeaveAsync;
 
             // Sanitize username on join
-            _shardedClient.GuildMemberAdded += _guildEventsHandler.SanitizeNameOnJoinAsync;
+            _shardedClient.GuildMemberAdded += _gatekeeper.SanitizeNameOnJoinAsync;
 
             // Sanitize nickname on update
-            _shardedClient.GuildMemberUpdated += _guildEventsHandler.SanitizeNameOnUpdateAsync;
+            _shardedClient.GuildMemberUpdated += _gatekeeper.SanitizeNameOnUpdateAsync;
+
+            // Send farewell message
+            _shardedClient.GuildMemberRemoved += _gatekeeper.SendFarewellMessageAsync;
+
+            // Send dm greet message
+            _shardedClient.GuildMemberAdded += _gatekeeper.SendGreetDmMessageAsync;
+
+            // Send greet message
+            _shardedClient.GuildMemberAdded += _gatekeeper.SendGreetMessageAsync;
 
             // Prevent mute evasion
             _shardedClient.GuildMemberAdded += _guildEventsHandler.RemuteAsync;

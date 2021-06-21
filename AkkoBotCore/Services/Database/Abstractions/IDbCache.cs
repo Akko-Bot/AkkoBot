@@ -113,6 +113,11 @@ namespace AkkoBot.Services.Database.Abstractions
         public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; }
 
         /// <summary>
+        /// Stores all guild gatekeeping settings.
+        /// </summary>
+        public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; }
+
+        /// <summary>
         /// Safely gets a database guild.
         /// </summary>
         /// <param name="sid">The GuildId of the database entry.</param>

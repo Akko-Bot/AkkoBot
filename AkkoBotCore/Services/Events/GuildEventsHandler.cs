@@ -1,4 +1,6 @@
-﻿using AkkoBot.Commands.Modules.Administration.Services;
+﻿using AkkoBot.Commands.Common;
+using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
@@ -41,45 +43,15 @@ namespace AkkoBot.Services.Events
         private readonly IDbCache _dbCache;
         private readonly RoleService _roleService;
         private readonly WarningService _warningService;
+        private readonly UtilitiesService _utilitiesService;
 
-        public GuildEventsHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, RoleService roleService, WarningService warningService)
+        public GuildEventsHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, RoleService roleService, WarningService warningService, UtilitiesService utilitiesService)
         {
             _scopeFactory = scopeFactory;
             _dbCache = dbCache;
             _roleService = roleService;
             _warningService = warningService;
-        }
-
-        public async Task SanitizeNameOnUpdateAsync(DiscordClient _, GuildMemberUpdateEventArgs eventArgs)
-        {
-            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
-
-            if (!dbGuild.SanitizeNames
-                || (!char.IsPunctuation(eventArgs.Member.DisplayName[0]) && !char.IsSymbol(eventArgs.Member.DisplayName[0]))
-                || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageNicknames)))
-                return;
-
-            await eventArgs.Member.ModifyAsync(user =>
-                    user.Nickname = (string.IsNullOrWhiteSpace(dbGuild.CustomSanitizedName))
-                        ? EnsureNameSanitization(eventArgs.Member)
-                        : dbGuild.CustomSanitizedName
-            );
-        }
-
-        public async Task SanitizeNameOnJoinAsync(DiscordClient _, GuildMemberAddEventArgs eventArgs)
-        {
-            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
-
-            if (!dbGuild.SanitizeNames
-                || (!char.IsPunctuation(eventArgs.Member.DisplayName[0]) && !char.IsSymbol(eventArgs.Member.DisplayName[0]))
-                || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageNicknames)))
-                return;
-
-            await eventArgs.Member.ModifyAsync(user =>
-                    user.Nickname = (string.IsNullOrWhiteSpace(dbGuild.CustomSanitizedName))
-                        ? EnsureNameSanitization(eventArgs.Member)
-                        : dbGuild.CustomSanitizedName
-            );
+            _utilitiesService = utilitiesService;
         }
 
         public Task RemuteAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
@@ -132,7 +104,7 @@ namespace AkkoBot.Services.Events
                     if (eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
                     {
                         await eventArgs.Member.GrantRoleAsync(role);
-                        await Task.Delay(AkkoEntities.SafetyDelay);
+                        await Task.Delay(AkkoEntities.SafetyDelay).ConfigureAwait(false);
                     }
                 }
 
@@ -355,24 +327,7 @@ namespace AkkoBot.Services.Events
         /// <returns><see langword="true"/> if it contains an invite, <see langword="false"/> otherwise.</returns>
         private bool HasInvite(DiscordMessage message)
             => _inviteRegex.Matches(message.Content).Count is not 0;
-
-        /// <summary>
-        /// Returns a valid display name for a user.
-        /// </summary>
-        /// <param name="user">The user to have its name sanitized.</param>
-        /// <returns>
-        /// The sanitized display name or "No Symbols Allowed" if their nickname AND username
-        /// are comprised of special characters only.
-        /// </returns>
-        private string EnsureNameSanitization(DiscordMember user)
-        {
-            var result = user.DisplayName.SanitizeUsername();
-
-            return (string.IsNullOrWhiteSpace(result))
-                ? (user.Username.All(x => char.IsPunctuation(x) || char.IsSymbol(x))) ? "No Symbols Allowed" : user.Username.SanitizeUsername()
-                : result;
-        }
-
+                
         /// <summary>
         /// Deletes a <see cref="DiscordMessage"/> if its content matches the specified filtered word.
         /// </summary>

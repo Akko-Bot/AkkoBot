@@ -365,7 +365,8 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<IGuildLoadHandler, GuildLoadHandler>(),
                 ServiceDescriptor.Singleton<IGuildEventsHandler, GuildEventsHandler>(),
                 ServiceDescriptor.Singleton<IGlobalEventsHandler, GlobalEventsHandler>(),
-                ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>()
+                ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>(),
+                ServiceDescriptor.Singleton<IGatekeepingEventHandler, GatekeepingEventHandler>()
             };
 
             foreach (var service in servicesList)

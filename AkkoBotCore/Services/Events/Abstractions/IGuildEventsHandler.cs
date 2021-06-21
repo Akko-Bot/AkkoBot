@@ -10,7 +10,7 @@ namespace AkkoBot.Services.Events.Abstractions
     public interface IGuildEventsHandler
     {
         /// <summary>
-        /// Adds roles to a user when they join a guild.
+        /// Adds roles to the user when they join a guild.
         /// </summary>
         Task AddJoinRolesAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
 
@@ -43,15 +43,5 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Mutes a user that has been previously muted.
         /// </summary>
         Task RemuteAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
-
-        /// <summary>
-        /// Sanitizes username on user join.
-        /// </summary>
-        Task SanitizeNameOnJoinAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
-
-        /// <summary>
-        /// Sanitizes user nickname on user update.
-        /// </summary>
-        Task SanitizeNameOnUpdateAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
     }
 }

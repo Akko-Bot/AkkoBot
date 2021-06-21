@@ -604,3 +604,16 @@ joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
 joinrole_removed: O cargo {0} foi removido da lista de cargos de entrada.
 joinrole_list_empty: Não há cargos de entrada.
 joinrole_list_title: Lista de Cargos de Entrada
+
+cmd_greetchannel: Define o canal onde a mensagem de boas-vindas deve ser enviada. Forneça nenhum parâmetro para remover.
+cmd_farewellchannel: Define o canal onde a mensagem de despedica deve ser enviada. Forneça nenhum parâmetro para remover.
+guild_prop_null: Nenhuma {0} foi definina.
+cmd_greetmessage: Define a mensagem a ser enviada quando usuários entram no servidor. Forneça nenhum parâmetro para exibir a mensagem de boas-vindas atual.
+greet_message: mensagem de boas-vindas
+greet_message_set: Mensagem de boas-vindas definida com sucesso.
+cmd_farewellmessage: Define a mensagem a ser enviada quando usuários deixam o servidor. Forneça nenhum parâmetro para visualizar a mensagem de despedida atual.
+farewell_message: mensagem de despedida
+farewell_message_set: Mensagem de despedida definida com sucesso.
+greetdm_enabled: A mensagem de boas-vindas será enviada em mensagem direta.
+greetdm_enabled: A mensagem de boas-vindas será enviada no servidor.
+cmd_greetdm: Define se mensagens de boas-vindas serão enviadas no servidor ou em mensagem direta com o usuário. Note que usuários que tiverem mensagens diretas bloqueadas não receberão a mensagem de boas-vindas.

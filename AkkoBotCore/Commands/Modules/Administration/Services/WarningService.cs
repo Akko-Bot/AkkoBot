@@ -282,7 +282,6 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 .ToArrayAsyncLinqToDB();
 
             return infractions
-                .Where(x => x.Infraction.UserIdFK is not 0)
                 .Select(x => (infractions.Select(y => y.User).FirstOrDefault(y => y.UserId == x.Infraction.AuthorId)?.FullName ?? "Unknown", x.Infraction))
                 .ToArray();
         }
@@ -314,7 +313,6 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 .ToArrayAsyncLinqToDB();
 
             return infractions
-                .Where(x => x.Infraction.UserIdFK is not 0)
                 .Select(x => (infractions.Select(y => y.User).FirstOrDefault(y => y.UserId == x.Infraction.AuthorId)?.FullName ?? "Unknown", x.Infraction))
                 .ToArray();
         }
