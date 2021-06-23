@@ -16,6 +16,7 @@ namespace AkkoBot.Config
         private string _locale = AkkoLocalizer.DefaultLanguage;
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
+        private TimeSpan _bulkGatekeepingTime = TimeSpan.FromSeconds(5);
 
         /// <summary>
         /// Groups the qualified name of all commands that have been disabled.
@@ -30,11 +31,6 @@ namespace AkkoBot.Config
             get => _locale;
             set => _locale = value?.MaxLength(10);
         }
-
-        /// <summary>
-        /// The default bot prefix.
-        /// </summary>
-        public string BotPrefix { get; set; } = "!";
 
         /// <summary>
         /// The default color for embeds.
@@ -53,6 +49,20 @@ namespace AkkoBot.Config
             get => _errorColor;
             set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
         }
+
+        /// <summary>
+        /// Defines how long the bot waits on bulk greetings and farewells.
+        /// </summary>
+        public TimeSpan BulkGatekeepTime
+        {
+            get => _bulkGatekeepingTime;
+            set => _bulkGatekeepingTime = (value <= TimeSpan.Zero) ? TimeSpan.FromSeconds(5) : value;
+        }
+
+        /// <summary>
+        /// The default bot prefix.
+        /// </summary>
+        public string BotPrefix { get; set; } = "!";
 
         /// <summary>
         /// Defines whether embeds should be used in responses by default.

@@ -15,7 +15,7 @@ namespace AkkoBot.Commands.Abstractions
         /// <param name="match">The regex match for the placeholder.</param>
         /// <param name="result">The parsed placeholder, <see langword="null"/> if parsing fails.</param>
         /// <remarks><paramref name="result"/> can return <see langword="null"/> even if this method returns <see langword="true"/>.</remarks>
-        /// <returns><see langword="true"/> if the placeholder was recognized, <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the placeholder was recognized, <see langword="false"/> otherwise.</returns>
         bool TryParse(CommandContext context, Match match, out object result);
     }
 }

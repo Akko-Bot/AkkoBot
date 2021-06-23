@@ -25,7 +25,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("embed")]
         [Description("cmd_guild_embed")]
-        public async Task ChangeEmbed(CommandContext context)
+        public async Task ChangeEmbedAsync(CommandContext context)
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.UseEmbed = !x.UseEmbed);
 
@@ -37,7 +37,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("okcolor")]
         [Description("cmd_guild_okcolor")]
-        public async Task ChangeOkColor(CommandContext context, [Description("arg_color")] string newColor)
+        public async Task ChangeOkColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
             var color = GeneralService.GetColor(newColor);
 
@@ -56,7 +56,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("errorcolor")]
         [Description("cmd_guild_errorcolor")]
-        public async Task ChangeErrorColor(CommandContext context, [Description("arg_color")] string newColor)
+        public async Task ChangeErrorColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
             var color = GeneralService.GetColor(newColor);
 
@@ -75,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("timeout")]
         [Description("cmd_guild_timeout")]
-        public async Task ChangeTimeout(CommandContext context, [Description("arg_timeout")] uint? seconds = null)
+        public async Task ChangeTimeoutAsync(CommandContext context, [Description("arg_timeout")] uint? seconds = null)
         {
             var result = await _service.SetPropertyAsync(
                 context.Guild,
@@ -97,7 +97,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("permissivemention"), Aliases("rolemention")]
         [Description("cmd_guild_rolemention")]
         [RequireUserPermissions(Permissions.ManageRoles)]
-        public async Task ChangeRoleMentionability(CommandContext context)
+        public async Task ChangeRoleMentionabilityAsync(CommandContext context)
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.PermissiveRoleMention = !x.PermissiveRoleMention);
 
@@ -109,7 +109,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("locale"), Aliases("language")]
         [Description("cmd_guild_locale")]
-        public async Task ListLocales(CommandContext context)
+        public async Task ListLocalesAsync(CommandContext context)
         {
             var locales = _service.GetLocales()
                 .OrderBy(code => code);
@@ -123,7 +123,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("locale"), Aliases("languages")]
-        public async Task ChangeGuildLocale(CommandContext context, [Description("arg_locale")] string languageCode)
+        public async Task ChangeGuildLocaleAsync(CommandContext context, [Description("arg_locale")] string languageCode)
         {
             var success = _service.IsLocaleRegistered(languageCode, out var responseKey);
 
@@ -144,7 +144,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("timezone")]
         [Description("cmd_guild_timezone")]
-        public async Task Timezone(CommandContext context, [RemainingText, Description("arg_timezone")] string timezone)
+        public async Task TimezoneAsync(CommandContext context, [RemainingText, Description("arg_timezone")] string timezone)
         {
             var zone = GeneralService.GetTimeZone(timezone);
             var embed = new DiscordEmbedBuilder()
@@ -163,7 +163,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("bantemplate")]
         [Description("cmd_bantemplate")]
         [RequireUserPermissions(Permissions.BanMembers)]
-        public async Task SetBanTemplate(CommandContext context, [RemainingText, Description("arg_bantemplate")] string banTemplate = "")
+        public async Task SetBanTemplateAsync(CommandContext context, [RemainingText, Description("arg_bantemplate")] string banTemplate = "")
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.BanTemplate = banTemplate);
 
@@ -180,7 +180,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("joinrole"), Aliases("jr")]
         [Description("cmd_joinrole")]
         [RequireUserPermissions(Permissions.ManageRoles)]
-        public async Task AddJoinRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+        public async Task AddJoinRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
             var embed = new DiscordEmbedBuilder();
 
@@ -210,7 +210,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("joinrole"), HiddenOverload]
-        public async Task AddJoinRoleList(CommandContext context)
+        public async Task AddJoinRoleListAsync(CommandContext context)
         {
             var dbGuild = _service.GetGuildSettings(context.Guild);
             var embed = new DiscordEmbedBuilder();
@@ -234,7 +234,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [GroupCommand, Command("list")]
         [Description("cmd_guild_list")]
-        public async Task ListGuildConfigs(CommandContext context)
+        public async Task ListGuildConfigsAsync(CommandContext context)
         {
             var settings = _service.GetGuildSettings(context.Guild).GetSettings();
 

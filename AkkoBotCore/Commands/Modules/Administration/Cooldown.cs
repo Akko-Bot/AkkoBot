@@ -27,7 +27,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("add")]
         [Description("cmd_cooldown_add")]
         [RequireUserPermissions(Permissions.ManageGuild)]
-        public async Task AddCmdCooldown(CommandContext context, [Description("arg_cooldown_time")] TimeSpan time, [Description("arg_command")] string command)
+        public async Task AddCmdCooldownAsync(CommandContext context, [Description("arg_cooldown_time")] TimeSpan time, [Description("arg_command")] string command)
         {
             if (command.StartsWith(context.Prefix))
                 command = command[context.Prefix.Length..];
@@ -42,7 +42,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("remove"), Aliases("rm")]
         [Description("cmd_cooldown_remove")]
         [RequireUserPermissions(Permissions.ManageGuild)]
-        public async Task RemoveCmdCooldown(CommandContext context, [Description("arg_command")] string command)
+        public async Task RemoveCmdCooldownAsync(CommandContext context, [Description("arg_command")] string command)
         {
             if (command.StartsWith(context.Prefix))
                 command = command[context.Prefix.Length..];
@@ -55,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_cooldown_list")]
-        public async Task ListCmdCooldowns(CommandContext context)
+        public async Task ListCmdCooldownsAsync(CommandContext context)
         {
             var commands = _service.GetCooldownCommands(context.Guild);
             var embed = new DiscordEmbedBuilder();

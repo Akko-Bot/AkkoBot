@@ -55,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             var dbGuild = _dbCache.Guilds.GetOrAdd(server.Id, sid => new GuildConfigEntity() { GuildId = sid });
-            var result = selector(dbGuild);           
+            var result = selector(dbGuild);
 
             db.GuildConfig.Update(dbGuild);
             await db.SaveChangesAsync();

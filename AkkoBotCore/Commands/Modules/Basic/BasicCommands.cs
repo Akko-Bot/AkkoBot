@@ -17,7 +17,7 @@ namespace AkkoBot.Commands.Modules.Basic
 
         [Command("ping")]
         [Description("Gets the websocket latency for this bot.")]
-        public async Task Ping(CommandContext context)
+        public async Task PingAsync(CommandContext context)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithDescription($"{context.Client.Ping} ms");
@@ -28,7 +28,7 @@ namespace AkkoBot.Commands.Modules.Basic
         [BotOwner]
         [Command("die"), Aliases("shutdown")]
         [Description("Shuts the bot down.")]
-        public async Task Die(CommandContext context)
+        public async Task DieAsync(CommandContext context)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("shutdown");
@@ -46,7 +46,7 @@ namespace AkkoBot.Commands.Modules.Basic
         [BotOwner]
         [Command("restart")]
         [Description("Restarts the bot.")]
-        public async Task Restart(CommandContext context)
+        public async Task RestartAsync(CommandContext context)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("restart");
@@ -62,7 +62,7 @@ namespace AkkoBot.Commands.Modules.Basic
 
         [Command("uptime")]
         [Description("Shows the bot's uptime.")]
-        public async Task Uptime(CommandContext context)
+        public async Task UptimeAsync(CommandContext context)
         {
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 

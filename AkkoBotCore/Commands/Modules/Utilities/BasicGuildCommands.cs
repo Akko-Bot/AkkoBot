@@ -18,7 +18,7 @@ namespace AkkoBot.Commands.Modules.Utilities
     {
         [Command("userid"), Aliases("uid")]
         [Description("cmd_userid")]
-        public async Task UserId(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        public async Task UserIdAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
         {
             user ??= context.Member;
 
@@ -30,7 +30,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("channelid"), Aliases("cid")]
         [Description("cmd_channelid")]
-        public async Task ChannelId(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task ChannelIdAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Channel;
 
@@ -42,7 +42,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("serverid"), Aliases("sid")]
         [Description("cmd_serverid")]
-        public async Task ServerId(CommandContext context)
+        public async Task ServerIdAsync(CommandContext context)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("xid", "server", Formatter.Bold(context.Guild.Name), Formatter.InlineCode(context.Guild.Id.ToString())));
@@ -52,7 +52,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("roleid"), Aliases("rid")]
         [Description("cmd_roleid")]
-        public async Task RoleId(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+        public async Task RoleIdAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithDescription(context.FormatLocalized("xid", "role", Formatter.Bold(role.Name), Formatter.InlineCode(role.Id.ToString())));
@@ -62,7 +62,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("rolecolor"), Aliases("rcolor")]
         [Description("cmd_rolecolor")]
-        public async Task RoleColor(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_color")] DiscordColor? newColor = null)
+        public async Task RoleColorAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_color")] DiscordColor? newColor = null)
         {
             if (newColor is null)
             {
@@ -85,14 +85,14 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("setnickname"), HiddenOverload]
-        public async Task SetNickname(CommandContext context, string nickname = "")
-            => await SetNickname(context, context.Guild.CurrentMember, nickname);
+        public async Task SetNicknameAsync(CommandContext context, string nickname = "")
+            => await SetNicknameAsync(context, context.Guild.CurrentMember, nickname);
 
         [Command("setnickname"), Aliases("setnick")]
         [Description("cmd_setnickname")]
         [RequirePermissions(Permissions.ManageNicknames)]
         [RequireBotPermissions(Permissions.ChangeNickname)]
-        public async Task SetNickname(
+        public async Task SetNicknameAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user = null,
             [RemainingText, Description("arg_nickname")] string nickname = "")
@@ -107,7 +107,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("listroles"), Aliases("roles")]
         [Description("cmd_listroles")]
-        public async Task ListRoles(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        public async Task ListRolesAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
         {
             var roles = (user?.Roles ?? context.Guild.Roles.Values)
                 .OrderByDescending(x => x.Position)
@@ -128,7 +128,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("inrole")]
         [Description("cmd_inrole")]
-        public async Task InRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+        public async Task InRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
             var users = context.Guild.Members.Values.Where(x => x.Roles.Contains(role))
                 .OrderByDescending(x => x.Hierarchy)
@@ -151,7 +151,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             [Command("createtextchannel"), Aliases("ctch")]
             [Description("cmd_createtextchannel")]
-            public async Task CreateTextChannel(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
+            public async Task CreateTextChannelAsync(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
             {
                 await context.Guild.CreateChannelAsync(name, ChannelType.Text, context.Message.Channel.Parent);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -159,7 +159,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("createvoicechannel"), Aliases("cvch")]
             [Description("cmd_createvoicechannel")]
-            public async Task CreateVoiceChannel(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
+            public async Task CreateVoiceChannelAsync(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
             {
                 await context.Guild.CreateChannelAsync(name, ChannelType.Voice, context.Message.Channel.Parent);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -167,7 +167,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("createcategorychannel"), Aliases("ccch")]
             [Description("cmd_createcategorychannel")]
-            public async Task CreateCategoryChannel(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
+            public async Task CreateCategoryChannelAsync(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
             {
                 await context.Guild.CreateChannelAsync(name, ChannelType.Category);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -175,14 +175,14 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("deletechannel"), Aliases("dtch", "dvch", "dch")]
             [Description("cmd_deletechannel")]
-            public async Task DeleteChannel(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+            public async Task DeleteChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
             {
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
                 _ = channel.DeleteAsync();  // This may be flimsy
             }
 
             [Command("deletechannel"), HiddenOverload]
-            public async Task DeleteChannel(CommandContext context, [RemainingText] string name)
+            public async Task DeleteChannelAsync(CommandContext context, [RemainingText] string name)
             {
                 var channel = context.Guild.Channels.Values
                     .FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) || x.Name.Equals(name.ToTextChannelName()));
@@ -196,7 +196,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("recreatechannel"), Aliases("rcc")]
             [Description("cmd_recreatechannel")]
-            public async Task RecreateChannel(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+            public async Task RecreateChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
             {
                 var permissionOverwrites = new List<DiscordOverwriteBuilder>(channel.PermissionOverwrites.Count);
 
@@ -217,7 +217,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("settopic"), Aliases("st")]
             [Description("cmd_settopic")]
-            public async Task SetTopic(CommandContext context, [RemainingText, Description("arg_channel_topic")] string topic)
+            public async Task SetTopicAsync(CommandContext context, [RemainingText, Description("arg_channel_topic")] string topic)
             {
                 await context.Channel.ModifyAsync(x => x.Topic = topic);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -225,7 +225,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("nsfwtoggle"), Aliases("nsfw")]
             [Description("cmd_nsfwtoggle")]
-            public async Task ToggleNsfw(CommandContext context)
+            public async Task ToggleNsfwAsync(CommandContext context)
             {
                 await context.Channel.ModifyAsync(x => x.Nsfw = !context.Channel.IsNSFW);
 
@@ -237,7 +237,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("slowmode")]
             [Description("cmd_slowmode")]
-            public async Task SlowMode(CommandContext context, TimeSpan? time = null)
+            public async Task SlowModeAsync(CommandContext context, TimeSpan? time = null)
             {
                 if (time.HasValue && time.Value > TimeSpan.FromHours(6))
                     time = TimeSpan.FromHours(6);
@@ -248,7 +248,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("renamechannel"), Aliases("rch")]
             [Description("cmd_renamechannel")]
-            public async Task RenameChannel(CommandContext context,
+            public async Task RenameChannelAsync(CommandContext context,
                 [Description("arg_discord_channel")] DiscordChannel channel,
                 [RemainingText, Description("arg_channel_newname")] string newName)
             {
@@ -258,7 +258,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("moveuser")]
             [Description("cmd_moveuser")]
-            public async Task MoveUser(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_discord_voicechannel")] DiscordChannel channel = null)
+            public async Task MoveUserAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_discord_voicechannel")] DiscordChannel channel = null)
             {
                 var success = user.VoiceState is not null
                     && channel?.Type is null or ChannelType.Voice
@@ -279,7 +279,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("createrole"), Aliases("cr")]
             [Description("cmd_createrole")]
-            public async Task CreateRole(CommandContext context, [RemainingText, Description("arg_role_name")] string name = null)
+            public async Task CreateRoleAsync(CommandContext context, [RemainingText, Description("arg_role_name")] string name = null)
             {
                 await context.Guild.CreateRoleAsync(name);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -287,7 +287,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("deleterole"), Aliases("dr")]
             [Description("cmd_deleterole")]
-            public async Task DeleteRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+            public async Task DeleteRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
             {
                 var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
 
@@ -298,7 +298,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             }
 
             [Command("deleterole"), HiddenOverload]
-            public async Task DeleteRole(CommandContext context, [RemainingText] string name)
+            public async Task DeleteRoleAsync(CommandContext context, [RemainingText] string name)
             {
                 var role = context.Guild.Roles.Values.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
                 var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
@@ -311,7 +311,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("recreaterole"), Aliases("rcr")]
             [Description("cmd_recreaterole")]
-            public async Task RecreateRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+            public async Task RecreateRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
             {
                 var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
 
@@ -328,7 +328,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("renamerole"), Aliases("renr")]
             [Description("cmd_renamerole")]
-            public async Task RenameRole(CommandContext context,
+            public async Task RenameRoleAsync(CommandContext context,
                 [Description("arg_discord_role")] DiscordRole role,
                 [RemainingText, Description("arg_role_newname")] string newName)
             {
@@ -342,7 +342,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("rolehoist"), Aliases("hoistrole", "rh")]
             [Description("cmd_rolehoist")]
-            public async Task RoleHoist(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+            public async Task RoleHoistAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
             {
                 var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
 
@@ -354,7 +354,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("deleteallroles"), Aliases("dar")]
             [Description("cmd_deleteallroles")]
-            public async Task RemoveAllRoles(CommandContext context)
+            public async Task RemoveAllRolesAsync(CommandContext context)
             {
                 var roles = context.Guild.Roles.Values
                     .Where(role => CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role) && !role.Name.Equals("@everyone"))
@@ -402,7 +402,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("setrole"), Aliases("sr")]
             [Description("cmd_setrole")]
-            public async Task SetRole(CommandContext context,
+            public async Task SetRoleAsync(CommandContext context,
                 [Description("arg_discord_user")] DiscordMember user,
                 [Description("arg_discord_role")] DiscordRole role)
             {
@@ -416,7 +416,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("removerole"), Aliases("rr")]
             [Description("cmd_removerole")]
-            public async Task RemoveRole(CommandContext context,
+            public async Task RemoveRoleAsync(CommandContext context,
                 [Description("arg_discord_user")] DiscordMember user,
                 [Description("arg_discord_role")] DiscordRole role)
             {
@@ -430,7 +430,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             [Command("removeallroles"), Aliases("rar")]
             [Description("cmd_removeallroles")]
-            public async Task RemoveAllRoles(CommandContext context, [Description("arg_discord_user")] DiscordMember user)
+            public async Task RemoveAllRolesAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user)
             {
                 var roles = user.Roles
                     .Where(role => CheckRoleHierarchy(context.Guild.CurrentMember, user, role))

@@ -25,7 +25,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("add")]
         [Description("cmd_voicerole_add")]
-        public async Task AddVoiceRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task AddVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Member.VoiceState?.Channel;
             var success = channel?.Type is ChannelType.Voice && await _service.AddVoiceRoleAsync(context.Guild, channel, role);
@@ -35,7 +35,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_voicerole_remove")]
-        public async Task RemoveVoiceRole(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task RemoveVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Member.VoiceState?.Channel;
             var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel.Id && x.RoleId == role.Id);
@@ -45,7 +45,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("removeall"), Aliases("rmall")]
         [Description("cmd_voicerole_removeall")]
-        public async Task RemoveAllVoiceRoles(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task RemoveAllVoiceRolesAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Member.VoiceState?.Channel;
             var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel.Id);
@@ -55,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_voicerole_list")]
-        public async Task ListVoiceRoles(CommandContext context)
+        public async Task ListVoiceRolesAsync(CommandContext context)
         {
             var voiceRoles = await _service.GetVoiceRolesAsync(context.Guild);
 

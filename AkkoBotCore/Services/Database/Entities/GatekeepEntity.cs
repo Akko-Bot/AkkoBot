@@ -94,7 +94,7 @@ namespace AkkoBot.Services.Database.Entities
         /// <remarks>This property is not mapped.</remarks>
         [NotMapped]
         public bool IsActive
-            => SanitizeNames 
+            => SanitizeNames
             || ((GreetChannelId is not null || GreetDm) && !string.IsNullOrWhiteSpace(GreetMessage))
             || (FarewellChannelId is not null && !string.IsNullOrWhiteSpace(FarewellMessage));
     }

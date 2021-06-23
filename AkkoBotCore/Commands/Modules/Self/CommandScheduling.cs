@@ -26,7 +26,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("addscheduled")]
         [Description("cmd_autocommand_addscheduled")]
-        public async Task AddScheduledCommand(CommandContext context, [Description("arg_autocommand_time")] TimeSpan time, [RemainingText, Description("arg_command")] string command)
+        public async Task AddScheduledCommandAsync(CommandContext context, [Description("arg_autocommand_time")] TimeSpan time, [RemainingText, Description("arg_command")] string command)
         {
             if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
                 command = command[context.Prefix.Length..];
@@ -40,7 +40,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("addrepeated")]
         [Description("cmd_autocommand_addrepeated")]
-        public async Task AddRepeatedCommand(CommandContext context, [Description("arg_autocommand_time")] TimeSpan time, [RemainingText, Description("arg_command")] string command)
+        public async Task AddRepeatedCommandAsync(CommandContext context, [Description("arg_autocommand_time")] TimeSpan time, [RemainingText, Description("arg_command")] string command)
         {
             if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
                 command = command[context.Prefix.Length..];
@@ -54,7 +54,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("addstartup")]
         [Description("cmd_autocommand_startup")]
-        public async Task AddStartupCommand(CommandContext context, [RemainingText, Description("arg_command")] string command)
+        public async Task AddStartupCommandAsync(CommandContext context, [RemainingText, Description("arg_command")] string command)
         {
             if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
                 command = command[context.Prefix.Length..];
@@ -68,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_autocommand_remove")]
-        public async Task RemoveAutoCommand(CommandContext context, [Description("arg_autocommand_id")] int id)
+        public async Task RemoveAutoCommandAsync(CommandContext context, [Description("arg_autocommand_id")] int id)
         {
             var success = await _service.RemoveAutoCommandAsync(context.User, id);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -76,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_autocommand_list")]
-        public async Task ListAutoCommands(CommandContext context)
+        public async Task ListAutoCommandsAsync(CommandContext context)
         {
             var reminders = (await _service.GetAutoCommandsAsync(context.User))
                 .OrderBy(x => _service.GetElapseTime(x));

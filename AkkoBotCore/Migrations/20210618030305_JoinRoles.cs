@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System.Collections.Generic;
 
 namespace AkkoBot.Migrations
 {

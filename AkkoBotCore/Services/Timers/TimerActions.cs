@@ -295,8 +295,7 @@ namespace AkkoBot.Services.Timers
                 var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
 
                 // If last message is the same repeated message, do nothing
-                if (lastMessage.Author == server.CurrentMember
-                    && (wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
+                if ((lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
                     || (!wasDeserialized && lastMessage.Content == message))
                     return;
 

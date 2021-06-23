@@ -38,7 +38,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [BotOwner, RequireGuild, Hidden]
         [Command("sudo")]
         [Description("cmd_sudo")]
-        public async Task Sudo(
+        public async Task SudoAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordUser user,
             [RemainingText, Description("arg_command")] string command)
@@ -68,12 +68,12 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("prefix"), HiddenOverload] // Account for dumb users
-        public async Task ChangeDumbPrefix(CommandContext context, string dumb, [RemainingText] string intendedPrefix)
-            => await ChangePrefix(context, (dumb.Equals("set", StringComparison.InvariantCultureIgnoreCase) ? intendedPrefix : context.RawArgumentString));
+        public async Task ChangeDumbPrefixAsync(CommandContext context, string dumb, [RemainingText] string intendedPrefix)
+            => await ChangePrefixAsync(context, (dumb.Equals("set", StringComparison.InvariantCultureIgnoreCase) ? intendedPrefix : context.RawArgumentString));
 
         [Command("prefix")]
         [Description("cmd_guild_prefix")]
-        public async Task ChangePrefix(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
+        public async Task ChangePrefixAsync(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
         {
             if (context.Guild is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.ManageGuild))
             {
@@ -90,13 +90,13 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("prune"), HiddenOverload]
-        public async Task Prune(CommandContext context, int amount = 50, string options = "")
-            => await Prune(context, null, amount, options);
+        public async Task PruneAsync(CommandContext context, int amount = 50, string options = "")
+            => await PruneAsync(context, null, amount, options);
 
         [Command("prune"), Aliases("clear")]
         [Description("cmd_prune")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task Prune(CommandContext context,
+        public async Task PruneAsync(CommandContext context,
             [Description("arg_discord_user")] DiscordUser user = null,
             [Description("arg_int")] int amount = 50,
             [Description("arg_prune_options")] string options = "")
@@ -125,7 +125,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("lockchannel"), Aliases("lockdown", "lock")]
         [Description("cmd_lockchannel")]
         [RequireGuild, RequirePermissions(Permissions.ManageChannels)]
-        public async Task LockChannel(CommandContext context)
+        public async Task LockChannelAsync(CommandContext context)
         {
             // Get the roles from the server mods
             var modRoles = context.Guild.Roles.Values
@@ -155,7 +155,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("unlockchannel"), Aliases("release", "unlock")]
         [Description("cmd_unlockchannel")]
         [RequireGuild, RequirePermissions(Permissions.ManageChannels)]
-        public async Task UnlockChannel(CommandContext context)
+        public async Task UnlockChannelAsync(CommandContext context)
         {
             // Get the roles from the server mods
             var modRoles = context.Guild.Roles.Values

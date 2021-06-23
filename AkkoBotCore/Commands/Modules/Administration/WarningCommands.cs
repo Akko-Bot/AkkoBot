@@ -36,7 +36,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("notice"), Aliases("note")]
         [Description("cmd_notice")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task Notice(
+        public async Task NoticeAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_notice")] string notice)
@@ -44,11 +44,11 @@ namespace AkkoBot.Commands.Modules.Administration
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
-            await Notice(context, user as DiscordUser, notice);
+            await NoticeAsync(context, user as DiscordUser, notice);
         }
 
         [Command("notice"), HiddenOverload]
-        public async Task Notice(
+        public async Task NoticeAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordUser user,
             [RemainingText, Description("arg_notice")] string note)
@@ -67,7 +67,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("warn")]
         [Description("cmd_warn")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task Warn(CommandContext context,
+        public async Task WarnAsync(CommandContext context,
         [Description("arg_discord_user")] DiscordMember user,
         [RemainingText, Description("arg_infraction")] string reason = null)
         {
@@ -116,7 +116,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("warnclear"), Aliases("warnc")]
         [Description("cmd_warnc")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task Unwarn(
+        public async Task UnwarnAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_uint")] int? id = null)
@@ -142,7 +142,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("infractions"), Aliases("warnlog")]
         [Description("cmd_infractions")]
-        public async Task Infractions(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
+        public async Task InfractionsAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
         {
             if (!context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.KickMembers) && user is not null)
                 return;
@@ -176,7 +176,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("modlog")]
         [Description("cmd_modlog")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task ModLog(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
+        public async Task ModLogAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
         {
             user ??= context.User;
             var infractions = await _warnService.GetInfractionsAsync(context.Guild, user);
@@ -214,17 +214,17 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("warnpunishment"), HiddenOverload]
-        public async Task Warnp(CommandContext context)
-            => await Warnpl(context);
+        public async Task WarnpAsync(CommandContext context)
+            => await WarnplAsync(context);
 
         [Command("warnpunishment"), HiddenOverload]
-        public async Task Warnp(CommandContext context, int amount, WarnPunishType punishmentType, TimeSpan? time = null)
-            => await Warnp(context, amount, punishmentType, null, time);
+        public async Task WarnpAsync(CommandContext context, int amount, WarnPunishType punishmentType, TimeSpan? time = null)
+            => await WarnpAsync(context, amount, punishmentType, null, time);
 
         [Command("warnpunishment"), Aliases("warnp")]
         [Description("cmd_warnp")]
         [RequireUserPermissions(Permissions.ManageGuild)]
-        public async Task Warnp(
+        public async Task WarnpAsync(
             CommandContext context,
             [Description("arg_warnp_amount")] int amount,
             [Description("arg_warnp_type")] WarnPunishType punishmentType,
@@ -240,7 +240,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("warnpunishment")]
-        public async Task Warnp(CommandContext context, [Description("arg_warnp_rem_amount")] int amount)
+        public async Task WarnpAsync(CommandContext context, [Description("arg_warnp_rem_amount")] int amount)
         {
             var embed = new DiscordEmbedBuilder();
             var isRemoved = await _warnService.RemoveWarnPunishmentAsync(context.Guild, amount);
@@ -255,7 +255,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("warnpunishmentlist"), Aliases("warnpl")]
         [Description("cmd_warnpl")]
-        public async Task Warnpl(CommandContext context)
+        public async Task WarnplAsync(CommandContext context)
         {
             var punishments = await _warnService.GetServerPunishmentsAsync(context.Guild);
 
@@ -292,7 +292,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("warnexpire"), Aliases("warne")]
         [Description("cmd_warne")]
         [RequireUserPermissions(Permissions.ManageGuild)]
-        public async Task Warne(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
+        public async Task WarneAsync(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
         {
             var botConfig = _botService.GetConfig();
             var embed = new DiscordEmbedBuilder();

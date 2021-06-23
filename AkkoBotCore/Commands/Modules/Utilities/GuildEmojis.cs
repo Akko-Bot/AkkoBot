@@ -28,7 +28,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [GroupCommand, Command("list")]
         [Description("cmd_emoji_list")]
-        public async Task CheckGuildEmoji(CommandContext context)
+        public async Task CheckGuildEmojiAsync(CommandContext context)
         {
             var fields = new List<SerializableEmbedField>();
             var embed = new DiscordEmbedBuilder()
@@ -51,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("show"), Aliases("showemoji", "se")]
         [Description("cmd_emoji_showemoji")]
-        public async Task ShowEmoji(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
+        public async Task ShowEmojiAsync(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
         {
             var result = new StringBuilder();
 
@@ -64,7 +64,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("add")]
         [Description("cmd_emoji_add")]
         [RequirePermissions(Permissions.ManageEmojis)]
-        public async Task AddEmojis(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
+        public async Task AddEmojisAsync(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
         {
             var success = false;
             await context.TriggerTypingAsync();
@@ -79,7 +79,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("add")]
-        public async Task AddEmoji(
+        public async Task AddEmojiAsync(
             CommandContext context,
             [Description("arg_emoji_url")] Uri url,
             [Description("arg_emoji_name")] string name = null)
@@ -89,7 +89,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("add")]
-        public async Task AddEmoji(
+        public async Task AddEmojiAsync(
             CommandContext context,
             [Description("arg_emoji")] DiscordEmoji emoji,
             [Description("arg_emoji_name")] string name)
@@ -99,7 +99,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("add")]
-        public async Task AddEmojiAttachments(CommandContext context)
+        public async Task AddEmojiAttachmentsAsync(CommandContext context)
         {
             var success = await _service.AddGuildEmojisAsync(context, context.Message.Attachments);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -108,7 +108,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("remove"), Aliases("rm")]
         [Description("cmd_emoji_remove")]
         [RequirePermissions(Permissions.ManageEmojis)]
-        public async Task RemoveEmojis(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
+        public async Task RemoveEmojisAsync(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
         {
             var success = false;
 
@@ -138,7 +138,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("rename"), Aliases("ren")]
         [Description("cmd_emoji_rename")]
         [RequirePermissions(Permissions.ManageEmojis)]
-        public async Task RenameEmoji(
+        public async Task RenameEmojiAsync(
             CommandContext context,
             [Description("arg_emoji")] DiscordEmoji emoji,
             [Description("arg_emoji_newname")] string newName)
@@ -154,7 +154,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("setrole"), Aliases("setroles")]
         [Description("cmd_emoji_setrole")]
         [RequirePermissions(Permissions.ManageEmojis | Permissions.ManageRoles)]
-        public async Task AddRoles(
+        public async Task AddRolesAsync(
             CommandContext context,
             [Description("arg_emoji")] DiscordEmoji emoji,
             [Description("arg_discord_roles")] params DiscordRole[] roles)
@@ -170,7 +170,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("removerole"), Aliases("removeroles")]
         [Description("cmd_emoji_removerole")]
         [RequirePermissions(Permissions.ManageEmojis | Permissions.ManageRoles)]
-        public async Task RemoveRoles(CommandContext context, [Description("arg_emoji")] DiscordEmoji emoji)
+        public async Task RemoveRolesAsync(CommandContext context, [Description("arg_emoji")] DiscordEmoji emoji)
         {
             var guildEmoji = await emoji.ToGuildEmojiAsync(context.Guild);
 

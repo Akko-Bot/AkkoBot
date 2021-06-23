@@ -39,7 +39,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the alias got successfully saved, <see langword="false"/> otherwise.</returns>
         public async Task<bool> SaveAliasAsync(CommandContext context, string alias, string command)
         {
-            if (string.IsNullOrWhiteSpace(command) || context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
+            if (string.IsNullOrWhiteSpace(command) || (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id)))
                 return false;
 
             // Sanitize the command input
@@ -57,7 +57,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             var newEntry = new AliasEntity()
             {
                 GuildId = context.Guild?.Id,
-                IsDynamic = (cmd is CommandGroup c) && c.Children.Count > 1     // This is not perfect but it will do for now
+                IsDynamic = ((cmd is CommandGroup c) && c.Children.Count > 1)     // This is not perfect but it will do for now
                     || cmd.Overloads.Any(x => x.Arguments.Count > args.Split(' ').Length - ((string.IsNullOrWhiteSpace(args)) ? 1 : 0)),
 
                 Alias = alias,

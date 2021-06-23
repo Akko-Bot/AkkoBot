@@ -43,6 +43,8 @@ arg_fw_ids: User, channel and/or role IDs, separated by space.
 arg_fw_message: The message to be sent.
 arg_fw_word: A word.
 arg_fw_words: Multiple words, separated by space.
+arg_gatekeep_bulktime: The waiting time. Default is `5s`.
+arg_greetdel_time: The deletion time. Maximum of `2m`.
 arg_infraction: The infraction to be added to the user's modlog.
 arg_int: An integer number.
 arg_keyword: The term to search for.
@@ -193,6 +195,7 @@ cmd_emoji_rename: Renames a server emoji.
 cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
 cmd_emoji_showemoji: Shows the name and URL of the specified emojis.
 cmd_farewellchannel: Sets the channel where the farewell message should be sent to. Provide no parameter to remove.
+cmd_farewelldel: Sets the time for the automatic deletion of farewell messages. Provide no parameter to disable.
 cmd_farewellmessage: Sets the message to be sent when users leave the server. Provide no parameter to visualize the current farewell message.
 cmd_fc: Groups commands that filter out messages that don't contain a certain type of content.
 cmd_fc_att: Toggles deletion of any message that doesn't contain an attachment in the specified channel. Provide no parameter to toggle deletion in the current channel.
@@ -218,9 +221,11 @@ cmd_fw_removeignore: Removes a user, channel and/or role IDs from the list of ig
 cmd_fw_removemany: Removes multiple words from the list of filtered words. Separate them with space.
 cmd_fw_stickers: Toggles the automatic deletion of messages containing stickers on the server.
 cmd_fw_warn: Toggles whether filtered messages should automatically issue a warning to the offending user.
+cmd_gatekeepbulktime: Sets how long the bot should wait before sending a bulk greeting or farewell message when multiple users join or leave the server simultaneously.
 cmd_globalcmd: Toggles activation of a command.
 cmd_globalmodule: Toggles activation of all commands in the specified module.
 cmd_greetchannel: Sets the channel where the greet message should be sent to. Provide no parameter to remove.
+cmd_greetdel: Sets the time for the automatic deletion of greet messages. Provide no parameter to disable.
 cmd_greetdm: Toggles whether greet messages should be sent in the server or to the user's direct message. Note that users who disallow direct messages from non-friends won't get the greeting message.
 cmd_greetmessage: Sets the message to be sent when users join the server. Provide no parameter to visualize the current greet message.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
@@ -359,6 +364,8 @@ farewell_channel_removed: The farewell channel has been successfully removed.
 farewell_channel_set: The farewell message will be sent to the {0} channel.
 farewell_message: farewell message
 farewell_message_set: The farewell message has been successfully set.
+farewelldel_disable: Automatic deletion of farewell messages has been disabled.
+farewelldel_enable: Farewell messages will be automatically deleted in {0} seconds.
 fc_allow: Allows Only
 fc_att_toggle: Attachment filter has been {0} on {1}.
 fc_command_toggle: Command filter has been {0} on {1}.
@@ -392,6 +399,8 @@ greet_channel_removed: The greet channel has been successfully removed.
 greet_channel_set: The greet message will be sent to the {0} channel.
 greet_message: greet message
 greet_message_set: The greet message has been successfully set.
+greetdel_disable: Automatic deletion of greet messages has been disabled.
+greetdel_enable: Greet messages will be automatically deleted in {0} seconds.
 greetdm_disabled: Greet messages will now be sent in the server.
 greetdm_enabled: Greet messages will now be sent in direct message.
 group: Group
@@ -620,11 +629,3 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
-
-cmd_greetdel: Sets the time for the automatic deletion of greet messages. Provide no parameter to disable.
-arg_greetdel_time: The deletion time. Maximum of `2m`.
-greetdel_disable: Automatic deletion of greet messages has been disabled.
-greetdel_enable: Greet messages will be automatically deleted in {0} seconds.
-cmd_farewelldel: Sets the time for the automatic deletion of farewell messages. Provide no parameter to disable.
-farewelldel_disable: Automatic deletion of farewell messages has been disabled.
-farewelldel_enable: Farewell messages will be automatically deleted in {0} seconds.

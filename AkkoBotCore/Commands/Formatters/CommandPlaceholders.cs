@@ -11,12 +11,15 @@ using System.Text.RegularExpressions;
 
 namespace AkkoBot.Commands.Formatters
 {
-    public class AkkoPlaceholders : IPlaceholderFormatter, ICommandService
+    /// <summary>
+    /// Defines the base formatter for command placeholders.
+    /// </summary>
+    public class CommandPlaceholders : IPlaceholderFormatter, ICommandService
     {
         /// <summary>
         /// Stores actions for placeholders with no parameters.
         /// </summary>
-        private readonly IReadOnlyDictionary<string, Func<CommandContext, object>> _placeholderActions = new Dictionary<string, Func<CommandContext, object>>()
+        protected readonly Dictionary<string, Func<CommandContext, object>> placeholderActions = new()
         {
             /* Bot Placeholders */
 
@@ -77,7 +80,7 @@ namespace AkkoBot.Commands.Formatters
             ["user.color"] = (context) => context.Member?.Color,
             ["user.nitrodate"] = (context) => context.Member?.PremiumSince,
             ["user.nitrotype"] = (context) => context.Member?.PremiumType,
-            ["user.roles"] = (context) => string.Join(", ", context.Member?.Roles.Select(x => x.Name).ToArray() ?? Array.Empty<string>()),
+            ["user.roles"] = (context) => string.Join(", ", context.Member?.Roles.Select(x => x.Name)),
             ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name,
 
             /* Miscelaneous */
@@ -118,7 +121,7 @@ namespace AkkoBot.Commands.Formatters
         /// <summary>
         /// Stores actions for placeholders with parameters.
         /// </summary>
-        private readonly IReadOnlyDictionary<string, Func<CommandContext, object, object>> _parameterizedActions = new Dictionary<string, Func<CommandContext, object, object>>()
+        protected readonly Dictionary<string, Func<CommandContext, object, object>> parameterizedActions = new()
         {
             /* Miscelaneous */
 
@@ -155,18 +158,18 @@ namespace AkkoBot.Commands.Formatters
             }
         };
 
-        public bool TryParse(CommandContext context, Match match, out object result)
+        public virtual bool TryParse(CommandContext context, Match match, out object result)
         {
             var groups = match.Groups.Values
                 .Where(x => !string.IsNullOrWhiteSpace(x.Value))    // This is needed because for some reason groups can contain empty values.
                 .ToArray();                                         // Contains capture group + matches.
 
-            if (groups.Length <= 2 && _placeholderActions.TryGetValue(groups[1].Value, out var action))
+            if (groups.Length <= 2 && placeholderActions.TryGetValue(groups[1].Value, out var action))
             {
                 result = action(context);
                 return true;
             }
-            else if (_parameterizedActions.TryGetValue(groups[1].Value, out var pAction))
+            else if (parameterizedActions.TryGetValue(groups[1].Value, out var pAction))
             {
                 object parameter = (groups.Length <= 2)
                     ? match.Index + match.Length    // int

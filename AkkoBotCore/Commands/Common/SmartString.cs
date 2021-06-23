@@ -79,14 +79,14 @@ namespace AkkoBot.Commands.Common
         /// <param name="content">The text with placeholders in it.</param>
         /// <param name="sanitizeRoles">Defines whether role mentions should be sanitized or not.</param>
         /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\.]+)\((.+?)\)}|{([\w\.]+)}".</param>
-        /// <param name="formatter">The object responsible for converting the placeholders to the values they represent. Default is <see cref="AkkoPlaceholders"/>.</param>
+        /// <param name="formatter">The object responsible for converting the placeholders to the values they represent. Default is <see cref="CommandPlaceholders"/>.</param>
         public SmartString(CommandContext context, string content, bool sanitizeRoles = false, Regex regex = null, IPlaceholderFormatter formatter = null)
         {
             _context = context;
             _contentBuilder = new(content ?? context.RawArgumentString);
             _sanitizeRoles = sanitizeRoles;
             ParseRegex = regex ?? new Regex(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
-            _formatter = formatter ?? context.CommandsNext.Services.GetService<AkkoPlaceholders>();
+            _formatter = formatter ?? context.CommandsNext.Services.GetService<CommandPlaceholders>();
         }
 
         /// <summary>

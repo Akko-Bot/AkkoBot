@@ -72,7 +72,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             foreach (var guild in servers)
             {
                 if (guild.Emojis.Values
-                    .Where(x => x.IsAvailable && x.Roles.Count == 0 || x.Roles.ContainsOne(guild.CurrentMember.Roles.Select(x => x.Id)))
+                    .Where(x => (x.IsAvailable && x.Roles.Count == 0) || x.Roles.ContainsOne(guild.CurrentMember.Roles.Select(x => x.Id)))
                     .Contains(emoji))
                 {
                     return true;

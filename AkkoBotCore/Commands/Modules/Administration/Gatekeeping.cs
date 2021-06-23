@@ -29,7 +29,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("sanitizenames"), Aliases("sanitizenicks")]
         [Description("cmd_sanitizenames")]
         [RequireUserPermissions(Permissions.ManageNicknames)]
-        public async Task SanitizeNicknames(CommandContext context)
+        public async Task SanitizeNicknamesAsync(CommandContext context)
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.SanitizeNames = !x.SanitizeNames);
 
@@ -44,7 +44,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("sanitizedname"), Aliases("sanitizednick")]
         [Description("cmd_sanitizedname")]
         [RequireUserPermissions(Permissions.ManageNicknames)]
-        public async Task SetCustomSanitizedNickname(CommandContext context, [RemainingText, Description("arg_nickname")] string nickname = "")
+        public async Task SetCustomSanitizedNicknameAsync(CommandContext context, [RemainingText, Description("arg_nickname")] string nickname = "")
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.CustomSanitizedName = nickname.SanitizeUsername());
 
@@ -60,7 +60,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("greetdm")]
         [Description("cmd_greetdm")]
-        public async Task ToggleDmGreeting(CommandContext context)
+        public async Task ToggleDmGreetingAsync(CommandContext context)
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.GreetDm = !x.GreetDm);
 
@@ -72,7 +72,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("greetchannel")]
         [Description("cmd_greetchannel")]
-        public async Task SetGreetChannel(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task SetGreetChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
             var embed = new DiscordEmbedBuilder()
@@ -90,7 +90,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("farewellchannel")]
         [Description("cmd_farewellchannel")]
-        public async Task SetFarewellChannel(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task SetFarewellChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
             var embed = new DiscordEmbedBuilder()
@@ -108,14 +108,13 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("greetmessage"), Aliases("greetmsg", "greet")]
         [Description("cmd_greetmessage")]
-        public async Task SetGreetChannelMessage(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
+        public async Task SetGreetChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
                 await SendSettingAsync(context, "greet_message", x => x.GreetMessage);
                 return;
             }
-
 
             var embed = new DiscordEmbedBuilder()
                 .WithDescription("greet_message_set");
@@ -126,7 +125,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("farewellmessage"), Aliases("farewellmsg", "farewell", "bye")]
         [Description("cmd_farewellmessage")]
-        public async Task SetFarewellChannelMessage(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
+        public async Task SetFarewellChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
@@ -143,7 +142,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("greetdelete"), Aliases("greetdel")]
         [Description("cmd_greetdel")]
-        public async Task SetGreetDeleteTime(CommandContext context, [Description("arg_greetdel_time")] TimeSpan time = default)
+        public async Task SetGreetDeleteTimeAsync(CommandContext context, [Description("arg_greetdel_time")] TimeSpan time = default)
         {
             if (time > TimeSpan.FromMinutes(2))
                 time = TimeSpan.FromMinutes(2);
@@ -157,7 +156,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("farewelldelete"), Aliases("farewelldel", "byedel")]
         [Description("cmd_farewelldel")]
-        public async Task SetFarewellDeleteTime(CommandContext context, [Description("arg_greetdel_time")] TimeSpan time = default)
+        public async Task SetFarewellDeleteTimeAsync(CommandContext context, [Description("arg_greetdel_time")] TimeSpan time = default)
         {
             if (time > TimeSpan.FromMinutes(2))
                 time = TimeSpan.FromMinutes(2);

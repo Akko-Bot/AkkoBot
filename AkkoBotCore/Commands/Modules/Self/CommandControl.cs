@@ -22,7 +22,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("globalcommand"), Aliases("gcmd")]
         [Description("cmd_globalcmd")]
-        public async Task GlobalCommandToggle(CommandContext context, [RemainingText, Description("arg_command")] string command)
+        public async Task GlobalCommandToggleAsync(CommandContext context, [RemainingText, Description("arg_command")] string command)
         {
             if (!string.IsNullOrWhiteSpace(command) && command.StartsWith(context.Prefix))
                 command = command[context.Prefix.Length..];
@@ -47,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("globalmodule"), Aliases("gmod")]
         [Description("cmd_globalmodule")]
-        public async Task GlobalModuleToggle(CommandContext context, [Description("arg_module")] string module)
+        public async Task GlobalModuleToggleAsync(CommandContext context, [Description("arg_module")] string module)
         {
             var cmds = context.CommandsNext.RegisteredCommands.Values
                 .Where(x => x.Module.ModuleType.FullName.Contains(module, StringComparison.InvariantCultureIgnoreCase))
@@ -71,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("listdisabledcommands"), Aliases("listdisabledcmds", "ldc")]
         [Description("cmd_ldc")]
-        public async Task ListDisabledCommands(CommandContext context)
+        public async Task ListDisabledCommandsAsync(CommandContext context)
         {
             var cmds = _service.GetDisabledCommands()
                 .Select(x => Formatter.InlineCode(x.Key))

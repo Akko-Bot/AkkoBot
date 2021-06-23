@@ -5,7 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0053:Use expression body for lambda expressions", Justification = "Lambda would impair readability.", Scope = "member", Target = "~F:AkkoBot.Commands.Formatters.AkkoPlaceholders._parameterizedActions")]
+[assembly: SuppressMessage("Style", "IDE0053:Use expression body for lambda expressions", Justification = "Lambda would impair readability.", Scope = "member", Target = "~F:AkkoBot.Commands.Formatters.CommandPlaceholders.parameterizedActions")]
 [assembly: SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Ternary would impair readability.", Scope = "member", Target = "~M:AkkoBot.Services.Localization.AkkoLocalizer.GetResponseString(System.String,System.String)~System.String")]
 [assembly: SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Ternary would impair readability.", Scope = "member", Target = "~M:AkkoBot.Extensions.DiscordChannelExt.GetMessagesAsync(DSharpPlus.Entities.DiscordChannel,DSharpPlus.DiscordClient,System.Int32)~System.Threading.Tasks.Task{System.Collections.Generic.IEnumerable{DSharpPlus.Entities.DiscordMessage}}")]
 [assembly: SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Ternary would impair readability.", Scope = "member", Target = "~M:AkkoBot.Services.Events.VoiceRoleConnectionHandler.VoiceRoleAsync(DSharpPlus.DiscordClient,DSharpPlus.EventArgs.VoiceStateUpdateEventArgs)~System.Threading.Tasks.Task")]

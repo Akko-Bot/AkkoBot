@@ -35,17 +35,17 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("prefix")]
         [Description("cmd_config_prefix")]
-        public async Task SetBotPrefix(CommandContext context, [Description("arg_prefix")] string prefix)
-            => await ChangeProperty(context, x => x.BotPrefix = prefix);
+        public async Task SetBotPrefixAsync(CommandContext context, [Description("arg_prefix")] string prefix)
+            => await ChangePropertyAsync(context, x => x.BotPrefix = prefix);
 
         [Command("reloadlocales"), Aliases("reloadresponses")]
         [Description("cmd_config_reloadlocales")]
-        public async Task ReloadResponseStrings(CommandContext context)
+        public async Task ReloadResponseStringsAsync(CommandContext context)
                 => await context.Message.CreateReactionAsync((_botService.ReloadLocales() is not 0) ? AkkoEntities.SuccessEmoji : AkkoEntities.WarningEmoji);
 
         [Command("locale")]
         [Description("cmd_config_locale")]
-        public async Task ListLocales(CommandContext context)
+        public async Task ListLocalesAsync(CommandContext context)
         {
             var locales = _botService.GetLocales()
                 .OrderBy(code => code);
@@ -60,7 +60,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("locale")]
         [Description("cmd_config_locale")]
-        public async Task SetBotLocale(CommandContext context, [Description("arg_locale")] string languageCode)
+        public async Task SetBotLocaleAsync(CommandContext context, [Description("arg_locale")] string languageCode)
         {
             if (!_guildService.IsLocaleRegistered(languageCode, out var result))
             {
@@ -68,12 +68,12 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            await ChangeProperty(context, x => x.Locale = result);
+            await ChangePropertyAsync(context, x => x.Locale = result);
         }
 
         [Command("okcolor")]
         [Description("cmd_config_okcolor")]
-        public async Task SetBotOkColor(CommandContext context, [Description("arg_color")] string newColor)
+        public async Task SetBotOkColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
             if (!GeneralService.GetColor(newColor).HasValue)
             {
@@ -81,12 +81,12 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            await ChangeProperty(context, x => x.OkColor = newColor);
+            await ChangePropertyAsync(context, x => x.OkColor = newColor);
         }
 
         [Command("errorcolor")]
         [Description("cmd_config_errorcolor")]
-        public async Task SetBotErrorColor(CommandContext context, [Description("arg_color")] string newColor)
+        public async Task SetBotErrorColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
             if (!GeneralService.GetColor(newColor).HasValue)
             {
@@ -94,52 +94,57 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            await ChangeProperty(context, x => x.ErrorColor = newColor);
+            await ChangePropertyAsync(context, x => x.ErrorColor = newColor);
         }
 
         [Command("embed"), Aliases("useembed")]
         [Description("cmd_config_embed")]
-        public async Task SetBotUseEmbed(CommandContext context, [Description("arg_bool")] bool useEmbed)
-            => await ChangeProperty(context, x => x.UseEmbed = useEmbed);
+        public async Task SetBotUseEmbedAsync(CommandContext context, [Description("arg_bool")] bool useEmbed)
+            => await ChangePropertyAsync(context, x => x.UseEmbed = useEmbed);
 
         [Command("dm"), Aliases("dms", "respondtodms")]
         [Description("cmd_config_dm")]
-        public async Task SetBotRespondDms(CommandContext context, [Description("arg_bool")] bool respondToDms)
-            => await ChangeProperty(context, x => x.RespondToDms = respondToDms);
+        public async Task SetBotRespondDmsAsync(CommandContext context, [Description("arg_bool")] bool respondToDms)
+            => await ChangePropertyAsync(context, x => x.RespondToDms = respondToDms);
 
         [Command("help"), Aliases("withhelp")]
         [Description("cmd_config_help")]
-        public async Task SetBotEnableHelp(CommandContext context, [Description("arg_bool")] bool enableHelp)
-            => await ChangeProperty(context, x => x.EnableHelp = enableHelp);
+        public async Task SetBotEnableHelpAsync(CommandContext context, [Description("arg_bool")] bool enableHelp)
+            => await ChangePropertyAsync(context, x => x.EnableHelp = enableHelp);
 
         [Command("mentionprefix"), Aliases("mention")]
         [Description("cmd_config_mention")]
-        public async Task SetBotMentionPrefix(CommandContext context, [Description("arg_bool")] bool mention)
-            => await ChangeProperty(context, x => x.MentionPrefix = mention);
+        public async Task SetBotMentionPrefixAsync(CommandContext context, [Description("arg_bool")] bool mention)
+            => await ChangePropertyAsync(context, x => x.MentionPrefix = mention);
 
         [Command("casesensitive"), Aliases("case")]
         [Description("cmd_config_case")]
-        public async Task SetBotCaseSensitive(CommandContext context, [Description("arg_bool")] bool caseSensitive)
-            => await ChangeProperty(context, x => x.CaseSensitiveCommands = caseSensitive);
+        public async Task SetBotCaseSensitiveAsync(CommandContext context, [Description("arg_bool")] bool caseSensitive)
+            => await ChangePropertyAsync(context, x => x.CaseSensitiveCommands = caseSensitive);
 
         [Command("cachesize"), Aliases("cache")]
         [Description("cmd_config_cache")]
-        public async Task SetBotCacheSize(CommandContext context, [Description("arg_uint")] uint cacheSize)
-            => await ChangeProperty(context, x => x.MessageSizeCache = (int)cacheSize);
+        public async Task SetBotCacheSizeAsync(CommandContext context, [Description("arg_uint")] uint cacheSize)
+            => await ChangePropertyAsync(context, x => x.MessageSizeCache = (int)cacheSize);
 
         [Command("timeout")]
         [Description("cmd_config_timeout")]
-        public async Task SetBotTimeout(CommandContext context, [Description("arg_config_timeout")] TimeSpan time)
-            => await ChangeProperty(context, x => x.InteractiveTimeout = (time < TimeSpan.FromSeconds(10) ? TimeSpan.FromSeconds(10) : time));
+        public async Task SetBotTimeoutAsync(CommandContext context, [Description("arg_config_timeout")] TimeSpan time)
+            => await ChangePropertyAsync(context, x => x.InteractiveTimeout = (time < TimeSpan.FromSeconds(10) ? TimeSpan.FromSeconds(10) : time));
 
         [Command("warnexpire"), Aliases("warne")]
         [Description("cmd_warne")]
-        public async Task SetMinWarnExpire(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
-            => await ChangeProperty(context, x => x.MinWarnExpire = time);
+        public async Task SetMinWarnExpireAsync(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
+            => await ChangePropertyAsync(context, x => x.MinWarnExpire = time);
+
+        [Command("gatekeepbulktime")]
+        [Description("cmd_gatekeepbulktime")]
+        public async Task SetBulkGatekeepTimeAsync(CommandContext context, [Description("arg_gatekeep_bulktime")] TimeSpan time)
+            => await ChangePropertyAsync(context, x => x.BulkGatekeepTime = time);
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_config_list")]
-        public async Task ListBotSettings(CommandContext context)
+        public async Task ListBotSettingsAsync(CommandContext context)
         {
             var settings = _botService.GetConfigs();
 
@@ -151,7 +156,7 @@ namespace AkkoBot.Commands.Modules.Self
             await context.RespondLocalizedAsync(embed);
         }
 
-        private async Task ChangeProperty<T>(CommandContext context, Func<BotConfig, T> selector)
+        private async Task ChangePropertyAsync<T>(CommandContext context, Func<BotConfig, T> selector)
         {
             _botService.GetOrSetProperty(selector);
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -168,9 +173,9 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("level")]
             [Description("cmd_config_log_level")]
-            public async Task SetBotLogLevel(CommandContext context, [Description("arg_loglevel")] LogLevel logLevel)
+            public async Task SetBotLogLevelAsync(CommandContext context, [Description("arg_loglevel")] LogLevel logLevel)
             {
-                await ChangeProperty(context, x => x.LogLevel = logLevel);
+                await ChangePropertyAsync(context, x => x.LogLevel = logLevel);
 
                 var logConfig = _service.GetLogConfig();
                 context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
@@ -178,9 +183,9 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("format")]
             [Description("cmd_config_log_format")]
-            public async Task SetBotLogFormat(CommandContext context, [Description("cmd_config_log_format_arg")] string logFormat)
+            public async Task SetBotLogFormatAsync(CommandContext context, [Description("cmd_config_log_format_arg")] string logFormat)
             {
-                await ChangeProperty(context, x => x.LogFormat = logFormat);
+                await ChangePropertyAsync(context, x => x.LogFormat = logFormat);
 
                 var logConfig = _service.GetLogConfig();
                 context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
@@ -188,7 +193,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("timeformat")]
             [Description("cmd_config_log_timeformat")]
-            public async Task SetBotLogTimeFormat(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string logTimeFormat = null)
+            public async Task SetBotLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string logTimeFormat = null)
             {
                 if (!GeneralService.IsValidTimeFormat(logTimeFormat))
                 {
@@ -196,7 +201,7 @@ namespace AkkoBot.Commands.Modules.Self
                     return;
                 }
 
-                await ChangeProperty(context, x => x.LogTimeFormat = logTimeFormat);
+                await ChangePropertyAsync(context, x => x.LogTimeFormat = logTimeFormat);
 
                 var logConfig = _service.GetLogConfig();
                 context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
@@ -204,7 +209,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("filetimestamp")]
             [Description("cmd_config_log_filetimestamp")]
-            public async Task SetFileLogTimeFormat(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string timestampFormat = null)
+            public async Task SetFileLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string timestampFormat = null)
             {
                 if (!GeneralService.IsValidTimeFormat(timestampFormat))
                 {
@@ -212,7 +217,7 @@ namespace AkkoBot.Commands.Modules.Self
                     return;
                 }
 
-                await ChangeProperty(context, x => x.LogTimeStamp = timestampFormat);
+                await ChangePropertyAsync(context, x => x.LogTimeStamp = timestampFormat);
 
                 if (context.Client.Logger.BeginScope(null) is IFileLogger fileLogger)
                     fileLogger.TimeStampFormat = timestampFormat;
@@ -220,10 +225,10 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("save")]
             [Description("cmd_config_log_save")]
-            public async Task SetFileLogging(CommandContext context, [Description("arg_bool")] bool isEnabled)
+            public async Task SetFileLoggingAsync(CommandContext context, [Description("arg_bool")] bool isEnabled)
             {
                 var wasEnabled = _service.GetLogConfig().IsLoggedToFile;
-                await ChangeProperty(context, x => x.IsLoggedToFile = isEnabled);
+                await ChangePropertyAsync(context, x => x.IsLoggedToFile = isEnabled);
 
                 if (isEnabled && isEnabled != wasEnabled)
                 {
@@ -237,15 +242,15 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("size"), Aliases("setsize")]
             [Description("cmd_config_log_size")]
-            public async Task SetFileMaxSize(CommandContext context, [Description("arg_double")] double size)
+            public async Task SetFileMaxSizeAsync(CommandContext context, [Description("arg_double")] double size)
             {
-                await ChangeProperty(context, x => x.LogSizeMb = size);
+                await ChangePropertyAsync(context, x => x.LogSizeMb = size);
 
                 if (context.Client.Logger.BeginScope(null) is IFileLogger fileLogger)
                     fileLogger.FileSizeLimitMB = size;
             }
 
-            private async Task ChangeProperty<T>(CommandContext context, Func<LogConfig, T> selector)
+            private async Task ChangePropertyAsync<T>(CommandContext context, Func<LogConfig, T> selector)
             {
                 _service.GetOrSetProperty(selector);
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -267,7 +272,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("add")]
             [Description("cmd_config_owner_add")]
-            public async Task AddOwner(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
+            public async Task AddOwnerAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
             {
                 if (_creds.OwnerIds.Add(user.Id))
                 {
@@ -280,7 +285,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             [Command("remove"), Aliases("rm")]
             [Description("cmd_config_owner_rem")]
-            public async Task RemoveOwner(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
+            public async Task RemoveOwnerAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user)
             {
                 if (_creds.OwnerIds.TryRemove(user.Id))
                 {
@@ -293,7 +298,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             [GroupCommand, Command("list"), Aliases("show")]
             [Description("cmd_config_owner_list")]
-            public async Task ListOwners(CommandContext context)
+            public async Task ListOwnersAsync(CommandContext context)
             {
                 var ids = _creds.OwnerIds
                     .Select(id => $"<@{id}>")

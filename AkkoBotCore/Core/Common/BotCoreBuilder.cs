@@ -9,6 +9,7 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Events;
 using AkkoBot.Services.Events.Abstractions;
+using AkkoBot.Services.Events.Common;
 using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging;
@@ -310,7 +311,7 @@ namespace AkkoBot.Core.Common
             var services = _cmdServices.BuildServiceProvider();     // Initialize the IoC container
 
             // Initialize the command handlers
-            var cmdHandlers = await GetCommandHandlers(shardedClient, services, isCaseSensitive, withDms, withMentionPrefix);
+            var cmdHandlers = await GetCommandHandlersAsync(shardedClient, services, isCaseSensitive, withDms, withMentionPrefix);
 
             // Register the events
             var events = services.GetService<IDiscordEventManager>();
@@ -350,6 +351,7 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<ITimerManager, TimerManager>(),
 
                 // > Utilities
+                ServiceDescriptor.Transient<IMemberAggregator, MemberAggregator>(),
                 ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
                 ServiceDescriptor.Singleton(new HttpClient()),
                 ServiceDescriptor.Singleton(new Random()),
@@ -366,7 +368,7 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<IGuildEventsHandler, GuildEventsHandler>(),
                 ServiceDescriptor.Singleton<IGlobalEventsHandler, GlobalEventsHandler>(),
                 ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>(),
-                ServiceDescriptor.Singleton<IGatekeepingEventHandler, GatekeepingEventHandler>()
+                ServiceDescriptor.Singleton<IGatekeepingEventHandler, GatekeepEventHandler>()
             };
 
             foreach (var service in servicesList)
@@ -386,7 +388,7 @@ namespace AkkoBot.Core.Common
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A collection of command handlers.</returns>
-        private async Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlers(DiscordShardedClient botClients, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
+        private async Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlersAsync(DiscordShardedClient botClients, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
         {
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()

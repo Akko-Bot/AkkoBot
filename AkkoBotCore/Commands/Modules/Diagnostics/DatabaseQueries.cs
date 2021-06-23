@@ -21,7 +21,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
 
         [Command("sql")]
         [Description("cmd_sql")]
-        public async Task ExecuteQuery(CommandContext context, [RemainingText, Description("arg_sql")] string query)
+        public async Task ExecuteQueryAsync(CommandContext context, [RemainingText, Description("arg_sql")] string query)
         {
             if (query.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
                 await SqlSelectAsync(context, query);

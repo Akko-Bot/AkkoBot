@@ -17,7 +17,7 @@ namespace AkkoBot.Commands.Modules.Utilities
     {
         [Command("timezone")]
         [Description("cmd_timezone")]
-        public async Task ServerTimezone(CommandContext context)
+        public async Task ServerTimezoneAsync(CommandContext context)
         {
             var timezone = context.GetTimeZone();
             var embed = new DiscordEmbedBuilder()
@@ -28,7 +28,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("timezones")]
         [Description("cmd_timezones")]
-        public async Task Timezone(CommandContext context)
+        public async Task TimezoneAsync(CommandContext context)
         {
             var fields = new List<SerializableEmbedField>();
             var timezones = TimeZoneInfo.GetSystemTimeZones()

@@ -20,11 +20,11 @@ namespace AkkoBot.Commands.Modules.Help
         [HiddenOverload]
         [Command("help"), Aliases("h")]
         [Description("cmd_help")]
-        public async Task HelpCommand(CommandContext context)
-            => await HelpCommand(context, Array.Empty<string>());
+        public async Task HelpCommandAsync(CommandContext context)
+            => await HelpCommandAsync(context, Array.Empty<string>());
 
         [Command("help")]
-        public async Task HelpCommand(CommandContext context, [Description("arg_command")] params string[] command)
+        public async Task HelpCommandAsync(CommandContext context, [Description("arg_command")] params string[] command)
         {
             // Might consider removing this line if I ever decide to change the default help command
             var baseCmds = context.CommandsNext.RegisteredCommands.Values.Where(cmd => !cmd.IsHidden).Distinct();
@@ -71,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Help
         [Command("module"), Aliases("modules", "cmds")]
         [Description("cmd_modules")]
         [RequireBotPermissions(Permissions.SendMessages)]
-        public async Task Modules(CommandContext context)
+        public async Task ModulesAsync(CommandContext context)
         {
             var namespaces = context.CommandsNext.RegisteredCommands.Values
                 .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))   // Remove library modules
@@ -99,7 +99,7 @@ namespace AkkoBot.Commands.Modules.Help
         }
 
         [Command("module")]
-        public async Task Modules(CommandContext context, [Description("arg_module")] string moduleName)
+        public async Task ModulesAsync(CommandContext context, [Description("arg_module")] string moduleName)
         {
             var cmdGroup = await context.CommandsNext.RegisteredCommands.Values
                 .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
@@ -141,7 +141,7 @@ namespace AkkoBot.Commands.Modules.Help
         [Command("search")]
         [Description("cmd_search")]
         [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
-        public async Task Search(CommandContext context, [RemainingText, Description("arg_keyword")] string keyword)
+        public async Task SearchAsync(CommandContext context, [RemainingText, Description("arg_keyword")] string keyword)
         {
             if (keyword.StartsWith(context.Prefix))
                 keyword = keyword[context.Prefix.Length..];

@@ -177,8 +177,8 @@ namespace AkkoBot.Services.Database.Entities
         /* Overrides */
 
         public static bool operator ==(TimerEntity x, TimerEntity y)
-            => (x.UserIdFK == y.UserIdFK && x.GuildIdFK == y.GuildIdFK && x.ChannelId == y.ChannelId && x.RoleId == y.RoleId && x.Interval == y.Interval)
-            && (x.IsRepeatable == y.IsRepeatable && x.Type == y.Type);
+            => x.UserIdFK == y.UserIdFK && x.GuildIdFK == y.GuildIdFK && x.ChannelId == y.ChannelId && x.RoleId == y.RoleId && x.Interval == y.Interval
+            && x.IsRepeatable == y.IsRepeatable && x.Type == y.Type;
 
         public static bool operator !=(TimerEntity x, TimerEntity y)
             => !(x == y);

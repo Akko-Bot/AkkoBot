@@ -193,7 +193,7 @@ namespace AkkoBot.Services.Database.Entities
         public override IReadOnlyDictionary<string, string> GetSettings()
         {
             var result = base.GetSettings() as Dictionary<string, string>;
-            
+
             result.Remove(nameof(GuildId).ToSnakeCase());
             result.Remove(nameof(BanTemplate).ToSnakeCase());
 

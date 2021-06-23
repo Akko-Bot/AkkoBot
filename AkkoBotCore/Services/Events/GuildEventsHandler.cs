@@ -1,5 +1,4 @@
-﻿using AkkoBot.Commands.Common;
-using AkkoBot.Commands.Modules.Administration.Services;
+﻿using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
@@ -254,7 +253,7 @@ namespace AkkoBot.Services.Events
         {
             if (eventArgs.Guild is null || eventArgs.Author.IsBot
                 || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
-                || _dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
+                || (_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id))
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                 return Task.CompletedTask;
 
@@ -327,7 +326,7 @@ namespace AkkoBot.Services.Events
         /// <returns><see langword="true"/> if it contains an invite, <see langword="false"/> otherwise.</returns>
         private bool HasInvite(DiscordMessage message)
             => _inviteRegex.Matches(message.Content).Count is not 0;
-                
+
         /// <summary>
         /// Deletes a <see cref="DiscordMessage"/> if its content matches the specified filtered word.
         /// </summary>

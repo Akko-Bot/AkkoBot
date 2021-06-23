@@ -7,7 +7,6 @@ using DSharpPlus;
 using DSharpPlus.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Events
@@ -45,7 +44,7 @@ namespace AkkoBot.Services.Events
 
                 var filteredContent = await db.FilteredContent
                     .Fetch(x => x.GuildIdFK == eventArgs.Guild.Id)
-                    .ToArrayAsync();              
+                    .ToArrayAsync();
 
                 _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
                 _dbCache.Gatekeeping.TryAdd(dbGuild.GuildId, gatekeep);
@@ -64,7 +63,7 @@ namespace AkkoBot.Services.Events
             _dbCache.Gatekeeping.TryRemove(eventArgs.Guild.Id, out _);
             _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
             _dbCache.FilteredContent.TryRemove(eventArgs.Guild.Id, out var filters);
-            
+
             filters.Clear();
 
             return Task.CompletedTask;

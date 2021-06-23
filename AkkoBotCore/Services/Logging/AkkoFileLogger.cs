@@ -12,7 +12,7 @@ namespace AkkoBot.Services.Logging
     /// </summary>
     public class AkkoFileLogger : IFileLogger
     {
-        private const double MB = 1000000.0;    // Byte to Megabyte ratio
+        private const double _mb = 1000000.0;    // Byte to Megabyte ratio
         private DateTimeOffset _time = DateTimeOffset.Now;
         private readonly MemoryStream _logStream = new();
         private readonly string _directory = AkkoEnvironment.LogsDirectory;
@@ -31,7 +31,7 @@ namespace AkkoBot.Services.Logging
             var encodedEntry = Encoding.UTF8.GetBytes(logEntry);
             _logStream.Write(encodedEntry);
 
-            if (_logStream.Length / MB > FileSizeLimitMB || DateTimeOffset.Now.Subtract(_time) > TimeSpan.FromDays(1))
+            if (_logStream.Length / _mb > FileSizeLimitMB || DateTimeOffset.Now.Subtract(_time) > TimeSpan.FromDays(1))
                 DumpToFile();
         }
 

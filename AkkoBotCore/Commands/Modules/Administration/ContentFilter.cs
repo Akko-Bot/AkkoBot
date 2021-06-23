@@ -27,32 +27,32 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("url"), Aliases("link")]
         [Description("cmd_fc_url")]
-        public async Task UrlToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task UrlToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
             => await SetPropertyAsync(context, channel, "fc_url_toggle", x => x.IsUrlOnly = !x.IsUrlOnly);
 
         [Command("attachment"), Aliases("att")]
         [Description("cmd_fc_att")]
-        public async Task AttachmentToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task AttachmentToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
             => await SetPropertyAsync(context, channel, "fc_att_toggle", x => x.IsAttachmentOnly = !x.IsAttachmentOnly);
 
         [Command("image"), Aliases("img")]
         [Description("cmd_fc_img")]
-        public async Task ImageToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task ImageToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
             => await SetPropertyAsync(context, channel, "fc_img_toggle", x => x.IsImageOnly = !x.IsImageOnly);
 
         [Command("invite")]
         [Description("cmd_fc_invite")]
-        public async Task InviteToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task InviteToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
             => await SetPropertyAsync(context, channel, "fc_invite_toggle", x => x.IsInviteOnly = !x.IsInviteOnly);
 
         [Command("command"), Aliases("cmd")]
         [Description("cmd_fc_command")]
-        public async Task CommandToggle(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task CommandToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
             => await SetPropertyAsync(context, channel, "fc_command_toggle", x => x.IsCommandOnly = !x.IsCommandOnly);
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_fc_remove")]
-        public async Task RemoveFilter(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task RemoveFilterAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Channel;
 
@@ -65,7 +65,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("remove")]
-        public async Task RemoveFilter(CommandContext context, [Description("arg_fc_id")] int id)
+        public async Task RemoveFilterAsync(CommandContext context, [Description("arg_fc_id")] int id)
         {
             var success = await _service.RemoveContentFilterAsync(context.Guild, id);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -73,7 +73,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("clear")]
         [Description("cmd_fc_clear")]
-        public async Task ClearAll(CommandContext context)
+        public async Task ClearAllAsync(CommandContext context)
         {
             var success = await _service.ClearContentFiltersAsync(context.Guild);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -81,7 +81,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_fc_list")]
-        public async Task ListFilters(CommandContext context)
+        public async Task ListFiltersAsync(CommandContext context)
         {
             var embed = new DiscordEmbedBuilder();
             var filters = _service.GetContentFilters(context.Guild)

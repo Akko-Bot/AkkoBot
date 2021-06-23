@@ -28,12 +28,12 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequirePermissions(Permissions.MuteMembers)]
         [RequireBotPermissions(Permissions.ManageRoles | Permissions.ManageChannels)]
         [Priority(0)]
-        public async Task Mute(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [RemainingText, Description("arg_punishment_reason")] string reason)
-            => await TimedMute(context, user, TimeSpan.FromHours(1), reason);
+        public async Task MuteAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [RemainingText, Description("arg_punishment_reason")] string reason)
+            => await TimedMuteAsync(context, user, TimeSpan.FromHours(1), reason);
 
         [Command("mute")]
         [Priority(1)]
-        public async Task TimedMute(
+        public async Task TimedMuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_timed_mute")] TimeSpan? time = null,
@@ -63,7 +63,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_unmute")]
         [RequirePermissions(Permissions.MuteMembers)]
         [RequireBotPermissions(Permissions.ManageRoles)]
-        public async Task Unmute(
+        public async Task UnmuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
@@ -90,7 +90,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("voicemute")]
         [Description("cmd_voicemute")]
         [RequirePermissions(Permissions.MuteMembers)]
-        public async Task VoiceMute(
+        public async Task VoiceMuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
@@ -107,7 +107,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("voiceunmute")]
         [Description("cmd_voiceunmute")]
         [RequirePermissions(Permissions.MuteMembers)]
-        public async Task VoiceUnmute(
+        public async Task VoiceUnmuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
@@ -124,7 +124,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("deafen"), Aliases("deaf")]
         [Description("cmd_deafen")]
         [RequirePermissions(Permissions.DeafenMembers)]
-        public async Task Deaf(
+        public async Task DeafAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
@@ -141,7 +141,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("undeafen"), Aliases("undeaf")]
         [Description("cmd_undeafen")]
         [RequirePermissions(Permissions.DeafenMembers)]
-        public async Task Undeaf(
+        public async Task UndeafAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
@@ -159,7 +159,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_chatmute")]
         [RequireUserPermissions(Permissions.MuteMembers)]
         [RequireBotPermissions(Permissions.ManageChannels)]
-        public async Task ChatMute(
+        public async Task ChatMuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
@@ -180,7 +180,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_chatunmute")]
         [RequireUserPermissions(Permissions.MuteMembers)]
         [RequireBotPermissions(Permissions.ManageChannels)]
-        public async Task ChatUnmute(
+        public async Task ChatUnmuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)

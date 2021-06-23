@@ -32,21 +32,21 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("here")]
         [Description("cmd_repeat_here")]
-        public async Task AddDailyRepeater(CommandContext context, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [RemainingText, Description("arg_repeat_message")] string message)
+        public async Task AddDailyRepeaterAsync(CommandContext context, [Description("arg_time_of_day")] TimeOfDay timeOfDay, [RemainingText, Description("arg_repeat_message")] string message)
         {
             var success = await _service.AddRepeaterAsync(context, context.Channel, timeOfDay.Interval, message, timeOfDay);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
         [Command("here")]
-        public async Task AddRepeater(CommandContext context, [Description("arg_repeat_time")] TimeSpan time, [RemainingText, Description("arg_repeat_message")] string message)
+        public async Task AddRepeaterAsync(CommandContext context, [Description("arg_repeat_time")] TimeSpan time, [RemainingText, Description("arg_repeat_message")] string message)
         {
             var success = await _service.AddRepeaterAsync(context, context.Channel, time, message);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
         }
 
         [GroupCommand, Command("channel")]
-        public async Task AddDailyChannelRepeater(CommandContext context,
+        public async Task AddDailyChannelRepeaterAsync(CommandContext context,
             [Description("arg_discord_channel")] DiscordChannel channel,
             [Description("arg_time_of_day")] TimeOfDay timeOfDay,
             [RemainingText, Description("arg_repeat_message")] string message)
@@ -57,7 +57,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [GroupCommand, Command("channel")]
         [Description("cmd_repeat_channel")]
-        public async Task AddChannelRepeater(CommandContext context,
+        public async Task AddChannelRepeaterAsync(CommandContext context,
             [Description("arg_discord_channel")] DiscordChannel channel,
             [Description("arg_repeat_time")] TimeSpan time,
             [RemainingText, Description("arg_repeat_message")] string message)
@@ -68,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_repeat_remove")]
-        public async Task RemoveRepeater(CommandContext context, [Description("arg_uint")] int id)
+        public async Task RemoveRepeaterAsync(CommandContext context, [Description("arg_uint")] int id)
         {
             var success = await _service.RemoveRepeaterAsync(context.Guild, id);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -76,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("clear")]
         [Description("cmd_repeat_clear")]
-        public async Task ClearRepeaters(CommandContext context)
+        public async Task ClearRepeatersAsync(CommandContext context)
         {
             var success = await _service.ClearRepeatersAsync(context.Guild);
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -84,7 +84,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("info")]
         [Description("cmd_repeat_info")]
-        public async Task RepeaterInfo(CommandContext context, [Description("arg_uint")] int id)
+        public async Task RepeaterInfoAsync(CommandContext context, [Description("arg_uint")] int id)
         {
             _dbCache.Repeaters.TryGetValue(context.Guild.Id, out var repeaterCache);
             var embed = new DiscordEmbedBuilder();
@@ -115,7 +115,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("list"), Aliases("show")]
         [Description("cmd_repeat_list")]
-        public async Task ListRepeaters(CommandContext context)
+        public async Task ListRepeatersAsync(CommandContext context)
         {
             var repeaters = await _service.GetRepeatersAsync(
                 context.Guild,

@@ -143,7 +143,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="user">The Discord user that got punished.</param>
         /// <param name="days">Days to remove the messages from.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task SoftbanUser(CommandContext context, DiscordMember user, int days, string reason)
+        public async Task SoftbanUserAsync(CommandContext context, DiscordMember user, int days, string reason)
             => await SoftbanUserAsync(context, user.Id, days, reason);
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="user">The Discord user that got punished.</param>
         /// <param name="days">Days to remove the messages from.</param>
         /// <param name="reason">The reason for the punishment.</param>
-        public async Task BanUser(CommandContext context, DiscordMember user, int days, string reason)
+        public async Task BanUserAsync(CommandContext context, DiscordMember user, int days, string reason)
             => await BanUserAsync(context, user.Id, days, reason);
 
         /// <summary>

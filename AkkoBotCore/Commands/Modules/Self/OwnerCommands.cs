@@ -24,7 +24,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("senddirectmessage"), Aliases("senddm")]
         [Description("cmd_senddm")]
-        public async Task SendMessage(CommandContext context, [Description("arg_discord_user")] DiscordUser user, [RemainingText, Description("arg_say")] SmartString message)
+        public async Task SendMessageAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user, [RemainingText, Description("arg_say")] SmartString message)
         {
             var server = context.Services.GetService<DiscordShardedClient>().ShardClients.Values
                 .SelectMany(x => x.Guilds.Values)
@@ -47,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("sendmessage"), Aliases("send")]
         [Description("cmd_send")]
-        public async Task SendMessage(CommandContext context, [Description("arg_channel_id")] ulong cid, [RemainingText, Description("arg_say")] SmartString message)
+        public async Task SendMessageAsync(CommandContext context, [Description("arg_channel_id")] ulong cid, [RemainingText, Description("arg_say")] SmartString message)
         {
             var server = context.Services.GetService<DiscordShardedClient>().ShardClients.Values
                 .SelectMany(x => x.Guilds.Values)

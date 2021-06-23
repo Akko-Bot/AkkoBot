@@ -13,10 +13,16 @@ namespace AkkoBot.Models
     /// <remarks>All its properties are <see langword="null"/> by default.</remarks>
     public class SerializableEmbed
     {
+        private string _content;
+
         /// <summary>
         /// Represents the message content outside of the embed.
         /// </summary>
-        public string Content { get; set; }
+        public string Content
+        {
+            get => _content;
+            set => _content = value?.MaxLength(AkkoConstants.MaxMessageLength, "[...]");
+        }
 
         /// <summary>
         /// Represents the embed color, in hexadecimal.
@@ -171,7 +177,14 @@ namespace AkkoBot.Models
     /// </summary>
     public class SerializableEmbedTitle
     {
-        public string Text { get; set; }
+        private string _text;
+
+        public string Text
+        {
+            get => _text;
+            set => _text = value?.MaxLength(AkkoConstants.MaxEmbedTitleLength);
+        }
+
         public string Url { get; set; }
 
         public SerializableEmbedTitle()

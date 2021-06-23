@@ -43,6 +43,8 @@ arg_fw_ids: IDs de usuários, canais e/ou cargos, separados por espaço.
 arg_fw_message: A mensagem a ser enviada.
 arg_fw_word: Uma palavra.
 arg_fw_words: Múltiplas palavras, separadas por espaço.
+arg_gatekeep_bulktime: Tempo de espera. O padrão é `5s`.
+arg_greetdel_time: O tempo de exclusão. Máximo de `2m`.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_int: Um número inteiro.
 arg_keyword: O termo da busca.
@@ -193,6 +195,7 @@ cmd_emoji_rename: Renomeia um emoji do servidor.
 cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
 cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
 cmd_farewellchannel: Define o canal onde a mensagem de despedica deve ser enviada. Forneça nenhum parâmetro para remover.
+cmd_farewelldel: Define o tempo para a exclusão automática de mensagens de despedida. Forneça nenhum parâmetro para desativar.
 cmd_farewellmessage: Define a mensagem a ser enviada quando usuários deixam o servidor. Forneça nenhum parâmetro para visualizar a mensagem de despedida atual.
 cmd_fc: Agrupa comandos que filtram mensagens que não contenham um determinado tipo de conteúdo.
 cmd_fc_att: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um anexo no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
@@ -218,9 +221,11 @@ cmd_fw_removeignore: Remove IDs de usuários, canais e/ou cargos da lista de IDs
 cmd_fw_removemany: Remove múltiplas palavras do filtro de palavras. Separe-as com espaço.
 cmd_fw_stickers: Ativa ou desativa a exclusão automática de mensagens que contenham figurinhas no servidor.
 cmd_fw_warn: Ativa ou desativa a advertência automática a usuários que enviarem mensagens com palavras proibidas.
+cmd_gatekeepbulktime: Define quanto tempo o bot deve esperar antes de enviar uma mensagem agregada de boas-vindas ou despedida quando multiplos usuários entram ou saem do servidor simultaneamente.
 cmd_globalcmd: Ativa ou desativa um comando.
 cmd_globalmodule: Ativa ou desativa todos os comandos do módulo especificado.
 cmd_greetchannel: Define o canal onde a mensagem de boas-vindas deve ser enviada. Forneça nenhum parâmetro para remover.
+cmd_greetdel: Define o tempo para exclusão automática de mensagens de boas-vindas. Forneça nenhum parâmetro para desativar.
 cmd_greetdm: Define se mensagens de boas-vindas serão enviadas no servidor ou em mensagem direta com o usuário. Note que usuários que tiverem mensagens diretas bloqueadas não receberão a mensagem de boas-vindas.
 cmd_greetmessage: Define a mensagem a ser enviada quando usuários entram no servidor. Forneça nenhum parâmetro para exibir a mensagem de boas-vindas atual.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
@@ -359,6 +364,8 @@ farewell_channel_removed: O canal de despedida foi removido com sucesso.
 farewell_channel_set: A mensagem de despedida será enviada no canal {0}.
 farewell_message: mensagem de despedida
 farewell_message_set: Mensagem de despedida definida com sucesso.
+farewelldel_disable: Exclusão automática de mensagens de despedida foi desativada.
+farewelldel_enable: Mensagens de despedida serão automaticamente excluídas em {0} segundos.
 fc_allow: Permite Apenas
 fc_att_toggle: O filtro de anexos foi {0} no canal {1}.
 fc_command_toggle: O filtro de comandos foi {0} no canal {1}.
@@ -392,6 +399,8 @@ greet_channel_removed: Canal de boas-vindas removido com sucesso.
 greet_channel_set: A mensagem de boas-vindas será enviada no canal {0}.
 greet_message: mensagem de boas-vindas
 greet_message_set: Mensagem de boas-vindas definida com sucesso.
+greetdel_disable: Exclusão automática de mensagens de boas-vindas foi desativada.
+greetdel_enable: Mensagens de boas-vindas serão automaticamente excluídas em {0} segundos.
 greetdm_enabled: A mensagem de boas-vindas será enviada em mensagem direta.
 greetdm_enabled: A mensagem de boas-vindas será enviada no servidor.
 group: Grupo
@@ -620,11 +629,3 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
-
-cmd_greetdel: Define o tempo para exclusão automática de mensagens de boas-vindas. Forneça nenhum parâmetro para desativar.
-arg_greetdel_time: O tempo de exclusão. Máximo de `2m`.
-greetdel_disable: Exclusão automática de mensagens de boas-vindas foi desativada.
-greetdel_enable: Mensagens de boas-vindas serão automaticamente excluídas em {0} segundos.
-cmd_farewelldel: Define o tempo para a exclusão automática de mensagens de despedida. Forneça nenhum parâmetro para desativar.
-farewelldel_disable: Exclusão automática de mensagens de despedida foi desativada.
-farewelldel_enable: Mensagens de despedida serão automaticamente excluídas em {0} segundos.

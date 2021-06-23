@@ -23,7 +23,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("add")]
         [Description("cmd_alias_add")]
         [RequirePermissions(Permissions.ManageGuild)]
-        public async Task AddAlias(CommandContext context,
+        public async Task AddAliasAsync(CommandContext context,
             [Description("arg_alias_add_alias")] string alias,
             [RemainingText, Description("arg_alias_add_command")] string command)
         {
@@ -36,7 +36,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("remove"), Aliases("rm")]
         [Description("cmd_alias_remove")]
         [RequirePermissions(Permissions.ManageGuild)]
-        public async Task RemoveAlias(CommandContext context, [RemainingText, Description("arg_alias_remove")] string alias)
+        public async Task RemoveAliasAsync(CommandContext context, [RemainingText, Description("arg_alias_remove")] string alias)
         {
             if (await _service.RemoveAliasAsync(context, alias))
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -47,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("clear")]
         [Description("cmd_alias_clear")]
         [RequirePermissions(Permissions.ManageGuild)]
-        public async Task ClearAliases(CommandContext context)
+        public async Task ClearAliasesAsync(CommandContext context)
         {
             if (await _service.ClearAliasesAsync(context))
                 await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
@@ -57,7 +57,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_alias_list")]
-        public async Task ListAliases(CommandContext context)
+        public async Task ListAliasesAsync(CommandContext context)
         {
             var dbAliases = _service.GetAliases(context.Guild?.Id);
             var isEmpty = dbAliases.Count is 0;

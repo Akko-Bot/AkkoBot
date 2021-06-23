@@ -164,7 +164,7 @@ namespace AkkoBot.Services.Timers
 
             // If it's a daily timer, set it to automatically create the permanent version of itself
             if (entity.TimeOfDay.HasValue && entity.Interval != TimeSpan.FromDays(1))
-                timer.OnDispose += async (timer, _) => await UpdateDailyTimer(timer as IAkkoTimer, client);
+                timer.OnDispose += async (timer, _) => await UpdateDailyTimerAsync(timer as IAkkoTimer, client);
 
             return timer;
         }
@@ -174,7 +174,7 @@ namespace AkkoBot.Services.Timers
         /// </summary>
         /// <param name="oldTimer">The timer that's currently being disposed.</param>
         /// <param name="client">The Discord client that fetched the database entry</param>
-        private async Task UpdateDailyTimer(IAkkoTimer oldTimer, DiscordClient client)
+        private async Task UpdateDailyTimerAsync(IAkkoTimer oldTimer, DiscordClient client)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             var dbTimer = await db.Timers.FindAsync(oldTimer.Id);

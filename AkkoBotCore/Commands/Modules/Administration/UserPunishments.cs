@@ -28,7 +28,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("kick"), Aliases("k")]
         [Description("cmd_kick")]
         [RequirePermissions(Permissions.KickMembers)]
-        public async Task Kick(
+        public async Task KickAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [RemainingText, Description("arg_punishment_reason")] string reason = null)
@@ -57,12 +57,12 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequireBotPermissions(Permissions.BanMembers)]
         [RequireUserPermissions(Permissions.KickMembers)]
         [Priority(0)]
-        public async Task SoftBan(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
-            => await SoftBan(context, user, null, reason);
+        public async Task SoftBanAsync(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
+            => await SoftBanAsync(context, user, null, reason);
 
         [Command("softban")]
         [Priority(1)]
-        public async Task SoftBan(
+        public async Task SoftBanAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_ban_deletion")] TimeSpan? time = null,
@@ -75,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "sban_notification", reason);
 
             // Softban the user
-            await _punishService.SoftbanUser(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+            await _punishService.SoftbanUserAsync(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send soft-ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
@@ -91,12 +91,12 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_ban")]
         [RequirePermissions(Permissions.BanMembers)]
         [Priority(1)]
-        public async Task Ban(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
-            => await Ban(context, user, null, reason);
+        public async Task BanAsync(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
+            => await BanAsync(context, user, null, reason);
 
         [Command("ban")]
         [Priority(2)]
-        public async Task Ban(
+        public async Task BanAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_ban_deletion")] TimeSpan? time = null,
@@ -109,7 +109,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var dmMsg = await _punishService.SendBanDmAsync(context, user, reason);
 
             // Ban the user
-            await _punishService.BanUser(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+            await _punishService.BanUserAsync(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
 
             // Send ban message to the context channel
             var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
@@ -122,7 +122,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("ban"), HiddenOverload]
         [Priority(0)]
-        public async Task HackBan(CommandContext context, DiscordUser user, [RemainingText] string reason = null)
+        public async Task HackBanAsync(CommandContext context, DiscordUser user, [RemainingText] string reason = null)
         {
             // Ban the user - Don't register any occurrency
             await context.Guild.BanMemberAsync(user.Id, 1, context.Member.GetFullname() + " | " + reason);
@@ -135,7 +135,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("massban")]
         [Description("cmd_massban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task MassBan(CommandContext context, [RemainingText, Description("arg_ulong_user_col")] params ulong[] userIds)
+        public async Task MassBanAsync(CommandContext context, [RemainingText, Description("arg_ulong_user_col")] params ulong[] userIds)
         {
             // Remove users that are already banned
             var nonBanned = userIds
@@ -180,7 +180,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("timedban"), Aliases("tb")]
         [Description("cmd_timedban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task TimedBan(
+        public async Task TimedBanAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_timed_ban")] TimeSpan time,
@@ -188,7 +188,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             if (time <= TimeSpan.Zero)
             {
-                await Ban(context, user, reason);
+                await BanAsync(context, user, reason);
                 return;
             }
 
@@ -209,7 +209,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("timedban"), HiddenOverload]
-        public async Task TimedHackBan(CommandContext context, DiscordUser user, TimeSpan time, [RemainingText] string reason = null)
+        public async Task TimedHackBanAsync(CommandContext context, DiscordUser user, TimeSpan time, [RemainingText] string reason = null)
         {
             // Perform the timed ban
             await _punishService.TimedBanAsync(context, time, user.Id, reason);
@@ -227,7 +227,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("unban")]
         [Description("cmd_unban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task Unban(
+        public async Task UnbanAsync(
             CommandContext context,
             [Description("arg_ulong_id")] ulong userId,
             [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
@@ -256,7 +256,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("massunban")]
         [Description("cmd_massunban")]
         [RequirePermissions(Permissions.BanMembers)]
-        public async Task MassUnban(CommandContext context, [RemainingText, Description("arg_ulong_user_col")] params ulong[] userIds)
+        public async Task MassUnbanAsync(CommandContext context, [RemainingText, Description("arg_ulong_user_col")] params ulong[] userIds)
         {
             var toUnban = (await context.Guild.GetBansAsync())
                 .Select(banned => banned.User.Id)

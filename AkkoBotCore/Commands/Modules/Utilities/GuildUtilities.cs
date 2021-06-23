@@ -25,14 +25,14 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("say"), HiddenOverload]
         [Priority(0)]
-        public async Task Say(CommandContext context, [RemainingText] SmartString message)
-            => await Say(context, context.Channel, message);
+        public async Task SayAsync(CommandContext context, [RemainingText] SmartString message)
+            => await SayAsync(context, context.Channel, message);
 
         [Command("say")]
         [Description("cmd_say")]
         [RequirePermissions(Permissions.ManageMessages)]
         [Priority(1)]
-        public async Task Say(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
+        public async Task SayAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
         {
             if (string.IsNullOrWhiteSpace(message))    // If command only contains a channel name
                 await context.RespondAsync(channel.Name);
@@ -44,11 +44,11 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("serverinfo"), Aliases("sinfo")]
         [Description("cmd_serverinfo")]
-        public async Task ServerInfo(CommandContext context)
+        public async Task ServerInfoAsync(CommandContext context)
             => await context.RespondLocalizedAsync(_service.GetServerInfo(context, context.Guild), false);
 
         [Command("serverinfo"), HiddenOverload]
-        public async Task ServerInfo(CommandContext context, DiscordGuild server)
+        public async Task ServerInfoAsync(CommandContext context, DiscordGuild server)
         {
             if (!GeneralService.IsOwner(context, context.Member.Id) || server.Channels.Count == 0)
                 return;
@@ -58,7 +58,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("channelinfo"), Aliases("cinfo")]
         [Description("cmd_channelinfo")]
-        public async Task ChannelInfo(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task ChannelInfoAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Channel;
 
@@ -70,7 +70,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [Command("userinfo"), Aliases("uinfo")]
         [Description("cmd_userinfo")]
-        public async Task UserInfo(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        public async Task UserInfoAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
         {
             user ??= context.Member;
             var isMod = user.Hierarchy is int.MaxValue || user.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers));
@@ -90,7 +90,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("userinfo"), HiddenOverload]
-        public async Task UserInfo(CommandContext context, DiscordUser user)
+        public async Task UserInfoAsync(CommandContext context, DiscordUser user)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
@@ -104,7 +104,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("edit")]
         [Description("cmd_edit")]
         [RequireUserPermissions(Permissions.ManageMessages)]
-        public async Task EditMessage(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [RemainingText, Description("arg_edit_message")] SmartString newMessage)
+        public async Task EditMessageAsync(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [RemainingText, Description("arg_edit_message")] SmartString newMessage)
         {
             if (message.Author.Id != context.Guild.CurrentMember.Id)
             {
@@ -119,13 +119,13 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("edit"), HiddenOverload]
-        public async Task EditMessage(CommandContext context, ulong messageId, [RemainingText] SmartString newMessage)
-            => await GetMessageAndExecuteAsync(context, messageId, (message) => EditMessage(context, message, newMessage));
+        public async Task EditMessageAsync(CommandContext context, ulong messageId, [RemainingText] SmartString newMessage)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => EditMessageAsync(context, message, newMessage));
 
         [Command("react")]
         [Description("cmd_react")]
         [RequireUserPermissions(Permissions.ManageMessages)]
-        public async Task React(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [Description("arg_emoji")] DiscordEmoji emoji)
+        public async Task ReactAsync(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [Description("arg_emoji")] DiscordEmoji emoji)
         {
             var canReact = _service.CanUseEmoji(context.Guild, message.Channel, emoji);
 
@@ -139,13 +139,13 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("react"), HiddenOverload]
-        public async Task React(CommandContext context, ulong messageId, DiscordEmoji emoji)
-            => await GetMessageAndExecuteAsync(context, messageId, (message) => React(context, message, emoji));
+        public async Task ReactAsync(CommandContext context, ulong messageId, DiscordEmoji emoji)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => ReactAsync(context, message, emoji));
 
         [Command("reactremove"), Aliases("reactrm")]
         [Description("cmd_reactremove")]
         [RequirePermissions(Permissions.ManageMessages)]
-        public async Task DeleteReaction(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [Description("arg_emoji")] DiscordEmoji emoji)
+        public async Task DeleteReactionAsync(CommandContext context, [Description("arg_discord_message")] DiscordMessage message, [Description("arg_emoji")] DiscordEmoji emoji)
         {
             var hasReaction = message.Reactions.Any(x => x.Emoji.Equals(emoji));
 
@@ -159,13 +159,13 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("reactremove"), HiddenOverload]
-        public async Task DeleteReaction(CommandContext context, ulong messageId, DiscordEmoji emoji)
-            => await GetMessageAndExecuteAsync(context, messageId, (message) => DeleteReaction(context, message, emoji));
+        public async Task DeleteReactionAsync(CommandContext context, ulong messageId, DiscordEmoji emoji)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => DeleteReactionAsync(context, message, emoji));
 
         [Command("reactclear")]
         [Description("cmd_reactclear")]
         [RequirePermissions(Permissions.ManageMessages)]
-        public async Task ClearReactions(CommandContext context, [Description("arg_discord_message")] DiscordMessage message)
+        public async Task ClearReactionsAsync(CommandContext context, [Description("arg_discord_message")] DiscordMessage message)
         {
             var hasReaction = message.Reactions.Count > 0;
 
@@ -179,8 +179,8 @@ namespace AkkoBot.Commands.Modules.Utilities
         }
 
         [Command("reactclear"), HiddenOverload]
-        public async Task ClearReactions(CommandContext context, ulong messageId)
-            => await GetMessageAndExecuteAsync(context, messageId, (message) => ClearReactions(context, message));
+        public async Task ClearReactionsAsync(CommandContext context, ulong messageId)
+            => await GetMessageAndExecuteAsync(context, messageId, (message) => ClearReactionsAsync(context, message));
 
         /// <summary>
         /// Safely gets a Discord message with the specified ID in the context channel and executes a follow-up method with it.

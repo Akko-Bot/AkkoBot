@@ -27,7 +27,7 @@ namespace AkkoBot.Commands.Modules.Self
         }
 
         [Command("set"), HiddenOverload]
-        public async Task ResetStatus(CommandContext context)
+        public async Task ResetStatusAsync(CommandContext context)
         {
             await context.Client.UpdateStatusAsync();
             var success = await _statusService.RemoveStatusesAsync(x => x.RotationTime == TimeSpan.Zero);
@@ -36,7 +36,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("set")]
         [Description("cmd_setstatus")]
-        public async Task SetStatus(CommandContext context,
+        public async Task SetStatusAsync(CommandContext context,
             [Description("arg_pstatus_type")] ActivityType type,
             [RemainingText, Description("arg_pstatus")] string message)
         {
@@ -49,7 +49,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("set")]
         [Description("cmd_setstatus")]
-        public async Task SetStreamStatus(CommandContext context,
+        public async Task SetStreamStatusAsync(CommandContext context,
             [Description("arg_stream_url")] string streamUrl,
             [RemainingText, Description("arg_pstatus")] string message)
         {
@@ -64,7 +64,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("add")]
         [Description("cmd_addstatus")]
-        public async Task AddStatus(CommandContext context,
+        public async Task AddStatusAsync(CommandContext context,
             [Description("arg_timed_pstatus")] TimeSpan time,
             [Description("arg_pstatus_type")] ActivityType type,
             [RemainingText, Description("arg_pstatus")] string message)
@@ -76,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Self
         }
 
         [Command("add")]
-        public async Task AddStreamStatus(CommandContext context,
+        public async Task AddStreamStatusAsync(CommandContext context,
             [Description("arg_timed_pstatus")] TimeSpan time,
             [Description("arg_stream_url")] string streamUrl,
             [RemainingText, Description("arg_pstatus")] string message)
@@ -89,7 +89,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("list"), Aliases("show")]
         [Description("cmd_liststatus")]
-        public async Task ListStatus(CommandContext context)
+        public async Task ListStatusAsync(CommandContext context)
         {
             var statuses = _statusService.GetStatuses();
 
@@ -118,7 +118,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_removestatus")]
-        public async Task RemoveStatus(CommandContext context, [Description("arg_int")] int id)
+        public async Task RemoveStatusAsync(CommandContext context, [Description("arg_int")] int id)
         {
             var success = await _statusService.RemoveStatusesAsync(x => x.Id == id);
 
@@ -130,7 +130,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("clear")]
         [Description("cmd_clearstatus")]
-        public async Task ClearStatus(CommandContext context)
+        public async Task ClearStatusAsync(CommandContext context)
         {
             var amount = await _statusService.ClearStatusesAsync();
 
@@ -140,7 +140,7 @@ namespace AkkoBot.Commands.Modules.Self
 
         [Command("rotatestatus"), Aliases("ropl")]
         [Description("cmd_rotatestatus")]
-        public async Task RotateStatus(CommandContext context)
+        public async Task RotateStatusAsync(CommandContext context)
         {
             var success = await _statusService.RotateStatusesAsync();
             await context.Message.CreateReactionAsync((success) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);

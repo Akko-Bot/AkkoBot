@@ -31,7 +31,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("startsimple"), Aliases("simple")]
         [Description("cmd_poll_startsimple")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task CreateSimplePoll(CommandContext context, [RemainingText, Description("arg_poll_question")] string question)
+        public async Task CreateSimplePollAsync(CommandContext context, [RemainingText, Description("arg_poll_question")] string question)
         {
             var embed = new DiscordEmbedBuilder()
                 .WithTitle(context.FormatLocalized("poll_title", context.User.GetFullname()))
@@ -51,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("startnumeric"), Aliases("numeric")]
         [Description("cmd_poll_startnumeric")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task CreateNumericPoll(CommandContext context, [RemainingText, Description("arg_poll_qanswer")] string questionAndAnswers)
+        public async Task CreateNumericPollAsync(CommandContext context, [RemainingText, Description("arg_poll_qanswer")] string questionAndAnswers)
         {
             var qAnswers = questionAndAnswers.Split(';');
             var pollMsg = await CreateNumeratedPollAsync(context, PollType.Numeric, qAnswers);
@@ -63,7 +63,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("startanonymous"), Aliases("anonymous")]
         [Description("cmd_poll_startanonymous")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task CreateAnonymousPoll(CommandContext context, [RemainingText, Description("arg_poll_qanswer")] string questionAndAnswers)
+        public async Task CreateAnonymousPollAsync(CommandContext context, [RemainingText, Description("arg_poll_qanswer")] string questionAndAnswers)
         {
             if (_service.GetPolls(context.Guild).Any(x => x.Type is PollType.Anonymous))
             {
@@ -79,7 +79,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [GroupCommand, Command("status"), Aliases("check", "result")]
         [Description("cmd_poll_status")]
-        public async Task ShowPollStatus(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
+        public async Task ShowPollStatusAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
         {
             var polls = _service.GetPolls(context.Guild);
 
@@ -114,7 +114,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("stop"), Aliases("end")]
         [Description("cmd_poll_stop")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task RemovePoll(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
+        public async Task RemovePollAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
         {
             var polls = _service.GetPolls(context.Guild);
 
@@ -146,7 +146,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("forcestop"), Aliases("forceend")]
         [Description("cmd_poll_forcestop")]
         [RequireGuild, RequirePermissions(Permissions.ManageGuild | Permissions.ManageMessages)]
-        public async Task ForceRemovePoll(CommandContext context, [Description("arg_poll_id")] int id)
+        public async Task ForceRemovePollAsync(CommandContext context, [Description("arg_poll_id")] int id)
         {
             var poll = _service.GetPolls(context.Guild).FirstOrDefault(x => x.Id == id);
             await context.Message.CreateReactionAsync((await _service.RemovePollAsync(poll)) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
@@ -155,7 +155,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("vote")]
         [Description("cmd_poll_vote")]
         [RequireDirectMessage]
-        public async Task Vote(CommandContext context, [Description("arg_poll_vote")] int option, [Description("arg_discord_message_link")] DiscordMessage message)
+        public async Task VoteAsync(CommandContext context, [Description("arg_poll_vote")] int option, [Description("arg_discord_message_link")] DiscordMessage message)
         {
             var poll = _service.GetPolls(message.Channel.Guild)
                 .FirstOrDefault(x => x.GuildIdFK == message.Channel.Guild.Id && x.ChannelId == message.Channel.Id && x.MessageId == message.Id);
@@ -173,7 +173,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("list"), Aliases("show")]
         [Description("cmd_poll_list")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task ListPolls(CommandContext context)
+        public async Task ListPollsAsync(CommandContext context)
         {
             var polls = _service.GetPolls(context.Guild);
             var embed = new DiscordEmbedBuilder();

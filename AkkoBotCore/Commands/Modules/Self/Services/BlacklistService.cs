@@ -172,25 +172,23 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The name of the entity if found, <see langword="null"/> otherwise.</returns>
         private string GetBlacklistedName(CommandContext context, BlacklistType blType, ulong id)
         {
-            switch (blType)
+            return blType switch
             {
-                case BlacklistType.User:
-                    return context.Client.Guilds.Values
+                BlacklistType.User =>
+                    context.Client.Guilds.Values
                         .FirstOrDefault(x => x.Members.Values.Any(u => u.Id == id))
                         .Members.Values.FirstOrDefault(u => u.Id == id)
-                        ?.GetFullname();
+                        ?.GetFullname(),
 
-                case BlacklistType.Channel:
-                    return context.Client.Guilds.Values
+                BlacklistType.Channel => 
+                    context.Client.Guilds.Values
                         .FirstOrDefault(x => x.Channels.Values.Any(c => c.Id == id))
-                        ?.Channels.Values.FirstOrDefault(c => c.Id == id)?.Name;
+                        ?.Channels.Values.FirstOrDefault(c => c.Id == id)?.Name,
 
-                case BlacklistType.Server:
-                    return context.Client.Guilds.Values.FirstOrDefault(s => s.Id == id)?.Name;
-
-                default:
-                    return null;
-            }
+                BlacklistType.Server => context.Client.Guilds.Values.FirstOrDefault(s => s.Id == id)?.Name,
+                
+                _ => null,
+            };
         }
     }
 }
