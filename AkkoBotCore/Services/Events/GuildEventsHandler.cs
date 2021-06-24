@@ -202,7 +202,7 @@ namespace AkkoBot.Services.Events
 
             eventArgs.Handled = true;
             eventArgs.Message.DeleteAsync();
-            
+
             return Task.FromResult(true);
         }
 

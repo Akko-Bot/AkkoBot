@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Utilities.Services
@@ -86,14 +85,10 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             db.Add(newRepeater);
             await db.SaveChangesAsync();
 
-            // Only cache the repeater if it triggers frequently
+            // Cache the repeater and create its timer
             _dbCache.Repeaters.TryAdd(context.Guild.Id, new());
-
-            if (newRepeater.Interval <= TimeSpan.FromDays(1))
-            {
-                _dbCache.Repeaters[context.Guild.Id].Add(newRepeater);
-                _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
-            }
+            _dbCache.Repeaters[context.Guild.Id].Add(newRepeater);
+            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
 
             return true;
         }
@@ -187,8 +182,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="predicate">Expression tree to filter the result.</param>
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it returns all guild repeaters.</remarks>
         /// <returns>A collection of repeaters.</returns>
-        public async Task<IReadOnlyCollection<RepeaterEntity>> GetRepeatersAsync(DiscordGuild server, Expression<Func<RepeaterEntity, bool>> predicate = null)
-            => await GetRepeatersAsync(server, predicate, x => x);
+        public IReadOnlyCollection<RepeaterEntity> GetRepeaters(DiscordGuild server, Func<RepeaterEntity, bool> predicate = null)
+            => GetRepeaters(server, predicate, x => x);
 
         /// <summary>
         /// Gets a collection of <typeparamref name="T"/> from the repeater entries in the database.
@@ -200,15 +195,17 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it returns all guild repeaters.</remarks>
         /// <returns>A collection of <typeparamref name="T"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
-        public async Task<IReadOnlyCollection<T>> GetRepeatersAsync<T>(DiscordGuild server, Expression<Func<RepeaterEntity, bool>> predicate, Expression<Func<RepeaterEntity, T>> selector)
+        public IReadOnlyCollection<T> GetRepeaters<T>(DiscordGuild server, Func<RepeaterEntity, bool> predicate, Func<RepeaterEntity, T> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            _dbCache.Repeaters.TryGetValue(server.Id, out var repeaters);
 
-            return await db.Repeaters.Fetch(x => x.GuildIdFK == server.Id)
+            repeaters ??= new(1, 0);
+
+            return repeaters
                 .Where(predicate ?? (x => true))
                 .OrderBy(x => x.DateAdded)
                 .Select(selector)
-                .ToArrayAsyncEF();
+                .ToArray();
         }
     }
 }

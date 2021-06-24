@@ -86,15 +86,11 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_repeat_info")]
         public async Task RepeaterInfoAsync(CommandContext context, [Description("arg_uint")] int id)
         {
-            _dbCache.Repeaters.TryGetValue(context.Guild.Id, out var repeaterCache);
             var embed = new DiscordEmbedBuilder();
-            var repeater = repeaterCache?.FirstOrDefault(x => x.Id == id)
-                ?? (await _service.GetRepeatersAsync(context.Guild, x => x.Id == id)).FirstOrDefault();
+            var repeater = _service.GetRepeaters(context.Guild, x => x.Id == id).FirstOrDefault();
 
             if (repeater is null)
-            {
                 embed.WithDescription(context.FormatLocalized("repeater_not_found", id));
-            }
             else
             {
                 _dbCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer);
@@ -117,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_repeat_list")]
         public async Task ListRepeatersAsync(CommandContext context)
         {
-            var repeaters = await _service.GetRepeatersAsync(
+            var repeaters = _service.GetRepeaters(
                 context.Guild,
                 null,
                 x => new RepeaterEntity()

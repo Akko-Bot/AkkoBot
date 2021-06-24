@@ -274,6 +274,16 @@ namespace AkkoBot.Services.Timers
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
+            // If repeater tries to run on a server the bot is not in, abort
+            // without removing the repeater from the database.
+            if (!_dbCache.Guilds.ContainsKey(server.Id))
+            {
+                _dbCache.Repeaters.TryRemove(server.Id, out _);
+                _dbCache.Timers.TryRemove(entryId);
+
+                return;
+            }
+
             _dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache);
             var cmdHandler = client.GetCommandsNext();
             var dbRepeater = repeaterCache?.FirstOrDefault(x => x.TimerIdFK == entryId)
@@ -295,8 +305,8 @@ namespace AkkoBot.Services.Timers
                 var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
 
                 // If last message is the same repeated message, do nothing
-                if ((lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
-                    || (!wasDeserialized && lastMessage.Content == message))
+                if ((lastMessage is not null && lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
+                    || (!wasDeserialized && lastMessage?.Content == message))
                     return;
 
                 // Send the repeater
@@ -317,7 +327,7 @@ namespace AkkoBot.Services.Timers
 
                 _dbCache.Timers.TryRemove(entryId);
 
-                _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run an autocommand. [User: {dbRepeater?.AuthorId}] [Server: {dbRepeater?.GuildIdFK}] [{ex.Message}]");
+                _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run a repeater. [User: {dbRepeater?.AuthorId}] [Server: {dbRepeater?.GuildIdFK}] [{ex.Message}]");
             }
         }
 

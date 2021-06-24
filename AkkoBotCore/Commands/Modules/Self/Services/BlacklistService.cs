@@ -203,13 +203,13 @@ namespace AkkoBot.Commands.Modules.Self.Services
                         .Members.Values.FirstOrDefault(u => u.Id == id)
                         ?.GetFullname(),
 
-                BlacklistType.Channel => 
+                BlacklistType.Channel =>
                     context.Client.Guilds.Values
                         .FirstOrDefault(x => x.Channels.Values.Any(c => c.Id == id))
                         ?.Channels.Values.FirstOrDefault(c => c.Id == id)?.Name,
 
                 BlacklistType.Server => context.Client.Guilds.Values.FirstOrDefault(s => s.Id == id)?.Name,
-                
+
                 _ => null,
             };
         }

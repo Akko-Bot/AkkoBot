@@ -54,7 +54,7 @@ namespace AkkoBot.Core.Services
             _shardedClient.GuildDownloadCompleted += _startup.InitializeTimersAsync;
 
             // Caches guild filtered words
-            _shardedClient.GuildDownloadCompleted += _startup.CacheFilteredElementsAsync;
+            _shardedClient.GuildDownloadCompleted += _startup.CacheActiveGuildsAsync;
 
             // Executes startup commands
             _shardedClient.GuildDownloadCompleted += _startup.ExecuteStartupCommandsAsync;

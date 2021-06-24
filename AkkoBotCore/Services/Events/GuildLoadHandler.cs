@@ -1,12 +1,7 @@
-﻿using AkkoBot.Extensions;
-using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Database.Queries;
+﻿using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Events
@@ -36,8 +31,12 @@ namespace AkkoBot.Services.Events
             _dbCache.Gatekeeping.TryRemove(eventArgs.Guild.Id, out _);
             _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
             _dbCache.FilteredContent.TryRemove(eventArgs.Guild.Id, out var filters);
+            _dbCache.VoiceRoles.TryRemove(eventArgs.Guild.Id, out var voiceRoles);
+            _dbCache.Polls.TryRemove(eventArgs.Guild.Id, out var polls);
 
             filters?.Clear();
+            voiceRoles?.Clear();
+            polls?.Clear();
 
             return Task.CompletedTask;
         }

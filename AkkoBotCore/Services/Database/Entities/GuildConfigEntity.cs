@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace AkkoBot.Services.Database.Entities
 {
@@ -176,6 +177,18 @@ namespace AkkoBot.Services.Database.Entities
         /// Defines the amount of time that an interactive command waits for user input.
         /// </summary>
         public TimeSpan? InteractiveTimeout { get; set; }
+
+        /// <summary>
+        /// Determines whether this guild has any sort of passive activity that needs to be handled by events.
+        /// </summary>
+        /// <remarks>
+        /// This property is not mapped.
+        /// It relies on this entity's navigation properties to determine whether this guild needs to handle passive activity.
+        /// </remarks>
+        [NotMapped]
+        public bool HasPassiveActivity
+            => GatekeepRel?.IsActive is true || FilteredWordsRel?.IsActive is true || PollRel.Any(x => x.Type is PollType.Anonymous)
+            || FilteredContentRel?.Count is > 0 || VoiceRolesRel?.Count is > 0 || RepeaterRel?.Count is > 0;
 
         public GuildConfigEntity()
         {

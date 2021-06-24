@@ -23,11 +23,12 @@ namespace AkkoBot.Services.Timers
         private const int _updateTimerDayAge = 1;
         private readonly Timer _updateTimer = new(TimeSpan.FromDays(_updateTimerDayAge).TotalMilliseconds);
         private readonly ConcurrentDictionary<int, IAkkoTimer> _timers = new();
+        private bool _isFlushed = true;
+
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ITimerActions _action;
         private readonly DiscordShardedClient _shardedClient;
         private ImmutableArray<TimerEntity> _timerEntries = ImmutableArray.Create<TimerEntity>();
-        private bool _isFlushed = true;
 
         public TimerManager(IServiceScopeFactory scopeFactory, ITimerActions action, DiscordShardedClient shardedClient)
         {

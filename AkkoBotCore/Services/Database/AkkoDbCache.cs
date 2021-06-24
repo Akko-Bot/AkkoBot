@@ -50,40 +50,30 @@ namespace AkkoBot.Services.Database
             using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var dbContext);
 
             _scopeFactory = scopeFactory;
+
+            // The properties below are global
             BotConfig = botConfig;
             LogConfig = logConfig;
             Users = dbContext.DiscordUsers.ToConcurrentDictionary(x => x.UserId);
             Blacklist = dbContext.Blacklist.AsNoTracking().Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Fetch(x => x.RotationTime != TimeSpan.Zero).ToList();
-            CooldownCommands = cmdCooldown.LoadFromEntities(dbContext.CommandCooldown.Fetch());
 
+            // The properties below can either be global or specific to a guild
+            CooldownCommands = cmdCooldown.LoadFromEntities(dbContext.CommandCooldown.Fetch());
             Aliases = dbContext.Aliases
                 .AsNoTracking()
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
 
-            Polls = dbContext.Polls
-                .AsNoTracking()
-                .SplitBy(x => x.GuildIdFK)
-                .Select(x => x.ToConcurrentHashSet())
-                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
-
-            Repeaters = dbContext.Repeaters
-                .Fetch(x => x.Interval <= TimeSpan.FromDays(1))
-                .SplitBy(x => x.GuildIdFK)
-                .Select(x => x.ToConcurrentHashSet())
-                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFK);
-
-            VoiceRoles = dbContext.VoiceRoles
-                .SplitBy(x => x.GuildIdFk)
-                .Select(x => x.ToConcurrentHashSet())
-                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildIdFk);
-
-            Guilds = new();             // Guild configs are loaded into the cache as needed.
-            FilteredWords = new();      // Filtered words are loaded into the cache as needed
-            FilteredContent = new();    // Special filters are loaded into the cache as needed
-            Gatekeeping = new();        // Gatekeep settings are loaded into the cache as needed
+            //The properties below are specific to a guild and are cached on demand
+            Guilds = new();
+            Repeaters = new();
+            VoiceRoles = new();
+            FilteredWords = new();
+            FilteredContent = new();
+            Gatekeeping = new();
+            Polls = new();
         }
 
         public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid)
@@ -94,9 +84,7 @@ namespace AkkoBot.Services.Database
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             dbGuild = await db.GuildConfig
                 .AsNoTracking()
-                .Include(x => x.GatekeepRel)
-                .Include(x => x.FilteredWordsRel)
-                .Include(x => x.FilteredContentRel)
+                .IncludeCacheable()
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
 
             if (dbGuild is null)
@@ -116,7 +104,16 @@ namespace AkkoBot.Services.Database
             if (dbGuild.FilteredContentRel.Count is not 0)
                 FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
 
-            Guilds.TryAdd(dbGuild.GuildId, dbGuild);
+            if (dbGuild.VoiceRolesRel.Count is not 0)
+                VoiceRoles.TryAdd(dbGuild.GuildId, dbGuild.VoiceRolesRel.ToConcurrentHashSet());
+
+            if (dbGuild.RepeaterRel.Count is not 0)
+                Repeaters.TryAdd(dbGuild.GuildId, dbGuild.RepeaterRel.ToConcurrentHashSet());
+
+            if (dbGuild.PollRel.Count is not 0)
+                Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
+
+            Guilds.AddOrUpdate(dbGuild.GuildId, dbGuild, (_, _) => dbGuild);
 
             return dbGuild;
         }

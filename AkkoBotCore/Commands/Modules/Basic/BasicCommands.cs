@@ -81,12 +81,5 @@ namespace AkkoBot.Commands.Modules.Basic
 
             await context.RespondLocalizedAsync(embed, false);
         }
-
-        [Command("test")]
-        public async Task TestAsync(CommandContext context)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(5));
-            await context.Channel.SendMessageAsync("Time-consuming command executed.");
-        }
     }
 }

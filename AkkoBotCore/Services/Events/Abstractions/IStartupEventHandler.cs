@@ -12,9 +12,9 @@ namespace AkkoBot.Services.Events
     public interface IStartupEventHandler
     {
         /// <summary>
-        /// Caches the filtered words of all guilds available to this client.
+        /// Caches all guilds with passive activity available to this client.
         /// </summary>
-        Task CacheFilteredElementsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs);
+        Task CacheActiveGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs);
 
         /// <summary>
         /// Executes startup commands.

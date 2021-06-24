@@ -67,37 +67,30 @@ namespace AkkoBot.Services.Events
 
         // Filters need to be cached even if the server has no activity, because they could be disabled but
         // have custom rules that users may want to read
-        public Task CacheFilteredElementsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public async Task CacheActiveGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            _ = Task.Run(async () =>
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
+            var dbGuilds = await db.GuildConfig
+                .AsNoTracking()
+                .IncludeCacheable()
+                .Where(x => (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId) // Replacement for "(sid >> 22) % max", since EF Core doesn't parse bitwise operators
+                .ToArrayAsyncEF();
+
+            foreach (var dbGuild in dbGuilds)
             {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                // Do not cache guilds that have no passive activity
+                if (!dbGuild.HasPassiveActivity || !client.Guilds.ContainsKey(dbGuild.GuildId))
+                    continue;
 
-                var gatekeeps = await db.Gatekeeping
-                    .Fetch(x => client.Guilds.Keys.Contains(x.GuildIdFK))
-                    .ToArrayAsyncEF();
-
-                var filteredWords = await db.FilteredWords
-                    .Fetch(x => x.Words.Count != 0)
-                    .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
-                    .ToArrayAsyncEF();
-
-                var filteredContent = await db.FilteredContent
-                    .Fetch(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
-                    .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
-                    .ToArrayAsyncEF();
-
-                foreach (var entry in gatekeeps)
-                    _dbCache.Gatekeeping.TryAdd(entry.GuildIdFK, entry);
-
-                foreach (var entry in filteredWords)
-                    _dbCache.FilteredWords.TryAdd(entry.GuildIdFK, entry);
-
-                foreach (var entry in filteredContent)
-                    _dbCache.FilteredContent.TryAdd(entry.GuildIdFK, new(filteredContent.Where(x => x.GuildIdFK == entry.GuildIdFK)));
-            });
-
-            return Task.CompletedTask;
+                _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
+                _dbCache.Gatekeeping.TryAdd(dbGuild.GuildId, dbGuild.GatekeepRel);
+                _dbCache.FilteredWords.TryAdd(dbGuild.GuildId, dbGuild.FilteredWordsRel);
+                _dbCache.FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
+                _dbCache.VoiceRoles.TryAdd(dbGuild.GuildId, dbGuild.VoiceRolesRel.ToConcurrentHashSet());
+                _dbCache.Repeaters.TryAdd(dbGuild.GuildId, dbGuild.RepeaterRel.ToConcurrentHashSet());
+                _dbCache.Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
+            }
         }
 
         public async Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)

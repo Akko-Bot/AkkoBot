@@ -57,7 +57,7 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <param name="channel">This Discord channel.</param>
         /// <param name="client">The Discord client that contains the cached messages.</param>
-        /// <returns>The last message from this channel.</returns>
+        /// <returns>The last message from this channel, <see langword="null"/> if the channel has no message.</returns>
         /// <exception cref="UnauthorizedException">Occurs when the client has no permission to see the content of this Discord channel.</exception>
         /// <exception cref="NotFoundException">Occurs when the client has no access to this Discord channel or when the channel has no messages.</exception>
         /// <exception cref="BadRequestException">Occurs when this Discord channel has been deleted or does not exist.</exception>
@@ -69,8 +69,8 @@ namespace AkkoBot.Extensions
 
             if (message is null)
             {
-                message = (await channel.GetMessagesAsync(1))[0];
-                messageCache.Add(message);
+                message = (await channel.GetMessagesAsync(1)).FirstOrDefault(); // Channel can be empty
+                messageCache.Add(message);  // It's fine to add null values to the message cache
             }
 
             return message;
