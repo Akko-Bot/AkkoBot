@@ -16,45 +16,18 @@ namespace AkkoBot.Services.Events
     /// </summary>
     internal class GuildLoadHandler : IGuildLoadHandler
     {
-        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
 
-        public GuildLoadHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+        public GuildLoadHandler(IDbCache dbCache)
+            => _dbCache = dbCache;
+
+        public async Task AddGuildOnJoinAsync(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
-            _scopeFactory = scopeFactory;
-            _dbCache = dbCache;
-        }
+            if (_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out _))
+                return;
 
-        public Task AddGuildOnJoinAsync(DiscordClient client, GuildCreateEventArgs eventArgs)
-        {
-            if (_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild))
-                return Task.CompletedTask;
-
-            return Task.Run(async () =>
-            {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-
-                dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
-
-                var gatekeep = await db.Gatekeeping.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
-
-                var filteredWords = await db.FilteredWords.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.GuildIdFK == eventArgs.Guild.Id);
-
-                var filteredContent = await db.FilteredContent
-                    .Fetch(x => x.GuildIdFK == eventArgs.Guild.Id)
-                    .ToArrayAsync();
-
-                _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
-                _dbCache.Gatekeeping.TryAdd(dbGuild.GuildId, gatekeep);
-
-                if (filteredWords is not null)
-                    _dbCache.FilteredWords.TryAdd(filteredWords.GuildIdFK, filteredWords);
-
-                if (filteredContent.Length is not 0)
-                    _dbCache.FilteredContent.TryAdd(dbGuild.GuildId, new(filteredContent));
-            });
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+            _dbCache.Guilds.AddOrUpdate(dbGuild.GuildId, dbGuild, (_, _) => dbGuild);
         }
 
         public Task RemoveGuildOnLeaveAsync(DiscordClient client, GuildDeleteEventArgs eventArgs)
@@ -64,7 +37,7 @@ namespace AkkoBot.Services.Events
             _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
             _dbCache.FilteredContent.TryRemove(eventArgs.Guild.Id, out var filters);
 
-            filters.Clear();
+            filters?.Clear();
 
             return Task.CompletedTask;
         }

@@ -38,26 +38,23 @@ namespace AkkoBot.Services.Events
         public Task LoadInitialStateAsync(DiscordClient client, ReadyEventArgs eventArgs)
             => Task.CompletedTask;
 
-        public Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            return Task.Run(async () =>
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
+            var botConfig = _dbCache.BotConfig;
+
+            // Filter out the guilds that are already in the database
+            var newGuilds = client.Guilds.Keys
+                .Except(db.GuildConfig.AsNoTracking().Select(dbGuild => dbGuild.GuildId))
+                .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
+                .ToArray();
+
+            if (newGuilds.Length is not 0)
             {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-
-                var botConfig = _dbCache.BotConfig;
-
-                // Filter out the guilds that are already in the database
-                var newGuilds = client.Guilds.Keys
-                    .Except(db.GuildConfig.AsNoTracking().Select(dbGuild => dbGuild.GuildId))
-                    .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
-                    .ToArray();
-
-                if (newGuilds.Length is not 0)
-                {
-                    // Save the new guilds to the database
-                    await db.BulkCopyAsync(100, newGuilds);
-                }
-            });
+                // Save the new guilds to the database
+                await db.BulkCopyAsync(100, newGuilds);
+            }
         }
 
         public Task InitializeTimersAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
@@ -65,22 +62,33 @@ namespace AkkoBot.Services.Events
             var cmdHandler = client.GetCommandsNext();
             _dbCache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
 
-            return _dbCache.Timers.CreateClientTimersAsync(client).AsTask();
+            return _dbCache.Timers.CreateClientTimersAsync(client);
         }
 
+        // Filters need to be cached even if the server has no activity, because they could be disabled but
+        // have custom rules that users may want to read
         public Task CacheFilteredElementsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            return Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-                var filteredWords = await db.FilteredWords.Fetch(x => x.Words.Count != 0)
+                var gatekeeps = await db.Gatekeeping
+                    .Fetch(x => client.Guilds.Keys.Contains(x.GuildIdFK))
+                    .ToArrayAsyncEF();
+
+                var filteredWords = await db.FilteredWords
+                    .Fetch(x => x.Words.Count != 0)
                     .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
                     .ToArrayAsyncEF();
 
-                var filteredContent = await db.FilteredContent.Fetch(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
+                var filteredContent = await db.FilteredContent
+                    .Fetch(x => x.IsAttachmentOnly || x.IsCommandOnly || x.IsImageOnly || x.IsInviteOnly || x.IsUrlOnly)
                     .Where(x => client.Guilds.Keys.Contains(x.GuildIdFK))
                     .ToArrayAsyncEF();
+
+                foreach (var entry in gatekeeps)
+                    _dbCache.Gatekeeping.TryAdd(entry.GuildIdFK, entry);
 
                 foreach (var entry in filteredWords)
                     _dbCache.FilteredWords.TryAdd(entry.GuildIdFK, entry);
@@ -88,35 +96,34 @@ namespace AkkoBot.Services.Events
                 foreach (var entry in filteredContent)
                     _dbCache.FilteredContent.TryAdd(entry.GuildIdFK, new(filteredContent.Where(x => x.GuildIdFK == entry.GuildIdFK)));
             });
+
+            return Task.CompletedTask;
         }
 
-        public Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public async Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            return Task.Run(async () =>
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
+            var cmdHandler = client.GetCommandsNext();
+            var startupCmds = await db.AutoCommands
+                .Fetch(x => x.Type == AutoCommandType.Startup && eventArgs.Guilds.Keys.Contains(x.GuildId))
+                .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
+                .ToArrayAsyncEF();
+
+            foreach (var dbCmd in startupCmds)
             {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
 
-                var cmdHandler = client.GetCommandsNext();
-                var startupCmds = await db.AutoCommands
-                    .Fetch(x => x.Type == AutoCommandType.Startup && eventArgs.Guilds.Keys.Contains(x.GuildId))
-                    .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
-                    .ToArrayAsyncEF();
+                if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
+                    continue;
 
-                foreach (var dbCmd in startupCmds)
-                {
-                    var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
+                var prefix = (await _dbCache.GetDbGuildAsync(server.Id)).Prefix;
 
-                    if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
-                        continue;
+                var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
 
-                    var prefix = (await _dbCache.GetDbGuildAsync(server.Id)).Prefix;
-
-                    var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
-
-                    if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
-                        _ = cmd.ExecuteAsync(fakeContext);  // Can't await because it takes too long to run
-                }
-            });
+                if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
+                    _ = cmd.ExecuteAsync(fakeContext);  // Can't await because it takes too long to run
+            }
         }
 
         public async Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs _)

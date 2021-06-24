@@ -95,7 +95,7 @@ namespace AkkoBot.Services.Timers
                 : TryAdd(timer);
         }
 
-        public async ValueTask<bool> CreateClientTimersAsync(DiscordClient client)
+        public async Task<bool> CreateClientTimersAsync(DiscordClient client)
         {
             var cachedTimersAmount = _timers.Count;
 

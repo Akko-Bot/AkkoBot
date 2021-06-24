@@ -28,7 +28,7 @@ namespace AkkoBot.Services.Timers.Abstractions
         /// </summary>
         /// <param name="client">The Discord client.</param>
         /// <returns><see langword="true"/> if timers were created, <see langword="false"/> otherwise.</returns>
-        ValueTask<bool> CreateClientTimersAsync(DiscordClient client);
+        Task<bool> CreateClientTimersAsync(DiscordClient client);
 
         /// <summary>
         /// Attempts to add the specified <see cref="IAkkoTimer"/> to the cache.

@@ -277,7 +277,7 @@ namespace AkkoBot.Services.Timers
             _dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache);
             var cmdHandler = client.GetCommandsNext();
             var dbRepeater = repeaterCache?.FirstOrDefault(x => x.TimerIdFK == entryId)
-                ?? await db.Repeaters.Fetch(x => x.TimerIdFK == entryId).FirstOrDefaultAsyncEF();
+                ?? await db.Repeaters.AsNoTracking().FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
 
             try
             {

@@ -60,8 +60,26 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 Reason = reason
             };
 
-            db.Upsert(entry);
-            await db.SaveChangesAsync();
+            // Upsert the entry
+            await db.GetTable<BlacklistEntity>().InsertOrUpdateAsync(
+                () => new BlacklistEntity()
+                {
+                    ContextId = id,
+                    Type = type,
+                    Name = entry.Name,
+                    Reason = reason
+                },
+                x => new BlacklistEntity()
+                {
+                    Type = type,
+                    Name = entry.Name,
+                    Reason = reason ?? x.Reason
+                },
+                () => new BlacklistEntity()
+                {
+                    ContextId = id
+                }
+            );
 
             return (entry, _dbCache.Blacklist.Add(id));
         }
@@ -76,8 +94,11 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            var newEntries = ids.Distinct()
-                .Select(id => new BlacklistEntity() { ContextId = id, Type = BlacklistType.Unspecified });
+            var newEntries = ids
+                .Distinct()
+                .Except(_dbCache.Blacklist)
+                .Select(id => new BlacklistEntity() { ContextId = id, Type = BlacklistType.Unspecified })
+                .ToArray();
 
             foreach (var blacklist in newEntries)
                 _dbCache.Blacklist.Add(blacklist.ContextId);
@@ -113,6 +134,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 return null;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
+            // Refactor this when DeleteWithOutPutAsync() is available for PostgreSQL
 
             var entry = await db.Blacklist.FirstOrDefaultAsync(x => x.ContextId == contextId);
 

@@ -95,6 +95,8 @@ namespace AkkoBot.Services.Database
             dbGuild = await db.GuildConfig
                 .AsNoTracking()
                 .Include(x => x.GatekeepRel)
+                .Include(x => x.FilteredWordsRel)
+                .Include(x => x.FilteredContentRel)
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
 
             if (dbGuild is null)
@@ -107,6 +109,12 @@ namespace AkkoBot.Services.Database
 
             if (dbGuild.GatekeepRel is not null)
                 Gatekeeping.TryAdd(dbGuild.GuildId, dbGuild.GatekeepRel);
+
+            if (dbGuild.FilteredWordsRel is not null)
+                FilteredWords.TryAdd(dbGuild.GuildId, dbGuild.FilteredWordsRel);
+
+            if (dbGuild.FilteredContentRel.Count is not 0)
+                FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
 
             Guilds.TryAdd(dbGuild.GuildId, dbGuild);
 

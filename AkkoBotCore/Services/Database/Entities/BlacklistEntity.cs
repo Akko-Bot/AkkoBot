@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Database.Entities
         Server,
 
         /// <summary>
-        /// Represents an entity that was not specified.
+        /// Represents a blacklisted entity that was not specified.
         /// </summary>
         Unspecified
     }

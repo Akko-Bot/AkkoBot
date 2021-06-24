@@ -18,7 +18,7 @@ namespace AkkoBot.Services.Events
     /// <summary>
     /// Handles events related to gatekeeping.
     /// </summary>
-    public class GatekeepEventHandler : IGatekeepingEventHandler, IDisposable
+    internal class GatekeepEventHandler : IGatekeepingEventHandler, IDisposable
     {
         private readonly ConcurrentHashSet<ulong> _waitingGreets = new();
         private readonly ConcurrentHashSet<ulong> _waitingFarewells = new();
@@ -148,22 +148,6 @@ namespace AkkoBot.Services.Events
         }
 
         /// <summary>
-        /// Deletes the provided Discord <paramref name="message"/> after the specified <paramref name="time"/>.
-        /// </summary>
-        /// <param name="message">The Discord message to be deleted.</param>
-        /// <param name="time">The delay time.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="time"/> is 0 or negative.</exception>
-        /// <exception cref="UnauthorizedException">Occurs when the bot has no permission to delete the message.</exception>
-        /// <exception cref="NotFoundException">Occurs when the message has already been deleted.</exception>
-        /// <exception cref="BadRequestException">Occurs when the delete request is made incorrectly.</exception>
-        /// <exception cref="ServerErrorException">Occurs when Discord is having internal issues.</exception>
-        private async Task DeleteMessageWithDelayAsync(DiscordMessage message, TimeSpan time)
-        {
-            await Task.Delay(time).ConfigureAwait(false);
-            await message.DeleteAsync();
-        }
-
-        /// <summary>
         /// Sends a greeting or farewell Discord message according to the specified settings.
         /// </summary>
         /// <param name="context">The command context.</param>
@@ -198,7 +182,7 @@ namespace AkkoBot.Services.Events
                 : await channel.SendMessageAsync(parsedString);
 
             if (deleteTime > TimeSpan.Zero)
-                await DeleteMessageWithDelayAsync(discordMessage, deleteTime);
+                await discordMessage.DeleteWithDelayAsync(deleteTime);
         }
 
         public void Dispose()
