@@ -23,6 +23,7 @@ using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -353,8 +354,8 @@ namespace AkkoBot.Core.Common
                 // > Utilities
                 ServiceDescriptor.Transient<IMemberAggregator, MemberAggregator>(),
                 ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
-                ServiceDescriptor.Singleton(new HttpClient()),
-                ServiceDescriptor.Singleton(new Random()),
+                ServiceDescriptor.Singleton(_ => new HttpClient()),
+                ServiceDescriptor.Singleton(_ => new Random()),
 
                 // > Commands
                 ServiceDescriptor.Singleton<IPrefixResolver, PrefixResolver>(),
@@ -368,7 +369,7 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<IGuildEventsHandler, GuildEventsHandler>(),
                 ServiceDescriptor.Singleton<IGlobalEventsHandler, GlobalEventsHandler>(),
                 ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>(),
-                ServiceDescriptor.Singleton<IGatekeepingEventHandler, GatekeepEventHandler>()
+                ServiceDescriptor.Singleton<IGatekeepEventHandler, GatekeepEventHandler>()
             };
 
             foreach (var service in servicesList)

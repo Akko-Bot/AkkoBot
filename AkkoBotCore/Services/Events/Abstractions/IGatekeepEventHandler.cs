@@ -1,5 +1,6 @@
 ﻿using DSharpPlus;
 using DSharpPlus.EventArgs;
+using System;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Events.Abstractions
@@ -7,7 +8,7 @@ namespace AkkoBot.Services.Events.Abstractions
     /// <summary>
     /// Represents an object that handles automated moderation features.
     /// </summary>
-    public interface IGatekeepingEventHandler
+    public interface IGatekeepEventHandler : IDisposable
     {
         /// <summary>
         /// Sanitizes the user's name when they join a guild.

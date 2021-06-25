@@ -20,11 +20,11 @@ namespace AkkoBot.Core.Services
         private readonly IGuildEventsHandler _guildEventsHandler;
         private readonly IGlobalEventsHandler _globalEventsHandler;
         private readonly ICommandLogHandler _cmdLogHandler;
-        private readonly IGatekeepingEventHandler _gatekeeper;
+        private readonly IGatekeepEventHandler _gatekeeper;
         private readonly DiscordShardedClient _shardedClient;
 
         public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
-            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepingEventHandler gatekeeper, DiscordShardedClient shardedClient)
+            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, DiscordShardedClient shardedClient)
         {
             _startup = startup;
             _voiceRoleHandler = vcRoleHandler;

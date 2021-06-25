@@ -3,6 +3,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Events.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging.Abstractions;
 using AkkoBot.Services.Timers.Abstractions;
@@ -74,6 +75,7 @@ namespace AkkoBot.Core.Common
             CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
             CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();
             CommandExt[0].Services.GetService<HttpClient>()?.Dispose();
+            CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
 
             // Dispose scoped
             foreach (var cmdHandler in CommandExt.Values)
