@@ -147,7 +147,7 @@ cmd_channelid: Exibe of ID do canal especificado. Forneça nenhum parâmetro par
 cmd_channelinfo: Exibe informações básicas sobre o canal especificado. Forneça nenhum parâmetro para exibir informações sobre o canal atual.
 cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
 cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
-cmd_checkperms: Exibe as permissões de um usuário no canal especificado. Forneça nenhum parâmetro para visualizar suas permissões no canal atual.
+cmd_checkperms: Exibe as permissões de um cargo ou usuário no canal especificado. Forneça nenhum parâmetro para visualizar suas permissões no canal atual.
 cmd_clearstatus: Remove todos os status do bot.
 cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
 cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
@@ -641,3 +641,5 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
+
+checkperms_role_title: Permissões para o cargo {0}

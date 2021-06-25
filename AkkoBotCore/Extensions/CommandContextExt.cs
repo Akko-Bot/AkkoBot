@@ -182,8 +182,8 @@ namespace AkkoBot.Extensions
 
             for (var index = 0; index < args.Length; index++)
             {
-                if (args[index] is string)
-                    args[index] = GeneralService.GetLocalizedResponse(localizer, locale, args[index] as string);
+                if (args[index] is string arg)
+                    args[index] = GeneralService.GetLocalizedResponse(localizer, locale, arg);
                 else if (args[index] is null)
                     args[index] = string.Empty;
             }

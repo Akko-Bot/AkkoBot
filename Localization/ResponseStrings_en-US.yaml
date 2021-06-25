@@ -147,7 +147,7 @@ cmd_channelid: Shows the ID of the specified channel. Provide no parameter to sh
 cmd_channelinfo: Shows basic information about the specified Discord channel. Provide no parameter to show information about the current channel.
 cmd_chatmute: Server mutes a user, preventing them from messaging on text channels.
 cmd_chatunmute: Server unmutes a user, allowing them to message on text channels.
-cmd_checkperms: Shows the permissions of a user in the specified channel. Provide no parameter to check your own permissions in the current channel.
+cmd_checkperms: Shows the permissions of a role or a user in the specified channel. Provide no parameter to check your own permissions in the current channel.
 cmd_clearstatus: Removes all statuses from the bot.
 cmd_config: Groups settings that define how the bot should behave globally.
 cmd_config_cache: Sets how many messages should be cached per channel. Requires a restart to take effect.
@@ -641,3 +641,5 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
+
+checkperms_role_title: Permissions for role {0}

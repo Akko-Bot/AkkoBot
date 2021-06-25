@@ -10,6 +10,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -195,37 +196,37 @@ namespace AkkoBot.Commands.Modules.Utilities
             channel ??= context.Channel;
             user ??= context.Member;
 
-            var allPerms = Enum.GetValues<Permissions>()
-                .Where(x => x is not Permissions.All and not Permissions.None and not Permissions.ViewAuditLog and not Permissions.Administrator)
-                .Where((channel.Type is ChannelType.Voice) ? x => x.HasOneFlag(_voicePerms) : x => !x.HasOneFlag(_voicePerms) || x is Permissions.MuteMembers);
-
-            var allowedPerms = string.Join(
-                "\n",
-                allPerms
-                    .Where(x => user.PermissionsIn(channel).HasFlag(x))
-                    .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
-                    .OrderBy(x => x)
-            );
-
-            var deniedPerms = string.Join(
-                "\n",
-                allPerms
-                    .Where(x => !user.PermissionsIn(channel).HasFlag(x))
-                    .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
-                    .OrderBy(x => x)
-            );
-
-            if (string.IsNullOrWhiteSpace(allowedPerms))
-                allowedPerms = AkkoConstants.ValidWhitespace;
-
-            if (string.IsNullOrWhiteSpace(deniedPerms))
-                deniedPerms = AkkoConstants.ValidWhitespace;
-
+            var (allowedPermsCol, deniedPermsCol) = GetLocalizedPermissions(context, user.PermissionsIn(channel), channel.Type);
+            var allowedPerms = string.Join("\n", allowedPermsCol);
+            var deniedPerms = string.Join("\n", deniedPermsCol);
 
             var embed = new DiscordEmbedBuilder()
-                .WithTitle(context.FormatLocalized("checkperms_title", user.GetFullname(), channel.Name))
-                .AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true)
-                .AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+                .WithTitle(context.FormatLocalized("checkperms_title", user.GetFullname(), channel.Name));
+
+            if (!string.IsNullOrWhiteSpace(allowedPerms))
+                embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+
+            if (!string.IsNullOrWhiteSpace(deniedPerms))
+                embed.AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("checkperms")]
+        public async Task CheckUserPermsAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+        {
+            var (allowedPermsCol, deniedPermsCol) = GetLocalizedPermissions(context, role.Permissions);
+            var allowedPerms = string.Join("\n", allowedPermsCol);
+            var deniedPerms = string.Join("\n", deniedPermsCol);
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle(context.FormatLocalized("checkperms_role_title", role.Name));
+
+            if (!string.IsNullOrWhiteSpace(allowedPerms))
+                embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+
+            if (!string.IsNullOrWhiteSpace(deniedPerms))
+                embed.AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -251,6 +252,37 @@ namespace AkkoBot.Commands.Modules.Utilities
             {
                 await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
             }
+        }
+
+        /// <summary>
+        /// Gets the localized strings of the allowed and denied permissions from the set of specified permissions.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="permissions">The set of permissions.</param>
+        /// <param name="channelType">The type of the Discord channel.</param>
+        /// <returns>A collection of localized allowed permissions and a collection of localized denied permissions.</returns>
+        private (IEnumerable<string>, IEnumerable<string>) GetLocalizedPermissions(CommandContext context, Permissions permissions, ChannelType? channelType = null)
+        {
+            var allPerms = Enum.GetValues<Permissions>()
+                .Where(x => x is not Permissions.All and not Permissions.None);
+
+            if (channelType is not null)
+            {
+                allPerms = allPerms.Where(x => x is not Permissions.ViewAuditLog and not Permissions.Administrator)
+                    .Where((channelType is ChannelType.Voice) ? x => x.HasOneFlag(_voicePerms) : x => !x.HasOneFlag(_voicePerms) || x is Permissions.MuteMembers);
+            }
+
+            var allowedPerms = allPerms
+                .Where(x => permissions.HasFlag(x))
+                .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
+                .OrderBy(x => x);
+
+            var deniedPerms = allPerms
+                .Where(x => !permissions.HasFlag(x))
+                .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
+                .OrderBy(x => x);
+
+            return (allowedPerms, deniedPerms);
         }
     }
 }
