@@ -95,6 +95,19 @@ namespace AkkoBot.Services.Database
                 await db.SaveChangesAsync();
             }
 
+            TryAddDbGuild(dbGuild);
+            Guilds.AddOrUpdate(dbGuild.GuildId, dbGuild, (_, _) => dbGuild);
+
+            return dbGuild;
+        }
+
+        public bool TryAddDbGuild(GuildConfigEntity dbGuild)
+        {
+            if (Guilds.ContainsKey(dbGuild.GuildId))
+                return false;
+
+            Guilds.TryAdd(dbGuild.GuildId, dbGuild);
+
             if (dbGuild.GatekeepRel is not null)
                 Gatekeeping.TryAdd(dbGuild.GuildId, dbGuild.GatekeepRel);
 
@@ -113,9 +126,26 @@ namespace AkkoBot.Services.Database
             if (dbGuild.PollRel.Count is not 0)
                 Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
 
-            Guilds.AddOrUpdate(dbGuild.GuildId, dbGuild, (_, _) => dbGuild);
+            return true;
+        }
 
-            return dbGuild;
+        public bool TryRemoveDbGuild(ulong sid)
+        {
+            Guilds.TryRemove(sid, out var dbGuild);
+            Gatekeeping.TryRemove(sid, out _);
+           
+            FilteredWords.TryRemove(sid, out _);
+           
+            FilteredContent.TryRemove(sid, out _);
+            VoiceRoles.TryRemove(sid, out var filters);
+            Repeaters.TryRemove(sid, out var voiceRoles);
+            Polls.TryRemove(sid, out var polls);
+
+            filters?.Clear();
+            voiceRoles?.Clear();
+            polls?.Clear();
+
+            return dbGuild is not null;
         }
 
         public void Dispose()

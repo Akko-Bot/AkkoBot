@@ -80,16 +80,8 @@ namespace AkkoBot.Services.Events
             foreach (var dbGuild in dbGuilds)
             {
                 // Do not cache guilds that have no passive activity
-                if (!dbGuild.HasPassiveActivity || !client.Guilds.ContainsKey(dbGuild.GuildId))
-                    continue;
-
-                _dbCache.Guilds.TryAdd(dbGuild.GuildId, dbGuild);
-                _dbCache.Gatekeeping.TryAdd(dbGuild.GuildId, dbGuild.GatekeepRel);
-                _dbCache.FilteredWords.TryAdd(dbGuild.GuildId, dbGuild.FilteredWordsRel);
-                _dbCache.FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
-                _dbCache.VoiceRoles.TryAdd(dbGuild.GuildId, dbGuild.VoiceRolesRel.ToConcurrentHashSet());
-                _dbCache.Repeaters.TryAdd(dbGuild.GuildId, dbGuild.RepeaterRel.ToConcurrentHashSet());
-                _dbCache.Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
+                if (dbGuild.HasPassiveActivity && client.Guilds.ContainsKey(dbGuild.GuildId))
+                    _dbCache.TryAddDbGuild(dbGuild);
             }
         }
 

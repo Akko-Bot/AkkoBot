@@ -47,9 +47,9 @@ namespace AkkoBot.Commands.Formatters
             foreach (var att in requirements.OrderBy(x => x.AttributeType.Name))
             {
                 if (att.AttributeType == typeof(BotOwnerAttribute))
-                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_bot_owner"));
+                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("perm_bot_owner"));
                 else if (att.AttributeType == typeof(RequireDirectMessageAttribute))
-                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("help_require_dm"));
+                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("perm_require_dm"));
                 else
                     _helpRequiresField.AppendLine(GetLocalizedPermissions(att.ConstructorArguments));
             }
@@ -221,6 +221,15 @@ namespace AkkoBot.Commands.Formatters
         }
 
         /// <summary>
+        /// Gets the localized permissions of a permission attribute.
+        /// </summary>
+        /// <param name="permissions">Collection of attributes to have their permissions taken from.</param>
+        /// <returns>A string with all localized attributes separated by a newline.</returns>
+        /// <exception cref="InvalidCastException">Occurs when the attribute argument is not of type <see cref="Permissions"/>.</exception>
+        private string GetLocalizedPermissions(IEnumerable<CustomAttributeTypedArgument> permissions)
+            => string.Join("\n", permissions.SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(_cmdContext)));
+
+        /// <summary>
         /// Gets the title of the help message.
         /// </summary>
         /// <param name="cmd">A command.</param>
@@ -232,7 +241,6 @@ namespace AkkoBot.Commands.Formatters
                 cmd.Aliases
                     .Select(alias => Formatter.InlineCode(alias))
                     .Prepend(Formatter.InlineCode(cmd.Name))
-                    .ToArray()
             );
         }
 
@@ -332,28 +340,6 @@ namespace AkkoBot.Commands.Formatters
 
             // Overload didn't match all reflected parameters
             return false;
-        }
-
-        /// <summary>
-        /// Gets the localized permissions of a permission attribute.
-        /// </summary>
-        /// <param name="permissions">Collection of attributes to have their permissions taken from.</param>
-        /// <returns>A string with all localized attributes separated by a newline.</returns>
-        private string GetLocalizedPermissions(IEnumerable<CustomAttributeTypedArgument> permissions)
-        {
-            var localizedPerms = new List<string>();
-
-            foreach (var perm in permissions)
-            {
-                Enum.TryParse(typeof(Permissions), perm.Value.ToString(), true, out var r);
-
-                var results = r.ToString().Replace(",", string.Empty).Split(" ");
-
-                foreach (var result in results)
-                    localizedPerms.Add(_cmdContext.FormatLocalized("help_" + result.ToSnakeCase()));
-            }
-
-            return string.Join("\n", localizedPerms);
         }
     }
 }

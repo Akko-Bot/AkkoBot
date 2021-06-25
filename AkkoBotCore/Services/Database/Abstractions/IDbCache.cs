@@ -125,5 +125,19 @@ namespace AkkoBot.Services.Database.Abstractions
         /// <remarks>If the entry doesn't exist, it creates one.</remarks>
         /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
         ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid);
+
+        /// <summary>
+        /// Adds a database guild and pertinent navigation properties to the cache.
+        /// </summary>
+        /// <param name="dbGuild">The database entry.</param>
+        /// <returns><see langword="true"/> if the database guild was successfully cached, <see langword="false"/> otherwise.</returns>
+        public bool TryAddDbGuild(GuildConfigEntity dbGuild);
+
+        /// <summary>
+        /// Removes a database guild and pertinent navigation properties from the cache.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <returns><see langword="true"/> if the database guild was successfully removed, <see langword="false"/> otherwise.</returns>
+        public bool TryRemoveDbGuild(ulong sid);
     }
 }

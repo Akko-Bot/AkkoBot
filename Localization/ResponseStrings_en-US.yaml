@@ -5,6 +5,7 @@ alias: Alias
 alias_error: No alias was found.
 alias_list_title_global: Global Aliases
 alias_list_title_server: Server Aliases
+allowed: Allowed
 app_owners: Application Owners
 arg_alias_add_alias: Text the bot should treat as a command.
 arg_alias_add_command: The command that should be mapped to this alias.
@@ -120,6 +121,7 @@ channel_invalid: I have no permission to send messages to the {0} channel.
 channels: Channels
 chatmute_success: User {0} can no longer message on text channels.
 chatunmute_success: User {0} can now message on text channels.
+checkperms_title: Permissions for {0} in {1}
 cmd_addstatus: Adds a status to the list of rotating statuses. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status.
 cmd_alias: Groups commands for adding, removing and listing command aliases.
 cmd_alias_add: Adds an alias for the specified command. If the alias has space in it, wrap it around quotation marks.
@@ -145,6 +147,7 @@ cmd_channelid: Shows the ID of the specified channel. Provide no parameter to sh
 cmd_channelinfo: Shows basic information about the specified Discord channel. Provide no parameter to show information about the current channel.
 cmd_chatmute: Server mutes a user, preventing them from messaging on text channels.
 cmd_chatunmute: Server unmutes a user, allowing them to message on text channels.
+cmd_checkperms: Shows the permissions of a user in the specified channel. Provide no parameter to check your own permissions in the current channel.
 cmd_clearstatus: Removes all statuses from the bot.
 cmd_config: Groups settings that define how the bot should behave globally.
 cmd_config_cache: Sets how many messages should be cached per channel. Requires a restart to take effect.
@@ -351,6 +354,7 @@ deafen_success: User {0} can no longer hear other users speaking in voice channe
 deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
+denied: Denied
 description: Description
 disabled: disabled
 emoji_list_title: Server Emojis
@@ -420,37 +424,10 @@ guild_timeout_reset: Command timeout on this server has been reset.
 guild_timezone_changed: The time zone of this server has been changed to {0}.
 guild_timezone_error: This time zone is not available. Use {0} to see the list of available time zones.
 hackban_title: User Hackbanned
-help_add_reactions: Add Reactions
-help_administrator: Administrator
-help_attach_files: Attach Files
-help_ban_members: Ban Members
-help_bot_owner: Bot Ownership
 help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.
-help_change_nickname: Change Nickname
 help_cmd_not_found: Command not found. Use {0} and/or {1} to find the command you're looking for.
-help_create_invite: Create Invite
-help_deafen_members: Deafen Members
 help_footer: Use {0} to get help for a specific command.
-help_kick_members: Kick Members
-help_manage_channels: Manage Channels
-help_manage_emojis: Manage Emojis
-help_manage_guild: Manage Server
-help_manage_messages: Manage Messages
-help_manage_nicknames: Manage Nicknames
-help_manage_roles: Manage Roles
-help_manage_webhooks: Manage Webhooks
-help_mention_everyone: Mention Everyone
-help_move_members: Move Members
-help_mute_members: Mute Members
 help_optional: Optional
-help_priority_speaker: Priority Speaker
-help_require_dm: Direct Message
-help_send_messages: Send Messages
-help_speak: Speak
-help_stream: Stream
-help_use_external_emojis: Use External Emojis
-help_use_voice: Connect
-help_view_audit_log: View Audit Log
 high: High
 highest: Highest
 hours: Hours
@@ -515,6 +492,41 @@ online_since: Online since
 owner: Owner
 owners: Owners
 pages: Page {0}/{1}
+perm_access_channels: View Channels
+perm_add_reactions: Add Reactions
+perm_administrator: Administrator
+perm_all: All
+perm_attach_files: Attach Files
+perm_ban_members: Ban Members
+perm_bot_owner: Bot Ownership
+perm_change_nickname: Change Nickname
+perm_create_instant_invite: Create Invite
+perm_create_invite: Create Invite
+perm_deafen_members: Deafen Members
+perm_embed_links: Embed Links
+perm_kick_members: Kick Members
+perm_manage_channels: Manage Channels
+perm_manage_emojis: Manage Emojis
+perm_manage_guild: Manage Server
+perm_manage_messages: Manage Messages
+perm_manage_nicknames: Manage Nicknames
+perm_manage_roles: Manage Roles
+perm_manage_webhooks: Manage Webhooks
+perm_mention_everyone: Mention Everyone
+perm_move_members: Move Members
+perm_mute_members: Mute Members
+perm_none: None
+perm_priority_speaker: Priority Speaker
+perm_read_message_history: Read Message History
+perm_require_dm: Direct Message
+perm_send_messages: Send Messages
+perm_send_tts_messages: Send TTS Messages
+perm_speak: Speak
+perm_stream: Stream
+perm_use_external_emojis: Use External Emojis
+perm_use_voice: Connect
+perm_use_voice_detection: Voice Detection
+perm_view_audit_log: View Audit Log
 poll: Poll
 poll_anonymous_error: There is an anonymous poll already active in this channel.
 poll_anonymous_footer: You can also use the {0} command in direct message to vote on this poll.

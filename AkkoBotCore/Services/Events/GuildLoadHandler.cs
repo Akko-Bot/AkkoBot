@@ -27,17 +27,7 @@ namespace AkkoBot.Services.Events
 
         public Task RemoveGuildOnLeaveAsync(DiscordClient client, GuildDeleteEventArgs eventArgs)
         {
-            _dbCache.Guilds.TryRemove(eventArgs.Guild.Id, out _);
-            _dbCache.Gatekeeping.TryRemove(eventArgs.Guild.Id, out _);
-            _dbCache.FilteredWords.TryRemove(eventArgs.Guild.Id, out _);
-            _dbCache.FilteredContent.TryRemove(eventArgs.Guild.Id, out var filters);
-            _dbCache.VoiceRoles.TryRemove(eventArgs.Guild.Id, out var voiceRoles);
-            _dbCache.Polls.TryRemove(eventArgs.Guild.Id, out var polls);
-
-            filters?.Clear();
-            voiceRoles?.Clear();
-            polls?.Clear();
-
+            _dbCache.TryRemoveDbGuild(eventArgs.Guild.Id);
             return Task.CompletedTask;
         }
     }

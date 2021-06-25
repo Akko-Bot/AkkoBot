@@ -5,6 +5,7 @@ alias: Atalho
 alias_error: Nenhum atalho de comando foi encontrado.
 alias_list_title_global: Atalhos de Comando Globais
 alias_list_title_server: Atalhod de Comando do Servidor
+allowed: Permitido
 app_owners: Donos da Aplicação
 arg_alias_add_alias: O atalho de comando.
 arg_alias_add_command: O comando a ser executado quando o atalho for utilizado.
@@ -120,6 +121,7 @@ channel_invalid: Não tenho permissão para enviar mensagens no canal {0}.
 channels: Canais
 chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
 chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
+checkperms_title: Permissões de {0} em {1}
 cmd_addstatus: Adiciona um status à lista de rotação. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ and __Competing__. Forneça uma URL para definir um status do tipo __Streaming__.
 cmd_alias: Agrupa commands para adicionar, remover e listar atalhos de comandos.
 cmd_alias_add: Adiciona um atalho de comando. Se o atalho tiver um espaço, coloque-o dentro de aspas.
@@ -145,6 +147,7 @@ cmd_channelid: Exibe of ID do canal especificado. Forneça nenhum parâmetro par
 cmd_channelinfo: Exibe informações básicas sobre o canal especificado. Forneça nenhum parâmetro para exibir informações sobre o canal atual.
 cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
 cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
+cmd_checkperms: Exibe as permissões de um usuário no canal especificado. Forneça nenhum parâmetro para visualizar suas permissões no canal atual.
 cmd_clearstatus: Remove todos os status do bot.
 cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
 cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
@@ -351,6 +354,7 @@ deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
+denied: Negado
 description: Descrição
 disabled: desativado
 emoji_list_title: Emojis do Servidor
@@ -420,37 +424,10 @@ guild_timeout_reset: Tempo de espera de comandos interativos foi redefinido para
 guild_timezone_changed: O fuso horário desse servidor foi alterado para {0}.
 guild_timezone_error: Esse fuso horário não está disponível. Utilize {0} para exibir a lista de fusos horários disponíveis.
 hackban_title: Usuário Preventivamente Banido
-help_add_reactions: Adicionar Reações
-help_administrator: Administrador
-help_attach_files: Anexar Arquivos
-help_ban_members: Banir Membros
-help_bot_owner: Autoria do Bot
 help_cant_dm: Eu não tenho permissão para Enviar Mensagens e Adicionar Reações no servidor {0}.
-help_change_nickname: Alterar Apelido
 help_cmd_not_found: Comando não encontrado. Utilize {0} e/ou {1} para encontrar o comando que você procura.
-help_create_invite: Criar Convite
-help_deafen_members: Ensurdecer Membros
 help_footer: Utilize {0} para receber ajuda sobre um comando específico.
-help_kick_members: Expulsar Membros
-help_manage_channels: Gerenciar Canais
-help_manage_emojis: Gerenciar Emojis
-help_manage_guild: Gerenciar Servidor
-help_manage_messages: Gerenciar Mensagens
-help_manage_nicknames: Gerenciar Apelidos
-help_manage_roles: Gerenciar Cargos
-help_manage_webhooks: Gerenciar Webhooks
-help_mention_everyone: Mencionar Everyone
-help_move_members: Mover Membros
-help_mute_members: Silenciar Membros
 help_optional: Opcional
-help_priority_speaker: Voz Prioritária
-help_require_dm: Mensagem Direta
-help_send_messages: Enviar Mensagens
-help_speak: Falar
-help_stream: Vídeo
-help_use_external_emojis: Usar Emojis Externos
-help_use_voice: Conectar
-help_view_audit_log: Ver o Registro de Auditoria
 high: Alto
 highest: Máximo
 hours: Horas
@@ -515,6 +492,41 @@ online_since: Online desde
 owner: Dono
 owners: Donos
 pages: Página {0}/{1}
+perm_access_channels: Visualizar Canais
+perm_add_reactions: Adicionar Reações
+perm_administrator: Administrador
+perm_all: Todas
+perm_attach_files: Anexar Arquivos
+perm_ban_members: Banir Membros
+perm_bot_owner: Autoria do Bot
+perm_change_nickname: Alterar Apelido
+perm_create_instant_invite: Criar Convite
+perm_create_invite: Criar Convite
+perm_deafen_members: Ensurdecer Membros
+perm_embed_links: Embed de Links
+perm_kick_members: Expulsar Membros
+perm_manage_channels: Gerenciar Canais
+perm_manage_emojis: Gerenciar Emojis
+perm_manage_guild: Gerenciar Servidor
+perm_manage_messages: Gerenciar Mensagens
+perm_manage_nicknames: Gerenciar Apelidos
+perm_manage_roles: Gerenciar Cargos
+perm_manage_webhooks: Gerenciar Webhooks
+perm_mention_everyone: Mencionar Everyone
+perm_move_members: Mover Membros
+perm_mute_members: Silenciar Membros
+perm_none: Nenhuma
+perm_priority_speaker: Prioridade de Voz
+perm_read_message_history: Visualizar Histórico de Mensagens
+perm_require_dm: Mensagem Direta
+perm_send_messages: Enviar Mensagens
+perm_send_tts_messages: Enviar Mensagens TTS
+perm_speak: Falar
+perm_stream: Vídeo
+perm_use_external_emojis: Usar Emojis Externos
+perm_use_voice: Conectar
+perm_use_voice_detection: Detecção de Voz
+perm_view_audit_log: Visualizar o Registro de Auditoria
 poll: Enquete
 poll_anonymous_error: Já existe uma enquete anônima ativa nesse canal.
 poll_anonymous_footer: Você também pode usar o comando {0} em mensagem direta para votar nessa enquete.

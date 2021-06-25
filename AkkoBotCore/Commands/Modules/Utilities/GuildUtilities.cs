@@ -18,6 +18,9 @@ namespace AkkoBot.Commands.Modules.Utilities
     [RequireGuild]
     public class GuildUtilities : AkkoCommandModule
     {
+        private readonly Permissions _voicePerms = Permissions.UseVoice | Permissions.UseVoiceDetection | Permissions.Speak | Permissions.MuteMembers
+            | Permissions.PrioritySpeaker | Permissions.Stream | Permissions.DeafenMembers | Permissions.MoveMembers;
+
         private readonly UtilitiesService _service;
 
         public GuildUtilities(UtilitiesService service)
@@ -32,10 +35,10 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_say")]
         [RequirePermissions(Permissions.ManageMessages)]
         [Priority(1)]
-        public async Task SayAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
+        public async Task SayAsync(CommandContext _, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
         {
             if (string.IsNullOrWhiteSpace(message))    // If command only contains a channel name
-                await context.RespondAsync(channel.Name);
+                await channel.SendMessageAsync(channel.Name);
             else if (_service.DeserializeEmbed(message, out var parsedMessage)) // If command contains an embed in yaml format
                 await channel.SendMessageAsync(parsedMessage);
             else    // If command is just plain text
@@ -181,6 +184,55 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("reactclear"), HiddenOverload]
         public async Task ClearReactionsAsync(CommandContext context, ulong messageId)
             => await GetMessageAndExecuteAsync(context, messageId, (message) => ClearReactionsAsync(context, message));
+
+        [Command("checkperms")]
+        [Description("cmd_checkperms")]
+        public async Task CheckUserPermsAsync(
+            CommandContext context,
+            [Description("arg_discord_channel")] DiscordChannel channel = null,
+            [Description("arg_discord_user")] DiscordMember user = null)
+        {
+            channel ??= context.Channel;
+            user ??= context.Member;
+
+            var allPerms = Enum.GetValues<Permissions>()
+                .Where(x => x is not Permissions.All and not Permissions.None and not Permissions.ViewAuditLog and not Permissions.Administrator)
+                .Where((channel.Type is ChannelType.Voice) ? x => x.HasOneFlag(_voicePerms) : x => !x.HasOneFlag(_voicePerms) || x is Permissions.MuteMembers);
+
+            var allowedPerms = string.Join(
+                "\n",
+                allPerms
+                    .Where(x => user.PermissionsIn(channel).HasFlag(x))
+                    .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
+                    .OrderBy(x => x)
+            );
+
+            var deniedPerms = string.Join(
+                "\n",
+                allPerms
+                    .Where(x => !user.PermissionsIn(channel).HasFlag(x))
+                    .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
+                    .OrderBy(x => x)
+            );
+
+            if (string.IsNullOrWhiteSpace(allowedPerms))
+                allowedPerms = AkkoConstants.ValidWhitespace;
+
+            if (string.IsNullOrWhiteSpace(deniedPerms))
+                deniedPerms = AkkoConstants.ValidWhitespace;
+
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle(context.FormatLocalized("checkperms_title", user.GetFullname(), channel.Name))
+                .AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true)
+                .AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("checkperms"), HiddenOverload]
+        public async Task CheckUserPermsAsync(CommandContext context, DiscordMember user = null)
+            => await CheckUserPermsAsync(context, null, user);
 
         /// <summary>
         /// Safely gets a Discord message with the specified ID in the context channel and executes a follow-up method with it.
