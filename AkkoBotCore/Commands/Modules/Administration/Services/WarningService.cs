@@ -46,7 +46,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(context.Guild.Id);
-            var dbOccurrence = await db.Occurrences.AsNoTracking()
+            var dbOccurrence = await db.Occurrences
                 .FirstOrDefaultAsyncEF(x => x.UserId == user.Id && x.GuildIdFK == context.Guild.Id);
 
             // Make sure the guild has warning punishments set up
@@ -143,7 +143,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             var punishments = await db.WarnPunishments
-                .Fetch(x => x.GuildIdFK == server.Id)
+                .Where(x => x.GuildIdFK == server.Id)
                 .ToArrayAsyncEF();
 
             return punishments;
@@ -238,7 +238,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (id.HasValue)
             {
                 var timerId = await db.Warnings
-                    .Fetch(x => x.Id == id.Value)
+                    .Where(x => x.Id == id.Value)
                     .Select(x => x.TimerIdFK)
                     .FirstOrDefaultAsyncEF();
 
@@ -327,7 +327,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            return await db.Occurrences.AsNoTracking()
+            return await db.Occurrences
                 .FirstOrDefaultAsyncEF(x => x.GuildIdFK == server.Id && x.UserId == user.Id) ?? new();
         }
 
@@ -365,7 +365,6 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             var updates = 0;
 
             var timers = await db.Timers
-                .AsNoTracking()
                 .Include(x => x.WarnRel)
                 .Where(x => x.GuildIdFK == dbGuild.GuildId && x.Type == TimerType.TimedWarn)
                 .Select(x => new TimerEntity(x) { WarnRel = new() { DateAdded = x.WarnRel.DateAdded } })

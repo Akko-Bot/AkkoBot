@@ -181,7 +181,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            return await db.Blacklist.Fetch(predicate)
+            return await db.Blacklist
+                .Where(predicate)
                 .Select(selector)
                 .ToArrayAsync();
         }

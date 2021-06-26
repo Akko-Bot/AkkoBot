@@ -109,7 +109,6 @@ namespace AkkoBot.Services.Timers
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers
-                .AsNoTracking()
                 .Select(x => new TimerEntity() { Id = x.Id, RoleId = x.RoleId })
                 .FirstOrDefaultAsyncEF(x => x.Id == entryId);
 
@@ -137,7 +136,6 @@ namespace AkkoBot.Services.Timers
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers
-                .AsNoTracking()
                 .Select(x => new TimerEntity() { Id = x.Id, RoleId = x.RoleId })
                 .FirstOrDefaultAsyncEF(x => x.Id == entryId);
 
@@ -165,7 +163,7 @@ namespace AkkoBot.Services.Timers
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var warnings = await db.Warnings
-                .Fetch(x => x.GuildIdFK == server.Id && x.UserIdFK == userId)
+                .Where(x => x.GuildIdFK == server.Id && x.UserIdFK == userId)
                 .Select(x => new WarnEntity() { Id = x.Id, DateAdded = x.DateAdded })
                 .ToListAsyncEF();
 
@@ -236,7 +234,6 @@ namespace AkkoBot.Services.Timers
 
             var cmdHandler = client.GetCommandsNext();
             var dbCmd = await db.AutoCommands
-                .AsNoTracking()
                 .FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
 
             try
@@ -287,7 +284,7 @@ namespace AkkoBot.Services.Timers
             _dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache);
             var cmdHandler = client.GetCommandsNext();
             var dbRepeater = repeaterCache?.FirstOrDefault(x => x.TimerIdFK == entryId)
-                ?? await db.Repeaters.AsNoTracking().FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
+                ?? await db.Repeaters.FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
 
             try
             {

@@ -3,6 +3,7 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
+using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -178,16 +179,19 @@ namespace AkkoBot.Services.Timers
         private async Task UpdateDailyTimerAsync(IAkkoTimer oldTimer, DiscordClient client)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            var dbTimer = await db.Timers.FindAsync(oldTimer.Id);
+            var dbTimer = await db.Timers.FirstOrDefaultAsyncEF(x => x.Id == oldTimer.Id);
 
             // Update database
             if (dbTimer is not null)
             {
-                dbTimer.Interval = TimeSpan.FromDays(1);
-                dbTimer.ElapseAt = dbTimer.ElapseAt.Add(dbTimer.Interval);
-                db.Update(dbTimer);
-
-                await db.SaveChangesAsync();
+                await db.Timers.UpdateAsync(
+                    x => x.Id == dbTimer.Id,
+                    y => new TimerEntity()
+                    {
+                        Interval = TimeSpan.FromDays(1),
+                        ElapseAt = y.ElapseAt + TimeSpan.FromDays(1)
+                    }
+                );
 
                 AddOrUpdateByEntity(client, dbTimer);
             }

@@ -25,7 +25,7 @@ namespace AkkoBot.Services.Database.Queries
         public static EntityEntry Upsert(this DbSet<AliasEntity> table, AliasEntity newEntry)
         {
             var oldEntry = table.Local.FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Alias == newEntry.Alias)
-                ?? table.AsNoTracking().FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Alias == newEntry.Alias);
+                ?? table.FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Alias == newEntry.Alias);
 
             if (oldEntry is null)
                 return table.Add(newEntry);

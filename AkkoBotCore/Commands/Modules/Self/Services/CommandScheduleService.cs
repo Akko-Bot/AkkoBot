@@ -3,7 +3,6 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -163,7 +162,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            return await db.AutoCommands.Fetch(x => x.AuthorId == user.Id)
+            return await db.AutoCommands
+                .Where(x => x.AuthorId == user.Id)
                 .Select(selector)
                 .ToArrayAsync();
         }

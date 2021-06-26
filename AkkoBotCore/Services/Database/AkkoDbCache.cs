@@ -55,13 +55,12 @@ namespace AkkoBot.Services.Database
             BotConfig = botConfig;
             LogConfig = logConfig;
             Users = dbContext.DiscordUsers.ToConcurrentDictionary(x => x.UserId);
-            Blacklist = dbContext.Blacklist.AsNoTracking().Select(x => x.ContextId).ToConcurrentHashSet();
-            PlayingStatuses = dbContext.PlayingStatuses.Fetch(x => x.RotationTime != TimeSpan.Zero).ToList();
+            Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
+            PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
 
             // The properties below can either be global or specific to a guild
-            CooldownCommands = cmdCooldown.LoadFromEntities(dbContext.CommandCooldown.Fetch());
+            CooldownCommands = cmdCooldown.LoadFromEntities(dbContext.CommandCooldown.ToArray());
             Aliases = dbContext.Aliases
-                .AsNoTracking()
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
@@ -83,7 +82,6 @@ namespace AkkoBot.Services.Database
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             dbGuild = await db.GuildConfig
-                .AsNoTracking()
                 .IncludeCacheable()
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
 
@@ -133,9 +131,9 @@ namespace AkkoBot.Services.Database
         {
             Guilds.TryRemove(sid, out var dbGuild);
             Gatekeeping.TryRemove(sid, out _);
-           
+
             FilteredWords.TryRemove(sid, out _);
-           
+
             FilteredContent.TryRemove(sid, out _);
             VoiceRoles.TryRemove(sid, out var filters);
             Repeaters.TryRemove(sid, out var voiceRoles);

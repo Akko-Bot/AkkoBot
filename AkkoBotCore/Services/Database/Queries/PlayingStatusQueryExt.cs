@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Database.Queries
         public static EntityEntry Upsert(this DbSet<PlayingStatusEntity> table, PlayingStatusEntity newEntry)
         {
             var oldEntry = table.Local.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero)
-                ?? table.AsNoTracking().FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
+                ?? table.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
 
             if (oldEntry is null)
                 return table.Add(newEntry);

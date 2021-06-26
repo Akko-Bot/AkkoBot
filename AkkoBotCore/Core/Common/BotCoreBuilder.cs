@@ -23,7 +23,6 @@ using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -258,28 +257,23 @@ namespace AkkoBot.Core.Common
             dbContext.Database.Migrate();
 
             // Register the database context
-            _cmdServices.AddDbContextPool<AkkoDbContext>(options =>
+            return WithDbContext<AkkoDbContext>(options =>
                 options.UseSnakeCaseNamingConvention()
                     .UseNpgsql(GetDefaultConnectionString())
                     .UseLoggerFactory(_loggerFactory)
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             );
-
-            return this;
         }
 
         /// <summary>
         /// Adds an EF Core <see cref="DbContext"/> as a service to this <see cref="BotCore"/>.
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="DbContext"/>.</typeparam>
-        /// <param name="connectionString">The connection string for the database.</param>
+        /// <param name="optionsAction">The options for the database connection.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithDbContext<T>(string connectionString) where T : DbContext
+        public BotCoreBuilder WithDbContext<T>(Action<DbContextOptionsBuilder> optionsAction) where T : DbContext
         {
-            _cmdServices.AddDbContextPool<T>(options =>
-                options.UseSnakeCaseNamingConvention()
-                    .UseNpgsql(connectionString)
-            );
-
+            _cmdServices.AddDbContextPool<T>(optionsAction);
             return this;
         }
 

@@ -85,7 +85,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         public async Task<bool> RemoveStatusesAsync(Expression<Func<PlayingStatusEntity, bool>> predicate)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            var entries = await db.Fetch(predicate)
+            var entries = await db.PlayingStatuses
+                .Where(predicate)
                 .Select(x => x.Id)
                 .ToArrayAsyncEF();
 
@@ -148,7 +149,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
                 _rotationTimer.Elapsed -= async (x, y) => await SetNextStatusAsync();
                 _rotationTimer.Stop();
 
-                var staticStatus = await db.PlayingStatuses.AsNoTracking()
+                var staticStatus = await db.PlayingStatuses
                     .FirstOrDefaultAsyncEF(x => x.RotationTime == TimeSpan.Zero);
 
                 if (staticStatus is not null)

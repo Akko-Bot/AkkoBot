@@ -3,7 +3,6 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -137,7 +136,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             return await db.Reminders
-                .Fetch(x => x.AuthorId == user.Id)
+                .Where(x => x.AuthorId == user.Id)
                 .OrderBy(x => x.ElapseAt)
                 .Select(selector)
                 .ToArrayAsync();

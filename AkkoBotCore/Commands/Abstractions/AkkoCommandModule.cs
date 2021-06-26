@@ -3,7 +3,6 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -66,7 +65,7 @@ namespace AkkoBot.Commands.Abstractions
 
             // Add these users to the cache
             var insertedEntries = await db.DiscordUsers
-                .Fetch(x => mentionedUsers.Select(y => y.Id).Contains(x.UserId))
+                .Where(x => mentionedUsers.Select(y => y.Id).Contains(x.UserId))
                 .ToArrayAsyncEF();
 
             foreach (var dbUser in insertedEntries)

@@ -25,7 +25,7 @@ namespace AkkoBot.Services.Database.Queries
         public static EntityEntry Upsert(this DbSet<WarnPunishEntity> table, WarnPunishEntity newEntry)
         {
             var oldEntry = table.Local.FirstOrDefault(x => x.GuildIdFK == newEntry.GuildIdFK && x.WarnAmount == newEntry.WarnAmount)
-                ?? table.AsNoTracking().FirstOrDefault(x => x.GuildIdFK == newEntry.GuildIdFK && x.WarnAmount == newEntry.WarnAmount);
+                ?? table.FirstOrDefault(x => x.GuildIdFK == newEntry.GuildIdFK && x.WarnAmount == newEntry.WarnAmount);
 
             if (oldEntry is null)
                 return table.Add(newEntry);

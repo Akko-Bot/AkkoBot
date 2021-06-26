@@ -4,6 +4,7 @@ using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -15,8 +16,8 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     /// </summary>
     public class GatekeepingService : ICommandService
     {
-        public readonly IServiceScopeFactory _scopeFactory;
-        public readonly IDbCache _dbCache;
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IDbCache _dbCache;
 
         public GatekeepingService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
         {
@@ -36,9 +37,12 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
             _dbCache.Gatekeeping.TryGetValue(server.Id, out var gatekeeper);
 
-            gatekeeper ??= new GatekeepEntity() { GuildIdFK = server.Id };
+            gatekeeper ??= await db.Gatekeeping.FirstOrDefaultAsyncEF(x => x.GuildIdFK == server.Id)
+                ?? new() { GuildIdFK = server.Id };
             var result = selector(gatekeeper);
 
+            // This will update the whole GuildConfig tree, not just gatekeeping.
+            // Optimize this once LinqToDB supports "WithOutput" for PostgreSQL
             db.Update(gatekeeper);
             await db.SaveChangesAsync();
 

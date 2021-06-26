@@ -107,7 +107,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             var dbRepeater = repeaterCache.FirstOrDefault(x => x.Id == id)
                 ?? await db.Repeaters
-                    .Fetch(x => x.Id == id)
+                    .Where(x => x.Id == id)
                     .Select(x => new RepeaterEntity() { Id = x.Id, TimerIdFK = x.TimerIdFK, TimerRel = new() { Id = x.TimerIdFK } })
                     .FirstOrDefaultAsyncEF();
 
@@ -169,8 +169,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbTimer = (timer?.Id is null) ? await db.Timers.Fetch(x => x.Id == dbRepeater.TimerIdFK).FirstOrDefaultAsyncEF() : null;
-            var dbUser = (user is null) ? await db.DiscordUsers.Fetch(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsyncEF() : null;
+            var dbTimer = (timer?.Id is null) ? await db.Timers.Where(x => x.Id == dbRepeater.TimerIdFK).FirstOrDefaultAsyncEF() : null;
+            var dbUser = (user is null) ? await db.DiscordUsers.Where(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsyncEF() : null;
 
             return (dbTimer, dbUser);
         }

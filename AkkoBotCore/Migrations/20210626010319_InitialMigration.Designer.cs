@@ -11,15 +11,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    [Migration("20210430144307_LogTimestamp")]
-    partial class LogTimestamp
+    [Migration("20210626010319_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.5")
+                .HasAnnotation("ProductVersion", "5.0.7")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.AliasEntity", b =>
@@ -62,10 +62,64 @@ namespace AkkoBot.Migrations
                     b.HasKey("Id")
                         .HasName("pk_aliases");
 
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_aliases_id");
+
                     b.ToTable("aliases");
 
                     b
                         .HasComment("Stores command aliases.");
+                });
+
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.AutoCommandEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<decimal>("AuthorId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("author_id");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("channel_id");
+
+                    b.Property<string>("CommandString")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("command_string");
+
+                    b.Property<DateTimeOffset>("DateAdded")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_added");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
+
+                    b.Property<int?>("TimerIdFK")
+                        .HasColumnType("integer")
+                        .HasColumnName("timer_id_fk");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_auto_commands");
+
+                    b.HasIndex("TimerIdFK")
+                        .IsUnique()
+                        .HasDatabaseName("ix_auto_commands_timer_id_fk");
+
+                    b.ToTable("auto_commands");
+
+                    b
+                        .HasComment("Stores command data and the context it should be automatically sent to.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.BlacklistEntity", b =>
@@ -110,92 +164,6 @@ namespace AkkoBot.Migrations
                         .HasComment("Stores users, channels, and servers blacklisted from the bot.");
                 });
 
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.BotConfigEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("BotPrefix")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)")
-                        .HasColumnName("bot_prefix");
-
-                    b.Property<bool>("CaseSensitiveCommands")
-                        .HasColumnType("boolean")
-                        .HasColumnName("case_sensitive_commands");
-
-                    b.Property<DateTimeOffset>("DateAdded")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_added");
-
-                    b.Property<List<string>>("DisabledCommands")
-                        .HasColumnType("text[]")
-                        .HasColumnName("disabled_commands");
-
-                    b.Property<bool>("EnableHelp")
-                        .HasColumnType("boolean")
-                        .HasColumnName("enable_help");
-
-                    b.Property<string>("ErrorColor")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)")
-                        .HasColumnName("error_color");
-
-                    b.Property<TimeSpan?>("InteractiveTimeout")
-                        .IsRequired()
-                        .HasColumnType("interval")
-                        .HasColumnName("interactive_timeout");
-
-                    b.Property<string>("Locale")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("locale");
-
-                    b.Property<bool>("MentionPrefix")
-                        .HasColumnType("boolean")
-                        .HasColumnName("mention_prefix");
-
-                    b.Property<int>("MessageSizeCache")
-                        .HasColumnType("integer")
-                        .HasColumnName("message_size_cache");
-
-                    b.Property<TimeSpan>("MinWarnExpire")
-                        .HasColumnType("interval")
-                        .HasColumnName("min_warn_expire");
-
-                    b.Property<string>("OkColor")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)")
-                        .HasColumnName("ok_color");
-
-                    b.Property<bool>("RespondToDms")
-                        .HasColumnType("boolean")
-                        .HasColumnName("respond_to_dms");
-
-                    b.Property<bool>("RotateStatus")
-                        .HasColumnType("boolean")
-                        .HasColumnName("rotate_status");
-
-                    b.Property<bool>("UseEmbed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("use_embed");
-
-                    b.HasKey("Id")
-                        .HasName("pk_bot_config");
-
-                    b.ToTable("bot_config");
-
-                    b
-                        .HasComment("Stores settings related to the bot.");
-                });
-
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.CommandCooldownEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -232,56 +200,6 @@ namespace AkkoBot.Migrations
 
                     b
                         .HasComment("Stores commands whose execution is restricted by a cooldown.");
-                });
-
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.CommandEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<decimal>("AuthorId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("author_id");
-
-                    b.Property<decimal>("ChannelId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("channel_id");
-
-                    b.Property<string>("CommandString")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("command_string");
-
-                    b.Property<DateTimeOffset>("DateAdded")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_added");
-
-                    b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id");
-
-                    b.Property<int?>("TimerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("timer_id");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.HasKey("Id")
-                        .HasName("pk_auto_commands");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_auto_commands_id");
-
-                    b.ToTable("auto_commands");
-
-                    b
-                        .HasComment("Stores command data and the context it should be sent to.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.DiscordUserEntity", b =>
@@ -321,7 +239,7 @@ namespace AkkoBot.Migrations
                     b.ToTable("discord_users");
 
                     b
-                        .HasComment("Stores data and settings related to individual Discord users.");
+                        .HasComment("Stores data related to individual Discord users.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.FilteredContentEntity", b =>
@@ -347,6 +265,10 @@ namespace AkkoBot.Migrations
                     b.Property<bool>("IsAttachmentOnly")
                         .HasColumnType("boolean")
                         .HasColumnName("is_attachment_only");
+
+                    b.Property<bool>("IsCommandOnly")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_command_only");
 
                     b.Property<bool>("IsImageOnly")
                         .HasColumnType("boolean")
@@ -384,9 +306,9 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
 
-                    b.Property<bool>("Enabled")
+                    b.Property<bool>("FilterInvites")
                         .HasColumnType("boolean")
-                        .HasColumnName("enabled");
+                        .HasColumnName("filter_invites");
 
                     b.Property<bool>("FilterStickers")
                         .HasColumnType("boolean")
@@ -399,6 +321,10 @@ namespace AkkoBot.Migrations
                     b.Property<List<long>>("IgnoredIds")
                         .HasColumnType("bigint[]")
                         .HasColumnName("ignored_ids");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("NotificationMessage")
                         .HasMaxLength(2000)
@@ -430,6 +356,74 @@ namespace AkkoBot.Migrations
                         .HasComment("Stores filtered words of a Discord server.");
                 });
 
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.GatekeepEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("CustomSanitizedName")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("custom_sanitized_name");
+
+                    b.Property<DateTimeOffset>("DateAdded")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_added");
+
+                    b.Property<decimal?>("FarewellChannelId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("farewell_channel_id");
+
+                    b.Property<TimeSpan>("FarewellDeleteTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("farewell_delete_time");
+
+                    b.Property<string>("FarewellMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("farewell_message");
+
+                    b.Property<decimal?>("GreetChannelId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("greet_channel_id");
+
+                    b.Property<TimeSpan>("GreetDeleteTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("greet_delete_time");
+
+                    b.Property<bool>("GreetDm")
+                        .HasColumnType("boolean")
+                        .HasColumnName("greet_dm");
+
+                    b.Property<string>("GreetMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("greet_message");
+
+                    b.Property<decimal>("GuildIdFK")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id_fk");
+
+                    b.Property<bool>("SanitizeNames")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sanitize_names");
+
+                    b.HasKey("Id")
+                        .HasName("pk_gatekeeping");
+
+                    b.HasIndex("GuildIdFK")
+                        .IsUnique()
+                        .HasDatabaseName("ix_gatekeeping_guild_id_fk");
+
+                    b.ToTable("gatekeeping");
+
+                    b
+                        .HasComment("Stores settings and data related to gatekeeping.");
+                });
+
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.GuildConfigEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -437,6 +431,11 @@ namespace AkkoBot.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("BanTemplate")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("ban_template");
 
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
@@ -455,6 +454,10 @@ namespace AkkoBot.Migrations
                     b.Property<TimeSpan?>("InteractiveTimeout")
                         .HasColumnType("interval")
                         .HasColumnName("interactive_timeout");
+
+                    b.Property<List<long>>("JoinRoles")
+                        .HasColumnType("bigint[]")
+                        .HasColumnName("join_roles");
 
                     b.Property<string>("Locale")
                         .IsRequired()
@@ -483,8 +486,8 @@ namespace AkkoBot.Migrations
                         .HasColumnName("prefix");
 
                     b.Property<string>("Timezone")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
                         .HasColumnName("timezone");
 
                     b.Property<bool>("UseEmbed")
@@ -504,56 +507,7 @@ namespace AkkoBot.Migrations
                     b.ToTable("guild_config");
 
                     b
-                        .HasComment("Stores settings related to individual Discord servers.");
-                });
-
-            modelBuilder.Entity("AkkoBot.Services.Database.Entities.LogConfigEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTimeOffset>("DateAdded")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_added");
-
-                    b.Property<bool>("IsLoggedToFile")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_logged_to_file");
-
-                    b.Property<string>("LogFormat")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("log_format");
-
-                    b.Property<int>("LogLevel")
-                        .HasColumnType("integer")
-                        .HasColumnName("log_level");
-
-                    b.Property<double>("LogSizeMB")
-                        .HasColumnType("double precision")
-                        .HasColumnName("log_size_mb");
-
-                    b.Property<string>("LogTimeFormat")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar")
-                        .HasColumnName("log_time_format");
-
-                    b.Property<string>("LogTimeStamp")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar")
-                        .HasColumnName("log_time_stamp");
-
-                    b.HasKey("Id")
-                        .HasName("pk_log_config");
-
-                    b.ToTable("log_config");
-
-                    b
-                        .HasComment("Stores data and settings related to how the bot logs command usage.");
+                        .HasComment("Stores settings and data related to a Discord server.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.MutedUserEntity", b =>
@@ -641,7 +595,7 @@ namespace AkkoBot.Migrations
                     b.ToTable("occurrences");
 
                     b
-                        .HasComment("Stores how many times a user got punished in a server.");
+                        .HasComment("Stores the amount of infractions commited by a user in a server.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.PlayingStatusEntity", b =>
@@ -667,8 +621,8 @@ namespace AkkoBot.Migrations
                         .HasColumnName("rotation_time");
 
                     b.Property<string>("StreamUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
                         .HasColumnName("stream_url");
 
                     b.Property<int>("Type")
@@ -677,6 +631,9 @@ namespace AkkoBot.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_playing_statuses");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_playing_statuses_id");
 
                     b.ToTable("playing_statuses");
 
@@ -739,7 +696,7 @@ namespace AkkoBot.Migrations
                     b.ToTable("polls");
 
                     b
-                        .HasComment("Stores data related to guild polls.");
+                        .HasComment("Stores data related to a server poll.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.ReminderEntity", b =>
@@ -780,20 +737,75 @@ namespace AkkoBot.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_private");
 
-                    b.Property<int>("TimerId")
+                    b.Property<int>("TimerIdFK")
                         .HasColumnType("integer")
-                        .HasColumnName("timer_id");
+                        .HasColumnName("timer_id_fk");
 
                     b.HasKey("Id")
                         .HasName("pk_reminders");
 
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_reminders_id");
+                    b.HasIndex("TimerIdFK")
+                        .IsUnique()
+                        .HasDatabaseName("ix_reminders_timer_id_fk");
 
                     b.ToTable("reminders");
 
                     b
                         .HasComment("Stores reminder data and the context it should be sent to.");
+                });
+
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.RepeaterEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<decimal>("AuthorId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("author_id");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("channel_id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTimeOffset>("DateAdded")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_added");
+
+                    b.Property<decimal>("GuildIdFK")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id_fk");
+
+                    b.Property<TimeSpan>("Interval")
+                        .HasColumnType("interval")
+                        .HasColumnName("interval");
+
+                    b.Property<int>("TimerIdFK")
+                        .HasColumnType("integer")
+                        .HasColumnName("timer_id_fk");
+
+                    b.HasKey("Id")
+                        .HasName("pk_repeaters");
+
+                    b.HasIndex("GuildIdFK")
+                        .HasDatabaseName("ix_repeaters_guild_id_fk");
+
+                    b.HasIndex("TimerIdFK")
+                        .IsUnique()
+                        .HasDatabaseName("ix_repeaters_timer_id_fk");
+
+                    b.ToTable("repeaters");
+
+                    b
+                        .HasComment("Stores repeater data and the context it should be sent to.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.TimerEntity", b =>
@@ -816,17 +828,17 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("elapse_at");
 
-                    b.Property<decimal?>("GuildId")
+                    b.Property<decimal?>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id");
+                        .HasColumnName("guild_id_fk");
 
                     b.Property<TimeSpan>("Interval")
                         .HasColumnType("interval")
                         .HasColumnName("interval");
 
-                    b.Property<bool>("IsAbsolute")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_absolute");
+                        .HasColumnName("is_active");
 
                     b.Property<bool>("IsRepeatable")
                         .HasColumnType("boolean")
@@ -836,24 +848,34 @@ namespace AkkoBot.Migrations
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("role_id");
 
+                    b.Property<TimeSpan?>("TimeOfDay")
+                        .HasColumnType("interval")
+                        .HasColumnName("time_of_day");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("type");
 
-                    b.Property<decimal?>("UserId")
+                    b.Property<decimal>("UserIdFK")
                         .HasColumnType("numeric(20,0)")
-                        .HasColumnName("user_id");
+                        .HasColumnName("user_id_fk");
 
                     b.HasKey("Id")
                         .HasName("pk_timers");
 
+                    b.HasIndex("GuildIdFK")
+                        .HasDatabaseName("ix_timers_guild_id_fk");
+
                     b.HasIndex("Id")
                         .HasDatabaseName("ix_timers_id");
+
+                    b.HasIndex("UserIdFK")
+                        .HasDatabaseName("ix_timers_user_id_fk");
 
                     b.ToTable("timers");
 
                     b
-                        .HasComment("Stores actions that need to be performed at some point in the future.");
+                        .HasComment("Stores a timer that executes actions at some point in the future.");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.VoiceRoleEntity", b =>
@@ -912,13 +934,17 @@ namespace AkkoBot.Migrations
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("guild_id_fk");
 
+                    b.Property<int?>("TimerIdFK")
+                        .HasColumnType("integer")
+                        .HasColumnName("timer_id_fk");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("type");
 
-                    b.Property<decimal>("UserId")
+                    b.Property<decimal>("UserIdFK")
                         .HasColumnType("numeric(20,0)")
-                        .HasColumnName("user_id");
+                        .HasColumnName("user_id_fk");
 
                     b.Property<string>("WarningText")
                         .HasMaxLength(2000)
@@ -930,6 +956,13 @@ namespace AkkoBot.Migrations
 
                     b.HasIndex("GuildIdFK")
                         .HasDatabaseName("ix_warnings_guild_id_fk");
+
+                    b.HasIndex("TimerIdFK")
+                        .IsUnique()
+                        .HasDatabaseName("ix_warnings_timer_id_fk");
+
+                    b.HasIndex("UserIdFK")
+                        .HasDatabaseName("ix_warnings_user_id_fk");
 
                     b.ToTable("warnings");
 
@@ -981,6 +1014,17 @@ namespace AkkoBot.Migrations
                         .HasComment("Stores punishments to be automatically applied once a user reaches a certain amount of warnings.");
                 });
 
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.AutoCommandEntity", b =>
+                {
+                    b.HasOne("AkkoBot.Services.Database.Entities.TimerEntity", "TimerRel")
+                        .WithOne()
+                        .HasForeignKey("AkkoBot.Services.Database.Entities.AutoCommandEntity", "TimerIdFK")
+                        .HasConstraintName("fk_auto_commands_timers_timer_rel_id")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("TimerRel");
+                });
+
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.FilteredContentEntity", b =>
                 {
                     b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
@@ -1000,6 +1044,19 @@ namespace AkkoBot.Migrations
                         .WithOne("FilteredWordsRel")
                         .HasForeignKey("AkkoBot.Services.Database.Entities.FilteredWordsEntity", "GuildIdFK")
                         .HasConstraintName("fk_filtered_words_guild_config_guild_config_rel_id")
+                        .HasPrincipalKey("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GuildConfigRel");
+                });
+
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.GatekeepEntity", b =>
+                {
+                    b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
+                        .WithOne("GatekeepRel")
+                        .HasForeignKey("AkkoBot.Services.Database.Entities.GatekeepEntity", "GuildIdFK")
+                        .HasConstraintName("fk_gatekeeping_guild_config_guild_config_rel_id")
                         .HasPrincipalKey("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1046,6 +1103,62 @@ namespace AkkoBot.Migrations
                     b.Navigation("GuildConfigRel");
                 });
 
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.ReminderEntity", b =>
+                {
+                    b.HasOne("AkkoBot.Services.Database.Entities.TimerEntity", "TimerRel")
+                        .WithOne()
+                        .HasForeignKey("AkkoBot.Services.Database.Entities.ReminderEntity", "TimerIdFK")
+                        .HasConstraintName("fk_reminders_timers_timer_rel_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TimerRel");
+                });
+
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.RepeaterEntity", b =>
+                {
+                    b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
+                        .WithMany("RepeaterRel")
+                        .HasForeignKey("GuildIdFK")
+                        .HasConstraintName("fk_repeaters_guild_config_guild_config_rel_id")
+                        .HasPrincipalKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AkkoBot.Services.Database.Entities.TimerEntity", "TimerRel")
+                        .WithOne()
+                        .HasForeignKey("AkkoBot.Services.Database.Entities.RepeaterEntity", "TimerIdFK")
+                        .HasConstraintName("fk_repeaters_timers_timer_rel_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GuildConfigRel");
+
+                    b.Navigation("TimerRel");
+                });
+
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.TimerEntity", b =>
+                {
+                    b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
+                        .WithMany("TimerRel")
+                        .HasForeignKey("GuildIdFK")
+                        .HasConstraintName("fk_timers_guild_config_guild_config_rel_id")
+                        .HasPrincipalKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AkkoBot.Services.Database.Entities.DiscordUserEntity", "UserRel")
+                        .WithMany("TimerRel")
+                        .HasForeignKey("UserIdFK")
+                        .HasConstraintName("fk_timers_discord_users_user_rel_id")
+                        .HasPrincipalKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GuildConfigRel");
+
+                    b.Navigation("UserRel");
+                });
+
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.VoiceRoleEntity", b =>
                 {
                     b.HasOne("AkkoBot.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
@@ -1069,7 +1182,25 @@ namespace AkkoBot.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AkkoBot.Services.Database.Entities.TimerEntity", "TimerRel")
+                        .WithOne("WarnRel")
+                        .HasForeignKey("AkkoBot.Services.Database.Entities.WarnEntity", "TimerIdFK")
+                        .HasConstraintName("fk_warnings_timers_timer_id_fk")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AkkoBot.Services.Database.Entities.DiscordUserEntity", "UserRel")
+                        .WithMany("WarnRel")
+                        .HasForeignKey("UserIdFK")
+                        .HasConstraintName("fk_warnings_discord_users_user_rel_id")
+                        .HasPrincipalKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("GuildConfigRel");
+
+                    b.Navigation("TimerRel");
+
+                    b.Navigation("UserRel");
                 });
 
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.WarnPunishEntity", b =>
@@ -1085,11 +1216,20 @@ namespace AkkoBot.Migrations
                     b.Navigation("GuildConfigRel");
                 });
 
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.DiscordUserEntity", b =>
+                {
+                    b.Navigation("TimerRel");
+
+                    b.Navigation("WarnRel");
+                });
+
             modelBuilder.Entity("AkkoBot.Services.Database.Entities.GuildConfigEntity", b =>
                 {
                     b.Navigation("FilteredContentRel");
 
                     b.Navigation("FilteredWordsRel");
+
+                    b.Navigation("GatekeepRel");
 
                     b.Navigation("MutedUserRel");
 
@@ -1097,10 +1237,19 @@ namespace AkkoBot.Migrations
 
                     b.Navigation("PollRel");
 
+                    b.Navigation("RepeaterRel");
+
+                    b.Navigation("TimerRel");
+
                     b.Navigation("VoiceRolesRel");
 
                     b.Navigation("WarnPunishRel");
 
+                    b.Navigation("WarnRel");
+                });
+
+            modelBuilder.Entity("AkkoBot.Services.Database.Entities.TimerEntity", b =>
+                {
                     b.Navigation("WarnRel");
                 });
 #pragma warning restore 612, 618

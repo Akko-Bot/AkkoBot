@@ -46,7 +46,7 @@ namespace AkkoBot.Services.Events
 
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
-                .Except(db.GuildConfig.AsNoTracking().Select(dbGuild => dbGuild.GuildId))
+                .Except(db.GuildConfig.Select(dbGuild => dbGuild.GuildId))
                 .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
                 .ToArray();
 
@@ -72,7 +72,6 @@ namespace AkkoBot.Services.Events
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbGuilds = await db.GuildConfig
-                .AsNoTracking()
                 .IncludeCacheable()
                 .Where(x => (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId) // Replacement for "(sid >> 22) % max", since EF Core doesn't parse bitwise operators
                 .ToArrayAsyncEF();
@@ -91,7 +90,7 @@ namespace AkkoBot.Services.Events
 
             var cmdHandler = client.GetCommandsNext();
             var startupCmds = await db.AutoCommands
-                .Fetch(x => x.Type == AutoCommandType.Startup && eventArgs.Guilds.Keys.Contains(x.GuildId))
+                .Where(x => x.Type == AutoCommandType.Startup && (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId)
                 .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
                 .ToArrayAsyncEF();
 
@@ -116,7 +115,7 @@ namespace AkkoBot.Services.Events
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var pStatus = await db.PlayingStatuses
-                .Fetch(x => x.RotationTime == TimeSpan.Zero)
+                .Where(x => x.RotationTime == TimeSpan.Zero)
                 .Select(x => new PlayingStatusEntity() { Message = x.Message, Type = x.Type, StreamUrl = x.StreamUrl })
                 .FirstOrDefaultAsyncEF();
 

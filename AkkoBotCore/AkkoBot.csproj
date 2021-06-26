@@ -6,6 +6,7 @@
     <StartupObject>AkkoBot.Program</StartupObject>
     <AssemblyName>AkkoBot</AssemblyName>
     <RootNamespace>AkkoBot</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
