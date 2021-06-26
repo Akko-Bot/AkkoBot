@@ -297,6 +297,21 @@ namespace AkkoBot.Services.Events
             eventArgs.Handled = true;
         }
 
+        public async Task DeleteCommandOnMessageAsync(CommandsNextExtension _, CommandExecutionEventArgs eventArgs)
+        {
+            if (eventArgs.Context.Guild is null)
+                return;
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Context.Guild.Id, out var dbGuild);
+            var isIgnoredContext = IsDelOnCmdIgnoredContext(dbGuild, eventArgs.Context);
+
+            if ((dbGuild.DeleteCmdOnMessage && isIgnoredContext)
+                || (!dbGuild.DeleteCmdOnMessage && !isIgnoredContext))
+                return;
+
+            await eventArgs.Context.Message.DeleteAsync();
+        }
+
         /* Utilities */
 
         /// <summary>
@@ -361,6 +376,18 @@ namespace AkkoBot.Services.Events
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether a command has been executed in a DelMsgOnCmd ignored context.
+        /// </summary>
+        /// <param name="dbGuild">The database guild settings.</param>
+        /// <param name="context">The command context.</param>
+        /// <returns><see langword="true"/> if the command was executed in an ignored context, <see langword="false"/> otherwise.</returns>
+        private bool IsDelOnCmdIgnoredContext(GuildConfigEntity dbGuild, CommandContext context)
+        {
+            return dbGuild.DelCmdBlacklist.Contains((long)context.User.Id) || dbGuild.DelCmdBlacklist.Contains((long)context.Channel.Id)
+                || dbGuild.DelCmdBlacklist.Any(x => context.Member.Roles.Select(x => (long)x.Id).Contains(x));
         }
     }
 }

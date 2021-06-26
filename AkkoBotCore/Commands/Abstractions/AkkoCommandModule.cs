@@ -19,14 +19,21 @@ namespace AkkoBot.Commands.Abstractions
     [IsNotBlacklisted, GlobalCooldown, BaseBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
     public abstract class AkkoCommandModule : BaseCommandModule
     {
-        // Cache users who have interacted with the bot
-        public override async Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            var dbCache = ctx.Services.GetService<IDbCache>();
+        // Executes before command execution
+        public override Task BeforeExecutionAsync(CommandContext ctx)
+            => UpsertUsersInMessageAsync(ctx);
 
-            var mentionedUsers = ctx.Message.MentionedUsers
-                .Concat(await GetUnmentionedUsersAsync(ctx, dbCache))
-                .Append(ctx.User)
+        /// <summary>
+        /// Caches the user who has interacted with the bot and up to 3 users mentioned in the message.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        private async Task UpsertUsersInMessageAsync(CommandContext context)
+        {
+            var dbCache = context.Services.GetService<IDbCache>();
+
+            var mentionedUsers = context.Message.MentionedUsers
+                .Concat(await GetUnmentionedUsersAsync(context, dbCache))
+                .Append(context.User)
                 .Distinct()
                 .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))
                 .ToList();
@@ -34,7 +41,7 @@ namespace AkkoBot.Commands.Abstractions
             if (mentionedUsers.Count is 0)
                 return;
 
-            using var scope = ctx.Services.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = context.Services.GetScopedService<AkkoDbContext>(out var db);
 
             for (var counter = 0; counter < mentionedUsers.Count; counter++)
             {

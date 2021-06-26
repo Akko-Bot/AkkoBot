@@ -85,6 +85,11 @@ namespace AkkoBot.Services.Database.Entities
         public List<long> JoinRoles { get; init; } = new();
 
         /// <summary>
+        /// The context IDs where command messages should not be deleted, regardless of the value set in <see cref="DeleteCmdOnMessage"/>.
+        /// </summary>
+        public List<long> DelCmdBlacklist { get; init; } = new();
+
+        /// <summary>
         /// The ID of the Discord guild these settings are associated with.
         /// </summary>
         public ulong GuildId { get; init; }
@@ -162,6 +167,11 @@ namespace AkkoBot.Services.Database.Entities
         /// or by EveryoneServer permission (<see langword="false"/>).
         /// </summary>
         public bool PermissiveRoleMention { get; set; } = false;
+
+        /// <summary>
+        /// Determines whether command messages should be automatically deleted.
+        /// </summary>
+        public bool DeleteCmdOnMessage { get; set; } = false;
 
         /// <summary>
         /// The ID of the mute role of this guild.

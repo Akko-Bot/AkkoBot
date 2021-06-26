@@ -47,9 +47,10 @@ namespace AkkoBot.Extensions
         public static IEnumerable<string> ToLocalizedStrings(this Permissions permissions, CommandContext context)
         {
             return Enum.GetValues<Permissions>()
-                .Where(x => permissions.HasFlag(x))
+                .Where(x => x is not Permissions.None && permissions.HasFlag(x))
                 .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
-                .OrderBy(x => x);
+                .OrderBy(x => x)
+                .DefaultIfEmpty(context.FormatLocalized("perm_" + Permissions.None.ToString().ToSnakeCase()));
         }
     }
 }

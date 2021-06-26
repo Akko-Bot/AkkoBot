@@ -3,6 +3,7 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
+using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -192,12 +193,13 @@ namespace AkkoBot.Commands.Modules.Administration
                     context.Guild,
                     x =>
                     {
+                        var id = (long)role.Id;
                         var amount = x.JoinRoles.Count;
 
-                        if (x.JoinRoles.Contains((long)role.Id))
-                            x.JoinRoles.Remove((long)role.Id);
+                        if (x.JoinRoles.Contains(id))
+                            x.JoinRoles.Remove(id);
                         else
-                            x.JoinRoles.Add((long)role.Id);
+                            x.JoinRoles.Add(id);
 
                         return amount < x.JoinRoles.Count;
                     }
@@ -210,7 +212,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("joinrole"), HiddenOverload]
-        public async Task AddJoinRoleListAsync(CommandContext context)
+        public async Task ListJoinRolesAsync(CommandContext context)
         {
             var dbGuild = _service.GetGuildSettings(context.Guild);
             var embed = new DiscordEmbedBuilder();
@@ -232,7 +234,7 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);
         }
 
-        [GroupCommand, Command("list")]
+        [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_guild_list")]
         public async Task ListGuildConfigsAsync(CommandContext context)
         {
@@ -244,6 +246,104 @@ namespace AkkoBot.Commands.Modules.Administration
                 .AddField("value", string.Join("\n", settings.Values), true);
 
             await context.RespondLocalizedAsync(embed);
+        }
+
+        [Group("delmsgoncmd"), Aliases("deletemessageoncommand", "deletemsgoncmd")]
+        [Description("cmd_guild_delmsgoncmd")]
+        public class DeleteMessageOnCommand : AkkoCommandModule
+        {
+            private readonly GuildConfigService _service;
+
+            public DeleteMessageOnCommand(GuildConfigService service)
+                => _service = service;
+
+            [Command("ignore")]
+            public async Task AddUserAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user)
+                => await AddIdsAsync(context, user.Id);
+
+            [Command("ignore")]
+            public async Task AddChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+                => await AddIdsAsync(context, channel.Id);
+
+            [Command("ignore")]
+            public async Task AddRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+                => await AddIdsAsync(context, role.Id);
+
+            [Command("ignore")]
+            [Description("cmd_guild_delmsgoncmd_ignore")]
+            public async Task AddIdsAsync(CommandContext context, [Description("arg_fw_ids")] params ulong[] ids)
+            {
+                var result = await _service.SetPropertyAsync(context.Guild, x => UpdateDelCmdBlacklist(x, ids));
+
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription(context.FormatLocalized((result) ? "delmsgoncmd_added_id" : "delmsgoncmd_removed_id", ids.Length));
+
+                await context.RespondLocalizedAsync(embed);
+            }
+
+            [Command("clearignored")]
+            [Description("cmd_guild_delmsgoncmd_clearignored")]
+            public async Task ClearIdsAsync(CommandContext context)
+            {
+                var result = await _service.SetPropertyAsync(context.Guild, x => 
+                {
+                    var amount = x.DelCmdBlacklist.Count;
+                    x.DelCmdBlacklist.Clear();
+
+                    return amount;
+                });
+
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription(context.FormatLocalized((result is not 0) ? "delmsgoncmd_removed_id" : "delmsgoncmd_empty", result));
+
+                await context.RespondLocalizedAsync(embed, isError: result is 0);
+            }
+
+            [Command("listignored"), Aliases("list", "show")]
+            [Description("cmd_guild_delmsgoncmd_listignored")]
+            public async Task ListIgnoredIdsAsync(CommandContext context)
+            {
+                var dbGuild = _service.GetGuildSettings(context.Guild);
+                var idsString = string.Join(", ", dbGuild.DelCmdBlacklist);
+                var embed = new DiscordEmbedBuilder()
+                    .WithTitle("delmsgoncmd_ignored_ids")
+                    .WithDescription(string.IsNullOrWhiteSpace(idsString) ? "delmsgoncmd_empty" : idsString);
+
+                await context.RespondLocalizedAsync(embed, false);
+            }
+
+            [GroupCommand, Command("invert")]
+            [Description("cmd_guild_delmsgoncmd_toggle")]
+            public async Task ToggleDelCmdOnCmdAsync(CommandContext context)
+            {
+                var result = await _service.SetPropertyAsync(context.Guild, x => x.DeleteCmdOnMessage = !x.DeleteCmdOnMessage);
+
+                var embed = new DiscordEmbedBuilder()
+                    .WithDescription((result) ? "delmsgoncmd_enabled" : "delmsgoncmd_disabled");
+
+                await context.RespondLocalizedAsync(embed);
+            }
+
+            /// <summary>
+            /// Updates the list of blacklisted IDs for automatic command message deletion.
+            /// </summary>
+            /// <param name="dbGuild">The guild settings.</param>
+            /// <param name="contextIds">The IDs to be included or removed from the list.</param>
+            /// <returns><see langword="true"/> if the ID list has increased, <see langword="false"/> otherwise.</returns>
+            private bool UpdateDelCmdBlacklist(GuildConfigEntity dbGuild, params ulong[] contextIds)
+            {
+                var amount = dbGuild.DelCmdBlacklist.Count;
+
+                foreach (long id in contextIds)
+                {
+                    if (dbGuild.DelCmdBlacklist.Contains(id))
+                        dbGuild.DelCmdBlacklist.Remove(id);
+                    else
+                        dbGuild.DelCmdBlacklist.Add(id);
+                }
+
+                return amount < dbGuild.DelCmdBlacklist.Count;
+            }
         }
     }
 }

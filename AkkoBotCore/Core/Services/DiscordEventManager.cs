@@ -122,8 +122,9 @@ namespace AkkoBot.Core.Services
 
             foreach (var cmdHandler in _shardedClient.ShardClients.Values.Select(x => x.GetCommandsNext()))
             {
-                // Log command execution
+                // Command handler events
                 cmdHandler.CommandExecuted += _cmdLogHandler.LogCmdExecutionAsync;
+                cmdHandler.CommandExecuted += _guildEventsHandler.DeleteCommandOnMessageAsync;
                 cmdHandler.CommandErrored += _cmdLogHandler.LogCmdErrorAsync;
             }
         }

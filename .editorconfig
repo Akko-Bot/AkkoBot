@@ -268,7 +268,7 @@ dotnet_naming_symbols.async_method.applicable_kinds = method, local_function
 dotnet_naming_symbols.async_method.applicable_accessibilities = *
 dotnet_naming_symbols.async_method.required_modifiers = async
 
-dotnet_naming_symbols.local_variable.applicable_kinds = local
+dotnet_naming_symbols.local_variable.applicable_kinds = parameter, local
 dotnet_naming_symbols.local_variable.applicable_accessibilities = local
 dotnet_naming_symbols.local_variable.required_modifiers = 
 

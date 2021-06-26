@@ -121,6 +121,7 @@ channel_invalid: I have no permission to send messages to the {0} channel.
 channels: Channels
 chatmute_success: User {0} can no longer message on text channels.
 chatunmute_success: User {0} can now message on text channels.
+checkperms_role_title: Permissions for role {0}
 checkperms_title: Permissions for {0} in {1}
 cmd_addstatus: Adds a status to the list of rotating statuses. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status.
 cmd_alias: Groups commands for adding, removing and listing command aliases.
@@ -232,6 +233,11 @@ cmd_greetdel: Sets the time for the automatic deletion of greet messages. Provid
 cmd_greetdm: Toggles whether greet messages should be sent in the server or to the user's direct message. Note that users who disallow direct messages from non-friends won't get the greeting message.
 cmd_greetmessage: Sets the message to be sent when users join the server. Provide no parameter to visualize the current greet message.
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
+cmd_guild_delmsgoncmd: Groups commands for managing automatic command deletion.
+cmd_guild_delmsgoncmd_clearignored: Clears the list of ignored IDs.
+cmd_guild_delmsgoncmd_ignore: Adds users, channels or roles to the list of ignored IDs.
+cmd_guild_delmsgoncmd_listignored: Lists the ignored IDs.
+cmd_guild_delmsgoncmd_toggle: Toggles automatic deletion of command messages.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
 cmd_guild_list: Shows the server's current settings.
@@ -354,6 +360,12 @@ deafen_success: User {0} can no longer hear other users speaking in voice channe
 deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
+delmsgoncmd_added_id: Added {0} IDs to the list of ignored IDs.
+delmsgoncmd_disabled: Automatic deletion of messages has been disabled. Commands will only be deleted if they are executed in a context with an ignored ID.
+delmsgoncmd_empty: There is no ignored ID.
+delmsgoncmd_enabled: Automatic deletion of messages has been enabled. Commands will be deleted by default unless if they are executed in a context with an ignored ID.
+delmsgoncmd_ignored_ids: List of ignored IDs.
+delmsgoncmd_removed_id: Removed {0} IDs from the list of ignored IDs.
 denied: Denied
 description: Description
 disabled: disabled
@@ -641,5 +653,3 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
-
-checkperms_role_title: Permissions for role {0}

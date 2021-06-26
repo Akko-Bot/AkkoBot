@@ -121,6 +121,7 @@ channel_invalid: Não tenho permissão para enviar mensagens no canal {0}.
 channels: Canais
 chatmute_success: Usuário {0} não pode mais escrever em canais de texto.
 chatunmute_success: Usuário {0} pode escrever em canais de texto novamente.
+checkperms_role_title: Permissões para o cargo {0}
 checkperms_title: Permissões de {0} em {1}
 cmd_addstatus: Adiciona um status à lista de rotação. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ and __Competing__. Forneça uma URL para definir um status do tipo __Streaming__.
 cmd_alias: Agrupa commands para adicionar, remover e listar atalhos de comandos.
@@ -232,6 +233,11 @@ cmd_greetdel: Define o tempo para exclusão automática de mensagens de boas-vin
 cmd_greetdm: Define se mensagens de boas-vindas serão enviadas no servidor ou em mensagem direta com o usuário. Note que usuários que tiverem mensagens diretas bloqueadas não receberão a mensagem de boas-vindas.
 cmd_greetmessage: Define a mensagem a ser enviada quando usuários entram no servidor. Forneça nenhum parâmetro para exibir a mensagem de boas-vindas atual.
 cmd_guild: Agrupa configurações que definem como o bot deve se comportar nesse servidor.
+cmd_guild_delmsgoncmd: Agrupa comandos relacionados à exclusão automática de comandos.
+cmd_guild_delmsgoncmd_clearignored: Remove todos os IDs ignorados.
+cmd_guild_delmsgoncmd_ignore: Adiciona usuários, canais ou cargos à lista de IDs ignorados.
+cmd_guild_delmsgoncmd_listignored: Exibe os IDs ignorados.
+cmd_guild_delmsgoncmd_toggle: Ativa ou desativa a exclusão automática de comandos.
 cmd_guild_embed: Ativa ou desativa o uso de embeds nas respostas do bot nesse servidor.
 cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro nesse servidor.
 cmd_guild_list: Exibe as configurações atuais do servidor.
@@ -354,6 +360,12 @@ deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
+delmsgoncmd_added_id: '{0} IDs foram adicionados à lista de IDs ignorados.'
+delmsgoncmd_disabled: A exclusão automática de comandos foi desativada. Comandos serão excluídos somente se forem executados em um context que contenha um ID ignorado.
+delmsgoncmd_empty: Não há IDs ignorados.
+delmsgoncmd_enabled: A exclusão automática de comandos foi ativada. Comandos serão excluídos a não ser que sejam executados em um contexto que contenha um ID ignorado.
+delmsgoncmd_ignored_ids: Lista de IDs ignorados.
+delmsgoncmd_removed_id: '{0} IDs foram removidos da lista de IDs ignorados.'
 denied: Negado
 description: Descrição
 disabled: desativado
@@ -641,5 +653,3 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
-
-checkperms_role_title: Permissões para o cargo {0}

@@ -1,4 +1,5 @@
 ﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
 using System.Threading.Tasks;
 
@@ -13,6 +14,11 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Adds roles to the user when they join a guild.
         /// </summary>
         Task AddJoinRolesAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
+
+        /// <summary>
+        /// Deletes the message that invoked a command.
+        /// </summary>
+        Task DeleteCommandOnMessageAsync(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs);
 
         /// <summary>
         /// Deletes a message that doesn't contain a certain type of content.
