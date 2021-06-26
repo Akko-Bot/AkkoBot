@@ -40,7 +40,7 @@ namespace AkkoBot.Services.Logging
         {
             ILogger logger = (categoryName.EqualsAny(DbLoggerCategory.Database.Command.Name, "LinqToDB"))
                 ? new DebugLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat)   // Log database queries as debug logs
-                : new AkkoLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat);   // Log everything else as normal
+                : new DefaultLogger(_minLogLevel, _fileLogger, _logFormat, _timeFormat);   // Log everything else as normal
 
             _loggers.Add(logger);
             return logger;
