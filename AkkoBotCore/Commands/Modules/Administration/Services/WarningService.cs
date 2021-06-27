@@ -1,7 +1,7 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
@@ -21,13 +21,15 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     public class WarningService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IAkkoCache _akkoCache;
         private readonly IDbCache _dbCache;
         private readonly RoleService _roleService;
         private readonly UserPunishmentService _punishmentService;
 
-        public WarningService(IServiceScopeFactory scopeFactory, IDbCache dbCache, RoleService roleService, UserPunishmentService punishmentService)
+        public WarningService(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache, RoleService roleService, UserPunishmentService punishmentService)
         {
             _scopeFactory = scopeFactory;
+            _akkoCache = akkoCache;
             _dbCache = dbCache;
             _roleService = roleService;
             _punishmentService = punishmentService;
@@ -347,7 +349,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             db.Timers.Add(newTimer);
             await db.SaveChangesAsync();
 
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
+            _akkoCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
             return newTimer;
         }
 
@@ -374,15 +376,15 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             {
                 timer.IsActive = dbGuild.WarnExpire != TimeSpan.Zero;
 
-                if (timer.IsActive)
+                if (!timer.IsActive)
+                    _akkoCache.Timers.TryRemove(timer.Id);
+                else
                 {
                     timer.ElapseAt = timer.WarnRel.DateAdded.Add(dbGuild.WarnExpire);
                     timer.Interval = dbGuild.WarnExpire;
 
-                    _dbCache.Timers.AddOrUpdateByEntity(client, timer);
+                    _akkoCache.Timers.AddOrUpdateByEntity(client, timer);
                 }
-                else
-                    _dbCache.Timers.TryRemove(timer.Id);
 
                 updates += await db.Timers.UpdateAsync(
                     x => x.Id == timer.Id,

@@ -1,4 +1,4 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Services.Caching.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.DependencyInjection;

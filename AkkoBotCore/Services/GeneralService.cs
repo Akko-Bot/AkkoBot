@@ -1,7 +1,8 @@
-﻿using AkkoBot.Common;
+﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -62,7 +63,7 @@ namespace AkkoBot.Services
         public static CultureInfo GetCultureInfo(string locale, bool getDefault = false)
         {
             try { return CultureInfo.CreateSpecificCulture(locale); }
-            catch { return (getDefault) ? CultureInfo.CreateSpecificCulture(AkkoLocalizer.DefaultLanguage) : null; }
+            catch { return (getDefault) ? CultureInfo.CreateSpecificCulture(AkkoConstants.DefaultLanguage) : null; }
         }
 
         /// <summary>
@@ -234,7 +235,7 @@ namespace AkkoBot.Services
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : dbCache.BotConfig;
+                : context.Services.GetService<BotConfig>();
 
             var responseString = GetLocalizedResponse(localizer, settings.Locale, message);  // Localize the content message, if there is one
             var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);         // Localize the embed message

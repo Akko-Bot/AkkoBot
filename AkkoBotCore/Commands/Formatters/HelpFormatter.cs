@@ -1,6 +1,7 @@
 using AkkoBot.Commands.Attributes;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -178,7 +179,7 @@ namespace AkkoBot.Commands.Formatters
             var dbCache = _cmdContext.Services.GetService<IDbCache>();
             var useEmbed = (dbCache.Guilds.TryGetValue(_cmdContext.Guild?.Id ?? 0, out var dbGuild))
                 ? dbGuild.UseEmbed
-                : dbCache.BotConfig.UseEmbed;
+                : _cmdContext.Services.GetService<BotConfig>().UseEmbed;
 
             if (useEmbed)
             {

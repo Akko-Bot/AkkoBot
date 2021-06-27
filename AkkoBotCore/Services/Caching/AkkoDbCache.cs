@@ -1,12 +1,9 @@
-﻿using AkkoBot.Commands.Abstractions;
-using AkkoBot.Config;
+﻿using AkkoBot.Config;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
-using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
-using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -27,39 +24,27 @@ namespace AkkoBot.Services.Database
 
         public ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; private set; }
         public ConcurrentHashSet<ulong> Blacklist { get; private set; }
-        public BotConfig BotConfig { get; private set; }
-        public LogConfig LogConfig { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
         public ConcurrentDictionary<ulong, GuildConfigEntity> Guilds { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; private set; }
         public ConcurrentDictionary<ulong, FilteredWordsEntity> FilteredWords { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; private set; }
-        public ICommandCooldown CooldownCommands { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<PollEntity>> Polls { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; private set; }
         public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; private set; }
 
-        /* Lazily instantiated */
-
-        public ITimerManager Timers { get; set; }   // ITimerManager has TimerActions, which has IDbCache as a dependency.
-        public ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
-
-        public AkkoDbCache(IServiceScopeFactory scopeFactory, ICommandCooldown cmdCooldown, BotConfig botConfig, LogConfig logConfig)
+        public AkkoDbCache(IServiceScopeFactory scopeFactory)
         {
+            _scopeFactory = scopeFactory;
             using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var dbContext);
 
-            _scopeFactory = scopeFactory;
-
             // The properties below are global
-            BotConfig = botConfig;
-            LogConfig = logConfig;
             Users = dbContext.DiscordUsers.ToConcurrentDictionary(x => x.UserId);
             Blacklist = dbContext.Blacklist.Select(x => x.ContextId).ToConcurrentHashSet();
             PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
 
             // The properties below can either be global or specific to a guild
-            CooldownCommands = cmdCooldown.LoadFromEntities(dbContext.CommandCooldown.ToArray());
             Aliases = dbContext.Aliases
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
@@ -75,19 +60,20 @@ namespace AkkoBot.Services.Database
             Polls = new();
         }
 
-        public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid)
+        public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig botConfig = default)
         {
             if (Guilds.TryGetValue(sid, out var dbGuild))
                 return dbGuild;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+
             dbGuild = await db.GuildConfig
                 .IncludeCacheable()
                 .FirstOrDefaultAsync(x => x.GuildId == sid);
 
             if (dbGuild is null)
             {
-                dbGuild = new GuildConfigEntity(BotConfig) { GuildId = sid };
+                dbGuild = new GuildConfigEntity(botConfig) { GuildId = sid };
                 db.Add(dbGuild);
 
                 await db.SaveChangesAsync();
@@ -161,13 +147,10 @@ namespace AkkoBot.Services.Database
                     Users?.Clear();
                     Blacklist?.Clear();
                     Guilds?.Clear();
-                    Timers?.Dispose();
-                    CooldownCommands?.Dispose();
                     PlayingStatuses?.Clear();
                     PlayingStatuses?.TrimExcess();
                     FilteredWords?.Clear();
                     FilteredContent?.Clear();
-                    DisabledCommandCache?.Clear();
                     Gatekeeping?.Clear();
 
                     if (Aliases is not null)
@@ -204,16 +187,11 @@ namespace AkkoBot.Services.Database
                 }
 
                 Blacklist = null;
-                BotConfig = null;
-                LogConfig = null;
                 Guilds = null;
-                Timers = null;
                 PlayingStatuses = null;
                 Aliases = null;
                 FilteredWords = null;
                 FilteredContent = null;
-                DisabledCommandCache = null;
-                CooldownCommands = null;
                 Polls = null;
                 Repeaters = null;
                 VoiceRoles = null;

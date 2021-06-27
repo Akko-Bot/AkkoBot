@@ -3,7 +3,6 @@ using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -17,15 +16,17 @@ namespace AkkoBot.Commands.Modules.Self.Services
     /// </summary>
     public class BotConfigService : ICommandService
     {
-        private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
         private readonly IConfigLoader _configLoader;
+        private readonly BotConfig _botConfig;
+        private readonly LogConfig _logConfig;
 
-        public BotConfigService(IDbCache dbCache, ILocalizer localizer, IConfigLoader configLoader)
+        public BotConfigService(ILocalizer localizer, IConfigLoader configLoader, BotConfig botConfig, LogConfig logConfig)
         {
-            _dbCache = dbCache;
             _localizer = localizer;
             _configLoader = configLoader;
+            _logConfig = logConfig;
+            _botConfig = botConfig;
         }
 
         /// <summary>
@@ -40,14 +41,14 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// </summary>
         /// <returns>The bot settings.</returns>
         public BotConfig GetConfig()
-            => _dbCache.BotConfig;
+            => _botConfig;
 
         /// <summary>
         /// Gets the bot's log settings.
         /// </summary>
         /// <returns>The log settings.</returns>
         public LogConfig GetLogConfig()
-            => _dbCache.LogConfig;
+            => _logConfig;
 
         /// <summary>
         /// Reloads the response strings from the original files.
@@ -66,8 +67,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The targeted property.</returns>
         public T GetOrSetProperty<T>(Func<BotConfig, T> selector)
         {
-            var result = selector(_dbCache.BotConfig);
-            _configLoader.SaveConfig(_dbCache.BotConfig, AkkoEnvironment.BotConfigPath);
+            var result = selector(_botConfig);
+            _configLoader.SaveConfig(_botConfig, AkkoEnvironment.BotConfigPath);
 
             return result;
         }
@@ -79,8 +80,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>The targeted property.</returns>
         public T GetOrSetProperty<T>(Func<LogConfig, T> selector)
         {
-            var result = selector(_dbCache.LogConfig);
-            _configLoader.SaveConfig(_dbCache.LogConfig, AkkoEnvironment.LogConfigPath);
+            var result = selector(_logConfig);
+            _configLoader.SaveConfig(_logConfig, AkkoEnvironment.LogConfigPath);
 
             return result;
         }
@@ -91,9 +92,9 @@ namespace AkkoBot.Commands.Modules.Self.Services
         /// <returns>A collection of setting name/value pairs.</returns>
         public IReadOnlyDictionary<string, string> GetConfigs()
         {
-            var settings = new Dictionary<string, string>(_dbCache.BotConfig.GetSettings());
+            var settings = new Dictionary<string, string>(_botConfig.GetSettings());
 
-            foreach (var propPair in _dbCache.LogConfig.GetSettings())
+            foreach (var propPair in _logConfig.GetSettings())
                 settings.TryAdd(propPair.Key, propPair.Value);
 
             return settings;

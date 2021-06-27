@@ -5,8 +5,9 @@ using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Core.Services;
 using AkkoBot.Core.Services.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Events;
 using AkkoBot.Services.Events.Abstractions;
 using AkkoBot.Services.Events.Common;
@@ -335,8 +336,9 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton(_botConfig),
                 ServiceDescriptor.Singleton(_logConfig),
 
-                // > Database
+                // > Caching
                 ServiceDescriptor.Singleton<IDbCache, AkkoDbCache>(),
+                ServiceDescriptor.Singleton<IAkkoCache, AkkoCache>(),
 
                 // > Localization
                 ServiceDescriptor.Singleton<ILocalizer, AkkoLocalizer>(),

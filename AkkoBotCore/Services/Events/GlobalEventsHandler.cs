@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Commands.Common;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
@@ -19,11 +20,13 @@ namespace AkkoBot.Services.Events
     {
         private readonly IGuildEventsHandler _guildEventsHandler;
         private readonly IDbCache _dbCache;
+        private readonly BotConfig _botConfig;
 
-        public GlobalEventsHandler(IGuildEventsHandler guildEventsHandler, IDbCache dbCache)
+        public GlobalEventsHandler(IGuildEventsHandler guildEventsHandler, IDbCache dbCache, BotConfig botconfig)
         {
             _guildEventsHandler = guildEventsHandler;
             _dbCache = dbCache;
+            _botConfig = botconfig;
         }
 
         public async Task BlockBlacklistedAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
@@ -46,7 +49,7 @@ namespace AkkoBot.Services.Events
 
             var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
                     ? dbGuild.Prefix
-                    : _dbCache.BotConfig.BotPrefix;
+                    : _botConfig.BotPrefix;
 
             if (eventArgs.Guild is not null && prefix.Equals("!", StringComparison.Ordinal))
                 return;
@@ -76,7 +79,7 @@ namespace AkkoBot.Services.Events
 
             // Get the context prefix
             var prefix = (eventArgs.Guild is null)
-                ? _dbCache.BotConfig.BotPrefix
+                ? _botConfig.BotPrefix
                 : _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
             // Get a string that parses its placeholders automatically

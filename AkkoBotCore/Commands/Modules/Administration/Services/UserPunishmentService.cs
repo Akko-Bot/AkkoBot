@@ -2,8 +2,8 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
@@ -21,12 +21,14 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     public class UserPunishmentService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IAkkoCache _akkoCache;
         private readonly IDbCache _dbCache;
         private readonly UtilitiesService _utilitiesService;
 
-        public UserPunishmentService(IServiceScopeFactory scopeFactory, IDbCache dbCache, UtilitiesService utilitiesService)
+        public UserPunishmentService(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache, UtilitiesService utilitiesService)
         {
             _scopeFactory = scopeFactory;
+            _akkoCache = akkoCache;
             _dbCache = dbCache;
             _utilitiesService = utilitiesService;
         }
@@ -286,7 +288,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, dbTimer);
+            _akkoCache.Timers.AddOrUpdateByEntity(context.Client, dbTimer);
         }
 
         /// <summary>
@@ -351,7 +353,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             await db.SaveChangesAsync();
 
             // Add the timer to the cache
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, dbTimer);
+            _akkoCache.Timers.AddOrUpdateByEntity(context.Client, dbTimer);
         }
     }
 }

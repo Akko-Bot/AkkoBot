@@ -1,6 +1,6 @@
 using System;
 
-namespace AkkoBot.Services.Database.Abstractions
+namespace AkkoBot.Commands.Abstractions
 {
     /// <summary>
     /// Contains information about how a message should be sent.

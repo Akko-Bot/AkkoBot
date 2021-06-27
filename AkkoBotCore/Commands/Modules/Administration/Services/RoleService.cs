@@ -1,7 +1,7 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
@@ -22,6 +22,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
     public class RoleService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IAkkoCache _akkoCache;
         private readonly IDbCache _dbCache;
 
         /// <summary>
@@ -39,9 +40,10 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// </summary>
         public const Permissions MutePermsAllow = Permissions.AccessChannels;
 
-        public RoleService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+        public RoleService(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache)
         {
             _scopeFactory = scopeFactory;
+            _akkoCache = akkoCache;
             _dbCache = dbCache;
         }
 
@@ -181,7 +183,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 db.Timers.Upsert(timerEntry);
                 await db.SaveChangesAsync();
 
-                _dbCache.Timers.AddOrUpdateByEntity(context.Client, timerEntry);
+                _akkoCache.Timers.AddOrUpdateByEntity(context.Client, timerEntry);
                 return true;
             }
 
@@ -216,7 +218,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             if (timerId is not default(int))
             {
                 await db.Timers.DeleteAsync(x => x.Id == timerId);
-                _dbCache.Timers.TryRemove(timerId);
+                _akkoCache.Timers.TryRemove(timerId);
             }
         }
 

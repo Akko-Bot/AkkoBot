@@ -1,15 +1,12 @@
-using AkkoBot.Commands.Abstractions;
 using AkkoBot.Config;
 using AkkoBot.Services.Database.Entities;
-using AkkoBot.Services.Timers.Abstractions;
 using ConcurrentCollections;
-using DSharpPlus.CommandsNext;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AkkoBot.Services.Database.Abstractions
+namespace AkkoBot.Services.Caching.Abstractions
 {
     /// <summary>
     /// Represents a default database cache for an <see cref="AkkoDbContext"/>.
@@ -25,16 +22,6 @@ namespace AkkoBot.Services.Database.Abstractions
         /// Contains all blacklisted IDs (guilds, channels and users).
         /// </summary>
         ConcurrentHashSet<ulong> Blacklist { get; }
-
-        /// <summary>
-        /// Contains settings that define how the bot should behave globally.
-        /// </summary>
-        BotConfig BotConfig { get; }
-
-        /// <summary>
-        /// Contains settings that define how logging should be handled.
-        /// </summary>
-        LogConfig LogConfig { get; }
 
         /// <summary>
         /// Contains the settings of all Discord guilds currently visible to the bot.
@@ -72,26 +59,6 @@ namespace AkkoBot.Services.Database.Abstractions
         ConcurrentDictionary<ulong, ConcurrentHashSet<FilteredContentEntity>> FilteredContent { get; }
 
         /// <summary>
-        /// Manages creation, execution and removal of <see cref="IAkkoTimer"/>s.
-        /// </summary>
-        /// <remarks>This property is lazily initialized on startup.</remarks>
-        ITimerManager Timers { get; set; }
-
-        /// <summary>
-        /// Contains commands that have been globally disabled.
-        /// </summary>
-        /// <remarks>
-        /// The <see langword="string"/> is the command's qualified name.
-        /// This property is lazily initialized on startup.
-        /// </remarks>
-        ConcurrentDictionary<string, Command> DisabledCommandCache { get; set; }
-
-        /// <summary>
-        /// Manages command cooldown.
-        /// </summary>
-        ICommandCooldown CooldownCommands { get; }
-
-        /// <summary>
         /// Contains all active polls.
         /// </summary>
         /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of polls of the guild.</remarks>
@@ -122,16 +89,17 @@ namespace AkkoBot.Services.Database.Abstractions
         /// Safely gets a database guild.
         /// </summary>
         /// <param name="sid">The GuildId of the database entry.</param>
+        /// <param name="botConfig">The default bot configurations.</param>
         /// <remarks>If the entry doesn't exist, it creates one.</remarks>
         /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
-        ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid);
+        ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig botConfig = default);
 
         /// <summary>
         /// Adds a database guild and pertinent navigation properties to the cache.
         /// </summary>
         /// <param name="dbGuild">The database entry.</param>
         /// <returns><see langword="true"/> if the database guild was successfully cached, <see langword="false"/> otherwise.</returns>
-        public bool TryAddDbGuild(GuildConfigEntity dbGuild);
+        bool TryAddDbGuild(GuildConfigEntity dbGuild);
 
         /// <summary>
         /// Removes a database guild and pertinent navigation properties from the cache.

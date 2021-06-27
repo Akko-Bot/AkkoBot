@@ -1,9 +1,9 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Models;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -19,12 +19,12 @@ namespace AkkoBot.Commands.Modules.Utilities
     [Description("cmd_poll")]
     public class Poll : AkkoCommandModule
     {
-        private readonly IDbCache _dbCache;
+        private readonly BotConfig _botConfig;
         private readonly PollService _service;
 
-        public Poll(IDbCache dbCache, PollService service)
+        public Poll(BotConfig botConfig, PollService service)
         {
-            _dbCache = dbCache;
+            _botConfig = botConfig;
             _service = service;
         }
 
@@ -226,7 +226,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 .WithDescription(Formatter.Bold(qAnswers[0]) + "\n\n" + string.Join("\n", answers));
 
             if (pollType is PollType.Anonymous)
-                embed.WithFooter(context.FormatLocalized("poll_anonymous_footer", $@"""{_dbCache.BotConfig.BotPrefix}poll vote"""));
+                embed.WithFooter(context.FormatLocalized("poll_anonymous_footer", $@"""{_botConfig.BotPrefix}poll vote"""));
 
             var pollMsg = await context.RespondLocalizedAsync(embed, false);
             await _service.AddPollAsync(pollMsg, qAnswers[0], pollType, answers);

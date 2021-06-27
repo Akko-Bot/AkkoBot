@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -22,12 +22,12 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     public class ReminderService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IDbCache _dbCache;
+        private readonly IAkkoCache _akkoCache;
 
-        public ReminderService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+        public ReminderService(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache)
         {
             _scopeFactory = scopeFactory;
-            _dbCache = dbCache;
+            _akkoCache = akkoCache;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             db.Add(newReminder);
             await db.SaveChangesAsync();
 
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
+            _akkoCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
 
             return true;
         }
@@ -109,7 +109,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             db.Remove(dbReminder);
             db.Remove(dbReminder.TimerRel);
 
-            _dbCache.Timers.TryRemove(dbReminder.TimerIdFK);
+            _akkoCache.Timers.TryRemove(dbReminder.TimerIdFK);
 
             return await db.SaveChangesAsync() is not 0;
         }

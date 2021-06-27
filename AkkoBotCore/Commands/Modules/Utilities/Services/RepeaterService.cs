@@ -1,8 +1,8 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
@@ -24,11 +24,13 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
     public class RepeaterService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IAkkoCache _akkoCache;
         private readonly IDbCache _dbCache;
 
-        public RepeaterService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+        public RepeaterService(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache)
         {
             _scopeFactory = scopeFactory;
+            _akkoCache = akkoCache;
             _dbCache = dbCache;
         }
 
@@ -88,7 +90,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             // Cache the repeater and create its timer
             _dbCache.Repeaters.TryAdd(context.Guild.Id, new());
             _dbCache.Repeaters[context.Guild.Id].Add(newRepeater);
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
+            _akkoCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
 
             return true;
         }
@@ -118,7 +120,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             // Remove from the cache after removing from the database,
             // so daily repeaters don't get re-added to the cache
             _dbCache.Repeaters[server.Id].TryRemove(dbRepeater);
-            _dbCache.Timers.TryRemove(dbRepeater.TimerIdFK);
+            _akkoCache.Timers.TryRemove(dbRepeater.TimerIdFK);
 
             return result;
         }
@@ -150,7 +152,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
             repeaterCache.Clear();
 
             foreach (var dbRepeater in dbRepeaters)
-                _dbCache.Timers.TryRemove(dbRepeater.TimerIdFK);
+                _akkoCache.Timers.TryRemove(dbRepeater.TimerIdFK);
 
             return result is not 0;
         }

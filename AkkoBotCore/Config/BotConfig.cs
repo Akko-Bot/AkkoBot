@@ -1,7 +1,6 @@
-﻿using AkkoBot.Common;
+﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Localization;
 using ConcurrentCollections;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace AkkoBot.Config
     /// </summary>
     public class BotConfig : Settings, IMessageSettings
     {
-        private string _locale = AkkoLocalizer.DefaultLanguage;
+        private string _locale = AkkoConstants.DefaultLanguage;
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
         private TimeSpan _bulkGatekeepingTime = TimeSpan.FromSeconds(5);
@@ -28,7 +27,7 @@ namespace AkkoBot.Config
         /// <summary>
         /// The default bot locale.
         /// </summary>
-        [YamlMember(Description = @"The default bot locale. Defaults to """ + AkkoLocalizer.DefaultLanguage + @""".")]
+        [YamlMember(Description = @"The default bot locale. Defaults to """ + AkkoConstants.DefaultLanguage + @""".")]
         public string Locale
         {
             get => _locale;

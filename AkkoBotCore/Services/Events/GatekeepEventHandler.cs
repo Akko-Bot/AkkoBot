@@ -1,7 +1,8 @@
 ﻿using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus;
@@ -25,13 +26,16 @@ namespace AkkoBot.Services.Events
         private readonly IDbCache _dbCache;
         private readonly IMemberAggregator _greetAggregator;
         private readonly IMemberAggregator _farewellAggregator;
+        private readonly BotConfig _botConfig;
         private readonly UtilitiesService _utilitiesService;
 
-        public GatekeepEventHandler(IDbCache dbCache, IMemberAggregator greetAggregator, IMemberAggregator farewellAggregator, UtilitiesService utilitiesService)
+        public GatekeepEventHandler(IDbCache dbCache, IMemberAggregator greetAggregator, IMemberAggregator farewellAggregator,
+            BotConfig botConfig, UtilitiesService utilitiesService)
         {
             _dbCache = dbCache;
             _greetAggregator = greetAggregator;
             _farewellAggregator = farewellAggregator;
+            _botConfig = botConfig;
             _utilitiesService = utilitiesService;
         }
 
@@ -51,7 +55,7 @@ namespace AkkoBot.Services.Events
 
         public async Task SanitizeNameOnJoinAsync(DiscordClient _, GuildMemberAddEventArgs eventArgs)
         {
-            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id, _botConfig);
 
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper) || !gatekeeper.SanitizeNames
                 || (!char.IsPunctuation(eventArgs.Member.DisplayName[0]) && !char.IsSymbol(eventArgs.Member.DisplayName[0]))
@@ -101,7 +105,7 @@ namespace AkkoBot.Services.Events
 
             _ = SendGatekeepMessageAsync(
                 fakeContext, eventArgs.Member, channel, gatekeeper.GreetDeleteTime,
-                _dbCache.BotConfig.BulkGatekeepTime, _greetAggregator, _waitingGreets, gatekeeper.GreetMessage
+                _botConfig.BulkGatekeepTime, _greetAggregator, _waitingGreets, gatekeeper.GreetMessage
             );
 
             return Task.CompletedTask;
@@ -123,7 +127,7 @@ namespace AkkoBot.Services.Events
 
             _ = SendGatekeepMessageAsync(
                 fakeContext, eventArgs.Member, channel, gatekeeper.FarewellDeleteTime,
-                _dbCache.BotConfig.BulkGatekeepTime, _farewellAggregator, _waitingFarewells, gatekeeper.FarewellMessage
+                _botConfig.BulkGatekeepTime, _farewellAggregator, _waitingFarewells, gatekeeper.FarewellMessage
             );
 
             return Task.CompletedTask;

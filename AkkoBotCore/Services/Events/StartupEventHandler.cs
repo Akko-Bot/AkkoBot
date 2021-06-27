@@ -1,7 +1,9 @@
 using AkkoBot.Commands.Modules.Self.Services;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
@@ -25,13 +27,17 @@ namespace AkkoBot.Services.Events
     internal class StartupEventHandler : IStartupEventHandler
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IAkkoCache _akkoCache;
         private readonly IDbCache _dbCache;
+        private readonly BotConfig _botConfig;
         private readonly StatusService _statusService;
 
-        public StartupEventHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, StatusService statusService)
+        public StartupEventHandler(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache, BotConfig botConfig, StatusService statusService)
         {
             _scopeFactory = scopeFactory;
+            _akkoCache = akkoCache;
             _dbCache = dbCache;
+            _botConfig = botConfig;
             _statusService = statusService;
         }
 
@@ -42,12 +48,10 @@ namespace AkkoBot.Services.Events
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            var botConfig = _dbCache.BotConfig;
-
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
                 .Except(db.GuildConfig.Select(dbGuild => dbGuild.GuildId))
-                .Select(key => new GuildConfigEntity(botConfig) { GuildId = key })
+                .Select(key => new GuildConfigEntity(_botConfig) { GuildId = key })
                 .ToArray();
 
             if (newGuilds.Length is not 0)
@@ -59,10 +63,14 @@ namespace AkkoBot.Services.Events
 
         public Task InitializeTimersAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            var cmdHandler = client.GetCommandsNext();
-            _dbCache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
+            if (_akkoCache is AkkoCache cache)
+            {
+                var cmdHandler = client.GetCommandsNext();
+                cache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
+                return cache.Timers.CreateClientTimersAsync(client);
+            }
 
-            return _dbCache.Timers.CreateClientTimersAsync(client);
+            return Task.CompletedTask;
         }
 
         // Filters need to be cached even if the server has no activity, because they could be disabled but
@@ -121,9 +129,9 @@ namespace AkkoBot.Services.Events
 
             if (pStatus is not null)
                 await client.UpdateStatusAsync(pStatus.Activity);
-            else if (_dbCache.BotConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
+            else if (_botConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
             {
-                _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;
+                _botConfig.RotateStatus = !_botConfig.RotateStatus;
                 await _statusService.RotateStatusesAsync();
             }
         }
@@ -134,7 +142,7 @@ namespace AkkoBot.Services.Events
             var cmdHandler = client.GetCommandsNext();                          // Initialize the command handler
 
             // Unregister the disabled commands from the command handlers
-            foreach (var dbCmd in _dbCache.BotConfig.DisabledCommands)
+            foreach (var dbCmd in _botConfig.DisabledCommands)
             {
                 var cmd = cmdHandler.FindCommand(dbCmd, out _);
 
@@ -149,7 +157,8 @@ namespace AkkoBot.Services.Events
             }
 
             // Set the cache of disabled commands
-            _dbCache.DisabledCommandCache ??= disabledCommands;
+            if (_akkoCache is AkkoCache cache)
+                cache.DisabledCommandCache ??= disabledCommands;
 
             return Task.CompletedTask;
         }

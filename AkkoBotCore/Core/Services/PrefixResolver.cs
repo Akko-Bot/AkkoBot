@@ -1,6 +1,6 @@
 using AkkoBot.Config;
 using AkkoBot.Core.Services.Abstractions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ namespace AkkoBot.Core.Services
             // Server prefix needs to be changed
             return (msg.Channel.IsPrivate)
                 ? msg.GetStringPrefixLength(_botConfig.BotPrefix)
-                : msg.GetStringPrefixLength((await _dbCache.GetDbGuildAsync(msg.Channel.Guild.Id)).Prefix);
+                : msg.GetStringPrefixLength((await _dbCache.GetDbGuildAsync(msg.Channel.Guild.Id, _botConfig)).Prefix);
         }
     }
 }

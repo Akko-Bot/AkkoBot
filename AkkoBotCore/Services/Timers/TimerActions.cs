@@ -1,9 +1,10 @@
 ﻿using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Localization.Abstractions;
@@ -33,15 +34,17 @@ namespace AkkoBot.Services.Timers
         private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
         private readonly ILogger _logger;
+        private readonly BotConfig _botConfig;
         private readonly DiscordShardedClient _shardedClient;
         private readonly UtilitiesService _utilitiesService;
 
-        public TimerActions(IServiceScopeFactory scopeFactory, IDbCache dbCache, ILocalizer localizer, DiscordShardedClient shardedClient, UtilitiesService utilitiesService)
+        public TimerActions(IServiceScopeFactory scopeFactory, IDbCache dbCache, ILocalizer localizer, BotConfig botConfig, DiscordShardedClient shardedClient, UtilitiesService utilitiesService)
         {
             _scopeFactory = scopeFactory;
             _dbCache = dbCache;
             _localizer = localizer;
             _shardedClient = shardedClient;
+            _botConfig = botConfig;
             _logger = shardedClient.Logger;
             _utilitiesService = utilitiesService;
         }
@@ -183,21 +186,25 @@ namespace AkkoBot.Services.Timers
 
             try
             {
-                _dbCache.Guilds.TryGetValue(dbReminder.GuildId ?? default, out var dbGuild);
                 var user = FindMember(dbReminder.AuthorId, server);
 
+                _dbCache.Guilds.TryGetValue(dbReminder.GuildId ?? default, out var dbGuild);
+
+                if (dbGuild is null && dbReminder.GuildId.HasValue)
+                    dbGuild = await _dbCache.GetDbGuildAsync(dbReminder.GuildId.Value);
+
                 var channel = (dbReminder.IsPrivate)
-                        ? await user.CreateDmChannelAsync()
-                        : server.GetChannel(dbReminder.ChannelId);
+                    ? await user.CreateDmChannelAsync()
+                    : server.GetChannel(dbReminder.ChannelId);
 
                 if (server is not null && !HasPermissionTo(server.CurrentMember, channel, Permissions.SendMessages))
                     return;
 
                 var fakeContext = cmdHandler.CreateFakeContext(
                     user,
-                    user.Guild.Channels.Values.FirstOrDefault(), // If channel is private, this throws
+                    channel,
                     dbReminder.Content,
-                    (dbReminder.IsPrivate) ? _dbCache.BotConfig.BotPrefix : dbGuild.Prefix,
+                    (dbReminder.IsPrivate) ? _botConfig.BotPrefix : dbGuild.Prefix,
                     null
                 );
 
@@ -206,7 +213,7 @@ namespace AkkoBot.Services.Timers
                 dmsg ??= new();
 
                 var localizedDate = (server is null)
-                    ? dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(_dbCache.BotConfig.Locale))
+                    ? dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(_botConfig.Locale))
                     : dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(dbGuild.Locale));
 
                 var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
@@ -243,7 +250,7 @@ namespace AkkoBot.Services.Timers
 
                 var fakeContext = cmdHandler.CreateFakeContext(
                     user,
-                    server.GetChannel(dbCmd.ChannelId), // If channel is private, this throws
+                    server.GetChannel(dbCmd.ChannelId),
                     dbCmd.CommandString,
                     (await _dbCache.GetDbGuildAsync(dbCmd.GuildId)).Prefix,
                     cmd,
@@ -276,7 +283,7 @@ namespace AkkoBot.Services.Timers
             if (!_dbCache.Guilds.ContainsKey(server.Id))
             {
                 _dbCache.Repeaters.TryRemove(server.Id, out _);
-                _dbCache.Timers.TryRemove(entryId);
+                scope.ServiceProvider.GetService<ITimerManager>().TryRemove(entryId);
 
                 return;
             }
@@ -322,7 +329,7 @@ namespace AkkoBot.Services.Timers
 
                 await db.Timers.DeleteAsync(x => x.Id == entryId);
 
-                _dbCache.Timers.TryRemove(entryId);
+                scope.ServiceProvider.GetService<ITimerManager>().TryRemove(entryId);
 
                 _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run a repeater. [User: {dbRepeater?.AuthorId}] [Server: {dbRepeater?.GuildIdFK}] [{ex.Message}]");
             }

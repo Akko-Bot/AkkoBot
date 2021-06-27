@@ -1,6 +1,6 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Formatters;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;

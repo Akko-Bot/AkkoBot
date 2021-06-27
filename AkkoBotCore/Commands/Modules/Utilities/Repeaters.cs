@@ -2,7 +2,7 @@
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
@@ -21,12 +21,12 @@ namespace AkkoBot.Commands.Modules.Utilities
     [RequireUserPermissions(Permissions.ManageMessages)]
     public class Repeaters : AkkoCommandModule
     {
-        private readonly IDbCache _dbCache;
+        private readonly IAkkoCache _akkoCache;
         private readonly RepeaterService _service;
 
-        public Repeaters(IDbCache dbCache, RepeaterService service)
+        public Repeaters(IAkkoCache akkoCache, RepeaterService service)
         {
-            _dbCache = dbCache;
+            _akkoCache = akkoCache;
             _service = service;
         }
 
@@ -93,7 +93,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 embed.WithDescription(context.FormatLocalized("repeater_not_found", id));
             else
             {
-                _dbCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer);
+                _akkoCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer);
                 var member = await context.Guild.GetMemberSafelyAsync(repeater.AuthorId);
                 var (dbTimer, dbUser) = await _service.GetRepeaterExtraInfoAsync(timer, repeater, member);
 
@@ -137,7 +137,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 var timers = new List<IAkkoTimer>(repeaters.Count);
 
                 foreach (var repeater in repeaters)
-                    timers.Add((_dbCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer)) ? timer : null);
+                    timers.Add((_akkoCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer)) ? timer : null);
 
                 embed.WithTitle("repeater_list_title")
                     .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, "[...]"))), true)

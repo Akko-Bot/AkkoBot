@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -21,12 +21,12 @@ namespace AkkoBot.Commands.Modules.Self.Services
     public class CommandScheduleService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IDbCache _dbCache;
+        private readonly IAkkoCache _akkoCache;
 
-        public CommandScheduleService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+        public CommandScheduleService(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache)
         {
             _scopeFactory = scopeFactory;
-            _dbCache = dbCache;
+            _akkoCache = akkoCache;
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             };
 
             db.Add(newCmd);
-            _dbCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
+            _akkoCache.Timers.AddOrUpdateByEntity(context.Client, newTimer);
             await db.SaveChangesAsync();
 
             return true;
@@ -135,7 +135,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
             if (dbCmd.TimerRel is not null)
             {
                 db.Remove(dbCmd.TimerRel);
-                _dbCache.Timers.TryRemove(dbCmd.TimerRel.Id);
+                _akkoCache.Timers.TryRemove(dbCmd.TimerRel.Id);
             }
 
             db.Remove(dbCmd);
@@ -182,7 +182,7 @@ namespace AkkoBot.Commands.Modules.Self.Services
 
                 case AutoCommandType.Scheduled:
                 case AutoCommandType.Repeated:
-                    _dbCache.Timers.TryGetValue(dbEntry.TimerIdFK.Value, out var timer);
+                    _akkoCache.Timers.TryGetValue(dbEntry.TimerIdFK.Value, out var timer);
                     return timer.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m");
 
                 default:

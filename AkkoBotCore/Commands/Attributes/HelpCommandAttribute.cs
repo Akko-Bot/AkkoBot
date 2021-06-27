@@ -1,4 +1,4 @@
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Config;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +19,8 @@ namespace AkkoBot.Commands.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var dbCache = context.Services.GetService<IDbCache>();
-            return Task.FromResult(dbCache.BotConfig.EnableHelp);
+            var botConfig = context.Services.GetService<BotConfig>();
+            return Task.FromResult(botConfig.EnableHelp);
         }
     }
 }

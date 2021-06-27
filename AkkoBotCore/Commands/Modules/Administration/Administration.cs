@@ -75,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_guild_prefix")]
         public async Task ChangePrefixAsync(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
         {
-            if (context.Guild is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.ManageGuild))
+            if (context.Guild is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.ManageGuild))
             {
                 await CheckPrefixAsync(context);
                 return;

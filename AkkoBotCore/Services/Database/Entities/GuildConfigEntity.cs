@@ -1,8 +1,8 @@
-﻿using AkkoBot.Common;
+﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
-using AkkoBot.Services.Localization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace AkkoBot.Services.Database.Entities
     public class GuildConfigEntity : DbEntity, IMessageSettings
     {
         private string _prefix = "!";
-        private string _locale = AkkoLocalizer.DefaultLanguage;
+        private string _locale = AkkoConstants.DefaultLanguage;
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
         private string _banTemplate;
@@ -206,6 +206,9 @@ namespace AkkoBot.Services.Database.Entities
 
         public GuildConfigEntity(BotConfig config)
         {
+            if (config is null)
+                return;
+
             Prefix = config.BotPrefix;
             Locale = config.Locale;
             UseEmbed = config.UseEmbed;

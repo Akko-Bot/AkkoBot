@@ -1,4 +1,5 @@
-﻿using AkkoBot.Services.Database.Abstractions;
+﻿using AkkoBot.Config;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
@@ -12,16 +13,20 @@ namespace AkkoBot.Services.Events
     internal class GuildLoadHandler : IGuildLoadHandler
     {
         private readonly IDbCache _dbCache;
+        private readonly BotConfig _botConfig;
 
-        public GuildLoadHandler(IDbCache dbCache)
-            => _dbCache = dbCache;
+        public GuildLoadHandler(IDbCache dbCache, BotConfig botConfig)
+        {
+            _dbCache = dbCache;
+            _botConfig = botConfig;
+        }
 
         public async Task AddGuildOnJoinAsync(DiscordClient client, GuildCreateEventArgs eventArgs)
         {
             if (_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out _))
                 return;
 
-            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id, _botConfig);
             _dbCache.Guilds.AddOrUpdate(dbGuild.GuildId, dbGuild, (_, _) => dbGuild);
         }
 

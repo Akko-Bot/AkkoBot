@@ -36,6 +36,11 @@ namespace AkkoBot.Common
         public const int LinesPerPage = 20;
 
         /// <summary>
+        /// The language the response strings default to when the requested locale does not exist.
+        /// </summary>
+        public const string DefaultLanguage = "en-US";
+
+        /// <summary>
         /// Represents a whitespace character that is not detected as such.
         /// </summary>
         public const string ValidWhitespace = "\u200B";

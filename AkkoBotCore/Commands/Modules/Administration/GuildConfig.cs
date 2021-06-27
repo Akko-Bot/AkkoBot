@@ -285,7 +285,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("cmd_guild_delmsgoncmd_clearignored")]
             public async Task ClearIdsAsync(CommandContext context)
             {
-                var result = await _service.SetPropertyAsync(context.Guild, x => 
+                var result = await _service.SetPropertyAsync(context.Guild, x =>
                 {
                     var amount = x.DelCmdBlacklist.Count;
                     x.DelCmdBlacklist.Clear();

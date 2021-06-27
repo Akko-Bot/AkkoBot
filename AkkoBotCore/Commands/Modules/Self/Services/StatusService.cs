@@ -1,9 +1,10 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Database.Queries;
 using DSharpPlus;
@@ -32,13 +33,15 @@ namespace AkkoBot.Commands.Modules.Self.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
         private readonly IConfigLoader _configLoader;
+        private readonly BotConfig _botConfig;
         private readonly DiscordShardedClient _clients;
 
-        public StatusService(IServiceScopeFactory scopeFactory, IDbCache dbCache, IConfigLoader configLoader, DiscordShardedClient clients)
+        public StatusService(IServiceScopeFactory scopeFactory, IDbCache dbCache, IConfigLoader configLoader, BotConfig botConfig, DiscordShardedClient clients)
         {
             _scopeFactory = scopeFactory;
             _dbCache = dbCache;
             _configLoader = configLoader;
+            _botConfig = botConfig;
             _clients = clients;
         }
 
@@ -122,11 +125,11 @@ namespace AkkoBot.Commands.Modules.Self.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            // Update the database entry
-            _dbCache.BotConfig.RotateStatus = !_dbCache.BotConfig.RotateStatus;
-            _configLoader.SaveConfig(_dbCache.BotConfig, AkkoEnvironment.BotConfigPath);
+            // Update the botconfig
+            _botConfig.RotateStatus = !_botConfig.RotateStatus;
+            _configLoader.SaveConfig(_botConfig, AkkoEnvironment.BotConfigPath);
 
-            if (_dbCache.BotConfig.RotateStatus)
+            if (_botConfig.RotateStatus)
             {
                 // Start rotation
                 var firstStatus = _dbCache.PlayingStatuses.FirstOrDefault();

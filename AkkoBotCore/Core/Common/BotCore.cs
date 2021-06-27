@@ -1,8 +1,8 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
 using AkkoBot.Services;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
-using AkkoBot.Services.Database.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Logging.Abstractions;
@@ -71,6 +71,7 @@ namespace AkkoBot.Core.Common
             CommandExt[0].Services.GetService<ILocalizer>()?.Dispose();
             CommandExt[0].Services.GetService<ILoggerFactory>()?.Dispose();
             CommandExt[0].Services.GetService<IAkkoLoggerProvider>()?.Dispose();
+            CommandExt[0].Services.GetService<IAkkoCache>()?.Dispose();
             CommandExt[0].Services.GetService<IDbCache>()?.Dispose();
             CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
             CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();

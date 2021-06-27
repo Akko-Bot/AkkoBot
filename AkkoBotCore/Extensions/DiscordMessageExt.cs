@@ -1,6 +1,8 @@
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Services;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -44,7 +46,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : dbCache.BotConfig;
+                : context.Services.GetService<BotConfig>();
 
             // Reset the embed's current color
             if (isError)

@@ -16,11 +16,6 @@ namespace AkkoBot.Services.Localization
     public class AkkoLocalizer : ILocalizer
     {
         /// <summary>
-        /// The language the response strings default to when the requested locale does not exist.
-        /// </summary>
-        public const string DefaultLanguage = "en-US";
-
-        /// <summary>
         /// The cache of response strings. First key is the locale. Second key is the response
         /// string's key. The value is the response string itself.
         /// </summary>
@@ -49,7 +44,7 @@ namespace AkkoBot.Services.Localization
         public bool ContainsResponse(string locale, string response)
             => _localizedStrings.ContainsKey(locale)
                 && (_localizedStrings[locale].ContainsKey(response)
-                || _localizedStrings[DefaultLanguage].ContainsKey(response));
+                || _localizedStrings[AkkoConstants.DefaultLanguage].ContainsKey(response));
 
         public void ReloadLocalizedStrings()
         {
@@ -74,19 +69,19 @@ namespace AkkoBot.Services.Localization
                 return string.Empty;
 
             if (!_localizedStrings.ContainsKey(locale))
-                locale = DefaultLanguage;
+                locale = AkkoConstants.DefaultLanguage;
 
-            if (_localizedStrings[locale].ContainsKey(response) || _localizedStrings[DefaultLanguage].ContainsKey(response))
+            if (_localizedStrings[locale].ContainsKey(response) || _localizedStrings[AkkoConstants.DefaultLanguage].ContainsKey(response))
             {
                 return (_localizedStrings[locale].TryGetValue(response, out _))
                     ? _localizedStrings[locale][response]
-                    : _localizedStrings[DefaultLanguage][response];
+                    : _localizedStrings[AkkoConstants.DefaultLanguage][response];
             }
             else
             {
                 return (_localizedStrings[locale].TryGetValue("error_not_found", out _))
                     ? _localizedStrings[locale]["error_not_found"]
-                    : _localizedStrings[DefaultLanguage]["error_not_found"];
+                    : _localizedStrings[AkkoConstants.DefaultLanguage]["error_not_found"];
             }
         }
 

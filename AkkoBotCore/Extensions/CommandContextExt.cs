@@ -1,7 +1,9 @@
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Models;
 using AkkoBot.Services;
-using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -49,8 +51,9 @@ namespace AkkoBot.Extensions
             var dbCache = context.Services.GetService<IDbCache>();
 
             // Get the timeout
-            dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild);
-            var timeout = dbGuild?.InteractiveTimeout ?? dbCache.BotConfig.InteractiveTimeout;
+            var timeout = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+                ? dbGuild.InteractiveTimeout
+                : context.Services.GetService<BotConfig>().InteractiveTimeout;
 
             // Send the question
             var question = await context.RespondLocalizedAsync(message, embed, isMarked, isError);
@@ -178,7 +181,7 @@ namespace AkkoBot.Extensions
 
             var locale = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild.Locale
-                : dbCache.BotConfig.Locale;
+                : context.Services.GetService<BotConfig>().Locale;
 
             for (var index = 0; index < args.Length; index++)
             {
@@ -221,7 +224,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : dbCache.BotConfig;
+                : context.Services.GetService<BotConfig>();
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPages(input, embed, maxLength, content)
@@ -292,7 +295,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : dbCache.BotConfig;
+                : context.Services.GetService<BotConfig>();
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPagesByFields(embed, maxFields, message)
@@ -332,7 +335,7 @@ namespace AkkoBot.Extensions
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : dbCache.BotConfig;
+                : context.Services.GetService<BotConfig>();
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPagesByFields(embed, fields, maxFields, message)
@@ -388,7 +391,7 @@ namespace AkkoBot.Extensions
         public static string GetLocaleKey(this CommandContext context)
         {
             return (context.Guild is null)
-                ? context.Services.GetService<IDbCache>().BotConfig.BotPrefix
+                ? context.Services.GetService<BotConfig>().BotPrefix
                 : context.Services.GetService<IDbCache>().Guilds[context.Guild.Id].Prefix;
         }
 
