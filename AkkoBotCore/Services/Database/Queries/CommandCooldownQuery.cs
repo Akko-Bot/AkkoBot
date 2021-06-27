@@ -25,7 +25,7 @@ namespace AkkoBot.Services.Database.Queries
         public static EntityEntry Upsert(this DbSet<CommandCooldownEntity> table, CommandCooldownEntity newEntry)
         {
             var oldEntry = table.Local.FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Command == newEntry.Command)
-                ?? table.FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Command == newEntry.Command);
+                ?? table.AsNoTracking().FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Command == newEntry.Command);
 
             if (oldEntry is null)
                 return table.Add(newEntry);

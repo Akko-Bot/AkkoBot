@@ -182,19 +182,22 @@ namespace AkkoBot.Services.Timers
             var dbTimer = await db.Timers.FirstOrDefaultAsyncEF(x => x.Id == oldTimer.Id);
 
             // Update database
-            if (dbTimer is not null)
-            {
-                await db.Timers.UpdateAsync(
-                    x => x.Id == dbTimer.Id,
-                    y => new TimerEntity()
-                    {
-                        Interval = TimeSpan.FromDays(1),
-                        ElapseAt = y.ElapseAt + TimeSpan.FromDays(1)
-                    }
-                );
+            if (dbTimer is null)
+                return;
 
-                AddOrUpdateByEntity(client, dbTimer);
-            }
+            await db.Timers.UpdateAsync(
+                x => x.Id == dbTimer.Id,
+                y => new TimerEntity()
+                {
+                    Interval = TimeSpan.FromDays(1),
+                    ElapseAt = y.ElapseAt + TimeSpan.FromDays(1)
+                }
+            );
+
+            dbTimer.Interval = TimeSpan.FromDays(1);
+            dbTimer.ElapseAt += TimeSpan.FromDays(1);
+
+            AddOrUpdateByEntity(client, dbTimer);
         }
 
         /// <summary>

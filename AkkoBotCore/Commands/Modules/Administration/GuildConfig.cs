@@ -183,10 +183,12 @@ namespace AkkoBot.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageRoles)]
         public async Task AddJoinRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
+            var dbGuild = _service.GetGuildSettings(context.Guild);
             var embed = new DiscordEmbedBuilder();
+            var isInvalid = role.IsManaged || (!dbGuild.JoinRoles.Contains((long)role.Id) && dbGuild.JoinRoles.Count >= 3);
 
-            if (role.IsManaged)
-                embed.WithDescription("joinrole_error");
+            if (isInvalid)
+                embed.WithDescription((role.IsManaged) ? "joinrole_error" : "joinrole_limit");
             else
             {
                 var result = await _service.SetPropertyAsync(
@@ -208,7 +210,23 @@ namespace AkkoBot.Commands.Modules.Administration
                 embed.WithDescription(context.FormatLocalized((result) ? "joinrole_added" : "joinrole_removed", Formatter.Bold(role.Name)));
             }
 
-            await context.RespondLocalizedAsync(embed, true, role.IsManaged);
+            await context.RespondLocalizedAsync(embed, true, isInvalid);
+        }
+
+        [Command("joinrole"), HiddenOverload]
+        public async Task AddOrRemoveJoinRoleAsync(CommandContext context, ulong id)
+        {
+            if (context.Guild.Roles.TryGetValue(id, out var role))
+            {
+                await AddJoinRoleAsync(context, role);
+                return;
+            }
+
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.JoinRoles.Remove((long)id));
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription((result) ? "joinrole_removed" : "role_not_found");
+
+            await context.RespondLocalizedAsync(embed, isError: !result);
         }
 
         [Command("joinrole"), HiddenOverload]
@@ -223,12 +241,11 @@ namespace AkkoBot.Commands.Modules.Administration
             else
             {
                 var roles = dbGuild.JoinRoles
-                    .Where(x => context.Guild.Roles.ContainsKey((ulong)x))
-                    .Select(x => context.Guild.GetRole((ulong)x))
-                    .OrderByDescending(x => x.Position);
+                    .Select(x => (Id: x, RoleName: context.Guild.GetRole((ulong)x)?.Name ?? context.FormatLocalized("deleted_role")))
+                    .OrderByDescending(x => x.Id);
 
                 embed.WithTitle("joinrole_list_title")
-                    .WithDescription(string.Join("\n", roles.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} - {Formatter.Bold(x.Name)}")));
+                    .WithDescription(string.Join("\n", roles.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} - {Formatter.Bold(x.RoleName)}")));
             }
 
             await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);

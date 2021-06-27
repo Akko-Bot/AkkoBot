@@ -44,7 +44,7 @@ namespace AkkoBot.Services.Database.Queries
         public static EntityEntry Upsert(this DbSet<DiscordUserEntity> table, DiscordUserEntity newEntry)
         {
             var oldEntry = table.Local.FirstOrDefault(x => x.UserId == newEntry.UserId)
-                ?? table.FirstOrDefault(x => x.UserId == newEntry.UserId);
+                ?? table.AsNoTracking().FirstOrDefault(x => x.UserId == newEntry.UserId);
 
             if (oldEntry is null)
                 return table.Add(newEntry);

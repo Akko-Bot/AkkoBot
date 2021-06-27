@@ -47,7 +47,7 @@ namespace AkkoBot.Services.Database.Queries
         /// <returns>The tracked database entry, <see langword="null"/> if the entry doesn't exist.</returns>
         private static TimerEntity GetTimerEntity(DbSet<TimerEntity> table, TimerEntity referenceEntity)
         {
-            return table.FirstOrDefault(x =>
+            return table.AsNoTracking().FirstOrDefault(x =>
                     x.Type == referenceEntity.Type
                     && x.GuildIdFK == referenceEntity.GuildIdFK
                     && x.UserIdFK == referenceEntity.UserIdFK

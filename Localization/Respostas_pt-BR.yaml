@@ -250,7 +250,7 @@ cmd_guild_timezone: Define o fuso horário desse servidor.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especificado.
-cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
+cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Máximo de 3 cargos por servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
 cmd_kick: Expulsa um usuário do servidor.
 cmd_ldc: Exibe todos os comandos desativados.
 cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
@@ -653,3 +653,5 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
+
+joinrole_limit: O limite de 3 cargos de entrada foi atingido.

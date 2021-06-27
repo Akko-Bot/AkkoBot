@@ -250,7 +250,7 @@ cmd_guild_timezone: Sets this server's time zone.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
 cmd_inrole: Lists all users on this server with the specified role.
-cmd_joinrole: Adds or removes a role to the list of roles that should be automatically assigned to a user when they join the server. Provide no parameter to see the list of join roles.
+cmd_joinrole: Adds or removes a role to the list of roles that should be automatically assigned to a user when they join the server. Maximum of 3 roles per server. Provide no parameter to see the list of join roles.
 cmd_kick: Kicks a user from the server.
 cmd_ldc: Lists all commands that have been disabled globally.
 cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
@@ -653,3 +653,5 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
+
+joinrole_limit: Limit of 3 join roles has been reached.

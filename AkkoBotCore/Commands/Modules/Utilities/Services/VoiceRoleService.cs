@@ -34,11 +34,13 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="server">The Discord guild the role is from.</param>
         /// <param name="channel">The channel to be associated with a role.</param>
         /// <param name="role">The role to be assigned/removed on channel connect/disconnect.</param>
+        /// <remarks>Limited to 3 voice roles per channel.</remarks>
         /// <returns><see langword="true"/> if the role got added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddVoiceRoleAsync(DiscordGuild server, DiscordChannel channel, DiscordRole role)
         {
             if (channel.Type is not ChannelType.Voice
-                || (_dbCache.VoiceRoles.TryGetValue(server.Id, out var voiceRoles)
+                || _dbCache.VoiceRoles.TryGetValue(server.Id, out var voiceRoles)
+                || (voiceRoles?.Count(x => x.GuildIdFk == server.Id && x.ChannelId == channel.Id) >= 3
                 && voiceRoles.Select(x => x.ChannelId).Contains(channel.Id)
                 && voiceRoles.Select(x => x.RoleId).Contains(role.Id)))
                 return false;
