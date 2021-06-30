@@ -12,9 +12,10 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <param name="msg">This string.</param>
         /// <param name="target">The string to compare with.</param>
+        /// <param name="comparisonType">The type of string comparison to be used.</param>
         /// <returns><see langword="true"/> if it matches, <see langword="false"/> otherwise.</returns>
-        public static bool EqualsOrStartsWith(this string msg, string target)
-            => msg.Equals(target) || msg.StartsWith(target[..1]);
+        public static bool EqualsOrStartsWith(this string msg, string target, StringComparison comparisonType = StringComparison.Ordinal)
+            => target is not null && (msg.Equals(target, comparisonType) || msg.StartsWith(target[..1], comparisonType));
 
         /// <summary>
         /// Removes the file extension of this string, if there is one.
@@ -30,6 +31,7 @@ namespace AkkoBot.Extensions
         /// <param name="text">This string.</param>
         /// <param name="maxLength">The maximum length the string should have.</param>
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
         public static string MaxLength(this string text, int maxLength)
             => text?.Substring(0, Math.Min(text.Length, maxLength));
 
@@ -41,10 +43,11 @@ namespace AkkoBot.Extensions
         /// <param name="append">The string to be appended to the end of the truncated string.</param>
         /// <remarks>The <paramref name="append"/> only gets added to the truncated string if this string exceeds <paramref name="maxLength"/> in length.</remarks>
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
         public static string MaxLength(this string text, int maxLength, string append)
             => (text.Length <= maxLength)
                 ? text
-                : text.MaxLength(maxLength - append.Length) + append;
+                : (text.MaxLength(Math.Max(0, maxLength - append.Length)) + append)[..maxLength];
 
         /// <summary>
         /// Returns a new string that has a space character inserted at its begining and that
@@ -65,7 +68,7 @@ namespace AkkoBot.Extensions
         /// <param name="text">This string.</param>
         /// <returns>This string capitalized.</returns>
         public static string Capitalize(this string text)
-            => char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
+            => string.IsNullOrWhiteSpace(text) ? string.Empty : char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
 
         /// <summary>
         /// Converts a string to the format used by Discord's text channel names.
@@ -86,12 +89,15 @@ namespace AkkoBot.Extensions
 
             for (var index = 1; index < buffer.Length; index++)
             {
-                if (char.IsUpper(buffer[index]) && !char.IsUpper(buffer[index - 1]))
+                if (buffer[index] == ' ' || (char.IsUpper(buffer[index]) && !char.IsUpper(buffer[index - 1])))
                     buffer.Insert(index++, '_');
             }
 
             if (buffer[0] == '_')
                 buffer.Remove(0, 1);
+
+            buffer.Replace(" ", string.Empty)
+                .Replace("__", "_");
 
             return buffer.ToString().ToLowerInvariant();
         }
@@ -236,7 +242,7 @@ namespace AkkoBot.Extensions
 
             foreach (var character in result.ToString())
             {
-                if (char.IsPunctuation(character))
+                if (char.IsPunctuation(character) && character is not '_')
                     result.Replace(character.ToString(), string.Empty);
             }
 

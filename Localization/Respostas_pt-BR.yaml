@@ -655,3 +655,5 @@ with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
 
 joinrole_limit: O limite de 3 cargos de entrada foi atingido.
+deleted_role: Cargo excluído
+role_not_found: Cargo não encontrado.

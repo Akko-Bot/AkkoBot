@@ -54,6 +54,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
 
             // Add to the database
             db.Add(newEntry);
+
             var success = await db.SaveChangesAsync() is not 0;
 
             // Add to the cache

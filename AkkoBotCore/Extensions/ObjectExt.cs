@@ -12,9 +12,12 @@ namespace AkkoBot.Extensions
         /// <returns><see langword="true"/> if this object is equal to any element in <paramref name="objects"/>, <see langword="false"/> otherwise.</returns>
         public static bool EqualsAny(this object thisObj, params object[] objects)
         {
+            if (thisObj is null && objects is null)
+                return true;
+
             foreach (var obj in objects)
             {
-                if (thisObj.Equals(obj))
+                if (thisObj?.Equals(obj) is true)
                     return true;
             }
 
@@ -29,9 +32,12 @@ namespace AkkoBot.Extensions
         /// <returns><see langword="true"/> if this object is equal to any element in <paramref name="objects"/>, <see langword="false"/> otherwise.</returns>
         public static bool EqualsAny(this object thisObj, IEnumerable<object> objects)
         {
+            if (thisObj is null && objects is null)
+                return true;
+
             foreach (var obj in objects)
             {
-                if (thisObj.Equals(obj))
+                if (thisObj?.Equals(obj) is true)
                     return true;
             }
 
