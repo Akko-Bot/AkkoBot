@@ -218,7 +218,7 @@ namespace AkkoBot.Commands.Modules.Administration
             => await WarnplAsync(context);
 
         [Command("warnpunishment"), HiddenOverload]
-        public async Task WarnpAsync(CommandContext context, int amount, WarnPunishType punishmentType, TimeSpan? time = null)
+        public async Task WarnpAsync(CommandContext context, int amount, PunishmentType punishmentType, TimeSpan? time = null)
             => await WarnpAsync(context, amount, punishmentType, null, time);
 
         [Command("warnpunishment"), Aliases("warnp")]
@@ -227,7 +227,7 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task WarnpAsync(
             CommandContext context,
             [Description("arg_warnp_amount")] int amount,
-            [Description("arg_warnp_type")] WarnPunishType punishmentType,
+            [Description("arg_warnp_type")] PunishmentType punishmentType,
             [Description("arg_warnp_role")] DiscordRole role = null,
             [Description("arg_warnp_time")] TimeSpan? time = null)
         {

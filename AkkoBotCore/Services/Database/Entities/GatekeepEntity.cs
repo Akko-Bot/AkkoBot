@@ -74,9 +74,25 @@ namespace AkkoBot.Services.Database.Entities
         public ulong? FarewellChannelId { get; set; }
 
         /// <summary>
+        /// Defines the punishment role to be applied to alt users.
+        /// </summary>
+        public ulong? AntiAltRoleId { get; set; }
+
+        /// <summary>
         /// Defines whether greet messages should be sent in direct message.
         /// </summary>
         public bool GreetDm { get; set; }
+
+        /// <summary>
+        /// Defines whether alt users should be automatically punished on join.
+        /// </summary>
+        public bool AntiAlt { get; set; }
+
+        /// <summary>
+        /// Defines the type of punishment to apply on alt users.
+        /// </summary>
+        /// <remarks>Currently only supports Mute, Kick, Ban and AddRole.</remarks>
+        public PunishmentType AntiAltPunishType { get; set; }
 
         /// <summary>
         /// Defines how long the greet message should last before it gets deleted.
@@ -89,12 +105,17 @@ namespace AkkoBot.Services.Database.Entities
         public TimeSpan FarewellDeleteTime { get; set; } = TimeSpan.Zero;
 
         /// <summary>
+        /// Defines the time difference between joining date and creation date for a user to be considered an alt.
+        /// </summary>
+        public TimeSpan AntiAltTime { get; set; } = TimeSpan.Zero;
+
+        /// <summary>
         /// Defines whether gatekeeping is active for this guild.
         /// </summary>
         /// <remarks>This property is not mapped.</remarks>
         [NotMapped]
         public bool IsActive
-            => SanitizeNames
+            => SanitizeNames || AntiAlt
             || ((GreetChannelId is not null || GreetDm) && !string.IsNullOrWhiteSpace(GreetMessage))
             || (FarewellChannelId is not null && !string.IsNullOrWhiteSpace(FarewellMessage));
     }

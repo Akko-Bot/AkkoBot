@@ -1,7 +1,9 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Utilities.Services;
+using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
@@ -123,7 +125,7 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
-        [Command("farewellmessage"), Aliases("farewellmsg", "farewell", "bye")]
+        [Command("farewellmessage"), Aliases("farewellmsg", "farewell", "byemsg", "bye")]
         [Description("cmd_farewellmessage")]
         public async Task SetFarewellChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
         {
@@ -165,6 +167,51 @@ namespace AkkoBot.Commands.Modules.Administration
                 .WithDescription(context.FormatLocalized((time == TimeSpan.Zero) ? "farewelldel_disable" : "farewelldel_enable", time.TotalSeconds));
 
             await _service.SetPropertyAsync(context.Guild, x => x.FarewellDeleteTime = time);
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("antialt")]
+        [Description("cmd_antialt")]
+        public async Task SetAntiAltAsync(
+            CommandContext context,
+            [Description("arg_antialt_time")] TimeSpan time,
+            [Description("arg_warnp_type")] PunishmentType action,
+            [Description("arg_discord_role")] DiscordRole role = null)
+        {
+            if (time <= TimeSpan.Zero || action is PunishmentType.Softban or PunishmentType.RemoveRole || (action is not PunishmentType.AddRole && role is not null))
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            await _service.SetPropertyAsync(context.Guild, x =>
+            {
+                x.AntiAlt = true;
+                x.AntiAltPunishType = action;
+                x.AntiAltTime = time;
+                x.AntiAltRoleId = role?.Id;
+
+                return true;
+            });
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(
+                    context.FormatLocalized(
+                        (action is PunishmentType.AddRole) ? "antialt_setrole" : "antialt_set",
+                        time.TotalHours.ToString("0.00"), Formatter.Bold(context.FormatLocalized(action.ToString())), Formatter.Bold(role?.Name ?? string.Empty)
+                    )
+                );
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("antialt"), HiddenOverload]
+        public async Task ToggleAntiAltAsync(CommandContext context)
+        {
+            await _service.SetPropertyAsync(context.Guild, x => x.AntiAlt = false);
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription("antialt_disabled");
+
             await context.RespondLocalizedAsync(embed);
         }
 

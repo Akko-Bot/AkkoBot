@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.ArgumentConverters
 {
-    public class WarnTypeConverter : IArgumentConverter<WarnPunishType>
+    public class WarnTypeConverter : IArgumentConverter<PunishmentType>
     {
-        public Task<Optional<WarnPunishType>> ConvertAsync(string input, CommandContext ctx)
+        public Task<Optional<PunishmentType>> ConvertAsync(string input, CommandContext ctx)
         {
             // Determine the appropriate type specified by the user
             return input?.ToLowerInvariant() switch
             {
-                "mute" => Task.FromResult(Optional.FromValue(WarnPunishType.Mute)),
-                "k" or "kick" => Task.FromResult(Optional.FromValue(WarnPunishType.Kick)),
-                "sb" or "softban" => Task.FromResult(Optional.FromValue(WarnPunishType.Softban)),
-                "b" or "ban" => Task.FromResult(Optional.FromValue(WarnPunishType.Ban)),
-                "ar" or "addrole" => Task.FromResult(Optional.FromValue(WarnPunishType.AddRole)),
-                "rr" or "remrole" or "removerole" => Task.FromResult(Optional.FromValue(WarnPunishType.RemoveRole)),
-                _ => Task.FromResult(Optional.FromNoValue<WarnPunishType>())
+                "mute" => Task.FromResult(Optional.FromValue(PunishmentType.Mute)),
+                "k" or "kick" => Task.FromResult(Optional.FromValue(PunishmentType.Kick)),
+                "sb" or "softban" => Task.FromResult(Optional.FromValue(PunishmentType.Softban)),
+                "b" or "ban" => Task.FromResult(Optional.FromValue(PunishmentType.Ban)),
+                "ar" or "addrole" => Task.FromResult(Optional.FromValue(PunishmentType.AddRole)),
+                "rr" or "remrole" or "removerole" => Task.FromResult(Optional.FromValue(PunishmentType.RemoveRole)),
+                _ => Task.FromResult(Optional.FromNoValue<PunishmentType>())
             };
         }
     }

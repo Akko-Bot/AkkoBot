@@ -89,14 +89,15 @@ namespace AkkoBot.Extensions
 
             for (var index = 1; index < buffer.Length; index++)
             {
-                if (buffer[index] == ' ' || (char.IsUpper(buffer[index]) && !char.IsUpper(buffer[index - 1])))
+                if (char.IsUpper(buffer[index]) && !char.IsUpper(buffer[index - 1]))
                     buffer.Insert(index++, '_');
             }
 
             if (buffer[0] == '_')
                 buffer.Remove(0, 1);
 
-            buffer.Replace(" ", string.Empty)
+            buffer.Replace(" _", " ")
+                .Replace("_ ", "_")
                 .Replace("__", "_");
 
             return buffer.ToString().ToLowerInvariant();

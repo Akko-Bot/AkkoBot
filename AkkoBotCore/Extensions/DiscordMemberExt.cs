@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.Entities;
+using System;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
@@ -31,6 +32,14 @@ namespace AkkoBot.Extensions
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
         public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordMember member, string content)
             => await SendMessageSafelyAsync(member, content, null);
+
+        /// <summary>
+        /// Gets the time difference between the date the user joined the guild and the date their account was created.
+        /// </summary>
+        /// <param name="member">This Discord member.</param>
+        /// <returns>The time interval between joining and creation.</returns>
+        public static TimeSpan GetTimeDifference(this DiscordMember member)
+            => member.JoinedAt.Subtract(member.CreationTimestamp);
 
         /// <summary>
         /// Safely sends a direct message to the specified user.

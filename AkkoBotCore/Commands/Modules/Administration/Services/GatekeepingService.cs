@@ -4,9 +4,11 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
+using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration.Services
@@ -41,7 +43,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 ?? new() { GuildIdFK = server.Id };
             var result = selector(gatekeeper);
 
-            // This will update the whole GuildConfig tree, not just gatekeeping.
+            // This will update the whole GuildConfig tree, not just Gatekeeping.
             // Optimize this once LinqToDB supports "WithOutput" for PostgreSQL
             db.Update(gatekeeper);
             await db.SaveChangesAsync();

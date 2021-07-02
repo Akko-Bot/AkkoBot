@@ -74,13 +74,16 @@ namespace AkkoTests.Core.Extensions.StringExt
 
         [Theory]
         [InlineData("hello", "hello")]
-        [InlineData("hello there", "hello_there")]
-        [InlineData("heLlo tHere", "he_llo_t_here")]
-        [InlineData("Long Channel Name", "long_channel_name")]
-        [InlineData("Double  space!", "double_space!")]
-        [InlineData("ALL CAPS", "all_caps")]
+        [InlineData("hello there", "hello there")]
+        [InlineData("heLlo tHere", "he_llo t_here")]
+        [InlineData("LongChannelName", "long_channel_name")]
+        [InlineData("Long Channel Name", "long channel name")]
+        [InlineData("Double  space!", "double  space!")]
+        [InlineData("ALL CAPS", "all caps")]
+        [InlineData("SOMECaps", "somecaps")]
         [InlineData("has_Underscore", "has_underscore")]
-        //[InlineData("has_ Underscore", "has_underscore")] // No need to support this
+        [InlineData("has_ Underscore", "has_underscore")]
+        [InlineData("has_ underscore", "has_underscore")]
         public void ToSnakeCaseTest(string caller, string result)
             => Assert.Equal(result, caller.ToSnakeCase());
 

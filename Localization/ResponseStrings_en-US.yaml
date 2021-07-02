@@ -657,3 +657,10 @@ xid: ID of {0} {1} is {2}.
 joinrole_limit: Limit of 3 join roles has been reached.
 deleted_role: Deleted role
 role_not_found: Role not found.
+
+antialt_punish: Possible alt
+antialt_setrole: User accounts created within {0} hours prior to joining the server will automatically receive the {2} role.
+antialt_set: User accounts created within {0} hours prior to joining the server will automatically receive the {1} punishment.
+antialt_disabled: The anti-alt filter has been disabled.
+cmd_antialt: 'Enables the anti-alt filter on the server. User accounts are considered as an alt if they are created and join the server within the specified time frame. Available actions: __AddRole__, __Mute__, __Kick__, __Ban__. Provide no parameter to disable.'
+arg_antialt_time: The time difference between when the user joined the server and when their account was created.

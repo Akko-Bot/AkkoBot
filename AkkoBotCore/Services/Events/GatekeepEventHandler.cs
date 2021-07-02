@@ -1,8 +1,10 @@
 ﻿using AkkoBot.Commands.Common;
+using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Caching.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Events.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus;
@@ -26,17 +28,43 @@ namespace AkkoBot.Services.Events
         private readonly IDbCache _dbCache;
         private readonly IMemberAggregator _greetAggregator;
         private readonly IMemberAggregator _farewellAggregator;
+        private readonly IAntiAltActions _antiAltActions;
         private readonly BotConfig _botConfig;
         private readonly UtilitiesService _utilitiesService;
 
         public GatekeepEventHandler(IDbCache dbCache, IMemberAggregator greetAggregator, IMemberAggregator farewellAggregator,
-            BotConfig botConfig, UtilitiesService utilitiesService)
+            IAntiAltActions antiAltActions, BotConfig botConfig, UtilitiesService utilitiesService)
         {
             _dbCache = dbCache;
             _greetAggregator = greetAggregator;
             _farewellAggregator = farewellAggregator;
+            _antiAltActions = antiAltActions;
             _botConfig = botConfig;
             _utilitiesService = utilitiesService;
+        }
+
+        public async Task PunishAltAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+        {
+            if (eventArgs.Member.IsBot
+                || !_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper) || !gatekeeper.AntiAlt
+                || gatekeeper.AntiAltTime <= TimeSpan.Zero || eventArgs.Member.GetTimeDifference() > gatekeeper.AntiAltTime)
+                return;
+
+            var cmdHandler = client.GetCommandsNext();
+            var context = cmdHandler.CreateFakeContext(eventArgs.Member, eventArgs.Guild.GetDefaultChannel(), string.Empty, _botConfig.BotPrefix, null);
+            var action = gatekeeper.AntiAltPunishType switch
+            {
+                PunishmentType.Mute => _antiAltActions.MuteAltAsync(context, eventArgs.Member, (await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id, _botConfig)).MuteRoleId ?? default),
+                PunishmentType.Kick => _antiAltActions.KickAltAsync(context, eventArgs.Member),
+                PunishmentType.Ban => _antiAltActions.BanAltAsync(context, eventArgs.Member),
+                PunishmentType.AddRole => _antiAltActions.RoleAltAsync(context, eventArgs.Member, gatekeeper.AntiAltRoleId ?? default),
+                _ => throw new NotImplementedException($"Punishment of type {gatekeeper.AntiAltPunishType} has not been implemented for alts."),
+            };
+
+            if (gatekeeper.AntiAltPunishType is PunishmentType.Kick or PunishmentType.Ban)
+                eventArgs.Handled = true;
+
+            await action;
         }
 
         public async Task SanitizeNameOnUpdateAsync(DiscordClient _, GuildMemberUpdateEventArgs eventArgs)
@@ -92,7 +120,7 @@ namespace AkkoBot.Services.Events
         public Task SendGreetMessageAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
-                || !gatekeeper.GreetChannelId.HasValue || gatekeeper.GreetDm //|| eventArgs.Member.IsBot
+                || !gatekeeper.GreetChannelId.HasValue || gatekeeper.GreetDm || eventArgs.Member.IsBot
                 || string.IsNullOrWhiteSpace(gatekeeper.GreetMessage)
                 || !eventArgs.Guild.Channels.TryGetValue(gatekeeper.GreetChannelId.Value, out var channel)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels | Permissions.SendMessages))
@@ -114,10 +142,14 @@ namespace AkkoBot.Services.Events
         public Task SendFarewellMessageAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
-                || !gatekeeper.FarewellChannelId.HasValue //|| eventArgs.Member.IsBot
+                || !gatekeeper.FarewellChannelId.HasValue || eventArgs.Member.IsBot
                 || string.IsNullOrWhiteSpace(gatekeeper.FarewellMessage)
                 || !eventArgs.Guild.Channels.TryGetValue(gatekeeper.FarewellChannelId.Value, out var channel)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels | Permissions.SendMessages))
+                return Task.CompletedTask;
+
+            // If antialt is enabled and user was kicked/banned, send no farewell message
+            if (gatekeeper.AntiAlt && eventArgs.Member.GetTimeDifference() <= gatekeeper.AntiAltTime)
                 return Task.CompletedTask;
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);

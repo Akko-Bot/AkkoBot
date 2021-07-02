@@ -72,6 +72,9 @@ namespace AkkoBot.Core.Services
             // Decache guild on leave
             _shardedClient.GuildDeleted += _guildLoader.RemoveGuildOnLeaveAsync;
 
+            // Punish alts
+            _shardedClient.GuildMemberAdded += _gatekeeper.PunishAltAsync;
+
             // Sanitize username on join
             _shardedClient.GuildMemberAdded += _gatekeeper.SanitizeNameOnJoinAsync;
 

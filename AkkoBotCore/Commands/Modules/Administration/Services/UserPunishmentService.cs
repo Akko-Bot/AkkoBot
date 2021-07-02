@@ -295,13 +295,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// Adds or removes a <paramref name="role"/> to the <paramref name="user"/> and creates a timer for it.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="type"><see cref="WarnPunishType.AddRole"/> to add a temporary role or <see cref="WarnPunishType.RemoveRole"/> to remove a role temporarily.</param>
+        /// <param name="type"><see cref="PunishmentType.AddRole"/> to add a temporary role or <see cref="PunishmentType.RemoveRole"/> to remove a role temporarily.</param>
         /// <param name="time">For how long the role should be added/removed.</param>
         /// <param name="user">The Discord user to have the role added/removed from.</param>
         /// <param name="role">The Discord role to be added/removed.</param>
         /// <param name="reason">The reason for the punishment.</param>
         /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
-        public async Task TimedRolePunishAsync(CommandContext context, WarnPunishType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
+        public async Task TimedRolePunishAsync(CommandContext context, PunishmentType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
@@ -310,9 +310,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 time = TimeSpan.FromMinutes(1);
 
             // Determine which action should be taken
-            if (type == WarnPunishType.AddRole)
+            if (type == PunishmentType.AddRole)
                 await user.GrantRoleAsync(role, reason);
-            else if (type == WarnPunishType.RemoveRole)
+            else if (type == PunishmentType.RemoveRole)
                 await user.RevokeRoleAsync(role, reason);
             else
                 throw new ArgumentException(@"Only punishment types of type ""AddRole"" and ""RemoveRole"" are supported.");
@@ -325,7 +325,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
                 RoleId = role.Id,
                 IsRepeatable = false,
                 Interval = time,
-                Type = (type is WarnPunishType.AddRole) ? TimerType.TimedUnrole : TimerType.TimedRole,
+                Type = (type is PunishmentType.AddRole) ? TimerType.TimedUnrole : TimerType.TimedRole,
                 ElapseAt = DateTimeOffset.Now.Add(time)
             };
 

@@ -64,7 +64,7 @@ namespace AkkoTests.Core.Extensions.EnumExt
         [InlineData(TestEnum.None | TestEnum.B, TestEnum.A | TestEnum.C | TestEnum.None, false)]
         [InlineData(TestEnum.None | TestEnum.B, TestEnum.A | TestEnum.C | TestEnum.D, false)]
         [InlineData(TestEnum.A | TestEnum.B, TestEnum.C | TestEnum.D | TestEnum.E, false)]
-        public void HasOneFlag_IndividualTests<T>(T caller, T calle, bool result) where T : struct, Enum
+        public void HasOneFlagTests<T>(T caller, T calle, bool result) where T : struct, Enum
             => Assert.Equal(result, caller.HasOneFlag(calle));
 
         [Theory]

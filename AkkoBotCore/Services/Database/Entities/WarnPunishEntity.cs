@@ -7,7 +7,7 @@ namespace AkkoBot.Services.Database.Entities
     /// <summary>
     /// Represents the type of punishment to be applied to a user.
     /// </summary>
-    public enum WarnPunishType
+    public enum PunishmentType
     {
         /// <summary>
         /// Mutes the user.
@@ -64,7 +64,7 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// The type of the punishment.
         /// </summary>
-        public WarnPunishType Type { get; set; }
+        public PunishmentType Type { get; set; }
 
         /// <summary>
         /// The time interval this punishment should last.

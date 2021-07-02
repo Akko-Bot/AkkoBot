@@ -657,3 +657,10 @@ xid: ID do {0} {1} é {2}.
 joinrole_limit: O limite de 3 cargos de entrada foi atingido.
 deleted_role: Cargo excluído
 role_not_found: Cargo não encontrado.
+
+antialt_punish: Possível alt
+antialt_setrole: Contas de usuário criadas em até {0} horas antes de entrarem no servidor automaticamente receberão o cargo {2}.
+antialt_set: Irei {1} contas de usuário criadas em até {0} horas antes de entrarem no servidor.
+antialt_disabled: O filtro anti-alt foi desativado.
+cmd_antialt: 'Ativa o filtro anti-alt. Contas de usuário são consideradas como alt se forem criadas e entrarem no servidor dentro do intervalo de tempo especificado. Ações disponíveis: __AddRole__, __Mute__, __Kick__, __Ban__. Forneça nenhum parâmetro para desativar.'
+arg_antialt_time: A diferença de tempo entre a entrada do usuário no servidor e a data em que sua conta foi criada.

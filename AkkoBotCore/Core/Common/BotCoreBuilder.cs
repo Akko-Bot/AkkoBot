@@ -349,6 +349,7 @@ namespace AkkoBot.Core.Common
 
                 // > Utilities
                 ServiceDescriptor.Transient<IMemberAggregator, MemberAggregator>(),
+                ServiceDescriptor.Singleton<IAntiAltActions, AntiAltActions>(),
                 ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
                 ServiceDescriptor.Singleton(_ => new HttpClient()),
                 ServiceDescriptor.Singleton(_ => new Random()),
