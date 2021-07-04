@@ -43,7 +43,7 @@ namespace AkkoBot.Commands.Formatters
             _helpDescription = _cmdContext.FormatLocalized(cmd.Description);
 
             // Add requirements
-            var requirements = GetCmdRequirements(cmd);
+            var requirements = cmd.GetRequirements();
 
             foreach (var att in requirements.OrderBy(x => x.AttributeType.Name))
             {
@@ -243,43 +243,6 @@ namespace AkkoBot.Commands.Formatters
                     .Select(alias => Formatter.InlineCode(alias))
                     .Prepend(Formatter.InlineCode(cmd.Name))
             );
-        }
-
-        /// <summary>
-        /// Gets the requirements from a command.
-        /// </summary>
-        /// <param name="cmd">The command to get the requirements from.</param>
-        /// <returns>A list of attributes with the requirements.</returns>
-        private IEnumerable<CustomAttributeData> GetCmdRequirements(Command cmd)
-        {
-            return cmd.Module.ModuleType.GetMethods()
-                .Where(
-                    method => method.CustomAttributes.Any(
-                        attribute => (attribute.ConstructorArguments.FirstOrDefault().Value as string)
-                            ?.Equals(cmd.Name, StringComparison.InvariantCultureIgnoreCase) ?? false
-                    )
-                )
-                .SelectMany(method => method.CustomAttributes)
-                .Concat(GetAttributeTree(cmd))
-                .Where(
-                    attribute => attribute.AttributeType == typeof(BotOwnerAttribute)
-                        || attribute.AttributeType == typeof(RequireDirectMessageAttribute)
-                        || attribute.AttributeType == typeof(RequireUserPermissionsAttribute)
-                        || attribute.AttributeType == typeof(RequirePermissionsAttribute)
-                )
-                .DistinctBy(attribute => attribute.ConstructorArguments.FirstOrDefault().Value);
-        }
-
-        /// <summary>
-        /// Gets all attributes from a command and the groups it belongs to.
-        /// </summary>
-        /// <param name="cmd">The command to get the attributes from.</param>
-        /// <returns>A collection of attributes.</returns>
-        private IEnumerable<CustomAttributeData> GetAttributeTree(Command cmd)
-        {
-            return (cmd.Parent is null)
-                ? cmd.Module.ModuleType.CustomAttributes
-                : cmd.Parent.Module.ModuleType.CustomAttributes.Concat(GetAttributeTree(cmd.Parent));
         }
 
         /// <summary>

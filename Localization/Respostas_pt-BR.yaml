@@ -6,10 +6,15 @@ alias_error: Nenhum atalho de comando foi encontrado.
 alias_list_title_global: Atalhos de Comando Globais
 alias_list_title_server: Atalhod de Comando do Servidor
 allowed: Permitido
+antialt_disabled: O filtro anti-alt foi desativado.
+antialt_punish: Possível alt
+antialt_set: Irei {1} contas de usuário criadas em até {0} horas antes de entrarem no servidor.
+antialt_setrole: Contas de usuário criadas em até {0} horas antes de entrarem no servidor automaticamente receberão o cargo {2}.
 app_owners: Donos da Aplicação
 arg_alias_add_alias: O atalho de comando.
 arg_alias_add_command: O comando a ser executado quando o atalho for utilizado.
 arg_alias_remove: O atalho de comando a ser removido.
+arg_antialt_time: A diferença de tempo entre a entrada do usuário no servidor e a data em que sua conta foi criada.
 arg_autocommand_id: O ID do comando automático.
 arg_autocommand_time: Tempo até a ativação do comando.
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
@@ -39,6 +44,7 @@ arg_emoji_name: O nome of novo emoji.
 arg_emoji_newname: O novo nome do emoji.
 arg_emoji_url: Um link direto a uma imagem.
 arg_emojis: Um ou mais emojis.
+arg_exportcommand_format: O formato do arquivo. O padrão é __yaml__.
 arg_fc_id: ID do filtro de conteúdo.
 arg_fw_ids: IDs de usuários, canais e/ou cargos, separados por espaço.
 arg_fw_message: A mensagem a ser enviada.
@@ -129,6 +135,7 @@ cmd_alias_add: Adiciona um atalho de comando. Se o atalho tiver um espaço, colo
 cmd_alias_clear: Remove todos os atalhos de comando desse servidor. Se for executado em mensagem direta com o bot, remove todos os atalhos de comando globais.
 cmd_alias_list: Exibe todos os atalhos de comando disponíveis nesse servidor. Se for executado em mensagem direta com o bot, exibe todos os atalhos de comand blobais.
 cmd_alias_remove: Remove um atalho de comando.
+cmd_antialt: 'Ativa o filtro anti-alt. Contas de usuário são consideradas como alt se forem criadas e entrarem no servidor dentro do intervalo de tempo especificado. Ações disponíveis: __AddRole__, __Mute__, __Kick__, __Ban__. Forneça nenhum parâmetro para desativar.'
 cmd_autocommand: Agrupa comandos que gerenciam comandos automáticos.
 cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado.
 cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado.
@@ -137,7 +144,9 @@ cmd_autocommand_remove: Remove um comando automático com o ID especificado.
 cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
 cmd_ban: Bane um usuário.
 cmd_bantemplate: Define o modelo de notificação de banimento a ser enviado a usuários que forem banidos do servidor. Forneça nenhum parâmetro para utilizar a notificação de banimento padrão.
+cmd_bl_addmany: Adiciona múltiplos IDs à lista negra.
 cmd_bl_check: Checa se o ID especificado está na lista negra.
+cmd_bl_removemany: Remove múltiplos IDs da lista negra.
 cmd_blacklist: Agrupa comandos relacionados à lista negra.
 cmd_blacklist_add: Adiciona um registro à lista negra.
 cmd_blacklist_clear: Limpa a lista negra.
@@ -198,6 +207,7 @@ cmd_emoji_removerole: Torna o emoji especificado disponível para uso por todos 
 cmd_emoji_rename: Renomeia um emoji do servidor.
 cmd_emoji_setrole: Define os cargos que poderão usar o emoji especificado. Só funciona se o bot estiver listado como uma integração no servidor.
 cmd_emoji_showemoji: Exibe o nome e URL dos emojis especificados.
+cmd_exportcommands: 'Exporta todos os comandos visíveis para um arquivo de texto. Formatos disponíveis: __yaml__, __json__.'
 cmd_farewellchannel: Define o canal onde a mensagem de despedica deve ser enviada. Forneça nenhum parâmetro para remover.
 cmd_farewelldel: Define o tempo para a exclusão automática de mensagens de despedida. Forneça nenhum parâmetro para desativar.
 cmd_farewellmessage: Define a mensagem a ser enviada quando usuários deixam o servidor. Forneça nenhum parâmetro para visualizar a mensagem de despedida atual.
@@ -360,6 +370,7 @@ deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
+deleted_role: Cargo excluído
 delmsgoncmd_added_id: '{0} IDs foram adicionados à lista de IDs ignorados.'
 delmsgoncmd_disabled: A exclusão automática de comandos foi desativada. Comandos serão excluídos somente se forem executados em um context que contenha um ID ignorado.
 delmsgoncmd_empty: Não há IDs ignorados.
@@ -376,6 +387,7 @@ error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
+exportcommands_description: '{0} comandos exportados com sucesso.'
 farewell_channel_removed: O canal de despedida foi removido com sucesso.
 farewell_channel_set: A mensagem de despedida será enviada no canal {0}.
 farewell_message: mensagem de despedida
@@ -461,6 +473,7 @@ is_url_only: URLs
 joined_at: Entrou Em
 joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
 joinrole_error: Cargos de integração não podem ser adicionados.
+joinrole_limit: O limite de 3 cargos de entrada foi atingido.
 joinrole_list_empty: Não há cargos de entrada.
 joinrole_list_title: Lista de Cargos de Entrada
 joinrole_removed: O cargo {0} foi removido da lista de cargos de entrada.
@@ -579,6 +592,7 @@ repeater_not_found: Repetidor de ID {0} não foi encontrado.
 requires: Requer
 restart: Reiniciando.
 role: Cargo
+role_not_found: Cargo não encontrado.
 roles: Cargos
 roles_title: Cargos nesse servidor
 sanitizedname_reset: Apelidos que contém caracteres especiais no início serão sanitizados.
@@ -653,14 +667,3 @@ warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 xid: ID do {0} {1} é {2}.
-
-joinrole_limit: O limite de 3 cargos de entrada foi atingido.
-deleted_role: Cargo excluído
-role_not_found: Cargo não encontrado.
-
-antialt_punish: Possível alt
-antialt_setrole: Contas de usuário criadas em até {0} horas antes de entrarem no servidor automaticamente receberão o cargo {2}.
-antialt_set: Irei {1} contas de usuário criadas em até {0} horas antes de entrarem no servidor.
-antialt_disabled: O filtro anti-alt foi desativado.
-cmd_antialt: 'Ativa o filtro anti-alt. Contas de usuário são consideradas como alt se forem criadas e entrarem no servidor dentro do intervalo de tempo especificado. Ações disponíveis: __AddRole__, __Mute__, __Kick__, __Ban__. Forneça nenhum parâmetro para desativar.'
-arg_antialt_time: A diferença de tempo entre a entrada do usuário no servidor e a data em que sua conta foi criada.

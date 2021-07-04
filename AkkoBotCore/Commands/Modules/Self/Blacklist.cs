@@ -71,6 +71,7 @@ namespace AkkoBot.Commands.Modules.Self
         }
 
         [Command("addmany")]
+        [Description("cmd_bl_addmany")]
         public async Task MassBlacklistAsync(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
             var amount = await _service.AddBlacklistsAsync(ids);
@@ -108,6 +109,7 @@ namespace AkkoBot.Commands.Modules.Self
         }
 
         [Command("removemany")]
+        [Description("cmd_bl_removemany")]
         public async Task MassRemoveAsync(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
         {
             var amount = await _service.RemoveBlacklistsAsync(ids);

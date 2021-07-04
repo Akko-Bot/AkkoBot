@@ -6,10 +6,15 @@ alias_error: No alias was found.
 alias_list_title_global: Global Aliases
 alias_list_title_server: Server Aliases
 allowed: Allowed
+antialt_disabled: The anti-alt filter has been disabled.
+antialt_punish: Possible alt
+antialt_set: User accounts created within {0} hours prior to joining the server will automatically receive the {1} punishment.
+antialt_setrole: User accounts created within {0} hours prior to joining the server will automatically receive the {2} role.
 app_owners: Application Owners
 arg_alias_add_alias: Text the bot should treat as a command.
 arg_alias_add_command: The command that should be mapped to this alias.
 arg_alias_remove: The alias to be removed.
+arg_antialt_time: The time difference between when the user joined the server and when their account was created.
 arg_autocommand_id: The ID of the autocommand.
 arg_autocommand_time: Time until the command activation.
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
@@ -39,6 +44,7 @@ arg_emoji_name: The name of the new emoji.
 arg_emoji_newname: The new name of the emoji.
 arg_emoji_url: A direct link to an image.
 arg_emojis: One or more Discord emojis.
+arg_exportcommand_format: The format of the file. Defaults to __yaml__.
 arg_fc_id: ID of the content filter.
 arg_fw_ids: User, channel and/or role IDs, separated by space.
 arg_fw_message: The message to be sent.
@@ -129,6 +135,7 @@ cmd_alias_add: Adds an alias for the specified command. If the alias has space i
 cmd_alias_clear: Removes all aliases from this server. If used in direct message with the bot, removes all global aliases.
 cmd_alias_list: Lists all aliases available in this server. Use it in direct message with the bot to list all global aliases.
 cmd_alias_remove: Removes an alias.
+cmd_antialt: 'Enables the anti-alt filter on the server. User accounts are considered as an alt if they are created and join the server within the specified time frame. Available actions: __AddRole__, __Mute__, __Kick__, __Ban__. Provide no parameter to disable.'
 cmd_autocommand: Groups commands for managing automatic commands.
 cmd_autocommand_addrepeated: Adds an autocommand that executes indefinitely at the specified interval.
 cmd_autocommand_addscheduled: Adds an autocommand that expires after it is triggered.
@@ -137,7 +144,9 @@ cmd_autocommand_remove: Removes an autocommand with the specified ID.
 cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
 cmd_ban: Bans a user.
 cmd_bantemplate: Sets a customized notification message to be sent to users when they are banned from the server. Provide no parameter to use the default ban notification message.
+cmd_bl_addmany: Adds multiple IDs to the blacklist.
 cmd_bl_check: Checks if the specified ID is blacklisted.
+cmd_bl_removemany: Removes multiple IDs from the blacklist.
 cmd_blacklist: Groups commands related to the bot's blacklist.
 cmd_blacklist_add: Adds an entry to the blacklist.
 cmd_blacklist_clear: Clears the blacklist.
@@ -198,6 +207,7 @@ cmd_emoji_removerole: Makes the specified emoji available to all users in the se
 cmd_emoji_rename: Renames a server emoji.
 cmd_emoji_setrole: Defines the roles that can use the specified emoji. This only works if the bot is listed as an integration in your server.
 cmd_emoji_showemoji: Shows the name and URL of the specified emojis.
+cmd_exportcommands: Exports all visible commands to a text file. Formats available are __yaml__ and __json__.
 cmd_farewellchannel: Sets the channel where the farewell message should be sent to. Provide no parameter to remove.
 cmd_farewelldel: Sets the time for the automatic deletion of farewell messages. Provide no parameter to disable.
 cmd_farewellmessage: Sets the message to be sent when users leave the server. Provide no parameter to visualize the current farewell message.
@@ -360,6 +370,7 @@ deafen_success: User {0} can no longer hear other users speaking in voice channe
 deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
+deleted_role: Deleted role
 delmsgoncmd_added_id: Added {0} IDs to the list of ignored IDs.
 delmsgoncmd_disabled: Automatic deletion of messages has been disabled. Commands will only be deleted if they are executed in a context with an ignored ID.
 delmsgoncmd_empty: There is no ignored ID.
@@ -376,6 +387,7 @@ error_hierarchy: This command can only be used on users with a role lower to min
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
+exportcommands_description: Successfully exported {0} commands.
 farewell_channel_removed: The farewell channel has been successfully removed.
 farewell_channel_set: The farewell message will be sent to the {0} channel.
 farewell_message: farewell message
@@ -461,6 +473,7 @@ is_url_only: URLs
 joined_at: Joined At
 joinrole_added: The {0} role has been added to the list of join roles.
 joinrole_error: Integration roles cannot be added.
+joinrole_limit: Limit of 3 join roles has been reached.
 joinrole_list_empty: There are no join roles.
 joinrole_list_title: List of Join Roles
 joinrole_removed: The {0} role has been removed from the list of join roles.
@@ -579,6 +592,7 @@ repeater_not_found: Repeater of ID {0} was not found.
 requires: Requires
 restart: Restarting.
 role: Role
+role_not_found: Role not found.
 roles: Roles
 roles_title: Roles on this server
 sanitizedname_reset: Nicknames starting with special characters will now be sanitized.
@@ -653,14 +667,3 @@ warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
 xid: ID of {0} {1} is {2}.
-
-joinrole_limit: Limit of 3 join roles has been reached.
-deleted_role: Deleted role
-role_not_found: Role not found.
-
-antialt_punish: Possible alt
-antialt_setrole: User accounts created within {0} hours prior to joining the server will automatically receive the {2} role.
-antialt_set: User accounts created within {0} hours prior to joining the server will automatically receive the {1} punishment.
-antialt_disabled: The anti-alt filter has been disabled.
-cmd_antialt: 'Enables the anti-alt filter on the server. User accounts are considered as an alt if they are created and join the server within the specified time frame. Available actions: __AddRole__, __Mute__, __Kick__, __Ban__. Provide no parameter to disable.'
-arg_antialt_time: The time difference between when the user joined the server and when their account was created.
