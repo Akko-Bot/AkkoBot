@@ -194,7 +194,7 @@ namespace AkkoBot.Services
             );
 
             if (embed.Fields.Count != 0)
-                dEmbed.Append(DeconstructEmbedFields(embed.Fields));
+                dEmbed.Append(Formatter.BlockCode(DeconstructEmbedFields(embed.Fields, 3))); // Discord limits embeds to 3 inline fields per line
 
             dEmbed.Append(
                 ((embed.Image is null) ? string.Empty : $"{embed.Image.Url}\n\n") +
@@ -247,8 +247,9 @@ namespace AkkoBot.Services
         /// Extracts the contents of embed fields into a formatted code block.
         /// </summary>
         /// <param name="originalFields">The collection of embed fields.</param>
+        /// <param name="inlineLimit">Defines how many inline fields should be allowed on a single line. Set to 0 to disable.</param>
         /// <returns>The formatted content of the fields.</returns>
-        private static string DeconstructEmbedFields(IEnumerable<DiscordEmbedField> originalFields)
+        internal static string DeconstructEmbedFields(IEnumerable<DiscordEmbedField> originalFields, int inlineLimit = 0)
         {
             // Redistribute the fields into groups based on their inline property
             var sisterFields = new List<List<DiscordEmbedField>> { new List<DiscordEmbedField>() };
@@ -257,11 +258,11 @@ namespace AkkoBot.Services
             // Build the groups
             foreach (var field in originalFields)
             {
-                if (!field.Inline || ++inlinedEmbeds > 3)
+                if (!field.Inline || (inlineLimit > 0 && ++inlinedEmbeds > inlineLimit))
                 {
                     sisterFields.Add(new List<DiscordEmbedField>());
                     sisterGroup++;
-                    inlinedEmbeds = 0; // Don't have more than 3 fields
+                    inlinedEmbeds = 0; // Reset limit for the new line
                 }
 
                 sisterFields[sisterGroup].Add(field);
@@ -273,17 +274,15 @@ namespace AkkoBot.Services
             foreach (var fieldGroup in sisterFields)
             {
                 if (fieldGroup.Count > 1)
-                    result.AppendLine(Formatter.BlockCode(ExtractInLineFields(fieldGroup)));
+                    result.AppendLine(ExtractInLineFields(fieldGroup));
                 else
                 {
                     foreach (var field in fieldGroup)
                     {
                         result.AppendLine(
-                            Formatter.BlockCode(
-                                $"|{field.Name.HardPad(field.Name.Length + 2)}|\n" +
-                                new string('-', field.Name.Length + 4) + '\n' +
-                                field.Value
-                            )
+                            $"|{field.Name.HardPad(field.Name.Length + 2)}|\n" +
+                            new string('-', field.Name.Length + 4) + '\n' +
+                            field.Value
                         );
                     }
                 }

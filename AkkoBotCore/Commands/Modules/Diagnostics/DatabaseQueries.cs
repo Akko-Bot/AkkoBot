@@ -2,11 +2,15 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Diagnostics.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Services;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Npgsql;
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Diagnostics
@@ -52,7 +56,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
                 var (rows, time) = await result;
 
                 var embed = new DiscordEmbedBuilder()
-                    .WithDescription(context.FormatLocalized("sqlexec_success", time, rows));
+                    .WithDescription(context.FormatLocalized("sqlexec_success", time.ToString("0.00"), rows));
 
                 await context.RespondLocalizedAsync(embed);
             });
@@ -73,10 +77,16 @@ namespace AkkoBot.Commands.Modules.Diagnostics
                 return;
             }
 
-            var embed = new DiscordEmbedBuilder()
-                .WithTitle("sqlselect_title");
+            var (fields, time) = await result;
 
-            await context.RespondPaginatedByFieldsAsync(embed, await result, 3);
+            var text = GeneralService.DeconstructEmbedFields(fields.Select(x => x.Build())).Replace("\r", string.Empty);
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text[..text.LastOccurrenceOf('\n', 2)]));    // Substring to remove the last row of empty values
+
+            var message = new DiscordMessageBuilder()
+                .WithContent(context.FormatLocalized("sqlselect_title", time.ToString("0.00"), fields.FirstOrDefault()?.Text.Occurrences('\n') ?? 0))
+                .WithFile("query_result.txt", stream);
+
+            await context.Channel.SendMessageAsync(message);
         }
 
         /// <summary>

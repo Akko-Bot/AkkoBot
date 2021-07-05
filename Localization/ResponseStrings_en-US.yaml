@@ -611,7 +611,7 @@ slowmode: Slowmode
 softban: Soft-ban
 softban_enum: soft-banned
 sqlexec_success: Query successfully run in {0} ms. {1} rows affected.
-sqlselect_title: Query Result
+sqlselect_title: Query successfully run in {0} ms. {1} rows returned.
 store: Store
 text: Text
 timedban_notification: You have been banned from the {0} server for {0}.

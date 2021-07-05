@@ -131,5 +131,35 @@ namespace AkkoTests.Core.Extensions.StringExt
         [InlineData("111e111", "111111")]
         public void GetDigitsTest(string caller, string result)
             => Assert.Equal(result, caller.GetDigits());
+
+        [Theory]
+        [InlineData("hello", 'a', 0, -1)]
+        [InlineData("hello", 'a', 3, -1)]
+        [InlineData("hello", 'e', 0, 1)]
+        [InlineData("hello", 'l', 0, 2)]
+        [InlineData("hello", 'l', 1, 3)]
+        [InlineData("hello", 'l', 2, -1)]
+        [InlineData("hello", 'h', 0, 0)]
+        [InlineData("hello", 'h', 1, -1)]
+        [InlineData("hello hello", 'l', 3, 9)]
+        [InlineData("hello hello", 'h', 0, 0)]
+        [InlineData("hello hello", 'h', 1, 6)]
+        public void FirstOccurrenceOfTest(string caller, char character, int match, int result)
+            => Assert.Equal(result, caller.FirstOccurrenceOf(character, match));
+
+        [Theory]
+        [InlineData("hello", 'a', 0, -1)]
+        [InlineData("hello", 'a', 3, -1)]
+        [InlineData("hello", 'e', 0, 1)]
+        [InlineData("hello", 'l', 0, 3)]
+        [InlineData("hello", 'l', 1, 2)]
+        [InlineData("hello", 'l', 2, -1)]
+        [InlineData("hello", 'h', 0, 0)]
+        [InlineData("hello", 'h', 1, -1)]
+        [InlineData("hello hello", 'l', 3, 2)]
+        [InlineData("hello hello", 'h', 0, 6)]
+        [InlineData("hello hello", 'h', 1, 0)]
+        public void LastOccurrenceOfTest(string caller, char character, int match, int result)
+            => Assert.Equal(result, caller.LastOccurrenceOf(character, match));
     }
 }

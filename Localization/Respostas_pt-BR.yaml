@@ -611,7 +611,7 @@ slowmode: Modo Lento
 softban: Expulsar e Excluir
 softban_enum: expulso
 sqlexec_success: Instrução executada com sucesso em {0} ms. {1} linhas alteradas.
-sqlselect_title: Resultado da Instrução
+sqlselect_title: Instrução executada com sucesso em {0} ms. {1} linhas retornadas.
 store: Loja
 text: Texto
 timedban_notification: Você foi banido do servidor {0} por {0}.

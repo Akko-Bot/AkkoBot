@@ -288,5 +288,65 @@ namespace AkkoBot.Extensions
 
             return result.ToString();
         }
+
+        /// <summary>
+        /// Returns the "Nth" index of the specified character.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="character">The character to get the index from.</param>
+        /// <param name="occurrence">Defines how many occurrences should be skipped, starting from 0 (first match).</param>
+        /// <returns>The index of the specified character or -1 if it was not found.</returns>
+        /// <example>This returns 2: <code>"hello".MatchedIndexOf('l', 0)</code></example>
+        /// <example>This returns 3: <code>"hello".MatchedIndexOf('l', 1)</code></example>
+        /// <example>This returns -1: <code>"hello".MatchedIndexOf('l', 2)</code></example>
+        /// <seealso cref="LastOccurrenceOf(string, char, int)"/>
+        public static int FirstOccurrenceOf(this string text, char character, int occurrence)
+        {
+            if (occurrence < 0)
+                occurrence = 0;
+
+            int counter = -1, result = -1;
+
+            for (var index = 0; index < text.Length - 1; index++)
+            {
+                if (text[index].Equals(character) && ++counter == occurrence)
+                {
+                    result = index;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the "Nth" last index of the specified character.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="character">The character to get the index from.</param>
+        /// <param name="occurrence">Defines how many occurrences should be skipped, starting from 0 (first match).</param>
+        /// <returns>The last index of the specified character or -1 if it was not found.</returns>
+        /// <example>This returns 3: <code>"hello".LastMatchedIndexOf('l', 0)</code></example>
+        /// <example>This returns 2: <code>"hello".LastMatchedIndexOf('l', 1)</code></example>
+        /// <example>This returns -1: <code>"hello".LastMatchedIndexOf('l', 2)</code></example>
+        /// <seealso cref="FirstOccurrenceOf(string, char, int)"/>
+        public static int LastOccurrenceOf(this string text, char character, int occurrence)
+        {
+            if (occurrence < 0)
+                occurrence = 0;
+
+            int counter = -1, result = -1;
+
+            for (var index = text.Length - 1; index >= 0; index--)
+            {
+                if (text[index].Equals(character) && ++counter == occurrence)
+                {
+                    result = index;
+                    break;
+                }
+            }
+
+            return result;
+        }
     }
 }

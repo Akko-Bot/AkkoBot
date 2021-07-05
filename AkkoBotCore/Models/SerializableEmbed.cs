@@ -235,6 +235,8 @@ namespace AkkoBot.Models
         private string _title;
         private string _text;
 
+        public bool Inline { get; set; }
+
         public string Title
         {
             get => _title;
@@ -247,8 +249,6 @@ namespace AkkoBot.Models
             set => _text = value?.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]");
         }
 
-        public bool Inline { get; set; }
-
         public SerializableEmbedField()
         {
         }
@@ -258,6 +258,21 @@ namespace AkkoBot.Models
             Title = name;
             Text = value;
             Inline = inline;
+        }
+
+        /// <summary>
+        /// Constructs the embed field represented by this model.
+        /// </summary>
+        /// <returns>An embed field.</returns>
+        public DiscordEmbedField Build()
+        {
+            var field = Activator.CreateInstance(typeof(DiscordEmbedField), true) as DiscordEmbedField;
+            
+            field.Name = Title;
+            field.Value = Text;
+            field.Inline = Inline;
+
+            return field;
         }
     }
 

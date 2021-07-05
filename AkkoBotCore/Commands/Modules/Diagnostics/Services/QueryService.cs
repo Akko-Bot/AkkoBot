@@ -6,6 +6,7 @@ using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,25 +32,25 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
         /// <param name="query"></param>
         /// <returns>The amount of rows affected and time, in milliseconds, the query took to run.</returns>
         /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
-        public async Task<(int, long)> RunExecQueryAsync(string query)
+        public async Task<(int, double)> RunExecQueryAsync(string query)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            var clock = new Stopwatch();
 
+            var clock = new Stopwatch();
             clock.Start();
             var rows = await db.Database.ExecuteSqlRawAsync(query);
             clock.Stop();
 
-            return (rows, clock.ElapsedMilliseconds);
+            return (rows, clock.Elapsed.TotalMilliseconds);
         }
 
         /// <summary>
         /// Runs a SELECT query on the database.
         /// </summary>
         /// <param name="query">The SQL query to be run.</param>
-        /// <returns>A collection of columns from the resulting query.</returns>
+        /// <returns>A collection of columns from the resulting query and time, in milliseconds, that it took to run.</returns>
         /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
-        public async Task<IReadOnlyCollection<SerializableEmbedField>> RunSelectQueryAsync(string query)
+        public async Task<(IReadOnlyCollection<SerializableEmbedField>, double)> RunSelectQueryAsync(string query)
         {
             var result = new List<SerializableEmbedField>();
             var fieldBuilders = new List<StringBuilder>();
@@ -63,6 +64,8 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
             using var command = connection.CreateCommand();
             command.CommandText = query;
 
+            var clock = new Stopwatch();
+            clock.Start();  // Start counting query execution time.
             using var reader = await command.ExecuteReaderAsync();
 
             // Get the column names
@@ -80,12 +83,14 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
                 var objs = new object[reader.FieldCount];
                 reader.GetValues(objs);
 
+                if (objs.All(x => x is null))
+                    continue;
+
                 while (row < reader.FieldCount)
                     fieldBuilders[row].AppendLine(objs[row++].ToString());
-
-                if (fieldBuilders.Any(x => x.Length >= AkkoConstants.MaxEmbedFieldLength))
-                    break;
             }
+
+            clock.Stop();   // Stop counting query execution time.
 
             // Add row values to result fields
             for (var counter = 0; counter < result.Count; counter++)
@@ -95,7 +100,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
                     : fieldBuilders[counter].ToString();
             }
 
-            return result;
+            return (result, clock.Elapsed.TotalMilliseconds);
         }
     }
 }
