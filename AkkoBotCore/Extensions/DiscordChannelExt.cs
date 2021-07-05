@@ -65,7 +65,9 @@ namespace AkkoBot.Extensions
         public static async Task<DiscordMessage> GetLatestMessageAsync(this DiscordChannel channel, DiscordClient client)
         {
             var messageCache = client.GetMessageCache();
-            var message = messageCache.WhereMax(x => x?.CreationTimestamp, y => y?.Channel.Id == channel.Id);
+            var message = messageCache
+                .Where(x => x?.Channel.Id == channel.Id)
+                .MaxBy(x => x.CreationTimestamp);
 
             if (message is null)
             {

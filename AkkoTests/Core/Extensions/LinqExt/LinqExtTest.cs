@@ -298,51 +298,5 @@ namespace AkkoTests.Core.Extensions.LinqExt
             Assert.Throws<ArgumentNullException>(() => _dummies.SplitBy<MockObject, int>(null));
             Assert.Throws<NullReferenceException>(() => _dummiesWithNull.SplitBy(x => x.Id));
         }
-
-        [Fact]
-        public void WhereMaxTest()
-        {
-            // Get the MockObject with the greatest even ID
-            var sample = _dummies.WhereMax(x => x.Id, x => x.Id % 2 is 0);
-            var offset = _dummies.Where(x => x.Id % 2 is 0).Max(x => x.Id);
-
-            Assert.Equal(new MockObject(offset, char.ConvertFromUtf32(65 + offset)), sample);
-
-            // Empty collection
-            Assert.Null(_dummiesEmpty.WhereMax(x => x.Id, x => x?.Id % 2 is 0));
-
-            // Null elements
-            Assert.NotNull(_dummiesWithNull.WhereMax(x => x?.Id, x => x is not null && x.Id % 2 is 0));
-
-            // Null input
-            Assert.Throws<ArgumentNullException>(() => _nullCollection.WhereMax(x => x.Id, x => x.Id % 2 is 0));
-            Assert.Throws<ArgumentNullException>(() => _dummies.WhereMax(x => x.Id, null));
-            Assert.Throws<ArgumentNullException>(() => _dummies.WhereMax<MockObject, int>(null, x => x.Id % 2 is 0));
-            Assert.Throws<ArgumentNullException>(() => _dummies.WhereMax<MockObject, int>(null, null));
-            Assert.Throws<NullReferenceException>(() => _dummiesWithNull.WhereMax(x => x.Id, x => x.Id % 2 is 0));
-        }
-
-        [Fact]
-        public void WhereMinTest()
-        {
-            // Get the MockObject with the greatest even ID
-            var sample = _dummies.WhereMin(x => x.Id, x => x.Id % 2 is 0);
-            var offset = _dummies.Where(x => x.Id % 2 is 0).Min(x => x.Id);
-
-            Assert.Equal(new MockObject(offset, char.ConvertFromUtf32(65 + offset)), sample);
-
-            // Empty collection
-            Assert.Null(_dummiesEmpty.WhereMin(x => x.Id, x => x?.Id % 2 is 0));
-
-            // Null elements
-            Assert.NotNull(_dummiesWithNull.WhereMin(x => x?.Id, x => x is not null && x.Id % 2 is 0));
-
-            // Null input
-            Assert.Throws<ArgumentNullException>(() => _nullCollection.WhereMin(x => x.Id, x => x.Id % 2 is 0));
-            Assert.Throws<ArgumentNullException>(() => _dummies.WhereMin(x => x.Id, null));
-            Assert.Throws<ArgumentNullException>(() => _dummies.WhereMin<MockObject, int>(null, x => x.Id % 2 is 0));
-            Assert.Throws<ArgumentNullException>(() => _dummies.WhereMin<MockObject, int>(null, null));
-            Assert.Throws<NullReferenceException>(() => _dummiesWithNull.WhereMin(x => x.Id, x => x.Id % 2 is 0));
-        }
     }
 }

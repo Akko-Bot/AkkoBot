@@ -326,7 +326,7 @@ namespace AkkoBot.Extensions
 
             while (enumerator.MoveNext())
             {
-                if (comparer.Compare(selector(previous), selector(enumerator.Current)) < 0)
+                if (comparer.Compare(selector(previous), selector(enumerator.Current)) <= 0)
                     result = enumerator.Current;
             }
 
@@ -352,81 +352,11 @@ namespace AkkoBot.Extensions
 
             while (enumerator.MoveNext())
             {
-                if (comparer.Compare(selector(previous), selector(enumerator.Current)) > 0)
+                if (comparer.Compare(selector(previous), selector(enumerator.Current)) >= 0)
                     result = enumerator.Current;
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Gets the <typeparamref name="T1"/> with the maximum property value defined by <paramref name="selector"/>
-        /// in this collection that conforms to the specified <paramref name="predicate"/>.
-        /// </summary>
-        /// <typeparam name="T1">Type of the elements.</typeparam>
-        /// <typeparam name="T2">Type of the selected property.</typeparam>
-        /// <param name="collection">This collection.</param>
-        /// <param name="selector">A method that defines the property to compare the elements with.</param>
-        /// <param name="predicate">A method to test each element for a condition.</param>
-        /// <param name="comparer">The comparer to compare the objects in the collection.</param>
-        /// <returns>
-        /// The <typeparamref name="T1"/> with the highest value of <typeparamref name="T2"/>
-        /// or <see langword="default"/> if no element matched the <paramref name="predicate"/>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Occurs when collection or delegates are <see langword="null"/>.</exception>
-        public static T1 WhereMax<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector, Predicate<T1> predicate, IComparer<T2> comparer = default)
-        {
-            if (collection is null || selector is null || predicate is null)
-                throw new ArgumentNullException((collection is null) ? nameof(collection) : (selector is null) ? nameof(selector) : nameof(predicate), "Argument cannot be null.");
-
-            using var enumerator = collection.GetEnumerator();
-            enumerator.MoveNext();  // Start iteration
-
-            var result = enumerator.Current;
-            comparer ??= Comparer<T2>.Default;
-
-            while (enumerator.MoveNext())
-            {
-                if (predicate(enumerator.Current) && comparer.Compare(selector(result), selector(enumerator.Current)) < 0)
-                    result = enumerator.Current;
-            }
-
-            return (predicate(result)) ? result : default;
-        }
-
-        /// <summary>
-        /// Gets the <typeparamref name="T1"/> with the minimum property value defined by <paramref name="selector"/>
-        /// in this collection that conforms to the specified <paramref name="predicate"/>.
-        /// </summary>
-        /// <typeparam name="T1">Type of the elements.</typeparam>
-        /// <typeparam name="T2">Type of the selected property.</typeparam>
-        /// <param name="collection">This collection.</param>
-        /// <param name="selector">A method that defines the property to compare the elements with.</param>
-        /// <param name="predicate">A method to test each element for a condition.</param>
-        /// <param name="comparer">The comparer to compare the objects in the collection.</param>
-        /// <returns>
-        /// The <typeparamref name="T1"/> with the lowest value of <typeparamref name="T2"/>
-        /// or <see langword="default"/> if no element matched the <paramref name="predicate"/>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Occurs when collection or delegates are <see langword="null"/>.</exception>
-        public static T1 WhereMin<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector, Predicate<T1> predicate, IComparer<T2> comparer = default)
-        {
-            if (collection is null || selector is null || predicate is null)
-                throw new ArgumentNullException((collection is null) ? nameof(collection) : (selector is null) ? nameof(selector) : nameof(predicate), "Argument cannot be null.");
-
-            using var enumerator = collection.GetEnumerator();
-            enumerator.MoveNext();  // Start iteration
-
-            var result = enumerator.Current;
-            comparer ??= Comparer<T2>.Default;
-
-            while (enumerator.MoveNext())
-            {
-                if (predicate(enumerator.Current) && comparer.Compare(selector(result), selector(enumerator.Current)) > 0)
-                    result = enumerator.Current;
-            }
-
-            return (predicate(result)) ? result : default;
         }
     }
 }

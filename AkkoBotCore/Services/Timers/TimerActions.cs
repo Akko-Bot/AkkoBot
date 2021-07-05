@@ -310,7 +310,7 @@ namespace AkkoBot.Services.Timers
 
                 // If last message is the same repeated message, do nothing
                 if ((lastMessage is not null && lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
-                    || (!wasDeserialized && lastMessage?.Content == message))
+                    || (!wasDeserialized && lastMessage?.Content == message && lastMessage.Author == server.CurrentMember))
                     return;
 
                 // Send the repeater
