@@ -284,7 +284,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             embed.AddField("warnpl_amount", amount, true)
                 .AddField("warnpl_punish", punish, true)
-                .AddField("warnpl_interval", interval, true);
+                .AddField("expires_in", interval, true);
 
             await context.RespondLocalizedAsync(embed);
         }

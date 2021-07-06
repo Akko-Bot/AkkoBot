@@ -31,6 +31,7 @@ arg_config_timeout: How long the bot should wait on interactive commands. Minimu
 arg_cooldown_time: For how long the cooldown should last.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_color: The hexadecimal value of a color.
+arg_discord_invite: The link or code of a Discord server invite.
 arg_discord_message: ID or URL to a Discord message.
 arg_discord_message_link: URL to a Discord message.
 arg_discord_role: ID or mention to a Discord role.
@@ -54,6 +55,9 @@ arg_gatekeep_bulktime: The waiting time. Default is `5s`.
 arg_greetdel_time: The deletion time. Maximum of `2m`.
 arg_infraction: The infraction to be added to the user's modlog.
 arg_int: An integer number.
+arg_invite_temporary: Defines whether invited users get automatically kicked from the server once they disconnect from Discord. This setting doesn't work if they receive a role. Defaults to `false`.
+arg_invite_time: Expiration time. Defaults to `0d` (never expires). Maximum of `7d`.
+arg_invite_uses: Defines how many times an invite can be used before automatically expiring. Defaults to `0` (never expires).
 arg_keyword: The term to search for.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
@@ -260,10 +264,16 @@ cmd_guild_timezone: Sets this server's time zone.
 cmd_help: Shows help for the specified command or the default help message if no command is specified.
 cmd_infractions: Shows the list of infractions of a user.
 cmd_inrole: Lists all users on this server with the specified role.
+cmd_invite: Groups commands for managing server invites.
+cmd_invite_add: Creates a server invite. Provide no parameter to create an invite for the default channel that never expires.
+cmd_invite_check: Shows basic information about the specified invite.
+cmd_invite_list: Lists all active invites of this server.
+cmd_invite_remove: Deletes the specified invite.
 cmd_joinrole: Adds or removes a role to the list of roles that should be automatically assigned to a user when they join the server. Maximum of 3 roles per server. Provide no parameter to see the list of join roles.
 cmd_kick: Kicks a user from the server.
 cmd_ldc: Lists all commands that have been disabled globally.
 cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
+cmd_listservers: Lists the servers serviced by the specified shard. Provide no parameter to list the servers on the current shard.
 cmd_liststatus: Lists all rotating statuses and their corresponding ID.
 cmd_lockchannel: Locks the current channel so users can't send messages to it. Users with permission to Kick Members, Ban Members or Manage Channels are immune.
 cmd_massban: Bans multiple users from the server.
@@ -322,6 +332,7 @@ cmd_send: Sends a message to the specified Discord channel.
 cmd_senddm: Sends a direct message to the specified user.
 cmd_serverid: Shows the ID of the current Discord server.
 cmd_serverinfo: Shows basic information about the current Discord server.
+cmd_setavatar: Sets a new avatar for the bot. Avatar can be provided either through a direct link or as an attachment on the command message. Provide no avatar to set it to the default.
 cmd_setnickname: Sets the nickname of a user. Provide no user to set the bot's nickname. Provide no nickname to remove it.
 cmd_setrole: Adds a role to the specified user.
 cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
@@ -387,6 +398,7 @@ error_hierarchy: This command can only be used on users with a role lower to min
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
+expires_in: Expires in
 exportcommands_description: Successfully exported {0} commands.
 farewell_channel_removed: The farewell channel has been successfully removed.
 farewell_channel_set: The farewell message will be sent to the {0} channel.
@@ -464,6 +476,9 @@ infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
 interval: Interval
 invalid_color: The specified color code is invalid.
+invite_list_title: List of server invites
+invite_not_found: Invite not found.
+invite_temporary: Is temporary
 is_attachment_only: Attachments
 is_command_only: Commands
 is_image_only: Images
@@ -484,6 +499,7 @@ kick_title: User Kicked
 language: Language
 ldc_empty: No command has been disabled.
 ldc_title: Disabled Commands
+listservers_title: List of servers on Shard {0}
 locales_title: Available Languages
 lockchannel_reason: Channel Lockdown
 low: Low
@@ -637,9 +653,11 @@ unwarn_failure: Infraction of ID {0} was not found.
 unwarn_success: Removed warning {0} from {1}.
 uptime: Uptime
 usage: Usage
+used: Used
 user: User
 user_limit: User Limit
 userroles_title: "{0}'s roles"
+uses_left: Uses left
 value: Value
 vanity_url: Vanity URL
 vcrole_empty: No voice roles were found.
@@ -662,8 +680,8 @@ warnp_rem_success: Punishment removed successfully.
 warnp_success: Added punishment successfully.
 warnpl_amount: Warnings
 warnpl_empty: There are no punishments for this server.
-warnpl_interval: Expires in
 warnpl_punish: Punishment
 warnpl_title: Server Punishments
 with_votes: with {0} votes.
+x_times: '{0} times'
 xid: ID of {0} {1} is {2}.

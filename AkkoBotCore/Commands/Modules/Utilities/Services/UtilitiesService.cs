@@ -200,7 +200,8 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                     ),
                     true
                 )
-                .AddField("roles", server.Roles.Count.ToString(), true);
+                .AddField("roles", server.Roles.Count.ToString(), true)
+                .AddField("shard", $"{(server.Id >> 22) % (ulong)context.Client.ShardCount}/{context.Client.ShardCount}");
 
             var modroles = server.Roles.Values
                 .Where(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers))

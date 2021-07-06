@@ -31,6 +31,7 @@ arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos.
 arg_cooldown_time: Por quanto tempo o cooldown deve durar.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_color: O valor hexadecimal de uma cor.
+arg_discord_invite: O link ou o código do convite de servidor.
 arg_discord_message: ID ou URL para uma mensagem do Discord.
 arg_discord_message_link: URL para uma mensagem do Discord.
 arg_discord_role: ID ou menção a um cargo do Discord.
@@ -54,6 +55,9 @@ arg_gatekeep_bulktime: Tempo de espera. O padrão é `5s`.
 arg_greetdel_time: O tempo de exclusão. Máximo de `2m`.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_int: Um número inteiro.
+arg_invite_temporary: Determina se usuários que utilizarem esse convite serão automaticamente expulsos do servidor quando se disconectarem do Discord. Essa configuração não funciona se eles receberem um cargo de servidor. O padrão é `false`.
+arg_invite_time: Tempo de validade. O padrão é `0d` (nunca expira). Máximo de `7d`.
+arg_invite_uses: Define quantas vezes um convite pode ser usado antes de expirar. O padrão é `0` (nunca expira).
 arg_keyword: O termo da busca.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
@@ -260,10 +264,16 @@ cmd_guild_timezone: Define o fuso horário desse servidor.
 cmd_help: Exibe ajuda para o comando especificado ou a ajuda padrão se nenhum comando for especificado.
 cmd_infractions: Exibe a lista de infrações de um usuário.
 cmd_inrole: Lista todos os usuários desse servidor que possuem o cargo especificado.
+cmd_invite: Agrupa comandos para gerenciar convites de servidor.
+cmd_invite_add: Cria um convite de servidor. Forneça nenhum parâmetro para criar um convite que nunca expira para o canal padrão do servidor.
+cmd_invite_check: Exibe informações básicas sobre o convite especificado.
+cmd_invite_list: Exibe todos os convites ativos desse servidor.
+cmd_invite_remove: Exclui o convite especificado.
 cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Máximo de 3 cargos por servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
 cmd_kick: Expulsa um usuário do servidor.
 cmd_ldc: Exibe todos os comandos desativados.
 cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
+cmd_listservers: Exibe os servidores na shard especificada. Forneça nenhum parâmetro para listar os servidores na shard atual.
 cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
 cmd_lockchannel: Tranca o canal atual para impedir que usuários enviem mensagens. Usuários com permissão para Expulsar Membros, Banir Membros ou Gerenciar Canais possuem imunidade.
 cmd_massban: Bane múltiplos usuários do servidor.
@@ -322,6 +332,7 @@ cmd_send: Envia uma mensagem ao canal do Discord especificado.
 cmd_senddm: Envia uma mensagem direta ao usuário especificado.
 cmd_serverid: Exibe of ID do servidor atual.
 cmd_serverinfo: Exibe informações básicas sobre o servidor atual.
+cmd_setavatar: Define um novo avatar para o bot. O avatar pode ser fornecido por um link direto ou por um anexo à mensagem que executar o comando. Forneça nenhum avatar para redefini-lo ao padrão.
 cmd_setnickname: Define o apelido de um usuário. Forneça nenhum usuário para definit o apelido do bot. Forneça nenhum apelido para removê-lo.
 cmd_setrole: Adiciona um cargo ao usuário especificado.
 cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
@@ -387,6 +398,7 @@ error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
+expires_in: Expira em
 exportcommands_description: '{0} comandos exportados com sucesso.'
 farewell_channel_removed: O canal de despedida foi removido com sucesso.
 farewell_channel_set: A mensagem de despedida será enviada no canal {0}.
@@ -464,6 +476,9 @@ infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
 interval: Intervalo
 invalid_color: O código de cor especificado é inválido.
+invite_list_title: Lista de convites do servidor
+invite_not_found: Convite não encontrado.
+invite_temporary: É temporário
 is_attachment_only: Anexos
 is_command_only: Comandos
 is_image_only: Imagens
@@ -484,6 +499,7 @@ kick_title: Usuário Expulso
 language: Idioma
 ldc_empty: Nenhum comando foi desativado.
 ldc_title: Comandos Desativados
+listservers_title: Lista de servidores na Shard {0}
 locales_title: Idiomas Disponíveis
 lockchannel_reason: Lockdown de Canal
 low: Baixo
@@ -637,9 +653,11 @@ unwarn_failure: A infração de ID {0} não foi encontrada.
 unwarn_success: A advertência número {0} do usuário {1} foi removida.
 uptime: Tempo Online
 usage: Uso
+used: Utilizado
 user: Usuário
 user_limit: Limite de Usuários
 userroles_title: 'Cargos do {0}'
+uses_left: Usos restantes
 value: Valor
 vanity_url: Vanity URL
 vcrole_empty: Nenhum cargo de voz foi encontrado.
@@ -662,8 +680,8 @@ warnp_rem_success: Punição removida com sucesso.
 warnp_success: Punição adicionada com sucesso.
 warnpl_amount: Advertências
 warnpl_empty: Não há punições nesse servidor.
-warnpl_interval: Expira em
 warnpl_punish: Punição
 warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
+x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.

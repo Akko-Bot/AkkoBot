@@ -13,6 +13,7 @@ using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,12 +25,14 @@ namespace AkkoBot.Commands.Modules.Self
     [BotOwner]
     public class OwnerCommands : AkkoCommandModule
     {
-        private readonly UtilitiesService _utilities;
+        private readonly DiscordShardedClient _shardedClient;
+        private readonly UtilitiesService _utilitiesService;
         private readonly ILocalizer _localizer;
 
-        public OwnerCommands(UtilitiesService utilities, ILocalizer localizer)
+        public OwnerCommands(DiscordShardedClient shardedClient, UtilitiesService utilities, ILocalizer localizer)
         {
-            _utilities = utilities;
+            _shardedClient = shardedClient;
+            _utilitiesService = utilities;
             _localizer = localizer;
         }
 
@@ -49,7 +52,7 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            var dm = (_utilities.DeserializeEmbed(message, out var dMsg))
+            var dm = (_utilitiesService.DeserializeEmbed(message, out var dMsg))
                 ? await member.SendMessageSafelyAsync(dMsg)
                 : await member.SendMessageSafelyAsync(message);
 
@@ -70,7 +73,7 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            var dm = (_utilities.DeserializeEmbed(message, out var dMsg))
+            var dm = (_utilitiesService.DeserializeEmbed(message, out var dMsg))
                 ? await channel.SendMessageSafelyAsync(dMsg)
                 : await channel.SendMessageSafelyAsync(message);
 
@@ -101,6 +104,60 @@ namespace AkkoBot.Commands.Modules.Self
                 .WithFile($"commands.{((isJson) ? "json" : "yaml")}", stream);
 
             await context.Channel.SendMessageAsync(message);
+        }
+
+        [Command("setname")]
+        public async Task SetNameAsync(CommandContext context, [RemainingText] string newName)
+        {
+            var result = await context.Client.UpdateCurrentUserAsync(newName).RunAndGetTaskAsync();
+            await context.Message.CreateReactionAsync((result.IsCompletedSuccessfully) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("setavatar"), HiddenOverload]
+        public async Task SetAvatarAsync(CommandContext context)
+            => await SetAvatarAsync(context, context.Message.Attachments.FirstOrDefault()?.Url ?? context.Guild.CurrentMember.DefaultAvatarUrl);
+
+        [Command("setavatar")]
+        [Description("cmd_setavatar")]
+        public async Task SetAvatarAsync(CommandContext context, [Description("arg_emoji_url")] string link)
+        {
+            var stream = await _utilitiesService.GetOnlineStreamAsync(link);
+
+            if (stream is null)
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            var result = await context.Client.UpdateCurrentUserAsync(null, stream).RunAndGetTaskAsync();
+            await context.Message.CreateReactionAsync((result.IsCompletedSuccessfully) ? AkkoEntities.SuccessEmoji : AkkoEntities.FailureEmoji);
+        }
+
+        [Command("listservers")]
+        [Description("cmd_listservers")]
+        public async Task ListServersAsync(CommandContext context, [Description("arg_uint")] int shard = -1)
+        {
+            if (shard is -1)
+                shard = context.Client.ShardId;
+
+            if (!_shardedClient.ShardClients.TryGetValue(shard, out var client))
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            var fields = new List<SerializableEmbedField>();
+            var guilds = client.Guilds.Values
+                .OrderBy(x => x.Name)
+                .SplitInto(AkkoConstants.LinesPerPage);
+
+            foreach (var group in guilds)
+                fields.Add(new(AkkoConstants.ValidWhitespace, string.Join("\n", group.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} {x.Name}")), true));
+
+            var embed = new DiscordEmbedBuilder()
+                .WithTitle(context.FormatLocalized("listservers_title", context.Client.ShardId));
+
+            await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
         }
     }
 }

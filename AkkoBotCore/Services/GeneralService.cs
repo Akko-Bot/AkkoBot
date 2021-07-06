@@ -262,7 +262,7 @@ namespace AkkoBot.Services
                 {
                     sisterFields.Add(new List<DiscordEmbedField>());
                     sisterGroup++;
-                    inlinedEmbeds = 0; // Reset limit for the new line
+                    inlinedEmbeds = 1; // Reset limit for the new line
                 }
 
                 sisterFields[sisterGroup].Add(field);
