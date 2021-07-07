@@ -67,7 +67,8 @@ namespace AkkoBot.Commands.Modules.Self.Services
                     ContextId = id,
                     Type = type,
                     Name = entry.Name,
-                    Reason = reason
+                    Reason = reason,
+                    DateAdded = DateTimeOffset.Now
                 },
                 x => new BlacklistEntity()
                 {
