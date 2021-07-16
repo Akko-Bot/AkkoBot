@@ -2,6 +2,7 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
@@ -46,7 +47,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         public async Task<DiscordMessage> SendPunishmentDmAsync(CommandContext context, DiscordMember user, string message, string reason, TimeSpan? time = null)
         {
             // Create the notification dm
-            var dm = new DiscordEmbedBuilder()
+            var dm = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized(message, Formatter.Bold(context.Guild.Name), time?.ToString(@"%d\d\ %h\h\ %m\m")));
 
             if (reason is not null)
@@ -86,9 +87,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="emoji">Emoji name with colons or its unicode representation.</param>
         /// <param name="titleKey">The response string for the embed title.</param>
         /// <returns>An embed with basic information about the punished user.</returns>
-        public DiscordEmbedBuilder GetPunishEmbed(CommandContext context, DiscordUser user, string emoji, string titleKey)
+        public SerializableDiscordMessage GetPunishEmbed(CommandContext context, DiscordUser user, string emoji, string titleKey)
         {
-            return new DiscordEmbedBuilder()
+            return new SerializableDiscordMessage()
                 .WithTitle($"{emoji} " + context.FormatLocalized(titleKey))
                 .AddField("user", user.GetFullname(), true)
                 .AddField("id", user.Id.ToString(), true);

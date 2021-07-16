@@ -2,10 +2,11 @@
 using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization;
 using AkkoBot.Services.Localization.Abstractions;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
@@ -128,106 +129,13 @@ namespace AkkoBot.Services
         }
 
         /// <summary>
-        /// Localizes the content of an embed to its corresponding response string(s).
-        /// </summary>
-        /// <param name="localizer">The response strings cache.</param>
-        /// <param name="embed">Embed to be localized.</param>
-        /// <param name="locale">Locale to localize to.</param>
-        /// <param name="okColor">OkColor to set the embed to, if it doesn't have one already.</param>
-        /// <param name="errorColor">ErrorColor to set the embed to, if it doesn't have one already.</param>
-        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
-        /// <remarks>It ignores strings that don't match any key for a response string.</remarks>
-        /// <returns>The localized embed or <see langword="null"/> if the embed is null.</returns>
-        internal static DiscordEmbedBuilder LocalizeEmbed(ILocalizer localizer, IMessageSettings settings, DiscordEmbedBuilder embed, bool isError = false)
-        {
-            if (embed is null)
-                return null;
-
-            if (embed.Title is not null)
-                embed.Title = GetLocalizedResponse(localizer, settings.Locale, embed.Title);
-
-            if (embed.Description is not null)
-                embed.Description = GetLocalizedResponse(localizer, settings.Locale, embed.Description);
-
-            if (!embed.Color.HasValue)
-                embed.Color = new DiscordColor((isError) ? settings.ErrorColor : settings.OkColor);
-
-            if (embed.Author is not null)
-                embed.Author.Name = GetLocalizedResponse(localizer, settings.Locale, embed.Author.Name);
-
-            if (embed.Footer is not null)
-                embed.Footer.Text = GetLocalizedResponse(localizer, settings.Locale, embed.Footer.Text);
-
-            foreach (var field in embed.Fields)
-            {
-                field.Name = GetLocalizedResponse(localizer, settings.Locale, field.Name);
-                field.Value = GetLocalizedResponse(localizer, settings.Locale, field.Value);
-            }
-
-            return embed;
-        }
-
-        /// <summary>
-        /// Converts all text content from an embed into a string.
-        /// </summary>
-        /// <param name="embed">Embed to be deconstructed.</param>
-        /// <remarks>It ignores image links, except for the one on the image field.</remarks>
-        /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
-        internal static string DeconstructEmbed(DiscordEmbedBuilder embed)
-            => DeconstructEmbed(embed.Build());
-
-        /// <summary>
-        /// Converts all text content from an embed into a string.
-        /// </summary>
-        /// <param name="embed">Embed to be deconstructed.</param>
-        /// <remarks>It ignores image links, except for the one on the image field.</remarks>
-        /// <returns>A formatted string with the contents of the embed or <see langword="null"/> if the embed is null.</returns>
-        internal static string DeconstructEmbed(DiscordEmbed embed)
-        {
-            if (embed is null)
-                return null;
-
-            var dEmbed = new StringBuilder(
-                ((embed.Author is null) ? string.Empty : embed.Author.Name + "\n\n") +
-                ((embed.Title is null) ? string.Empty : Formatter.Bold(embed.Title) + "\n") +
-                ((embed.Description is null) ? string.Empty : embed.Description + "\n\n")
-            );
-
-            if (embed.Fields.Count != 0)
-                dEmbed.Append(Formatter.BlockCode(DeconstructEmbedFields(embed.Fields, 3))); // Discord limits embeds to 3 inline fields per line
-
-            dEmbed.Append(
-                ((embed.Image is null) ? string.Empty : $"{embed.Image.Url}\n\n") +
-                ((embed.Footer is null) ? string.Empty : embed.Footer.Text + "\n") +
-                ((embed.Timestamp is null) ? string.Empty : embed.Timestamp.ToString())
-            );
-
-            return dEmbed.ToString();
-        }
-
-        /// <summary>
-        /// Gets the localized response string.
-        /// </summary>
-        /// <param name="localizer">The response strings cache.</param>
-        /// <param name="locale">The locale of the response string.</param>
-        /// <param name="sample">The key of the response string.</param>
-        /// <returns>The localized response string. If it does not exist, returns <paramref name="sample"/>.</returns>
-        internal static string GetLocalizedResponse(ILocalizer localizer, string locale, string sample)
-        {
-            return (sample is not null && localizer.ContainsResponse(locale, sample))
-                ? localizer.GetResponseString(locale, sample)
-                : sample ?? string.Empty;
-        }
-
-        /// <summary>
         /// Gets the localized Discord message.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="message">The message content.</param>
         /// <param name="embed">The message embed.</param>
-        /// <param name="isError"><see langword="true"/> if the embed should contain the guild OkColor, <see langword="false"/> for ErrorColor.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <returns>The localized message content, embed, and the message settings.</returns>
-        internal static (string, DiscordEmbedBuilder, IMessageSettings) GetLocalizedMessage(CommandContext context, string message, DiscordEmbedBuilder embed, bool isError)
+        internal static (SerializableDiscordMessage, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordMessage embed, bool isError)
         {
             var dbCache = context.Services.GetService<IDbCache>();
             var localizer = context.Services.GetService<ILocalizer>();
@@ -237,10 +145,10 @@ namespace AkkoBot.Services
                 ? dbGuild
                 : context.Services.GetService<BotConfig>();
 
-            var responseString = GetLocalizedResponse(localizer, settings.Locale, message);  // Localize the content message, if there is one
-            var localizedEmbed = LocalizeEmbed(localizer, settings, embed, isError);         // Localize the embed message
+            embed.Color ??= (isError) ? settings.ErrorColor : settings.OkColor;
+            embed.WithLocalization(localizer, settings.Locale);
 
-            return (responseString, localizedEmbed, settings);
+            return (embed, settings);
         }
 
         /// <summary>
@@ -249,10 +157,10 @@ namespace AkkoBot.Services
         /// <param name="originalFields">The collection of embed fields.</param>
         /// <param name="inlineLimit">Defines how many inline fields should be allowed on a single line. Set to 0 to disable.</param>
         /// <returns>The formatted content of the fields.</returns>
-        internal static string DeconstructEmbedFields(IEnumerable<DiscordEmbedField> originalFields, int inlineLimit = 0)
+        internal static string DeconstructEmbedFields(IEnumerable<SerializableEmbedField> originalFields, int inlineLimit = 0)
         {
             // Redistribute the fields into groups based on their inline property
-            var sisterFields = new List<List<DiscordEmbedField>> { new List<DiscordEmbedField>() };
+            var sisterFields = new List<List<SerializableEmbedField>> { new List<SerializableEmbedField>() };
             int sisterGroup = 0, inlinedEmbeds = 0;
 
             // Build the groups
@@ -260,7 +168,7 @@ namespace AkkoBot.Services
             {
                 if (!field.Inline || (inlineLimit > 0 && ++inlinedEmbeds > inlineLimit))
                 {
-                    sisterFields.Add(new List<DiscordEmbedField>());
+                    sisterFields.Add(new List<SerializableEmbedField>());
                     sisterGroup++;
                     inlinedEmbeds = 1; // Reset limit for the new line
                 }
@@ -280,9 +188,9 @@ namespace AkkoBot.Services
                     foreach (var field in fieldGroup)
                     {
                         result.AppendLine(
-                            $"|{field.Name.HardPad(field.Name.Length + 2)}|\n" +
-                            new string('-', field.Name.Length + 4) + '\n' +
-                            field.Value
+                            $"|{field.Title.HardPad(field.Title.Length + 2)}|\n" +
+                            new string('-', field.Title.Length + 4) + '\n' +
+                            field.Text
                         );
                     }
                 }
@@ -296,17 +204,17 @@ namespace AkkoBot.Services
         /// </summary>
         /// <param name="fields">A collection of embed fields.</param>
         /// <returns>The formatted content of all fields.</returns>
-        private static string ExtractInLineFields(IEnumerable<DiscordEmbedField> fields)
+        private static string ExtractInLineFields(IEnumerable<SerializableEmbedField> fields)
         {
             // Extract the content of the fields
             var result = new StringBuilder();
 
             // Get the names and values of the grouped fields
-            var names = fields.Select(x => x.Name).ToArray();
+            var names = fields.Select(x => x.Title).ToArray();
             var namesLengthCounter = 0;
 
             var values = fields
-                .Select(x => x.Value.Split('\n'))
+                .Select(x => x.Text.Split('\n'))
                 .Fill(string.Empty)
                 .Select(x =>
                 {

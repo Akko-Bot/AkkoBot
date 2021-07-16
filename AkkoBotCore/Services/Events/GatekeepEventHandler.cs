@@ -1,5 +1,4 @@
 ﻿using AkkoBot.Commands.Common;
-using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Config;
 using AkkoBot.Extensions;

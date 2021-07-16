@@ -2,7 +2,8 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -102,7 +103,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 fields.Add(new("expires_in", string.Join("\n", group.Select(x => (x.MaxAge is 0) ? "-" : x.CreatedAt.AddSeconds(x.MaxAge).ToDiscordTimestamp())), true));
             }
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("invite_list_title");
 
             await context.RespondPaginatedByFieldsAsync(embed, fields, 3);
@@ -112,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_invite_check")]
         public async Task CheckInviteAsync(CommandContext context, [Description("arg_discord_invite")] string invite)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var guildInvite = (await context.Guild.GetInvitesAsync()).FirstOrDefault(x => invite.Contains(x.Code, StringComparison.Ordinal));
 
             if (guildInvite is null)

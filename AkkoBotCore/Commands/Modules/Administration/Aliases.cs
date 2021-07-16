@@ -2,10 +2,10 @@
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -61,7 +61,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var dbAliases = _service.GetAliases(context.Guild?.Id);
             var isEmpty = dbAliases.Count is 0;
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (isEmpty)
                 embed.WithDescription("alias_error");

@@ -2,10 +2,10 @@
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,7 +54,8 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task ToggleNotificationAsync(CommandContext context)
         {
             var isEnabled = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.NotifyOnDelete = !x.NotifyOnDelete);
-            var embed = new DiscordEmbedBuilder { Description = context.FormatLocalized("fw_notify", (isEnabled) ? "enabled" : "disabled") };
+            var embed = new SerializableDiscordMessage()
+                .WithDescription(context.FormatLocalized("fw_notify", (isEnabled) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -65,7 +66,8 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task ToggleWarnOnDeleteAsync(CommandContext context)
         {
             var isEnabled = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.WarnOnDelete = !x.WarnOnDelete);
-            var embed = new DiscordEmbedBuilder { Description = context.FormatLocalized("fw_warn", (isEnabled) ? "enabled" : "disabled") };
+            var embed = new SerializableDiscordMessage()
+                .WithDescription(context.FormatLocalized("fw_warn", (isEnabled) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -122,7 +124,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.IsActive = !x.IsActive);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fw_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -135,7 +137,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fw_invite_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -148,7 +150,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fw_sticker_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -166,7 +168,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             var isEmpty = dbEntry is null || words.Length == 0;
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoConstants.MaxEmbedDescriptionLength, "[...]"));
 
             if (!isEmpty)

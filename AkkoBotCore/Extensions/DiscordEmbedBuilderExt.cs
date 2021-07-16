@@ -1,4 +1,5 @@
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System.Collections.Generic;
@@ -47,13 +48,13 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <param name="embed">This embed.</param>
         /// <param name="content">The text content from outside the embed.</param>
-        /// <returns>A <see cref="SerializableEmbed"/> of this <paramref name="embed"/>.</returns>
-        public static SerializableEmbed BuildSerializableEmbed(this DiscordEmbedBuilder embed, string content = null)
+        /// <returns>A <see cref="SerializableDiscordMessage"/> of this <paramref name="embed"/>.</returns>
+        public static SerializableDiscordMessage BuildSerializableEmbed(this DiscordEmbedBuilder embed, string content = null)
         {
             var embedAuthor = (embed.Author is null) ? null : new SerializableEmbedAuthor(embed.Author.Name, embed.Author.Url, embed.Author.IconUrl);
             var embedTitle = (embed.Title is null) ? null : new SerializableEmbedTitle(embed.Title, embed.Url);
 
-            var model = new SerializableEmbed
+            var model = new SerializableDiscordMessage
             {
                 Content = content,
                 Color = (!embed.Color.HasValue) ? null : embed.Color.Value.ToString(),

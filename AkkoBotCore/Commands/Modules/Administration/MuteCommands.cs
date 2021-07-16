@@ -2,6 +2,7 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -53,7 +54,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 await user.SetMuteAsync(true);
 
             // Send confirmation message
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("mute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);
@@ -81,7 +82,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 await user.SetMuteAsync(false);
 
             // Send confirmation message
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("unmute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);
@@ -99,7 +100,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             var embed = await _roleService.SetVoiceMuteAsync(user, true, "voicemute_success", reason);
-            embed.Description = context.FormatLocalized(embed.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -116,7 +117,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             var embed = await _roleService.SetVoiceMuteAsync(user, false, "voiceunmute_success", reason);
-            embed.Description = context.FormatLocalized(embed.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -133,7 +134,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             var embed = await _roleService.SetDeafAsync(user, true, "deafen_success", reason);
-            embed.Description = context.FormatLocalized(embed.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -150,7 +151,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             var embed = await _roleService.SetDeafAsync(user, false, "undeafen_success", reason);
-            embed.Description = context.FormatLocalized(embed.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -170,7 +171,7 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.TriggerTypingAsync();
             await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason, true);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("chatmute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);
@@ -191,7 +192,7 @@ namespace AkkoBot.Commands.Modules.Administration
             await context.TriggerTypingAsync();
             await _channelServices.RemoveOverwritesAsync(context.Guild, reason, x => x.Id == user.Id);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("chatunmute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);

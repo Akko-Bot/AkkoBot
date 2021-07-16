@@ -7,7 +7,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AkkoBot.Models
+namespace AkkoBot.Models.Serializable
 {
     /// <summary>
     /// Represents a serializable model of a <see cref="Command"/> object.

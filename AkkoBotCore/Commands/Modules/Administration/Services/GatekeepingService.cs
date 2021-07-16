@@ -4,11 +4,9 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus.Entities;
-using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Administration.Services

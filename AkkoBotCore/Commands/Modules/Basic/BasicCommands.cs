@@ -1,10 +1,10 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -19,7 +19,7 @@ namespace AkkoBot.Commands.Modules.Basic
         [Description("Gets the websocket latency for this bot.")]
         public async Task PingAsync(CommandContext context)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription($"{context.Client.Ping} ms");
 
             await context.RespondLocalizedAsync(embed);
@@ -30,7 +30,7 @@ namespace AkkoBot.Commands.Modules.Basic
         [Description("Shuts the bot down.")]
         public async Task DieAsync(CommandContext context)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription("shutdown");
 
             await context.RespondLocalizedAsync(embed);
@@ -48,7 +48,7 @@ namespace AkkoBot.Commands.Modules.Basic
         [Description("Restarts the bot.")]
         public async Task RestartAsync(CommandContext context)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription("restart");
 
             await context.RespondLocalizedAsync(embed);
@@ -66,7 +66,7 @@ namespace AkkoBot.Commands.Modules.Basic
         {
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("online_since")
                 .WithDescription(Formatter.InlineCode($"[{_startup.LocalDateTime}]"))
                 .AddField("Shards", $"#{context.Client.ShardId}/{context.Client.ShardCount}", inline: true)

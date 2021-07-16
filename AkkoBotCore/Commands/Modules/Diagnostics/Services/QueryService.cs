@@ -1,12 +1,11 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

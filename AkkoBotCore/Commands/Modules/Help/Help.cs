@@ -2,11 +2,11 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Formatters;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,23 +48,20 @@ namespace AkkoBot.Commands.Modules.Help
                     helpBuilder.WithCommand(cmd);
             }
 
-            var (content, embed) = helpBuilder.Build();
+            var message = helpBuilder.Build();
             var botPerms = context.Guild?.CurrentMember.PermissionsIn(context.Channel) ?? Permissions.SendMessages;
 
             // Try to send: channel message, channel reaction, direct message
             if (botPerms.HasPermission(Permissions.SendMessages))
-                await context.RespondLocalizedAsync(content, embed, helpBuilder.IsErroed, helpBuilder.IsErroed);
+                await context.RespondLocalizedAsync(message, helpBuilder.IsErroed, helpBuilder.IsErroed);
             else if (botPerms.HasPermission(Permissions.AddReactions))
                 await context.Message.CreateReactionAsync(AkkoEntities.WarningEmoji);
             else
             {
+                message.Content = "⚠️ " + Formatter.Bold(context.FormatLocalized("help_cant_dm", context.Guild.Name)) + "\n\n" + message.Content;
+
                 // Might consider placing a global ratelimit on !help because of this
-                await context.SendLocalizedDmAsync(
-                    context.Member,
-                    "⚠️ " + Formatter.Bold(context.FormatLocalized("help_cant_dm", context.Guild.Name)) + "\n\n" + content,
-                    embed,
-                    true
-                );
+                await context.SendLocalizedDmAsync(context.Member, message, true);
             }
         }
 
@@ -84,7 +81,7 @@ namespace AkkoBot.Commands.Modules.Help
                 .OrderBy(x => x)
                 .ToArray();
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("modules_title")
                 .WithDescription(string.Join("\n", namespaces))
                 .WithFooter(
@@ -115,7 +112,7 @@ namespace AkkoBot.Commands.Modules.Help
                 })
                 .ToListAsync();
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (cmdGroup.Count == 0)
             {
@@ -146,7 +143,7 @@ namespace AkkoBot.Commands.Modules.Help
             if (keyword.StartsWith(context.Prefix))
                 keyword = keyword[context.Prefix.Length..];
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var cmds = context.CommandsNext.RegisteredCommands.Values
                 .Concat(
                     context.CommandsNext.RegisteredCommands.Values

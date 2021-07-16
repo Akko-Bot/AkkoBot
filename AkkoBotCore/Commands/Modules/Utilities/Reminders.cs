@@ -2,6 +2,7 @@
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -100,7 +101,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 }
             );
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (reminders.Count == 0)
             {

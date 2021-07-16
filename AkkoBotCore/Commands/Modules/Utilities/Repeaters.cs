@@ -2,6 +2,7 @@
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Timers.Abstractions;
@@ -86,7 +87,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_repeat_info")]
         public async Task RepeaterInfoAsync(CommandContext context, [Description("arg_uint")] int id)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var repeater = _service.GetRepeaters(context.Guild, x => x.Id == id).FirstOrDefault();
 
             if (repeater is null)
@@ -125,7 +126,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 }
             );
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (repeaters.Count is 0)
             {

@@ -4,6 +4,7 @@ using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -47,7 +48,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             if (cmd is null)
             {
-                var embed = new DiscordEmbedBuilder().WithDescription("command_not_found");
+                var embed = new SerializableDiscordMessage().WithDescription("command_not_found");
                 await context.RespondLocalizedAsync(embed, isError: true);
 
                 return;
@@ -58,7 +59,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             if (failedChecks.Any())
             {
-                var embed = new DiscordEmbedBuilder().WithDescription("command_check_failed");
+                var embed = new SerializableDiscordMessage().WithDescription("command_check_failed");
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
             else
@@ -83,7 +84,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             await _guildService.SetPropertyAsync(context.Guild, x => x.Prefix = newPrefix);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(newPrefix)));
 
             await context.RespondLocalizedAsync(embed);
@@ -113,7 +114,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             if (!messages.Any())
             {
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription("prune_error");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -198,7 +199,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 ?? _botService.GetOrSetProperty(x => x.BotPrefix);
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized(response, Formatter.InlineCode(prefix)));
 
             await context.RespondLocalizedAsync(embed);

@@ -3,7 +3,8 @@ using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -33,7 +34,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
         public async Task CreateSimplePollAsync(CommandContext context, [RemainingText, Description("arg_poll_question")] string question)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle(context.FormatLocalized("poll_title", context.User.GetFullname()))
                 .WithDescription(Formatter.Bold(question));
 
@@ -67,7 +68,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             if (_service.GetPolls(context.Guild).Any(x => x.Type is PollType.Anonymous))
             {
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription("poll_anonymous_error");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -89,7 +90,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             if (poll is null)
             {
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription("poll_not_found");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -124,7 +125,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
             if (poll is null)
             {
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription("poll_not_found");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -160,12 +161,14 @@ namespace AkkoBot.Commands.Modules.Utilities
             var poll = _service.GetPolls(message.Channel.Guild)
                 .FirstOrDefault(x => x.GuildIdFK == message.Channel.Guild.Id && x.ChannelId == message.Channel.Id && x.MessageId == message.Id);
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var success = poll is not null && await _service.VoteAsync(context.User, poll, option);
 
-            embed.Description = (success)
+            embed.WithDescription(
+                (success)
                 ? context.FormatLocalized("voted_for", "\n" + poll.Answers[option - 1])
-                : "vote_failure"; // Poll doesn't exist or user has voted already
+                : "vote_failure"    // Poll doesn't exist or user has voted already
+            );
 
             await context.RespondLocalizedAsync(embed, isError: !success);
         }
@@ -176,7 +179,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         public async Task ListPollsAsync(CommandContext context)
         {
             var polls = _service.GetPolls(context.Guild);
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (!polls.Any())
             {
@@ -208,7 +211,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         /// <returns>The poll that was just created.</returns>
         private async Task<DiscordMessage> CreateNumeratedPollAsync(CommandContext context, PollType pollType, string[] qAnswers)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (qAnswers.Length < 3 || (pollType is PollType.Numeric && qAnswers.Length > 11))
             {

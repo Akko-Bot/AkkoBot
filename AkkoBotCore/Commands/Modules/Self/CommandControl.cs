@@ -2,10 +2,10 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,7 +33,7 @@ namespace AkkoBot.Commands.Modules.Self
                 ? await _service.DisableGlobalCommandAsync(cmd)
                 : await _service.EnableGlobalCommandAsync(command);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(
                     context.FormatLocalized(
                         (cmd is not null || success) ? "gcmd_toggle" : "gcmd_error",
@@ -57,7 +57,7 @@ namespace AkkoBot.Commands.Modules.Self
                 ? await _service.DisableGlobalCommandsAsync(cmds)
                 : await _service.EnableGlobalCommandsAsync(module);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(
                     context.FormatLocalized(
                         (cmds.Length is not 0 || success) ? "gmod_toggle" : "gmod_error",
@@ -77,7 +77,7 @@ namespace AkkoBot.Commands.Modules.Self
                 .Select(x => Formatter.InlineCode(x.Key))
                 .ToArray();
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("ldc_title")
                 .WithDescription((cmds.Length is 0) ? "ldc_empty" : string.Join(", ", cmds));
 

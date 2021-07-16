@@ -3,6 +3,7 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -95,7 +96,7 @@ namespace AkkoBot.Commands.Modules.Self
 
             if (statuses.Count == 0)
             {
-                var error = new DiscordEmbedBuilder()
+                var error = new SerializableDiscordMessage()
                     .WithDescription("pstatus_error");
 
                 await context.RespondLocalizedAsync(error, isError: true);
@@ -106,7 +107,7 @@ namespace AkkoBot.Commands.Modules.Self
             var messages = string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, "[...]")).ToArray());
             var time = string.Join('\n', statuses.Select(x => x.RotationTime).ToArray());
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("pstatus_title")
                 .AddField("id", ids, true)
                 .AddField("message", messages, true)

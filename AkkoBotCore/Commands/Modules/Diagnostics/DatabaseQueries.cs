@@ -2,6 +2,7 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Diagnostics.Services;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -40,7 +41,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
         /// <param name="query">The SQL query.</param>
         private async Task SqlExecAsync(CommandContext context, string query)
         {
-            var question = new DiscordEmbedBuilder()
+            var question = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("q_are_you_sure", "q_sql_query", "q_yes", "q_no"));
 
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
@@ -55,7 +56,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
 
                 var (rows, time) = await result;
 
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription(context.FormatLocalized("sqlexec_success", time.ToString("0.00"), rows));
 
                 await context.RespondLocalizedAsync(embed);
@@ -79,7 +80,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
 
             var (fields, time) = await result;
 
-            var text = GeneralService.DeconstructEmbedFields(fields.Select(x => x.Build())).Replace("\r", string.Empty);
+            var text = GeneralService.DeconstructEmbedFields(fields).Replace("\r", string.Empty);
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text[..text.LastOccurrenceOf('\n', 2)]));    // Substring to remove the last row of empty values
 
             var message = new DiscordMessageBuilder()
@@ -101,7 +102,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
             if (task.Exception.GetBaseException() is not PostgresException exception)
                 throw task.Exception.GetBaseException();
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                     .WithDescription($"{exception.Severity} ({exception.SqlState}): {exception.MessageText}\n" + exception.Hint);
 
             await context.RespondLocalizedAsync(embed, isError: true);

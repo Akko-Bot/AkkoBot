@@ -5,6 +5,7 @@ using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services;
 using AkkoBot.Services.Logging;
 using AkkoBot.Services.Logging.Abstractions;
@@ -50,7 +51,7 @@ namespace AkkoBot.Commands.Modules.Self
             var locales = _botService.GetLocales()
                 .OrderBy(code => code);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("locales_title")
                 .AddField("code", string.Join('\n', locales), true)
                 .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x)), true);
@@ -148,7 +149,7 @@ namespace AkkoBot.Commands.Modules.Self
         {
             var settings = _botService.GetConfigs();
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("bot_settings_title")
                 .AddField("settings", string.Join("\n", settings.Keys.ToArray()), true)
                 .AddField("value", string.Join("\n", settings.Values.ToArray()), true);
@@ -304,7 +305,7 @@ namespace AkkoBot.Commands.Modules.Self
                     .Select(id => $"<@{id}>")
                     .ToArray();
 
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .AddField("owners", (ids.Length is 0) ? "-" : string.Join("\n", ids), true)
                     .AddField("app_owners", string.Join("\n", context.Client.CurrentApplication.Owners.Select(user => user.Mention).ToArray()), true);
 

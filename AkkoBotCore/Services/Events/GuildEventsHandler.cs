@@ -2,6 +2,8 @@
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
@@ -19,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static DSharpPlus.Entities.DiscordEmbedBuilder;
 
 namespace AkkoBot.Services.Events
 {
@@ -165,18 +166,23 @@ namespace AkkoBot.Services.Events
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
             var toWarn = filteredWords.WarnOnDelete && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
 
-            var embed = new DiscordEmbedBuilder
+            var message = new SerializableDiscordMessage()
             {
-                Description = (string.IsNullOrWhiteSpace(filteredWords.NotificationMessage))
-                    ? "fw_default_notification"
-                    : filteredWords.NotificationMessage,
+                Content = eventArgs.Author.Mention,
+
+                Body = new()
+                {
+                    Description = (string.IsNullOrWhiteSpace(filteredWords.NotificationMessage))
+                        ? "fw_default_notification"
+                        : filteredWords.NotificationMessage
+                },
 
                 Footer = (toWarn)
-                    ? new EmbedFooter() { Text = "fw_warn_footer" }
+                    ? new SerializableEmbedFooter("fw_warn_footer")
                     : null
             };
 
-            var notification = await dummyCtx.RespondLocalizedAsync(eventArgs.Author.Mention, embed, false, true);
+            var notification = await dummyCtx.RespondLocalizedAsync(message, false, true);
 
             // Apply warning, if enabled
             if (toWarn)
@@ -225,12 +231,13 @@ namespace AkkoBot.Services.Events
 
             var cmdHandler = client.GetCommandsNext();
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
+                .WithContent(eventArgs.Author.Mention)
                 .WithDescription("fw_stickers_notification");
 
             var fakeContext = cmdHandler.CreateContext(eventArgs.Message, null, null);
 
-            var notification = await fakeContext.RespondLocalizedAsync(eventArgs.Author.Mention, embed, false, true);
+            var notification = await fakeContext.RespondLocalizedAsync(embed, false, true);
 
             // Delete the notification message after some time
             _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));

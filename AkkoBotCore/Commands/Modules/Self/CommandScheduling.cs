@@ -3,11 +3,11 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -81,7 +81,7 @@ namespace AkkoBot.Commands.Modules.Self
             var reminders = (await _service.GetAutoCommandsAsync(context.User))
                 .OrderBy(x => _service.GetElapseTime(x));
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (!reminders.Any())
             {

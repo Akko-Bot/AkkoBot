@@ -2,7 +2,8 @@
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -83,7 +84,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Description("cmd_fc_list")]
         public async Task ListFiltersAsync(CommandContext context)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var filters = _service.GetContentFilters(context.Guild)
                 .Where(x => x.IsActive);
 
@@ -119,7 +120,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             channel ??= context.Channel;
             var result = await _service.SetContentFilterAsync(context.Guild, channel, selector);
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized(responseKey, (result) ? "enabled" : "disabled", channel.Mention));
 
             return await context.RespondLocalizedAsync(embed);

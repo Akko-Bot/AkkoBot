@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -42,7 +42,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         {
             try
             {
-                result = input.FromYaml<SerializableEmbed>().BuildMessage();
+                result = input.FromYaml<SerializableDiscordMessage>().BuildMessage();
                 return result.Content is not null || result.Embed is not null;
             }
             catch
@@ -168,9 +168,9 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="context">The command context.</param>
         /// <param name="server">The Discord guild to get information from</param>
         /// <returns>An embed with information about the <paramref name="server"/>.</returns>
-        public DiscordEmbedBuilder GetServerInfo(CommandContext context, DiscordGuild server)
+        public SerializableDiscordMessage GetServerInfo(CommandContext context, DiscordGuild server)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle(server.Name)
                 .WithThumbnail(server.IconUrl)
                 .AddField("id", server.Id.ToString(), true)
@@ -232,7 +232,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// <param name="embed">Embed to add the information to.</param>
         /// <param name="channel">Channel to get the information from.</param>
         /// <returns>An embed with information about the Discord <paramref name="channel"/>.</returns>
-        public DiscordEmbedBuilder GetChannelInfo(DiscordEmbedBuilder embed, DiscordChannel channel)
+        public SerializableDiscordMessage GetChannelInfo(SerializableDiscordMessage embed, DiscordChannel channel)
         {
             embed.WithTitle(channel.Name)
                 .AddField("type", channel.Type.ToString().ToLowerInvariant(), true)

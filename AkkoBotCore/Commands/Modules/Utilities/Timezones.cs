@@ -1,11 +1,11 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         public async Task ServerTimezoneAsync(CommandContext context)
         {
             var timezone = context.GetTimeZone();
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("server_timezone", Formatter.InlineCode($"{timezone.StandardName} ({timezone.BaseUtcOffset.Hours:00}:{timezone.BaseUtcOffset.Minutes:00})")));
 
             await context.RespondLocalizedAsync(embed);
@@ -36,7 +36,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 .Select(x => x.Id)
                 .SplitInto(AkkoConstants.LinesPerPage);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("timezone_list");
 
             foreach (var group in timezones)

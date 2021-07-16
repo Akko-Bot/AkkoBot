@@ -2,12 +2,12 @@
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +58,7 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task ListCmdCooldownsAsync(CommandContext context)
         {
             var commands = _service.GetCooldownCommands(context.Guild);
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (!commands.Any())
             {

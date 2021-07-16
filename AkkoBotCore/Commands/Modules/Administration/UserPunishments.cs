@@ -3,6 +3,7 @@ using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -143,7 +144,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 .ToArray();
 
             // Send the confirmation message
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle(":radioactive: " + context.FormatLocalized("massban"))
                 .WithDescription(context.FormatLocalized("massban_description", nonBanned.Length))
                 .WithFooter(context.FormatLocalized("q_operation_length_seconds", nonBanned.Length * AkkoEntities.SafetyDelay.TotalSeconds));
@@ -165,16 +166,13 @@ namespace AkkoBot.Commands.Modules.Administration
             }
 
             // Check if no user got banned
-            if (fails == nonBanned.Length)
-            {
-                embed.Description = context.FormatLocalized("massban_failure");
-                await result.ModifyLocalizedAsync(context, embed, false, true);
-            }
-            else
-            {
-                embed.Description = context.FormatLocalized("massban_success", nonBanned.Length - fails);
-                await result.ModifyLocalizedAsync(context, embed, false);
-            }
+            embed.WithDescription(
+                (fails == nonBanned.Length)
+                    ? "massban_failure"
+                    : context.FormatLocalized("massban_success", nonBanned.Length - fails)
+            );
+
+            await result.ModifyLocalizedAsync(context, embed, false, fails == nonBanned.Length);
         }
 
         [Command("timedban"), Aliases("tb")]
@@ -237,7 +235,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             if (user is null)
             {
-                var embed = new DiscordEmbedBuilder().WithDescription("unban_not_found");
+                var embed = new SerializableDiscordMessage().WithDescription("unban_not_found");
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
             else
@@ -246,7 +244,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 await context.Guild.UnbanMemberAsync(user.User, reason);
 
                 // Send unban message to the context channel
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription(context.FormatLocalized("unban_success", Formatter.Bold(user.User.GetFullname())));
 
                 await context.RespondLocalizedAsync(embed);
@@ -277,18 +275,14 @@ namespace AkkoBot.Commands.Modules.Administration
                 }
             }
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage()
+                .WithDescription(
+                    (failed == toUnban.Length)
+                        ? "massunban_failed"
+                        : context.FormatLocalized("massunban_succeded", toUnban.Length - failed)
+                );
 
-            if (failed == toUnban.Length)
-            {
-                embed.Description = "massunban_failed";
-                await context.RespondLocalizedAsync(embed, isError: true);
-            }
-            else
-            {
-                embed.Description = context.FormatLocalized("massunban_succeded", toUnban.Length - failed);
-                await context.RespondLocalizedAsync(embed);
-            }
+            await context.RespondLocalizedAsync(embed, true, failed == toUnban.Length);
         }
     }
 }

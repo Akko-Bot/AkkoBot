@@ -4,7 +4,8 @@ using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -58,7 +59,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             await _warnService.SaveInfractionAsync(context, user, note);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription("notice_success");
 
             await context.RespondLocalizedAsync(embed);
@@ -75,7 +76,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
 
             // Dm the user about the warn
-            var notification = new DiscordEmbedBuilder()
+            var notification = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("warn_dm", Formatter.Bold(context.Guild.Name)));
 
             if (reason is not null)
@@ -85,7 +86,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
             // Save warning to the database
             var punishment = await _warnService.SaveWarnAsync(context, user, reason);
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (punishment is not null)
             {
@@ -128,7 +129,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var amount = await _warnService.RemoveInfractionAsync(context.Guild, user, id);
 
             // Send confirmation message
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (amount == 1 && id.HasValue)
                 embed.WithDescription(context.FormatLocalized("unwarn_success", Formatter.InlineCode("#" + id), Formatter.Bold(user.GetFullname())));
@@ -151,7 +152,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var infractions = await _warnService.GetInfractionsAsync(context.Guild, user, WarnType.Warning);
             var fields = new List<SerializableEmbedField>(infractions.Count);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
 
             foreach (var (modName, infraction) in infractions)
@@ -183,7 +184,7 @@ namespace AkkoBot.Commands.Modules.Administration
             var occurrence = await _warnService.GetUserOccurrencesAsync(context.Guild, user);
             var fields = new List<SerializableEmbedField>(infractions.Count);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()))
                 .WithDescription(
                     context.FormatLocalized(
@@ -208,7 +209,7 @@ namespace AkkoBot.Commands.Modules.Administration
             }
 
             if (infractions.Count is 0)
-                embed.Description += "\n\n" + context.FormatLocalized("infractions_empty");
+                embed.Body.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
             await context.RespondPaginatedByFieldsAsync(embed, fields);
         }
@@ -233,7 +234,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             await _warnService.SaveWarnPunishmentAsync(context.Guild, amount, punishmentType, role, time);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription("warnp_success");
 
             await context.RespondLocalizedAsync(embed);
@@ -242,7 +243,7 @@ namespace AkkoBot.Commands.Modules.Administration
         [Command("warnpunishment")]
         public async Task WarnpAsync(CommandContext context, [Description("arg_warnp_rem_amount")] int amount)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var isRemoved = await _warnService.RemoveWarnPunishmentAsync(context.Guild, amount);
 
             if (isRemoved)
@@ -259,7 +260,7 @@ namespace AkkoBot.Commands.Modules.Administration
         {
             var punishments = await _warnService.GetServerPunishmentsAsync(context.Guild);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("warnpl_title");
 
             if (punishments.Count == 0)
@@ -295,7 +296,7 @@ namespace AkkoBot.Commands.Modules.Administration
         public async Task WarneAsync(CommandContext context, [Description("arg_timed_warn")] TimeSpan time)
         {
             var botConfig = _botService.GetConfig();
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (time < botConfig.MinWarnExpire && time != TimeSpan.Zero)
             {

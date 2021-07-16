@@ -2,6 +2,7 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -22,7 +23,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             user ??= context.Member;
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("xid", "user", Formatter.Bold(user.GetFullname()), Formatter.InlineCode(user.Id.ToString())));
 
             await context.RespondLocalizedAsync(embed);
@@ -34,7 +35,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             channel ??= context.Channel;
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("xid", "channel", Formatter.Bold(channel.Mention), Formatter.InlineCode(channel.Id.ToString())));
 
             await context.RespondLocalizedAsync(embed);
@@ -44,7 +45,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_serverid")]
         public async Task ServerIdAsync(CommandContext context)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("xid", "server", Formatter.Bold(context.Guild.Name), Formatter.InlineCode(context.Guild.Id.ToString())));
 
             await context.RespondLocalizedAsync(embed);
@@ -54,7 +55,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Description("cmd_roleid")]
         public async Task RoleIdAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("xid", "role", Formatter.Bold(role.Name), Formatter.InlineCode(role.Id.ToString())));
 
             await context.RespondLocalizedAsync(embed);
@@ -66,7 +67,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             if (newColor is null)
             {
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription(role.Color.ToString());
 
                 await context.RespondLocalizedAsync(embed, isMarked: false);
@@ -118,7 +119,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 ? "roles_title"
                 : context.FormatLocalized("userroles_title", user.Username);
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             foreach (var roleGroup in roles)
                 embed.AddField(title, string.Join('\n', roleGroup.ToArray()));
@@ -136,7 +137,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 .SplitInto(AkkoConstants.LinesPerPage);     // x users per page
 
             var title = context.FormatLocalized("inrole_title", role.Name);
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithFooter(context.FormatLocalized("total_of", ((users.Count - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault().Count));
 
             foreach (var userGroup in users)
@@ -229,7 +230,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             {
                 await context.Channel.ModifyAsync(x => x.Nsfw = !context.Channel.IsNSFW);
 
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription(context.FormatLocalized("nsfw_toggle", (context.Channel.IsNSFW) ? "enabled" : "disabled"));
 
                 await context.RespondLocalizedAsync(embed);
@@ -362,7 +363,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
                 if (roles.Length == 0)
                 {
-                    var embed = new DiscordEmbedBuilder()
+                    var embed = new SerializableDiscordMessage()
                         .WithDescription("deleteallroles_error");
 
                     await context.RespondLocalizedAsync(embed, isError: true);
@@ -370,7 +371,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 }
 
                 // Build the confirmation message
-                var question = new DiscordEmbedBuilder()
+                var question = new SerializableDiscordMessage()
                     .WithFooter(context.FormatLocalized("q_operation_length_seconds", roles.Length * AkkoEntities.SafetyDelay.TotalSeconds))
                     .WithDescription(
                         context.FormatLocalized(
@@ -389,7 +390,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                         await Task.Delay(AkkoEntities.SafetyDelay);
                     }
 
-                    var embed = new DiscordEmbedBuilder()
+                    var embed = new SerializableDiscordMessage()
                         .WithDescription(context.FormatLocalized("deleteallroles", roles.Length));
 
                     await context.RespondLocalizedAsync(embed);
@@ -445,7 +446,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 }
 
                 // add thing for length 0
-                var embed = new DiscordEmbedBuilder()
+                var embed = new SerializableDiscordMessage()
                     .WithDescription(context.FormatLocalized("removeallroles", roles.Length, Formatter.Bold(user.GetFullname())));
 
                 await context.RespondLocalizedAsync(embed);

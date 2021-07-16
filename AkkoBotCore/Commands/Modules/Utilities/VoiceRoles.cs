@@ -2,7 +2,8 @@
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -59,7 +60,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         {
             var voiceRoles = await _service.GetVoiceRolesAsync(context.Guild);
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
             var fields = new List<SerializableEmbedField>();
 
             if (voiceRoles.Count == 0)

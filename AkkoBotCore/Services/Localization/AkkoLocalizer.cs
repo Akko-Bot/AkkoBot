@@ -42,9 +42,11 @@ namespace AkkoBot.Services.Localization
             => _localizedStrings.ContainsKey(locale);
 
         public bool ContainsResponse(string locale, string response)
-            => _localizedStrings.ContainsKey(locale)
-                && (_localizedStrings[locale].ContainsKey(response)
-                || _localizedStrings[AkkoConstants.DefaultLanguage].ContainsKey(response));
+        {
+            return !string.IsNullOrWhiteSpace(response)
+                && _localizedStrings.ContainsKey(locale)
+                && (_localizedStrings[locale].ContainsKey(response) || _localizedStrings[AkkoConstants.DefaultLanguage].ContainsKey(response));
+        }
 
         public void ReloadLocalizedStrings()
         {
@@ -77,12 +79,8 @@ namespace AkkoBot.Services.Localization
                     ? _localizedStrings[locale][response]
                     : _localizedStrings[AkkoConstants.DefaultLanguage][response];
             }
-            else
-            {
-                return (_localizedStrings[locale].TryGetValue("error_not_found", out _))
-                    ? _localizedStrings[locale]["error_not_found"]
-                    : _localizedStrings[AkkoConstants.DefaultLanguage]["error_not_found"];
-            }
+
+            return response;
         }
 
         /// <summary>

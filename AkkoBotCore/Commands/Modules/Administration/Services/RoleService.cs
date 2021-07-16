@@ -1,5 +1,6 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
@@ -69,7 +70,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         {
             if (!CheckHierarchyAsync(context.Member, user))
             {
-                var embed = new DiscordEmbedBuilder().WithDescription(errorMessage);
+                var embed = new SerializableDiscordMessage()
+                    .WithDescription(errorMessage);
+
                 await context.RespondLocalizedAsync(embed, isError: true);
 
                 return false;
@@ -230,9 +233,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="responseKey">The key of the response string to be used in the response.</param>
         /// <param name="reason">The reason for the mute/unmute.</param>
         /// <returns>An embed with the appropriate response key.</returns>
-        public async Task<DiscordEmbedBuilder> SetVoiceMuteAsync(DiscordMember user, bool isMuting, string responseKey, string reason)
+        public async Task<SerializableDiscordMessage> SetVoiceMuteAsync(DiscordMember user, bool isMuting, string responseKey, string reason)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (user.VoiceState is null)
                 embed.WithDescription("voice_failure");
@@ -253,9 +256,9 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="responseKey">The key of the response string to be used in the response.</param>
         /// <param name="reason">The reason for the deaf/undeaf.</param>
         /// <returns>An embed with the appropriate response key.</returns>
-        public async Task<DiscordEmbedBuilder> SetDeafAsync(DiscordMember user, bool isDeafening, string responseKey, string reason)
+        public async Task<SerializableDiscordMessage> SetDeafAsync(DiscordMember user, bool isDeafening, string responseKey, string reason)
         {
-            var embed = new DiscordEmbedBuilder();
+            var embed = new SerializableDiscordMessage();
 
             if (user.VoiceState is not null)
                 embed.WithDescription("voice_failure");

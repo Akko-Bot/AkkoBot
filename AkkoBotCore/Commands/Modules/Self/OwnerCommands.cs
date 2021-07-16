@@ -4,7 +4,8 @@ using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -154,7 +155,7 @@ namespace AkkoBot.Commands.Modules.Self
             foreach (var group in guilds)
                 fields.Add(new(AkkoConstants.ValidWhitespace, string.Join("\n", group.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} {x.Name}")), true));
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle(context.FormatLocalized("listservers_title", context.Client.ShardId));
 
             await context.RespondPaginatedByFieldsAsync(embed, fields, 2);

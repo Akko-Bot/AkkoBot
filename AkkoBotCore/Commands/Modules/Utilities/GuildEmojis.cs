@@ -2,7 +2,8 @@ using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
-using AkkoBot.Models;
+using AkkoBot.Models.Serializable;
+using AkkoBot.Models.Serializable.EmbedParts;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -31,7 +32,7 @@ namespace AkkoBot.Commands.Modules.Utilities
         public async Task CheckGuildEmojiAsync(CommandContext context)
         {
             var fields = new List<SerializableEmbedField>();
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .WithTitle("emoji_list_title");
 
             var emojis = context.Guild.Emojis.Values

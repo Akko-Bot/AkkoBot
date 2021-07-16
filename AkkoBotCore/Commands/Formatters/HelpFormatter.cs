@@ -1,11 +1,11 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -174,7 +174,7 @@ namespace AkkoBot.Commands.Formatters
         /// </summary>
         /// <remarks>The string will be <see langword="null"/> if the embed is not <see langword="null"/> and vice-versa.</remarks>
         /// <returns>The result help message.</returns>
-        public (string, DiscordEmbedBuilder) Build()
+        public SerializableDiscordMessage Build()
         {
             var dbCache = _cmdContext.Services.GetService<IDbCache>();
             var useEmbed = (dbCache.Guilds.TryGetValue(_cmdContext.Guild?.Id ?? 0, out var dbGuild))
@@ -183,7 +183,7 @@ namespace AkkoBot.Commands.Formatters
 
             if (useEmbed)
             {
-                var msg = new DiscordEmbedBuilder()
+                var msg = new SerializableDiscordMessage()
                     .WithTitle(_helpTitle)
                     .WithDescription(_helpDescription);
 
@@ -206,18 +206,18 @@ namespace AkkoBot.Commands.Formatters
                 if (_helpExamplesField is not null)
                     msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
 
-                return (null, msg);
+                return msg;
             }
             else
             {
-                return (
-                    ((_helpTitle is not null) ? Formatter.Bold(_helpTitle) + "\n" : string.Empty) +
-                    ((_helpDescription is not null) ? _helpDescription + "\n\n" : string.Empty) +
-                    ((_helpRequiresField.Length != 0) ? Formatter.Bold(_cmdContext.FormatLocalized("requires")) + "\n" + _helpRequiresField.ToString() + "\n" : string.Empty) +
-                    ((_helpCommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("commands")) + "\n" + _helpCommandsField.ToString() + "\n" : string.Empty) +
-                    ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty),
-                    null
-                );
+                return new SerializableDiscordMessage()
+                    .WithContent(
+                        ((_helpTitle is not null) ? Formatter.Bold(_helpTitle) + "\n" : string.Empty) +
+                        ((_helpDescription is not null) ? _helpDescription + "\n\n" : string.Empty) +
+                        ((_helpRequiresField.Length != 0) ? Formatter.Bold(_cmdContext.FormatLocalized("requires")) + "\n" + _helpRequiresField.ToString() + "\n" : string.Empty) +
+                        ((_helpCommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("commands")) + "\n" + _helpCommandsField.ToString() + "\n" : string.Empty) +
+                        ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty)
+                    );
             }
         }
 

@@ -26,7 +26,7 @@ namespace AkkoBot.Services.Localization.Abstractions
         /// </summary>
         /// <param name="locale">Locale of the response string.</param>
         /// <param name="response">Response string key to be checked.</param>
-        /// <returns><see langword="true"/> if the response is registered, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the response is registered, <see langword="false"/> otherwise.</returns>
         bool ContainsResponse(string locale, string response);
 
         /// <summary>

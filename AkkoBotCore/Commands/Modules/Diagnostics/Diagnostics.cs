@@ -2,12 +2,12 @@
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
+using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
@@ -38,7 +38,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics
                 .EnumerateFiles("*.txt", SearchOption.AllDirectories)
                 .Sum(x => x.Length);
 
-            var embed = new DiscordEmbedBuilder()
+            var embed = new SerializableDiscordMessage()
                 .AddField("db_cache", $"{dbCache / _mb:0.00} MB", true)
                 .AddField("timers", $"{timers / _mb:0.00} MB", true)
                 .AddField("total", $"{GC.GetTotalMemory(false) / _mb:0.00} MB", true)
