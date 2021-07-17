@@ -25,6 +25,8 @@ namespace AkkoBot.Services
     /// </summary>
     public static class GeneralService
     {
+        private static readonly string[] _newlines = new string[] { "\n", Environment.NewLine };
+
         /// <summary>
         /// Checks if the specified <paramref name="id"/> is registered as a bot owner.
         /// </summary>
@@ -214,7 +216,7 @@ namespace AkkoBot.Services
             var namesLengthCounter = 0;
 
             var values = fields
-                .Select(x => x.Text.Split('\n'))
+                .Select(x => x.Text.Split(_newlines, StringSplitOptions.None))
                 .Fill(string.Empty)
                 .Select(x =>
                 {

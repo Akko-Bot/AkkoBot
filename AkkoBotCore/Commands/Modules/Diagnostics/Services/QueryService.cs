@@ -6,6 +6,7 @@ using AkkoBot.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -70,8 +71,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
             // Get the column names
             for (var column = 0; column < reader.FieldCount; column++)
             {
-                // Constant so the column name doesn't get localized
-                result.Add(new(AkkoConstants.ValidWhitespace + reader.GetName(column), string.Empty, true));
+                result.Add(new(reader.GetName(column), string.Empty, true));
                 fieldBuilders.Add(new());
             }
 
@@ -86,7 +86,24 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
                     continue;
 
                 while (row < reader.FieldCount)
-                    fieldBuilders[row].AppendLine(objs[row++].ToString());
+                {
+                    if (objs[row] is not ICollection collection)
+                        fieldBuilders[row].AppendLine(objs[row].ToString());
+                    else
+                    {
+                        fieldBuilders[row].Append('{');
+
+                        foreach (var obj in collection)
+                            fieldBuilders[row].Append(obj.ToString() + ", ");
+
+                        if (collection.Count is not 0)
+                            fieldBuilders[row].Remove(fieldBuilders[row].Length - 2, 2);
+
+                        fieldBuilders[row].AppendLine("}");
+                    }
+
+                    row++;
+                }
             }
 
             clock.Stop();   // Stop counting query execution time.
@@ -95,7 +112,7 @@ namespace AkkoBot.Commands.Modules.Diagnostics.Services
             for (var counter = 0; counter < result.Count; counter++)
             {
                 result[counter].Text = (string.IsNullOrWhiteSpace(fieldBuilders[counter].ToString()))
-                    ? AkkoConstants.ValidWhitespace
+                    ? string.Empty
                     : fieldBuilders[counter].ToString();
             }
 
