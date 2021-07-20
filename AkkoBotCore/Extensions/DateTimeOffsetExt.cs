@@ -1,3 +1,4 @@
+using AkkoBot.Common;
 using System;
 
 namespace AkkoBot.Extensions
@@ -19,18 +20,8 @@ namespace AkkoBot.Extensions
         /// </summary>
         /// <param name="date">This date time.</param>
         /// <param name="format">The timestamp format.</param>
-        /// <remarks>
-        /// Values for <paramref name="format"/>:
-        /// <br>f: Short date and time - "July 3, 2021 1:13 AM"</br>
-        /// <br>F: Long date and time - "Saturday, July 3, 2021 1:13 AM"</br>
-        /// <br>d: Short date - "07/03/2021"</br>
-        /// <br>D: Long date - "July 3, 2021"</br>
-        /// <br>t: Short time - "1:13 AM"</br>
-        /// <br>T: Long time - "1:13:15 AM"</br>
-        /// <br>R: Relative time - "3 days ago"</br>
-        /// </remarks>
         /// <returns>A Discord markdown timestamp.</returns>
-        public static string ToDiscordTimestamp(this DateTimeOffset date, char format = 'f')
-            => $"<t:{date.ToUnixTimeSeconds()}:{format}>";
+        public static string ToDiscordTimestamp(this DateTimeOffset date, DiscordTimestamp format = DiscordTimestamp.ShortDateAndTime)
+            => $"<t:{date.ToUnixTimeSeconds()}:{(char)format}>";
     }
 }

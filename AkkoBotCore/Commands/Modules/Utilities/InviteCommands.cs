@@ -122,7 +122,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             {
                 embed.AddField("author", guildInvite.Inviter.GetFullname(), true)
                     .AddField("code", guildInvite.Code, true)
-                    .AddField("created_at", guildInvite.CreatedAt.ToDiscordTimestamp('d'), true)
+                    .AddField("created_at", guildInvite.CreatedAt.ToDiscordTimestamp(DiscordTimestamp.ShortDate), true)
                     .AddField("channel", $"<#{guildInvite.Channel.Id}>", true)
                     .AddField("invite_temporary", (guildInvite.IsTemporary) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
                     .AddField("expires_in", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(), true)
