@@ -702,3 +702,5 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
+
+autoslowmode_title: Autoslowmode Settings

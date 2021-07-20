@@ -131,8 +131,8 @@ namespace AkkoBot.Commands.Modules.Administration
             var slowmode = _service.GetAutoSlowmodeSettings(context.Guild) ?? new();
 
             var embed = new SerializableDiscordMessage()
-                .WithTitle("ignored_ids")
-                .WithDescription((slowmode.IgnoredIds.Count is not 0) ? string.Join(", ", slowmode.IgnoredIds) : "ignored_ids_empty")
+                .WithTitle("autoslowmode_title")
+                .WithDescription((slowmode.IgnoredIds.Count is not 0) ? $"{context.FormatLocalized("ignored_ids")}: {string.Join(", ", slowmode.IgnoredIds)}" : null)
                 .AddField("message", slowmode.MessageAmount.ToString(), true)
                 .AddField("trigger_time", slowmode.SlowmodeTriggerTime.ToString(), true)
                 .AddField("interval", slowmode.SlowmodeInterval.ToString(), true)
