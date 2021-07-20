@@ -108,6 +108,9 @@ namespace AkkoBot.Core.Services
             // Catch aliased commands and execute them
             _shardedClient.MessageCreated += _globalEventsHandler.HandleCommandAliasAsync;
 
+            // Enables and disables channel slow mode
+            _shardedClient.MessageCreated += _guildEventsHandler.AutoSlowmodeAsync;
+
             // Delete messages with filtered words
             _shardedClient.MessageCreated += _guildEventsHandler.FilterWordAsync;
 

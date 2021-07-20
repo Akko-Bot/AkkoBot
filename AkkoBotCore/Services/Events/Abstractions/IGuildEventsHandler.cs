@@ -16,6 +16,11 @@ namespace AkkoBot.Services.Events.Abstractions
         Task AddJoinRolesAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
 
         /// <summary>
+        /// Handles channel automatic slow mode when a message is sent.
+        /// </summary>
+        Task AutoSlowmodeAsync(DiscordClient client, MessageCreateEventArgs eventArgs);
+
+        /// <summary>
         /// Deletes the message that invoked a command.
         /// </summary>
         Task DeleteCommandOnMessageAsync(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs);

@@ -294,7 +294,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 var result = await _service.SetPropertyAsync(context.Guild, x => UpdateDelCmdBlacklist(x, ids));
 
                 var embed = new SerializableDiscordMessage()
-                    .WithDescription(context.FormatLocalized((result) ? "delmsgoncmd_added_id" : "delmsgoncmd_removed_id", ids.Length));
+                    .WithDescription(context.FormatLocalized((result) ? "ignored_ids_add" : "ignored_ids_remove", ids.Length));
 
                 await context.RespondLocalizedAsync(embed);
             }
@@ -312,7 +312,7 @@ namespace AkkoBot.Commands.Modules.Administration
                 });
 
                 var embed = new SerializableDiscordMessage()
-                    .WithDescription(context.FormatLocalized((result is not 0) ? "delmsgoncmd_removed_id" : "delmsgoncmd_empty", result));
+                    .WithDescription(context.FormatLocalized((result is not 0) ? "ignored_ids_remove" : "delmsgoncmd_empty", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
             }
@@ -324,8 +324,8 @@ namespace AkkoBot.Commands.Modules.Administration
                 var dbGuild = _service.GetGuildSettings(context.Guild);
                 var idsString = string.Join(", ", dbGuild.DelCmdBlacklist);
                 var embed = new SerializableDiscordMessage()
-                    .WithTitle("delmsgoncmd_ignored_ids")
-                    .WithDescription(string.IsNullOrWhiteSpace(idsString) ? "delmsgoncmd_empty" : idsString);
+                    .WithTitle("ignored_ids_list")
+                    .WithDescription(string.IsNullOrWhiteSpace(idsString) ? "ignored_ids_empty" : idsString);
 
                 await context.RespondLocalizedAsync(embed, false);
             }
@@ -347,7 +347,7 @@ namespace AkkoBot.Commands.Modules.Administration
             /// </summary>
             /// <param name="dbGuild">The guild settings.</param>
             /// <param name="contextIds">The IDs to be included or removed from the list.</param>
-            /// <returns><see langword="true"/> if the ID list has increased, <see langword="false"/> otherwise.</returns>
+            /// <returns><see langword="true"/> if the list of IDs has increased, <see langword="false"/> otherwise.</returns>
             private bool UpdateDelCmdBlacklist(GuildConfigEntity dbGuild, params ulong[] contextIds)
             {
                 var amount = dbGuild.DelCmdBlacklist.Count;

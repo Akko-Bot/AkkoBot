@@ -44,6 +44,12 @@ namespace AkkoBot.Services.Caching.Abstractions
         ConcurrentDictionary<ulong, ConcurrentHashSet<AliasEntity>> Aliases { get; }
 
         /// <summary>
+        /// Contains all automatic slow mode settings.
+        /// </summary>
+        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild.</remarks>
+        ConcurrentDictionary<ulong, AutoSlowmodeEntity> AutoSlowmode { get; }
+
+        /// <summary>
         /// Contains all active word filters.
         /// </summary>
         /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild.</remarks>

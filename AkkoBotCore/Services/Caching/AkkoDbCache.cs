@@ -33,6 +33,7 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, ConcurrentHashSet<RepeaterEntity>> Repeaters { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; private set; }
         public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; private set; }
+        public ConcurrentDictionary<ulong, AutoSlowmodeEntity> AutoSlowmode { get; private set; }
 
         public AkkoDbCache(IServiceScopeFactory scopeFactory)
         {
@@ -58,6 +59,7 @@ namespace AkkoBot.Services.Database
             FilteredContent = new();
             Gatekeeping = new();
             Polls = new();
+            AutoSlowmode = new();
         }
 
         public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig botConfig = default)
@@ -98,6 +100,9 @@ namespace AkkoBot.Services.Database
             if (dbGuild.FilteredWordsRel is not null)
                 FilteredWords.TryAdd(dbGuild.GuildId, dbGuild.FilteredWordsRel);
 
+            if (dbGuild.AutoSlowmodeRel is not null)
+                AutoSlowmode.TryAdd(dbGuild.GuildId, dbGuild.AutoSlowmodeRel);
+
             if (dbGuild.FilteredContentRel.Count is not 0)
                 FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
 
@@ -121,6 +126,7 @@ namespace AkkoBot.Services.Database
             FilteredWords.TryRemove(sid, out _);
 
             FilteredContent.TryRemove(sid, out _);
+            AutoSlowmode.TryRemove(sid, out _);
             VoiceRoles.TryRemove(sid, out var filters);
             Repeaters.TryRemove(sid, out var voiceRoles);
             Polls.TryRemove(sid, out var polls);
@@ -152,6 +158,7 @@ namespace AkkoBot.Services.Database
                     FilteredWords?.Clear();
                     FilteredContent?.Clear();
                     Gatekeeping?.Clear();
+                    AutoSlowmode?.Clear();
 
                     if (Aliases is not null)
                     {
@@ -196,6 +203,7 @@ namespace AkkoBot.Services.Database
                 Repeaters = null;
                 VoiceRoles = null;
                 Gatekeeping = null;
+                AutoSlowmode = null;
 
                 _isDisposed = true;
             }

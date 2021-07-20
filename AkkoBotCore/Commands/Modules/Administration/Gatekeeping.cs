@@ -205,7 +205,7 @@ namespace AkkoBot.Commands.Modules.Administration
         }
 
         [Command("antialt"), HiddenOverload]
-        public async Task ToggleAntiAltAsync(CommandContext context)
+        public async Task DisableAntiAltAsync(CommandContext context)
         {
             await _service.SetPropertyAsync(context.Guild, x => x.AntiAlt = false);
             var embed = new SerializableDiscordMessage()

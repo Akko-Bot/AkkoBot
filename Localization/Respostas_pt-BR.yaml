@@ -17,6 +17,10 @@ arg_alias_remove: O atalho de comando a ser removido.
 arg_antialt_time: A diferença de tempo entre a entrada do usuário no servidor e a data em que sua conta foi criada.
 arg_autocommand_id: O ID do comando automático.
 arg_autocommand_time: Tempo até a ativação do comando.
+arg_autoslowmode_duration: Quanto tempo o modo lento deverá durar. Defini-lo para `0s` tornará o modo lento permanente.
+arg_autoslowmode_interval: O quão frequentemente usuários poderão enviar mensagens depois que o modo lento for ativado.
+arg_autoslowmode_messages: A quantidade de mensagens que precisam ser enviadas sucessivamente para ativar o modo lento. Mínimo de `2`.
+arg_autoslowmode_time: O período de tempo em que mensagens sucessivas precisam ser enviadas para que o modo lento seja ativado.
 arg_ban_deletion: Dias a se remover as últimas mensagens. O padrão é __1d__.
 arg_bantemplate: O modelo de notificação de banimento.
 arg_bltype: O tipo de registro na lista negra - __user__, __channel__ ou __server__.
@@ -105,6 +109,8 @@ author: Autor
 auto_punish: Punição | {0} | {1}
 autocommand_empty: Nenhum comando automático foi encontrado.
 autocommand_title: Lista de Comandos Automáticos
+autoslowmode_disabled: O modo lento automático foi desativado.
+autoslowmode_enabled: O modo lento será automaticamente ativado quando um usuário enviar {0} mensagens em {1} segundos, limitando usuários a uma mensagem a cada {2} segundos por {3} segundos.
 ban: Banir
 ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
@@ -146,6 +152,11 @@ cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando 
 cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
 cmd_autocommand_remove: Remove um comando automático com o ID especificado.
 cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
+cmd_autoslowmode: Agrupa comandos relacionados ao modo lento automático.
+cmd_autoslowmode_ignore: Adiciona IDs de usuários, canais e/ou cargos à lista de IDs ignorados, desativando a ativação do modo lento para eles.
+cmd_autoslowmode_ignoreclear: Remove todos os IDs ignorados para o modo lento automático.
+cmd_autoslowmode_list: Exibe as configurações do modo lento automático nesse servidor.
+cmd_autoslowmode_set: Ativa o modo lento automático no servidor. Quando um usuário enviar uma certa quantidade de mensagens num espaço de tempo, o modo lento será automaticamente ativado no canal onde as mensagens foram enviadas. Usuários com permissão para GerenciarMensagens ou GerenciarCanais não ativam o modo lento. Canais onde o modo lento já está ativado não são afetados. Forneça nenhum parâmetro para desativar.
 cmd_ban: Bane um usuário.
 cmd_bantemplate: Define o modelo de notificação de banimento a ser enviado a usuários que forem banidos do servidor. Forneça nenhum parâmetro para utilizar a notificação de banimento padrão.
 cmd_bl_addmany: Adiciona múltiplos IDs à lista negra.
@@ -382,15 +393,12 @@ deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novam
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
 deleted_role: Cargo excluído
-delmsgoncmd_added_id: '{0} IDs foram adicionados à lista de IDs ignorados.'
 delmsgoncmd_disabled: A exclusão automática de comandos foi desativada. Comandos serão excluídos somente se forem executados em um context que contenha um ID ignorado.
-delmsgoncmd_empty: Não há IDs ignorados.
 delmsgoncmd_enabled: A exclusão automática de comandos foi ativada. Comandos serão excluídos a não ser que sejam executados em um contexto que contenha um ID ignorado.
-delmsgoncmd_ignored_ids: Lista de IDs ignorados.
-delmsgoncmd_removed_id: '{0} IDs foram removidos da lista de IDs ignorados.'
 denied: Negado
 description: Descrição
 disabled: desativado
+duration: Duração
 emoji_list_title: Emojis do Servidor
 emojis: Emojis
 enabled: ativado
@@ -468,6 +476,11 @@ high: Alto
 highest: Máximo
 hours: Horas
 id: ID
+ignored_ids: IDs Ignorados
+ignored_ids_add: '{0} IDs foram adicionados à lista de IDs ignorados.'
+ignored_ids_empty: Não há IDs ignorados.
+ignored_ids_list: Lista de IDs ignorados.
+ignored_ids_remove: '{0} IDs foram removidos da lista de IDs ignorados.'
 info: Info
 infraction: Infração
 infractions_empty: Esse usuário não possui infrações.
@@ -479,11 +492,13 @@ invalid_color: O código de cor especificado é inválido.
 invite_list_title: Lista de convites do servidor
 invite_not_found: Convite não encontrado.
 invite_temporary: É temporário
+is_active: Está Ativo
 is_attachment_only: Anexos
 is_command_only: Comandos
 is_image_only: Imagens
 is_invite_only: Convites
 is_mod: É Moderador
+is_not_active: Não Está Ativo
 is_url_only: URLs
 joined_at: Entrou Em
 joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
@@ -513,6 +528,7 @@ massunban_succeded: '{0} usuários foram desbanidos do servidor.'
 medium: Médio
 members: Membros
 message: Mensagem
+messages: Mensagens
 minutes: Minutos
 modlog_description: '{0} anotações, {1} advertências, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
 modroles: Cargos de Moderador
@@ -639,6 +655,7 @@ timers: Timers
 timezone_list: Fusos Horários
 total: Total
 total_of: 'Total de {0}'
+trigger_time: Ativa Dentro De
 triggers_at: Data de Execução
 triggers_in: Executa Em
 type: Tipo

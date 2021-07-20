@@ -17,6 +17,10 @@ arg_alias_remove: The alias to be removed.
 arg_antialt_time: The time difference between when the user joined the server and when their account was created.
 arg_autocommand_id: The ID of the autocommand.
 arg_autocommand_time: Time until the command activation.
+arg_autoslowmode_duration: For how long the slow mode is going to last. Setting it to `0s` to makes the slow mode permanent.
+arg_autoslowmode_interval: How frequently users will be able to send messages after the slow mode is triggered.
+arg_autoslowmode_messages: The amount of messages that need to be sent in rapid succession in order to trigger the slow mode. Minimum of `2`.
+arg_autoslowmode_time: The time frame within successive messages need to be sent in order for the slow mode to be triggered.
 arg_ban_deletion: How many days to remove messages from. Default is __1d__.
 arg_bantemplate: The template for the ban notification.
 arg_bltype: The type of the blacklist entry - __user__, __channel__ or __server__.
@@ -105,6 +109,8 @@ author: Author
 auto_punish: Punishment | {0} | {1}
 autocommand_empty: No autocommands were found.
 autocommand_title: List of Autocommands
+autoslowmode_disabled: Automatic slow mode has been disabled.
+autoslowmode_enabled: Slow mode will be automatically enabled when a user sends {0} messages within {1} seconds, limiting users to one message every {2} seconds for {3} seconds.
 ban: Ban
 ban_enum: banned
 ban_notification: You have been banned from the {0} server.
@@ -146,6 +152,11 @@ cmd_autocommand_addscheduled: Adds an autocommand that expires after it is trigg
 cmd_autocommand_list: Lists all autocommands you have created.
 cmd_autocommand_remove: Removes an autocommand with the specified ID.
 cmd_autocommand_startup: Adds an autocommand that executes as soon as the bot connects to Discord.
+cmd_autoslowmode: Groups commands related to automatic slow mode.
+cmd_autoslowmode_ignore: Adds a user, channel and/or role IDs to the list of ignored IDs, disabling the activation of slow mode for them.
+cmd_autoslowmode_ignoreclear: Removes all ignored IDs for the automatic slow mode.
+cmd_autoslowmode_list: Lists the settings for the automatic slow mode on this server.
+cmd_autoslowmode_set: Enables automatic slowmode for the server. When a user sends a certain amount of messages within the specified time frame, slow mode will be automatically enabled in the channel the messages were sent. Users with permission to ManageMessages or ManageChannels will not trigger the slow mode. Channels that already have slow mode enabled are unaffected. Provide no parameter to disable.
 cmd_ban: Bans a user.
 cmd_bantemplate: Sets a customized notification message to be sent to users when they are banned from the server. Provide no parameter to use the default ban notification message.
 cmd_bl_addmany: Adds multiple IDs to the blacklist.
@@ -382,15 +393,12 @@ deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
 deleted_role: Deleted role
-delmsgoncmd_added_id: Added {0} IDs to the list of ignored IDs.
 delmsgoncmd_disabled: Automatic deletion of messages has been disabled. Commands will only be deleted if they are executed in a context with an ignored ID.
-delmsgoncmd_empty: There is no ignored ID.
 delmsgoncmd_enabled: Automatic deletion of messages has been enabled. Commands will be deleted by default unless if they are executed in a context with an ignored ID.
-delmsgoncmd_ignored_ids: List of ignored IDs.
-delmsgoncmd_removed_id: Removed {0} IDs from the list of ignored IDs.
 denied: Denied
 description: Description
 disabled: disabled
+duration: Duration
 emoji_list_title: Server Emojis
 emojis: Emojis
 enabled: enabled
@@ -468,6 +476,11 @@ high: High
 highest: Highest
 hours: Hours
 id: ID
+ignored_ids: Ignored IDs
+ignored_ids_add: Added {0} IDs to the list of ignored IDs.
+ignored_ids_empty: There is no ignored ID.
+ignored_ids_list: List of ignored IDs.
+ignored_ids_remove: Removed {0} IDs from the list of ignored IDs.
 info: Info
 infraction: Infraction
 infractions_empty: There are no infractions to show.
@@ -479,11 +492,13 @@ invalid_color: The specified color code is invalid.
 invite_list_title: List of server invites
 invite_not_found: Invite not found.
 invite_temporary: Is temporary
+is_active: Is Active
 is_attachment_only: Attachments
 is_command_only: Commands
 is_image_only: Images
 is_invite_only: Invites
 is_mod: Is a Moderator
+is_not_active: Is Not Active
 is_url_only: URLs
 joined_at: Joined At
 joinrole_added: The {0} role has been added to the list of join roles.
@@ -513,6 +528,7 @@ massunban_succeded: '{0} users were unbanned from the server.'
 medium: Medium
 members: Members
 message: Message
+messages: Messages
 minutes: Minutes
 modlog_description: '{0} notices, {1} warnings, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
 modroles: Moderator Roles
@@ -639,6 +655,7 @@ timers: Timers
 timezone_list: Time Zones
 total: Total
 total_of: '{0} total'
+trigger_time: Triggers Within
 triggers_at: Triggers At
 triggers_in: Triggers In
 type: Type

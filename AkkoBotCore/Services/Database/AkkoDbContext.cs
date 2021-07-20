@@ -27,6 +27,7 @@ namespace AkkoBot.Services.Database
         public DbSet<CommandCooldownEntity> CommandCooldown { get; init; }
         public DbSet<PollEntity> Polls { get; init; }
         public DbSet<GatekeepEntity> Gatekeeping { get; init; }
+        public DbSet<AutoSlowmodeEntity> AutoSlowmode { get; init; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
         {
@@ -140,6 +141,14 @@ namespace AkkoBot.Services.Database
                 .HasOne(x => x.GuildConfigRel)
                 .WithOne(x => x.GatekeepRel)
                 .HasForeignKey<GatekeepEntity>(x => x.GuildIdFK)
+                .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Guild -> Autoslowmode
+            modelBuilder.Entity<AutoSlowmodeEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithOne(x => x.AutoSlowmodeRel)
+                .HasForeignKey<AutoSlowmodeEntity>(x => x.GuildIdFK)
                 .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 

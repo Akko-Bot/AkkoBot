@@ -35,6 +35,11 @@ namespace AkkoBot.Services.Database.Entities
         public GatekeepEntity GatekeepRel { get; init; }
 
         /// <summary>
+        /// The automatic slow mode settings of this Discord guild.
+        /// </summary>
+        public AutoSlowmodeEntity AutoSlowmodeRel { get; init; }
+
+        /// <summary>
         /// The timers associated with this Discord guild.
         /// </summary>
         public List<TimerEntity> TimerRel { get; init; }

@@ -17,6 +17,7 @@ using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -38,6 +39,8 @@ namespace AkkoBot.Services.Events
             @"discord(?:\.gg|\.io|\.me|\.li|(?:app)?\.com\/invite)\/(\w+)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
+
+        private readonly ConcurrentDictionary<(ulong, ulong, ulong), (int, DateTimeOffset)> _slowmodeRegister = new();
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
@@ -119,6 +122,42 @@ namespace AkkoBot.Services.Events
             });
         }
 
+        public Task AutoSlowmodeAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null
+                || eventArgs.Channel.PerUserRateLimit is not 0
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageChannels)
+                || !_dbCache.AutoSlowmode.TryGetValue(eventArgs.Guild.Id, out var slowmode) || !slowmode.IsActive
+                || IsIgnoredContext(slowmode.IgnoredIds, eventArgs)
+                || (eventArgs.Author as DiscordMember).PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | Permissions.ManageChannels | Permissions.ManageMessages))
+                return Task.CompletedTask;
+
+            if (_slowmodeRegister.TryAdd((eventArgs.Guild.Id, eventArgs.Channel.Id, eventArgs.Author.Id), (2, DateTimeOffset.Now.Add(slowmode.SlowmodeTriggerTime))))
+            {
+                // If entry has beed registred for the first time, setup its removal.
+                _ = DoWithDelayAsync(slowmode.SlowmodeTriggerTime, () =>
+                {
+                    _slowmodeRegister.TryRemove((eventArgs.Guild.Id, eventArgs.Channel.Id, eventArgs.Author.Id), out _);
+                    return Task.CompletedTask;
+                });
+            }
+            else if (_slowmodeRegister.TryGetValue((eventArgs.Guild.Id, eventArgs.Channel.Id, eventArgs.Author.Id), out var stats) && slowmode.MessageAmount > stats.Item1 && DateTimeOffset.Now < stats.Item2)
+            {
+                // If entry already exists but is still within the server's limits, update its message counter
+                _slowmodeRegister.TryUpdate((eventArgs.Guild.Id, eventArgs.Channel.Id, eventArgs.Author.Id), (stats.Item1 + 1, stats.Item2), stats);
+            }
+            else
+            {
+                // If entry already exists and has exceeded the server's limits, trigger the slow mode
+                if (slowmode.SlowmodeDuration > TimeSpan.Zero)
+                    _ = DoWithDelayAsync(slowmode.SlowmodeDuration, () => eventArgs.Channel.ModifyAsync(x => x.PerUserRateLimit = 0));
+
+                return eventArgs.Channel.ModifyAsync(x => x.PerUserRateLimit = (int)slowmode.SlowmodeInterval.TotalSeconds);
+            }
+
+            return Task.CompletedTask;
+        }
+
         public async Task<bool> FilterWordAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             // If message starts with the server prefix or bot has no permission to delete messages or server has no filtered words, quit
@@ -126,13 +165,8 @@ namespace AkkoBot.Services.Events
                 || !_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || filteredWords.Words.Count == 0
                 || !filteredWords.IsActive
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
-                return false;
-
-            // Do not delete from ignored users, channels and roles
-            if (filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)
-            || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
-            || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
+                || IsIgnoredContext(filteredWords.IgnoredIds, eventArgs))
                 return false;
 
             var matches = filteredWords.Words.Where(word => eventArgs.Message.Content.Contains(word.Trim('*'), StringComparison.InvariantCultureIgnoreCase));
@@ -338,6 +372,17 @@ namespace AkkoBot.Services.Events
             => _inviteRegex.Matches(message.Content).Count is not 0;
 
         /// <summary>
+        /// Performs an action after the specified amount of time.
+        /// </summary>
+        /// <param name="delay">Waiting time.</param>
+        /// <param name="action">Action to be performed.</param>
+        private async Task DoWithDelayAsync(TimeSpan delay, Func<Task> action)
+        {
+            await Task.Delay(delay).ConfigureAwait(false);
+            await action().ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Deletes a <see cref="DiscordMessage"/> if its content matches the specified filtered word.
         /// </summary>
         /// <param name="message">The message to be deleted.</param>
@@ -395,6 +440,19 @@ namespace AkkoBot.Services.Events
         {
             return dbGuild.DelCmdBlacklist.Contains((long)context.User.Id) || dbGuild.DelCmdBlacklist.Contains((long)context.Channel.Id)
                 || dbGuild.DelCmdBlacklist.Any(x => context.Member.Roles.Select(x => (long)x.Id).Contains(x));
+        }
+
+        /// <summary>
+        /// Determines whether a message was sent in an ignored context.
+        /// </summary>
+        /// <param name="ignoredIds">The list of ignored ids.</param>
+        /// <param name="eventArgs">The message event.</param>
+        /// <returns><see langword="true"/> if the message was sent in an ignored context, <see langword="false"/> otherwise.</returns>
+        private bool IsIgnoredContext(List<long> ignoredIds, MessageCreateEventArgs eventArgs)
+        {
+            return ignoredIds.Contains((long)eventArgs.Channel.Id)
+                || ignoredIds.Contains((long)eventArgs.Author.Id)
+                || (eventArgs.Guild is not null && (eventArgs.Author as DiscordMember).Roles.Any(role => ignoredIds.Contains((long)role.Id)));
         }
     }
 }
