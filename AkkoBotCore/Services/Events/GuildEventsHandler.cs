@@ -30,12 +30,12 @@ namespace AkkoBot.Services.Events
     /// </summary>
     internal class GuildEventsHandler : IGuildEventsHandler
     {
-        private readonly Regex _imageUrlRegex = new(
+        private static readonly Regex _imageUrlRegex = new(
             @"http\S*?\.(png|jpg|jpeg|gif)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
 
-        private readonly Regex _inviteRegex = new(
+        private static readonly Regex _inviteRegex = new(
             @"discord(?:\.gg|\.io|\.me|\.li|(?:app)?\.com\/invite)\/(\w+)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );

@@ -17,7 +17,8 @@ namespace AkkoBot.Commands.Common
     public class SmartString
     {
         private readonly bool _sanitizeRoles;
-        private readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
+        private static readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
+        private static readonly Regex _defaultPlaceholderRegex = new(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
         private readonly StringBuilder _contentBuilder;
         private readonly CommandContext _context;
         private readonly IPlaceholderFormatter _formatter;
@@ -85,7 +86,7 @@ namespace AkkoBot.Commands.Common
             _context = context;
             _contentBuilder = new(content ?? context.RawArgumentString);
             _sanitizeRoles = sanitizeRoles;
-            ParseRegex = regex ?? new Regex(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
+            ParseRegex = regex ?? _defaultPlaceholderRegex;
             _formatter = formatter ?? context.CommandsNext.Services.GetService<CommandPlaceholders>();
         }
 

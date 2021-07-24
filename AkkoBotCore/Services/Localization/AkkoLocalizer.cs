@@ -24,7 +24,7 @@ namespace AkkoBot.Services.Localization
         /// <summary>
         /// Regex to get the locale of the response files. Matches anything enclosed between "_" and "."
         /// </summary>
-        private readonly Regex _localeRegex = new(@"_(.*?)\.", RegexOptions.Compiled);
+        private static readonly Regex _localeRegex = new(@"_(.*?)\.", RegexOptions.Compiled);
 
         public IReadOnlyCollection<string> Locales
             => _localizedStrings.Keys;

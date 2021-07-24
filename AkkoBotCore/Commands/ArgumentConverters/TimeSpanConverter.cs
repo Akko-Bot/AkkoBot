@@ -11,7 +11,7 @@ namespace AkkoBot.Commands.ArgumentConverters
 {
     public class TimeSpanConverter : IArgumentConverter<TimeSpan>
     {
-        private readonly Regex _timeSpanRegex = new(
+        private static readonly Regex _timeSpanRegex = new(
             @"^(\d+y)?(\d+mo)?(\d+w)?(\d+d)?(\d+h)?(\d+m)?(\d+s)?$",
             RegexOptions.Compiled
         );
