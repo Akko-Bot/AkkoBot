@@ -1,4 +1,5 @@
 ﻿using AkkoBot.Commands.Abstractions;
+using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
 using DSharpPlus;
@@ -83,6 +84,15 @@ namespace AkkoBot.Commands.Formatters
             ["user.roles"] = (context) => string.Join(", ", context.Member?.Roles.Select(x => x.Name)),
             ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name,
 
+            /* Discord Timestamps */
+            ["datenow.shortdateandtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.ShortDateAndTime),
+            ["datenow.shortdate"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.ShortDate),
+            ["datenow.shorttime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.ShortTime),
+            ["datenow.longdateandtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.LongDateAndTime),
+            ["datenow.longdate"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.LongDate),
+            ["datenow.longtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.LongTime),
+            ["datenow.relativetime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.RelativeTime),
+
             /* Miscelaneous */
 
             ["rng"] = (context) => context.Services.GetService<Random>().Next(),
@@ -123,6 +133,63 @@ namespace AkkoBot.Commands.Formatters
         /// </summary>
         protected readonly Dictionary<string, Func<CommandContext, object, object>> parameterizedActions = new()
         {
+            /* Discord Timestamps */
+            ["date.shortdateandtime"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.ShortDateAndTime);
+            },
+
+            ["date.shortdate"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.ShortDate);
+            },
+
+            ["date.shorttime"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.ShortTime);
+            },
+
+            ["date.longdateandtime"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.LongDateAndTime);
+            },
+
+            ["date.longdate"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.LongDate);
+            },
+
+            ["date.longtime"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.LongTime);
+            },
+
+            ["date.relativetime"] = (context, parameter) =>
+            {
+                return parameter is not string[] arguments || arguments.Length != 1
+                    || !long.TryParse(arguments[0], out var unixSeconds)
+                    ? null
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.RelativeTime);
+            },
+
             /* Miscelaneous */
 
             ["remaining.text"] = (context, endMatchIndex) => context.RawArgumentString[(int)endMatchIndex..].Trim(),
@@ -171,7 +238,7 @@ namespace AkkoBot.Commands.Formatters
             }
             else if (parameterizedActions.TryGetValue(groups[1].Value, out var pAction))
             {
-                object parameter = (groups.Length <= 2)
+                object parameter = (groups.Length <= 2) // If there is no user provided parameter
                     ? match.Index + match.Length    // int
                     : groups[2].Value.Split(',');   // string[]
 
