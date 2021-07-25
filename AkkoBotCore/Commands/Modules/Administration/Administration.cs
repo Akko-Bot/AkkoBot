@@ -5,6 +5,7 @@ using AkkoBot.Commands.Modules.Self.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
+using AkkoBot.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -57,14 +58,12 @@ namespace AkkoBot.Commands.Modules.Administration
             var fakeContext = context.CommandsNext.CreateFakeContext(user, context.Channel, command, context.Prefix, cmd, args);
             var failedChecks = await cmd.RunChecksAsync(fakeContext, false);
 
-            if (failedChecks.Any())
+            if (!failedChecks.Any())
+                await cmd.ExecuteAsync(fakeContext);
+            else
             {
                 var embed = new SerializableDiscordMessage().WithDescription("command_check_failed");
                 await context.RespondLocalizedAsync(embed, isError: true);
-            }
-            else
-            {
-                await cmd.ExecuteAsync(fakeContext);
             }
         }
 
@@ -103,7 +102,7 @@ namespace AkkoBot.Commands.Modules.Administration
             [Description("arg_prune_options")] string options = "")
         {
             amount = Math.Abs(amount);
-            var requestLimit = (int)Math.Ceiling(Math.Min(amount, 400) / 100.0) * 100;  // Limit it to 4 requests at most
+            var requestLimit = GeneralService.GetMaxMessageRequest(amount, 4);  // Limit it to 4 requests at most
 
             Predicate<DiscordMessage> userCheck = (user is null) ? (msg) => true : (msg) => msg.Author.Equals(user);
             Predicate<DiscordMessage> optionsCheck = (!options.Equals(StringComparison.InvariantCultureIgnoreCase, "-s", "--safe")) ? (msg) => true : (msg) => !msg.Pinned;

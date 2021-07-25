@@ -704,3 +704,9 @@ x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
 
 autoslowmode_title: Configurações do Modo Lento Automático
+
+log_channel_name: Nome do canal
+log_channel_topic: Tópico do canal
+log_messages_logged: Mensagens registradas
+log_start: Início do Log
+cmd_savechat: Salva em um arquivo as últimas mensagens enviadas a um canal de texto. Mensagens de bots são ignoradas. Usuários sem autoria do bot são limitados a 100 mensagens. Forneça nenhum parâmetro para salvar as 100 últimas mensagens do canal atual.

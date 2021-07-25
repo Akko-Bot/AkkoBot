@@ -704,3 +704,9 @@ x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
 
 autoslowmode_title: Autoslowmode Settings
+
+log_channel_name: Channel name
+log_channel_topic: Channel topic
+log_messages_logged: Messages logged
+log_start: Log Start
+cmd_savechat: Saves the last messages sent in a text channel to a file. Bot messages are ignored. Users with no bot ownership are limited to 100 messages. Provide no paraameters to save the last 100 messages from the current channel.

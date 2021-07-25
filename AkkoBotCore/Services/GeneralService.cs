@@ -28,6 +28,15 @@ namespace AkkoBot.Services
         private static readonly string[] _newlines = new string[] { "\n", Environment.NewLine };
 
         /// <summary>
+        /// Gets the most optimal amount of messages to request from Discord from the specified amount of messages to get.
+        /// </summary>
+        /// <param name="msgAmount">The desired amount of messages to get.</param>
+        /// <param name="maxRequests">The maximum amount of requests to be sent to Discord.</param>
+        /// <returns>The amount of messages to request from Discord.</returns>
+        public static int GetMaxMessageRequest(int msgAmount, int maxRequests)
+            => (int)Math.Ceiling(Math.Min(Math.Abs(msgAmount), maxRequests * 100) / 100.0) * 100;
+
+        /// <summary>
         /// Checks if the specified <paramref name="id"/> is registered as a bot owner.
         /// </summary>
         /// <param name="context">The command context.</param>

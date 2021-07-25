@@ -12,7 +12,9 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Utilities
@@ -24,9 +26,13 @@ namespace AkkoBot.Commands.Modules.Utilities
             | Permissions.PrioritySpeaker | Permissions.Stream | Permissions.DeafenMembers | Permissions.MoveMembers;
 
         private readonly UtilitiesService _service;
+        private readonly LogService _logService;
 
-        public GuildUtilities(UtilitiesService service)
-            => _service = service;
+        public GuildUtilities(UtilitiesService service, LogService logService)
+        {
+            _service = service;
+            _logService = logService;
+        }
 
         [Command("say"), HiddenOverload]
         [Priority(0)]
@@ -235,6 +241,51 @@ namespace AkkoBot.Commands.Modules.Utilities
         [Command("checkperms"), HiddenOverload]
         public async Task CheckUserPermsAsync(CommandContext context, DiscordMember user = null)
             => await CheckUserPermsAsync(context, null, user);
+
+        [Command("savechat"), HiddenOverload]
+        public async Task SaveChatAsync(CommandContext context, int amount)
+            => await SaveChatAsync(context, context.Channel, amount);
+
+        [Command("savechat")]
+        [Description("cmd_savechat")]
+        [RequireUserPermissions(Permissions.ManageGuild)]
+        public async Task SaveChatAsync(
+            CommandContext context,
+            [Description("arg_discord_channel")] DiscordChannel channel = null,
+            [Description("arg_int")] int amount = 100)
+        {
+            channel ??= context.Channel;
+
+            if (amount is 0 || !context.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels))
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            amount = Math.Abs(amount);
+            var requestLimit = (GeneralService.IsOwner(context, context.User.Id))
+                ? amount
+                : GeneralService.GetMaxMessageRequest(amount, 1);
+
+            var messages = (await channel.GetMessagesAsync(requestLimit))
+                .Where(x => !x.Author.IsBot)
+                .Take(amount)
+                .OrderBy(x => x.CreationTimestamp);
+                
+            var log = _logService.GenerateMessageLog(messages, channel, context.GetLocaleKey());
+
+            if (log is null)
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(log));
+            var message = new DiscordMessageBuilder()
+                .WithFile($"savechat_{channel.Name}_{DateTimeOffset.Now}.txt", stream);
+
+            await context.Channel.SendMessageAsync(message);
+        }
 
         /// <summary>
         /// Safely gets a Discord message with the specified ID in the context channel and executes a follow-up method with it.
