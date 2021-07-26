@@ -1,5 +1,5 @@
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
-using AkkoBot.Commands.Formatters;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
@@ -17,38 +17,16 @@ namespace AkkoBot.Commands.Modules.Help
     [HelpCommand, IsNotBlacklisted, GlobalCooldown]
     public class Help : BaseCommandModule
     {
-        [HiddenOverload]
-        [Command("help"), Aliases("h")]
-        [Description("cmd_help")]
+        [Command("help"), HiddenOverload]
         public async Task HelpCommandAsync(CommandContext context)
             => await HelpCommandAsync(context, Array.Empty<string>());
 
-        [Command("help")]
+        [Command("help"), Aliases("h")]
+        [Description("cmd_help")]
         public async Task HelpCommandAsync(CommandContext context, [Description("arg_command")] params string[] command)
         {
-            // Might consider removing this line if I ever decide to change the default help command
-            var baseCmds = context.CommandsNext.RegisteredCommands.Values.Where(cmd => !cmd.IsHidden).Distinct();
-            var helpBuilder = new HelpFormatter(context);
-
-            // If no parameter, send the default help message
-            if (command.Length == 0)
-                helpBuilder.WithSubcommands(baseCmds);
-            else
-            {
-                // Remove prefix from the command, if user typed it in
-                command[0] = command[0].Replace(context.Prefix, string.Empty);
-
-                var cmd = context.CommandsNext.FindCommand(string.Join(" ", command), out _);
-
-                if (cmd is null)
-                    helpBuilder.WithCmdNotFound();
-                else if (cmd is CommandGroup group)
-                    helpBuilder.WithCommand(cmd).WithSubcommands(group.Children);
-                else
-                    helpBuilder.WithCommand(cmd);
-            }
-
-            var message = helpBuilder.Build();
+            using var scope = context.Services.GetScopedService<IHelpFormatter>(out var helpBuilder);
+            var message = helpBuilder.GenerateHelpMessage(context, command);
             var botPerms = context.Guild?.CurrentMember.PermissionsIn(context.Channel) ?? Permissions.SendMessages;
 
             // Try to send: channel message, channel reaction, direct message

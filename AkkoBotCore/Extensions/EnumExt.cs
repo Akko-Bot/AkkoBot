@@ -1,4 +1,5 @@
-﻿using DSharpPlus;
+﻿using AkkoBot.Services.Localization.Abstractions;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,22 @@ namespace AkkoBot.Extensions
                 .Select(x => context.FormatLocalized("perm_" + x.ToString().ToSnakeCase()))
                 .OrderBy(x => x)
                 .DefaultIfEmpty(context.FormatLocalized("perm_" + Permissions.None.ToString().ToSnakeCase()));
+        }
+
+        /// <summary>
+        /// Creates a collection of localized, human-readable strings of this <see cref="Permissions"/>.
+        /// </summary>
+        /// <param name="permissions">This permissions.</param>
+        /// <param name="localizer">The localizer.</param>
+        /// <param name="locale">The locale.</param>
+        /// <returns>The localized permission strings.</returns>
+        public static IEnumerable<string> ToLocalizedStrings(this Permissions permissions, ILocalizer localizer, string locale)
+        {
+            return Enum.GetValues<Permissions>()
+                .Where(x => x is not Permissions.None && permissions.HasFlag(x))
+                .Select(x => localizer.GetResponseString(locale, "perm_" + x.ToString().ToSnakeCase()))
+                .OrderBy(x => x)
+                .DefaultIfEmpty(localizer.GetResponseString(locale, "perm_" + Permissions.None.ToString().ToSnakeCase()));
         }
     }
 }

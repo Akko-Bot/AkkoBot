@@ -1,12 +1,13 @@
+using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
+using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,45 +16,92 @@ using System.Text;
 
 namespace AkkoBot.Commands.Formatters
 {
-    public class HelpFormatter
+    /// <summary>
+    /// Generates help messages for a specific command.
+    /// </summary>
+    public class HelpFormatter : IHelpFormatter
     {
-        private string _helpTitle;
-        private string _helpDescription;
-        private readonly StringBuilder _helpRequiresField = new();
-        private StringBuilder _helpExamplesField;
-        private StringBuilder _helpCommandsField;
-        private readonly CommandContext _cmdContext;
+        private readonly SerializableDiscordMessage _helpMessage = new();
+        private readonly IDbCache _dbCache;
+        private readonly ILocalizer _localizer;
+        private readonly BotConfig _botConfig;
 
         public bool IsErroed { get; private set; }
 
-        public HelpFormatter(CommandContext context)
-            => _cmdContext = context;
+        public HelpFormatter(IDbCache dbCache, ILocalizer localizer, BotConfig botConfig)
+        {
+            _dbCache = dbCache;
+            _localizer = localizer;
+            _botConfig = botConfig;
+        }
+
+        public SerializableDiscordMessage GenerateHelpMessage(CommandContext context)
+            => GenerateHelpMessage(context, context.RawArguments as List<string>);
+
+        public SerializableDiscordMessage GenerateHelpMessage(CommandContext context, IList<string> inputCommand)
+        {
+            inputCommand ??= context.RawArguments as List<string>;
+
+            // If no parameter, send the default help message
+            if (inputCommand.Count == 0)
+            {
+                // Default help message (no command)
+                this.WithSubcommands(
+                    context,
+                    context.CommandsNext.RegisteredCommands.Values
+                        .Where(cmd => !cmd.IsHidden)
+                        .Distinct()
+                );
+            }
+            else
+            {
+                // Remove prefix from the command, if user typed it in
+                inputCommand[0] = inputCommand[0].Replace(context.Prefix, string.Empty);
+
+                var cmd = context.CommandsNext.FindCommand(string.Join(" ", inputCommand), out _);
+
+                if (cmd is null)
+                    this.WithCmdNotFound(context);
+                else if (cmd is CommandGroup group)
+                    this.WithCommand(context, cmd).WithSubcommands(context, group.Children);
+                else
+                    this.WithCommand(context, cmd);
+            }
+
+            return this.Build(context);
+        }
 
         /// <summary>
         /// Adds a command to the help message.
         /// </summary>
+        /// <param name="context">The command context.</param>
         /// <param name="cmd">Command to provide help for.</param>
         /// <returns>This HelpFormatter.</returns>
-        public HelpFormatter WithCommand(Command cmd)
+        private HelpFormatter WithCommand(CommandContext context, Command cmd)
         {
-            // Set title
-            _helpTitle = GetHelpHeader(cmd);
-
-            // Add description
-            _helpDescription = _cmdContext.FormatLocalized(cmd.Description);
+            // Set title and description
+            _helpMessage
+                .WithTitle(GetHelpHeader(cmd))
+                .WithDescription(cmd.Description);
 
             // Add requirements
+            var stringBuilder = new StringBuilder();
             var requirements = cmd.GetRequirements();
 
             foreach (var att in requirements.OrderBy(x => x.AttributeType.Name))
             {
                 if (att.AttributeType == typeof(BotOwnerAttribute))
-                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("perm_bot_owner"));
+                    stringBuilder.AppendLine(context.FormatLocalized("perm_bot_owner"));
                 else if (att.AttributeType == typeof(RequireDirectMessageAttribute))
-                    _helpRequiresField.AppendLine(_cmdContext.FormatLocalized("perm_require_dm"));
+                    stringBuilder.AppendLine(context.FormatLocalized("perm_require_dm"));
                 else
-                    _helpRequiresField.AppendLine(GetLocalizedPermissions(att.ConstructorArguments));
+                    stringBuilder.AppendLine(GetLocalizedPermissions(context, att.ConstructorArguments));
             }
+
+            if (stringBuilder.Length is not 0)
+                _helpMessage.AddField("requires", stringBuilder.ToString());
+
+            stringBuilder.Clear();
 
             // If this is a group, there are no arguments to be shown
             if (cmd is CommandGroup)
@@ -68,41 +116,41 @@ namespace AkkoBot.Commands.Formatters
                 if (!IsValidOverload(overload, reflectedParameters))
                     continue;
 
-                // Initialize string builder
-                _helpExamplesField ??= new();
-
                 // If command takes no argument
                 if (overload.Arguments.Count == 0)
                 {
-                    _helpExamplesField.AppendLine(Formatter.InlineCode(_cmdContext.Prefix + cmd.QualifiedName) + "\n");
+                    stringBuilder.AppendLine(Formatter.InlineCode(context.Prefix + cmd.QualifiedName) + "\n");
                     continue;
                 }
 
                 // Format full command name + <arguments>
-                _helpExamplesField.Append($"`{_cmdContext.Prefix}{cmd.QualifiedName}");
+                stringBuilder.Append($"`{context.Prefix}{cmd.QualifiedName}");
 
                 foreach (var argument in overload.Arguments)
                 {
-                    _helpExamplesField.Append($" <{argument.Name}>");
+                    stringBuilder.Append($" <{argument.Name}>");
                 }
 
-                _helpExamplesField.AppendLine("`");
+                stringBuilder.AppendLine("`");
 
                 // Format argument descriptions
                 foreach (var argument in overload.Arguments)
                 {
                     var optional = (argument.IsOptional)
-                        ? $"({_cmdContext.FormatLocalized("help_optional")})"
+                        ? $"({context.FormatLocalized("help_optional")})"
                         : string.Empty;
 
-                    _helpExamplesField.AppendLine(
+                    stringBuilder.AppendLine(
                         $"{Formatter.InlineCode(argument.Name)}: {optional} " +
-                        _cmdContext.FormatLocalized(argument.Description ?? string.Empty)
+                        context.FormatLocalized(argument.Description ?? string.Empty)
                     );
                 }
 
-                _helpExamplesField.AppendLine();
+                stringBuilder.AppendLine();
             }
+
+            _helpMessage.AddField("usage", stringBuilder.ToString());
+            stringBuilder.Clear();
 
             return this;
         }
@@ -110,45 +158,33 @@ namespace AkkoBot.Commands.Formatters
         /// <summary>
         /// Adds subcommands associated with a specified command
         /// </summary>
+        /// <param name="context">The command context.</param>
         /// <param name="subcommands">The collection of subcommands.</param>
         /// <remarks>Only use this on a command that is a <see cref="CommandGroup"/>.</remarks>
         /// <returns>This HelpFormatter.</returns>
-        public HelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
+        private HelpFormatter WithSubcommands(CommandContext context, IEnumerable<Command> subcommands)
         {
-            // var isHelpCmd = _cmdContext.CommandsNext.RegisteredCommands.Values.ContainsSubcollection(subcommands);
-            _helpCommandsField = new();
-
-            // if (isHelpCmd)
-            // {
-            //     // Get all parent command groups
-            //     var rootCmdGroups = _cmdContext.CommandsNext.RegisteredCommands.Values
-            //         .Where(cmd => cmd is CommandGroup)
-            //         ;//.DistinctBy(cmd => cmd.QualifiedName);
-
-            //     // Add command groups
-            //     foreach (var cmdGroup in rootCmdGroups)
-            //         _helpCommandsField.Append(Formatter.InlineCode(cmdGroup.Name) + ", ");
-
-            //     // Add regular commands
-            //     foreach (var command in subcommands.Where(cmd => cmd is not CommandGroup))
-            //         _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
-            // }
-            // else
-            // {
-            //     // Add regular commands
-            //     foreach (var command in subcommands)
-            //         _helpCommandsField.Append(Formatter.InlineCode(command.Name) + ", ");
-            // }
-
-            _helpCommandsField.AppendJoin(
-                ", ",
-                subcommands.OrderBy(command => command.Name)
-                    .Select(command =>
-                        (command.CustomAttributes.Any(x => x.GetType() == typeof(GroupCommandAttribute)))
-                            ? Formatter.Underline(Formatter.InlineCode(command.Name))
-                            : Formatter.InlineCode(command.Name)
+            _helpMessage
+                .AddField(
+                    "commands",
+                    string.Join(
+                        ", ",
+                        subcommands.OrderBy(command => command.Name)
+                            .Select(command =>
+                                (command.CustomAttributes.Any(x => x.GetType() == typeof(GroupCommandAttribute)))
+                                    ? Formatter.Underline(Formatter.InlineCode(command.Name))
+                                    : Formatter.InlineCode(command.Name)
+                            )
+                    )
                 )
-            );
+                .WithFooter(
+                    context.FormatLocalized(
+                        "help_footer",
+                        context.Prefix + context.Command.QualifiedName + " " + context.RawArgumentString +
+                        " <" + context.FormatLocalized("name").ToLowerInvariant() + ">"
+                    )
+                    .Replace("  ", " ")
+                );
 
             return this;
         }
@@ -156,14 +192,17 @@ namespace AkkoBot.Commands.Formatters
         /// <summary>
         /// Returns an error message.
         /// </summary>
+        /// <param name="context">The command context.</param>
         /// <returns>This HelpFormatter.</returns>
-        public HelpFormatter WithCmdNotFound()
+        private HelpFormatter WithCmdNotFound(CommandContext context)
         {
             IsErroed = true;
-            _helpDescription = _cmdContext.FormatLocalized(
-                "help_cmd_not_found",
-                Formatter.InlineCode(_cmdContext.Prefix + "module"),
-                Formatter.InlineCode(_cmdContext.Prefix + "module" + " <" + _cmdContext.FormatLocalized("name").ToLowerInvariant() + ">")
+            _helpMessage.WithDescription(
+                context.FormatLocalized(
+                    "help_cmd_not_found",
+                    Formatter.InlineCode(context.Prefix + "module"),
+                    Formatter.InlineCode(context.Prefix + "module" + " <" + context.FormatLocalized("name").ToLowerInvariant() + ">")
+                )
             );
 
             return this;
@@ -172,63 +211,38 @@ namespace AkkoBot.Commands.Formatters
         /// <summary>
         /// Builds the help message.
         /// </summary>
+        /// <param name="context">The command context.</param>
         /// <remarks>The string will be <see langword="null"/> if the embed is not <see langword="null"/> and vice-versa.</remarks>
-        /// <returns>The result help message.</returns>
-        public SerializableDiscordMessage Build()
+        /// <returns>The resulting help message.</returns>
+        private SerializableDiscordMessage Build(CommandContext context)
         {
-            var dbCache = _cmdContext.Services.GetService<IDbCache>();
-            var useEmbed = (dbCache.Guilds.TryGetValue(_cmdContext.Guild?.Id ?? 0, out var dbGuild))
+            var useEmbed = (_dbCache.Guilds.TryGetValue(context.Guild?.Id ?? 0, out var dbGuild))
                 ? dbGuild.UseEmbed
-                : _cmdContext.Services.GetService<BotConfig>().UseEmbed;
+                : _botConfig.UseEmbed;
 
             if (useEmbed)
-            {
-                var msg = new SerializableDiscordMessage()
-                    .WithTitle(_helpTitle)
-                    .WithDescription(_helpDescription);
+                return _helpMessage;
 
-                if (_helpRequiresField.Length != 0)
-                    msg.AddField(_cmdContext.FormatLocalized("requires"), _helpRequiresField.ToString());
+            _helpMessage.WithLocalization(_localizer, context.GetLocaleKey());
 
-                if (_helpCommandsField is not null)
-                {
-                    msg.AddField(_cmdContext.FormatLocalized("commands"), _helpCommandsField.ToString())
-                        .WithFooter(
-                            _cmdContext.FormatLocalized(
-                                "help_footer",
-                                _cmdContext.Prefix + _cmdContext.Command.QualifiedName + " " + _cmdContext.RawArgumentString +
-                               " <" + _cmdContext.FormatLocalized("name").ToLowerInvariant() + ">"
-                            )
-                            .Replace("  ", " ")
-                        );
-                }
-
-                if (_helpExamplesField is not null)
-                    msg.AddField(_cmdContext.FormatLocalized("usage"), _helpExamplesField.ToString());
-
-                return msg;
-            }
-            else
-            {
-                return new SerializableDiscordMessage()
-                    .WithContent(
-                        ((_helpTitle is not null) ? Formatter.Bold(_helpTitle) + "\n" : string.Empty) +
-                        ((_helpDescription is not null) ? _helpDescription + "\n\n" : string.Empty) +
-                        ((_helpRequiresField.Length != 0) ? Formatter.Bold(_cmdContext.FormatLocalized("requires")) + "\n" + _helpRequiresField.ToString() + "\n" : string.Empty) +
-                        ((_helpCommandsField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("commands")) + "\n" + _helpCommandsField.ToString() + "\n" : string.Empty) +
-                        ((_helpExamplesField is not null) ? Formatter.Bold(_cmdContext.FormatLocalized("usage")) + "\n" + _helpExamplesField.ToString() + "\n" : string.Empty)
-                    );
-            }
+            return new SerializableDiscordMessage()
+                .WithContent(
+                    ((_helpMessage.Body?.Title?.Text is not null) ? Formatter.Bold(_helpMessage.Body.Title.Text) + "\n" : string.Empty) +
+                    ((_helpMessage.Body?.Description is not null) ? _helpMessage.Body.Description + "\n\n" : string.Empty) +
+                    ((_helpMessage.Fields?.Count is not 0 and not null) ? string.Join("\n", _helpMessage.Fields.Select(x => $"{Formatter.Bold(x.Title)}\n{x.Text}")) + "\n\n" : string.Empty) +
+                    ((_helpMessage.Footer?.Text is not null) ? _helpMessage.Footer.Text : string.Empty)
+                );
         }
 
         /// <summary>
         /// Gets the localized permissions of a permission attribute.
         /// </summary>
+        /// <param name="context">The command context.</param>
         /// <param name="permissions">Collection of attributes to have their permissions taken from.</param>
         /// <returns>A string with all localized attributes separated by a newline.</returns>
         /// <exception cref="InvalidCastException">Occurs when the attribute argument is not of type <see cref="Permissions"/>.</exception>
-        private string GetLocalizedPermissions(IEnumerable<CustomAttributeTypedArgument> permissions)
-            => string.Join("\n", permissions.SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(_cmdContext)));
+        private string GetLocalizedPermissions(CommandContext context, IEnumerable<CustomAttributeTypedArgument> permissions)
+            => string.Join("\n", permissions.SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(context)));
 
         /// <summary>
         /// Gets the title of the help message.
@@ -294,8 +308,8 @@ namespace AkkoBot.Commands.Formatters
                 {
                     foreach (var ovArg in overload.Arguments)
                     {
-                        if (ovArg.Name.Equals(param.Name)
-                            && (param.ParameterType.BaseType == typeof(Array) || ovArg.Type == param.ParameterType) // This is needed for variable arrays
+                        if (ovArg.Name.Equals(param.Name, StringComparison.Ordinal)
+                            && (param.ParameterType.BaseType == typeof(Array) || ovArg.Type == param.ParameterType) // This is needed for arrays of variable length
                             && ++matches == parameters.Length)
                             return true; // Overload is valid
                     }
@@ -304,6 +318,12 @@ namespace AkkoBot.Commands.Formatters
 
             // Overload didn't match all reflected parameters
             return false;
+        }
+
+        public void Dispose()
+        {
+            _helpMessage.Clear();
+            GC.SuppressFinalize(this);
         }
     }
 }

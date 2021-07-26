@@ -329,6 +329,21 @@ namespace AkkoBot.Models.Serializable
             };
         }
 
+        /// <summary>
+        /// Clears all data in this message.
+        /// </summary>
+        public void Clear()
+        {
+            _content = null;
+            Color = null;
+            Header = null;
+            Body = null;
+            Fields?.Clear();
+            Fields = null;
+            Footer = null;
+            Timestamp = null;
+        }
+
         /* Operator Overloads */
 
         public static implicit operator DiscordEmbedBuilder(SerializableDiscordMessage x) => x?.BuildEmbed();

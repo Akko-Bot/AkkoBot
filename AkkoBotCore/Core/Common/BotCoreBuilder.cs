@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Common;
+using AkkoBot.Commands.Formatters;
 using AkkoBot.Config;
 using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Core.Services;
@@ -355,6 +356,7 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton(_ => new Random()),
 
                 // > Commands
+                ServiceDescriptor.Transient<IHelpFormatter, HelpFormatter>(),
                 ServiceDescriptor.Singleton<IPrefixResolver, PrefixResolver>(),
                 ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>(),
 
