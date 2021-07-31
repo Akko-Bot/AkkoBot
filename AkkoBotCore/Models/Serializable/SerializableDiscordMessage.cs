@@ -260,6 +260,9 @@ namespace AkkoBot.Models.Serializable
                 ((this.Timestamp is null) ? string.Empty : this.Timestamp.ToString())
             );
 
+            if (dEmbed.Length > AkkoConstants.MaxMessageLength)
+                dEmbed.Remove(AkkoConstants.MaxMessageLength, dEmbed.Length - AkkoConstants.MaxMessageLength);
+
             return dEmbed.ToString();
         }
 
@@ -327,6 +330,18 @@ namespace AkkoBot.Models.Serializable
                 Content = this.Content,
                 Embed = BuildEmbed()
             };
+        }
+
+        /// <summary>
+        /// Constructs the Discord webhook message represented by this model.
+        /// </summary>
+        /// <returns>A <see cref="DiscordWebhookBuilder"/> with the message content and the embed.</returns>
+        /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
+        public DiscordWebhookBuilder BuildWebhookMessage()
+        {
+            return new DiscordWebhookBuilder()
+                .WithContent(this.Content)
+                .AddEmbed(BuildEmbed());
         }
 
         /// <summary>

@@ -194,8 +194,9 @@ namespace AkkoBot.Commands.Modules.Administration
         /// <param name="context">The command context.</param>
         private async Task CheckPrefixAsync(CommandContext context)
         {
-            var prefix = await _guildService.SetPropertyAsync(context.Guild, x => x?.Prefix)
-                ?? _botService.GetOrSetProperty(x => x.BotPrefix);
+            var prefix = (context.Guild is null)
+                ? _botService.GetOrSetProperty(x => x.BotPrefix)
+                : await _guildService.SetPropertyAsync(context.Guild, x => x?.Prefix);
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
             var embed = new SerializableDiscordMessage()

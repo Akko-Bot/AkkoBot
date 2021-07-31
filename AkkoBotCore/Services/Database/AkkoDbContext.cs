@@ -28,6 +28,7 @@ namespace AkkoBot.Services.Database
         public DbSet<PollEntity> Polls { get; init; }
         public DbSet<GatekeepEntity> Gatekeeping { get; init; }
         public DbSet<AutoSlowmodeEntity> AutoSlowmode { get; init; }
+        public DbSet<GuildLogEntity> GuildLogs { get; init; }
 
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
         {
@@ -150,6 +151,14 @@ namespace AkkoBot.Services.Database
                 .WithOne(x => x.AutoSlowmodeRel)
                 .HasForeignKey<AutoSlowmodeEntity>(x => x.GuildIdFK)
                 .HasPrincipalKey<GuildConfigEntity>(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Guild -> LogSettings
+            modelBuilder.Entity<GuildLogEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.GuildLogsRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion Guild Configuration

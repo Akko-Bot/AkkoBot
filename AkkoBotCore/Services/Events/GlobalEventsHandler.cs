@@ -44,7 +44,7 @@ namespace AkkoBot.Services.Events
 
         public async Task DefaultPrefixAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
-            if (!eventArgs.Message.Content.StartsWith("!prefix", StringComparison.InvariantCultureIgnoreCase))
+            if (eventArgs.Author.IsBot || !eventArgs.Message.Content.StartsWith("!prefix", StringComparison.InvariantCultureIgnoreCase))
                 return;
 
             var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)

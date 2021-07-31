@@ -95,7 +95,20 @@ namespace AkkoBot.Commands.Modules.Self
                 return;
             }
 
-            await ChangePropertyAsync(context, x => x.ErrorColor = newColor);
+            await ChangePropertyAsync(context, x => x.ErrorColor = newColor.MaxLength(AkkoConstants.MaxUsernameLength));
+        }
+
+        [Command("webhooklogname")]
+        [Description("cmd_config_webhooklogname")]
+        public async Task SetWebhookDefaultNameAsync(CommandContext context, [Description("arg_webhooklogname"), RemainingText] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                await context.Message.CreateReactionAsync(AkkoEntities.FailureEmoji);
+                return;
+            }
+
+            await ChangePropertyAsync(context, x => x.WebhookLogName = name);
         }
 
         [Command("embed"), Aliases("useembed")]

@@ -352,6 +352,7 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Transient<IMemberAggregator, MemberAggregator>(),
                 ServiceDescriptor.Singleton<IAntiAltActions, AntiAltActions>(),
                 ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
+                ServiceDescriptor.Singleton(_ => new DiscordWebhookClient(loggerFactory: _loggerFactory, minimumLogLevel: LogLevel.None)),
                 ServiceDescriptor.Singleton(_ => new HttpClient()),
                 ServiceDescriptor.Singleton(_ => new Random()),
 
@@ -368,7 +369,9 @@ namespace AkkoBot.Core.Common
                 ServiceDescriptor.Singleton<IGuildEventsHandler, GuildEventsHandler>(),
                 ServiceDescriptor.Singleton<IGlobalEventsHandler, GlobalEventsHandler>(),
                 ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>(),
-                ServiceDescriptor.Singleton<IGatekeepEventHandler, GatekeepEventHandler>()
+                ServiceDescriptor.Singleton<IGatekeepEventHandler, GatekeepEventHandler>(),
+                ServiceDescriptor.Singleton<IGuildLogEventHandler, GuildLogEventHandler>(),
+                ServiceDescriptor.Singleton<IGuildLogGenerator, GuildLogGenerator>()
             };
 
             foreach (var service in servicesList)

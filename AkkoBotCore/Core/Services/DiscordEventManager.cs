@@ -21,10 +21,11 @@ namespace AkkoBot.Core.Services
         private readonly IGlobalEventsHandler _globalEventsHandler;
         private readonly ICommandLogHandler _cmdLogHandler;
         private readonly IGatekeepEventHandler _gatekeeper;
+        private readonly IGuildLogEventHandler _guildLogger;
         private readonly DiscordShardedClient _shardedClient;
 
         public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
-            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, DiscordShardedClient shardedClient)
+            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, IGuildLogEventHandler guildLogger, DiscordShardedClient shardedClient)
         {
             _startup = startup;
             _voiceRoleHandler = vcRoleHandler;
@@ -33,6 +34,7 @@ namespace AkkoBot.Core.Services
             _globalEventsHandler = globalEventsHandler;
             _cmdLogHandler = cmdLogHandler;
             _gatekeeper = gatekeeper;
+            _guildLogger = guildLogger;
             _shardedClient = shardedClient;
         }
 
@@ -66,6 +68,13 @@ namespace AkkoBot.Core.Services
         /// <exception cref="InvalidOperationException"/>
         public void RegisterEvents()
         {
+            // TODO: REMOVE THIS
+            /* Test Log Events*/
+            _shardedClient.MessageCreated += _guildLogger.CacheMessageOnCreationAsync;
+
+            _shardedClient.MessageDeleted += _guildLogger.LogDeletedMessageAsync;
+            /* End Of Test*/
+
             // Save guild on join
             _shardedClient.GuildCreated += _guildLoader.AddGuildOnJoinAsync;
 

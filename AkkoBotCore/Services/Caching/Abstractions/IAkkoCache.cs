@@ -1,16 +1,24 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Services.Timers.Abstractions;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Concurrent;
 
 namespace AkkoBot.Services.Caching.Abstractions
 {
     /// <summary>
-    /// Represents an object responsible for caching whose instantiation depends partially on external data.
+    /// Represents an object responsible for caching external data or objects that need to be lazily instantiated.
     /// </summary>
     public interface IAkkoCache : IDisposable
     {
+        /// <summary>
+        /// Contains messages cached from a Discord guild.
+        /// </summary>
+        /// <remarks>The <see langword="ulong"/> is the ID of the guild. Messages are only cached if the guild is logging messages.</remarks>
+        ConcurrentDictionary<ulong, RingBuffer<DiscordMessage>> GuildMessageCache { get; }
+
         /// <summary>
         /// Contains commands that have been globally disabled.
         /// </summary>

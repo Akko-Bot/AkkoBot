@@ -129,7 +129,7 @@ namespace AkkoBot.Services.Events
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageChannels)
                 || !_dbCache.AutoSlowmode.TryGetValue(eventArgs.Guild.Id, out var slowmode) || !slowmode.IsActive
                 || IsIgnoredContext(slowmode.IgnoredIds, eventArgs)
-                || (eventArgs.Author as DiscordMember).PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | Permissions.ManageChannels | Permissions.ManageMessages))
+                || ((eventArgs.Author is DiscordMember member) && member.PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | Permissions.ManageChannels | Permissions.ManageMessages)))
                 return Task.CompletedTask;
 
             if (_slowmodeRegister.TryAdd((eventArgs.Guild.Id, eventArgs.Channel.Id, eventArgs.Author.Id), (2, DateTimeOffset.Now.Add(slowmode.SlowmodeTriggerTime))))
@@ -237,7 +237,8 @@ namespace AkkoBot.Services.Events
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
-                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                || eventArgs.Author.Id == eventArgs.Guild.CurrentMember.Id
+                || (eventArgs.Author as DiscordMember)?.Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)) is true)
                 return Task.FromResult(false);
 
             eventArgs.Handled = true;
@@ -253,7 +254,8 @@ namespace AkkoBot.Services.Events
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
-                || (eventArgs.Author as DiscordMember).Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)))
+                || eventArgs.Author.Id == eventArgs.Guild.CurrentMember.Id
+                || (eventArgs.Author as DiscordMember)?.Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)) is true)
                 return false;
 
             // Delete the message
@@ -312,7 +314,7 @@ namespace AkkoBot.Services.Events
 
         public async Task PollVoteAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
-            if (!int.TryParse(eventArgs.Message.Content, out var vote) || vote <= 0 || !_dbCache.Polls.TryGetValue(eventArgs.Guild.Id, out var polls))
+            if (eventArgs.Author.IsBot || !int.TryParse(eventArgs.Message.Content, out var vote) || vote <= 0 || !_dbCache.Polls.TryGetValue(eventArgs.Guild.Id, out var polls))
                 return;
 
             var poll = polls.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id && x.Type is PollType.Anonymous);
@@ -452,7 +454,7 @@ namespace AkkoBot.Services.Events
         {
             return ignoredIds.Contains((long)eventArgs.Channel.Id)
                 || ignoredIds.Contains((long)eventArgs.Author.Id)
-                || (eventArgs.Guild is not null && (eventArgs.Author as DiscordMember).Roles.Any(role => ignoredIds.Contains((long)role.Id)));
+                || (eventArgs.Guild is not null && (eventArgs.Author as DiscordMember)?.Roles.Any(role => ignoredIds.Contains((long)role.Id)) is true);
         }
     }
 }

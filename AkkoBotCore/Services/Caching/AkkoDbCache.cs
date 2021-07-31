@@ -34,6 +34,7 @@ namespace AkkoBot.Services.Database
         public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; private set; }
         public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; private set; }
         public ConcurrentDictionary<ulong, AutoSlowmodeEntity> AutoSlowmode { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; private set; }
 
         public AkkoDbCache(IServiceScopeFactory scopeFactory)
         {
@@ -60,6 +61,7 @@ namespace AkkoBot.Services.Database
             Gatekeeping = new();
             Polls = new();
             AutoSlowmode = new();
+            GuildLogs = new();
         }
 
         public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig botConfig = default)
@@ -115,6 +117,9 @@ namespace AkkoBot.Services.Database
             if (dbGuild.PollRel.Count is not 0)
                 Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
 
+            if (dbGuild.GuildLogsRel.Count is not 0)
+                GuildLogs.TryAdd(dbGuild.GuildId, dbGuild.GuildLogsRel.ToConcurrentHashSet());
+
             return true;
         }
 
@@ -130,10 +135,12 @@ namespace AkkoBot.Services.Database
             VoiceRoles.TryRemove(sid, out var filters);
             Repeaters.TryRemove(sid, out var voiceRoles);
             Polls.TryRemove(sid, out var polls);
+            GuildLogs.TryRemove(sid, out var guildLogs);
 
             filters?.Clear();
             voiceRoles?.Clear();
             polls?.Clear();
+            guildLogs?.Clear();
 
             return dbGuild is not null;
         }
@@ -191,6 +198,14 @@ namespace AkkoBot.Services.Database
 
                         VoiceRoles.Clear();
                     }
+
+                    if (GuildLogs is not null)
+                    {
+                        foreach (var group in GuildLogs.Values)
+                            group.Clear();
+
+                        GuildLogs.Clear();
+                    }
                 }
 
                 Blacklist = null;
@@ -204,6 +219,7 @@ namespace AkkoBot.Services.Database
                 VoiceRoles = null;
                 Gatekeeping = null;
                 AutoSlowmode = null;
+                GuildLogs = null;
 
                 _isDisposed = true;
             }

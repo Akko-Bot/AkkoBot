@@ -710,3 +710,12 @@ log_channel_topic: Channel topic
 log_messages_logged: Messages logged
 log_start: Log Start
 cmd_savechat: Saves the last messages sent in a text channel to a file. Bot messages are ignored. Users with no bot ownership are limited to 100 messages. Provide no paraameters to save the last 100 messages from the current channel.
+
+cmd_log: Starts logging on the specified channel. Use {TODO} to see the list of events available for logging. Provide no channel to output the logs in the current channel.
+arg_guildlog_type: The type of event to be logged.
+arg_webhook_name: The name of the webhook.
+message_deleted: Message deleted
+author_mention: Author mention
+deleted_at: Deleted at
+cmd_config_webhooklogname: Sets the default name to be used on the webhooks for guild logs.
+arg_webhooklogname: The default name for the webhooks.

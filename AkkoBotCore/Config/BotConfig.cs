@@ -71,6 +71,12 @@ namespace AkkoBot.Config
         public string BotPrefix { get; set; } = "!";
 
         /// <summary>
+        /// The default name to be used on webhooks for guild logging.
+        /// </summary>
+        [YamlMember(Description = @"The default name to be used on webhooks for guild logging. Defaults to ""AkkoLog"".")]
+        public string WebhookLogName { get; set; } = "AkkoLog";
+
+        /// <summary>
         /// Defines whether embeds should be used in responses by default.
         /// </summary>
         [YamlMember(Description = @"Defines whether embeds should be used in responses by default. Defaults to ""true"". Values: true, false")]

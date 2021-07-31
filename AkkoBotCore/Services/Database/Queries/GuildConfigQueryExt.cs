@@ -21,7 +21,8 @@ namespace AkkoBot.Services.Database.Queries
                 .Include(x => x.VoiceRolesRel)
                 .Include(x => x.RepeaterRel)
                 .Include(x => x.PollRel)
-                .Include(x => x.AutoSlowmodeRel);
+                .Include(x => x.AutoSlowmodeRel)
+                .Include(x => x.GuildLogsRel);
         }
     }
 }

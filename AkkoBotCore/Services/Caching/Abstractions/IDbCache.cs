@@ -16,7 +16,7 @@ namespace AkkoBot.Services.Caching.Abstractions
         /// <summary>
         /// Contains all users that have interacted with the bot.
         /// </summary>
-        public ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; }
+        ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; }
 
         /// <summary>
         /// Contains all blacklisted IDs (guilds, channels and users).
@@ -83,13 +83,19 @@ namespace AkkoBot.Services.Caching.Abstractions
         /// Stores all voice roles.
         /// </summary>
         /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of voice roles of the guild.</remarks>
-        public ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; }
+        ConcurrentDictionary<ulong, ConcurrentHashSet<VoiceRoleEntity>> VoiceRoles { get; }
 
         /// <summary>
         /// Stores all guild gatekeeping settings.
         /// </summary>
         /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild.</remarks>
-        public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; }
+        ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; }
+
+        /// <summary>
+        /// Stores all guild log settings.
+        /// </summary>
+        /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of logs of the guild.</remarks>
+        ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; }
 
         /// <summary>
         /// Safely gets a database guild.

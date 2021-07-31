@@ -85,6 +85,11 @@ namespace AkkoBot.Services.Database.Entities
         public List<RepeaterEntity> RepeaterRel { get; init; }
 
         /// <summary>
+        /// The list of guild logs.
+        /// </summary>
+        public List<GuildLogEntity> GuildLogsRel { get; init; }
+
+        /// <summary>
         /// The IDs of the roles that should be assigned to a Discord user when they join the guild.
         /// </summary>
         public List<long> JoinRoles { get; init; } = new();
