@@ -75,7 +75,11 @@ namespace AkkoBot.Core.Services
             _shardedClient.MessageUpdated += _guildLogger.LogUpdatedMessageAsync;
 
             _shardedClient.MessageDeleted += _guildLogger.LogDeletedMessageAsync;
+
+            _shardedClient.MessagesBulkDeleted += _guildLogger.LogBulkDeletedMessagesAsync;
             /* End Of Test*/
+
+            #region Bot Events
 
             // Save guild on join
             _shardedClient.GuildCreated += _guildLoader.AddGuildOnJoinAsync;
@@ -137,6 +141,10 @@ namespace AkkoBot.Core.Services
             // Assign role on channel join/leave
             _shardedClient.VoiceStateUpdated += _voiceRoleHandler.VoiceRoleAsync;
 
+            #endregion
+
+            #region Command Handler Events
+
             foreach (var cmdHandler in _shardedClient.ShardClients.Values.Select(x => x.GetCommandsNext()))
             {
                 // Command handler events
@@ -144,6 +152,8 @@ namespace AkkoBot.Core.Services
                 cmdHandler.CommandExecuted += _guildEventsHandler.DeleteCommandOnMessageAsync;
                 cmdHandler.CommandErrored += _cmdLogHandler.LogCmdErrorAsync;
             }
+
+            #endregion
         }
 
         public void UnregisterStartupEvents() => throw new NotImplementedException();

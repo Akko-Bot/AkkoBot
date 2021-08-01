@@ -723,3 +723,4 @@ message_edited: Message edited
 before: Before
 after: After
 edited_at: Edited at
+log_messages_deleted: Messages deleted

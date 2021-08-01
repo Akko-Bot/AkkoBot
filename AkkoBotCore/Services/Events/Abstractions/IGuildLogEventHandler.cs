@@ -23,5 +23,10 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs an edited message.
         /// </summary>
         Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs messages deleted in bulk.
+        /// </summary>
+        Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs);
     }
 }

@@ -1,4 +1,5 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Commands.Modules.Administration.Services;
+using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
@@ -6,6 +7,10 @@ using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace AkkoBot.Services.Events.Common
 {
@@ -16,11 +21,13 @@ namespace AkkoBot.Services.Events.Common
     {
         private readonly ILocalizer _localizer;
         private readonly IDbCache _dbCache;
+        private readonly GuildLogService _logService;
 
-        public GuildLogGenerator(ILocalizer localizer, IDbCache dbCache)
+        public GuildLogGenerator(ILocalizer localizer, IDbCache dbCache, GuildLogService logService)
         {
             _localizer = localizer;
             _dbCache = dbCache;
+            _logService = logService;
         }
 
         public DiscordWebhookBuilder GetMessageDeleteLog(DiscordMessage message)
@@ -69,6 +76,28 @@ namespace AkkoBot.Services.Events.Common
             return (dbGuild.UseEmbed)
                 ? result.BuildWebhookMessage()
                 : new DiscordWebhookBuilder() { Content = result.Deconstruct() };
+        }
+
+        public DiscordWebhookBuilder GetMessageBulkDeleteLog(IEnumerable<DiscordMessage> messages, Stream stream, MessageBulkDeleteEventArgs eventArgs)
+        {
+            if (messages is null || !messages.Any())
+                throw new ArgumentException("Message collection cannot be null or empty.", nameof(messages));
+            else if (!stream.CanWrite)
+                throw new ArgumentException("Stream must allow writing.", nameof(stream));
+            else if (eventArgs is null)
+                throw new ArgumentException("Event arguments cannot be null.", nameof(eventArgs));
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var extraInfo = $"==> {_localizer.GetResponseString(dbGuild.Locale, "log_messages_deleted")}: {eventArgs.Messages.Count}" + Environment.NewLine;
+            var fileContent = _logService.GenerateMessageLog(messages, eventArgs.Channel, dbGuild.Locale, extraInfo);
+
+            // The async version is only worth it if you intend to cancel the write
+            stream.Write(Encoding.UTF8.GetBytes(fileContent));
+            stream.Position = 0;
+
+            return new DiscordWebhookBuilder()
+                .AddFile($"Logs_BulkDelete_{eventArgs.Channel.Name}_{DateTimeOffset.Now}.txt", stream);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Attributes;
 using AkkoBot.Commands.Common;
+using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Commands.Modules.Utilities.Services;
 using AkkoBot.Common;
 using AkkoBot.Extensions;
@@ -26,9 +27,9 @@ namespace AkkoBot.Commands.Modules.Utilities
             | Permissions.PrioritySpeaker | Permissions.Stream | Permissions.DeafenMembers | Permissions.MoveMembers;
 
         private readonly UtilitiesService _service;
-        private readonly LogService _logService;
+        private readonly GuildLogService _logService;
 
-        public GuildUtilities(UtilitiesService service, LogService logService)
+        public GuildUtilities(UtilitiesService service, GuildLogService logService)
         {
             _service = service;
             _logService = logService;
