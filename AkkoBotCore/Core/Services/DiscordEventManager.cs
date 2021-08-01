@@ -72,6 +72,8 @@ namespace AkkoBot.Core.Services
             /* Test Log Events*/
             _shardedClient.MessageCreated += _guildLogger.CacheMessageOnCreationAsync;
 
+            _shardedClient.MessageUpdated += _guildLogger.LogUpdatedMessageAsync;
+
             _shardedClient.MessageDeleted += _guildLogger.LogDeletedMessageAsync;
             /* End Of Test*/
 

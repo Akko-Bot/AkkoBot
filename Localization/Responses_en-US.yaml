@@ -719,3 +719,7 @@ author_mention: Author mention
 deleted_at: Deleted at
 cmd_config_webhooklogname: Sets the default name to be used on the webhooks for guild logs.
 arg_webhooklogname: The default name for the webhooks.
+message_edited: Message edited
+before: Before
+after: After
+edited_at: Edited at

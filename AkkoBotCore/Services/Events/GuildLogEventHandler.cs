@@ -3,6 +3,7 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,22 +47,48 @@ namespace AkkoBot.Services.Events
             return Task.CompletedTask;
         }
 
+        public async Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null  || eventArgs.Message.Author.IsBot
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            if (eventArgs.MessageBefore is null)
+            {
+                if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
+                {
+                    messageCache = new(_botConfig.MessageSizeCache) { eventArgs.Message };
+                    _akkoCache.GuildMessageCache.TryAdd(eventArgs.Guild.Id, messageCache);
+                }
+
+                messageCache.Add(eventArgs.Message);
+                return;
+            }
+
+
+            var webhook = _webhookClient.GetRegisteredWebhook(guildLog.WebhookId)
+                ?? await _webhookClient.AddWebhookAsync(guildLog.WebhookId, client);
+
+            await webhook.ExecuteAsync(_logGenerator.GetMessageUpdateLog(eventArgs));
+        }
+
         public async Task LogDeletedMessageAsync(DiscordClient client, MessageDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
+                || !guildLog.IsActive
+                || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
+                || !messageCache.TryGet(x => x.Id == eventArgs.Message.Id, out var message))
                 return;
 
             var webhook = _webhookClient.GetRegisteredWebhook(guildLog.WebhookId)
                 ?? await _webhookClient.AddWebhookAsync(guildLog.WebhookId, client);
 
             // Remove from the cache
-            if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache) || !messageCache.TryGet(x => x.Id == eventArgs.Message.Id, out var message))
-                return;
-
             messageCache.Remove(x => x.Id == eventArgs.Message.Id);
 
-            await webhook.ExecuteAsync(_logGenerator.GetDeleteLog(message));
+            await webhook.ExecuteAsync(_logGenerator.GetMessageDeleteLog(message));
         }
 
         /// <summary>
