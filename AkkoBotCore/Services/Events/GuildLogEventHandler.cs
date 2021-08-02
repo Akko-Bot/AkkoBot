@@ -12,6 +12,7 @@ using LinqToDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,7 +67,9 @@ namespace AkkoBot.Services.Events
         {
             if (eventArgs.Guild is null  || eventArgs.Message.Author.IsBot
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog.IsActive
+
+                || IsIgnoredContext(eventArgs.Guild.Id, (eventArgs.Author as DiscordMember).Roles.Select(x => x.Id).Append(eventArgs.Author.Id).Append(eventArgs.Channel.Id)))
                 return;
 
             // Cache uncached edited messages, but don't log them.
@@ -95,7 +98,8 @@ namespace AkkoBot.Services.Events
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
                 || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
-                || !messageCache.TryGet(x => x.Id == eventArgs.Message.Id, out var message))
+                || !messageCache.TryGet(x => x.Id == eventArgs.Message.Id, out var message)
+                || IsIgnoredContext(eventArgs.Guild.Id, (eventArgs.Message.Author as DiscordMember).Roles.Select(x => x.Id).Append(eventArgs.Message.Author.Id).Append(eventArgs.Channel.Id)))
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -112,7 +116,8 @@ namespace AkkoBot.Services.Events
             if (eventArgs.Guild is null || eventArgs.Messages.All(x => x.Author?.IsBot is not false)
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
-                || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
+                || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
+                || IsIgnoredContext(eventArgs.Guild.Id, eventArgs.Channel.Id))
                 return;
 
             using var stream = new MemoryStream();
@@ -162,6 +167,35 @@ namespace AkkoBot.Services.Events
                     )
                 );
             }
+        }
+
+        /// <summary>
+        /// Checks if the provided ids are from an ignored context.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <param name="ids">The IDs to be checked.</param>
+        /// <returns><see langword="true"/> if at least one of the IDs is ignored or if the guild is not cached, <see langword="false"/> otherwise.</returns>
+        private bool IsIgnoredContext(ulong sid, params ulong[] ids)
+            => IsIgnoredContext(sid, ids);
+
+        /// <summary>
+        /// Checks if the provided ids are from an ignored context.
+        /// </summary>
+        /// <param name="sid">The ID of the Discord guild.</param>
+        /// <param name="ids">The IDs to be checked.</param>
+        /// <returns><see langword="true"/> if at least one of the IDs is ignored or if the guild is not cached, <see langword="false"/> otherwise.</returns>
+        private bool IsIgnoredContext(ulong sid, IEnumerable<ulong> ids)
+        {
+            if (!_dbCache.Guilds.TryGetValue(sid, out var dbGuild))
+                return true;
+
+            foreach (long id in ids)
+            {
+                if (dbGuild.GuildLogBlacklist.Contains(id))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>

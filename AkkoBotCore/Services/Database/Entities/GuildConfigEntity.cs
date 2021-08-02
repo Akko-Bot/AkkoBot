@@ -100,6 +100,11 @@ namespace AkkoBot.Services.Database.Entities
         public List<long> DelCmdBlacklist { get; init; } = new();
 
         /// <summary>
+        /// The context IDs that guild logs should ignore.
+        /// </summary>
+        public List<long> GuildLogBlacklist { get; init; } = new();
+
+        /// <summary>
         /// The ID of the Discord guild these settings are associated with.
         /// </summary>
         public ulong GuildId { get; init; }
@@ -196,7 +201,7 @@ namespace AkkoBot.Services.Database.Entities
         /// <summary>
         /// Defines the amount of time that an interactive command waits for user input.
         /// </summary>
-        public TimeSpan? InteractiveTimeout { get; set; }
+        public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
         /// <summary>
         /// Determines whether this guild has any sort of passive activity that needs to be handled by events.
@@ -208,7 +213,7 @@ namespace AkkoBot.Services.Database.Entities
         [NotMapped]
         public bool HasPassiveActivity
             => GatekeepRel?.IsActive is true || FilteredWordsRel?.IsActive is true || PollRel.Any(x => x.Type is PollType.Anonymous)
-            || FilteredContentRel?.Count is > 0 || VoiceRolesRel?.Count is > 0 || RepeaterRel?.Count is > 0;
+            || FilteredContentRel?.Count is > 0 || VoiceRolesRel?.Count is > 0 || RepeaterRel?.Count is > 0 || GuildLogsRel?.Count is > 0;
 
         public GuildConfigEntity()
         {

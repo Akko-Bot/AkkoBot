@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Common;
+using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
@@ -24,12 +25,14 @@ namespace AkkoBot.Services.Events.Common
         private readonly ILocalizer _localizer;
         private readonly IDbCache _dbCache;
         private readonly GuildLogService _logService;
+        private readonly BotConfig _botConfig;
 
-        public GuildLogGenerator(ILocalizer localizer, IDbCache dbCache, GuildLogService logService)
+        public GuildLogGenerator(ILocalizer localizer, IDbCache dbCache, GuildLogService logService, BotConfig botConfig)
         {
             _localizer = localizer;
             _dbCache = dbCache;
             _logService = logService;
+            _botConfig = botConfig;
         }
 
         public DiscordWebhookBuilder GetMessageDeleteLog(DiscordMessage message)
@@ -119,7 +122,7 @@ namespace AkkoBot.Services.Events.Common
                 };
 
             var message = new SerializableDiscordMessage()
-                .WithColor(dbGuild.OkColor)
+                .WithColor((action <= 0) ? dbGuild.OkColor : dbGuild.ErrorColor)
                 .WithTitle("log_emoji_title")
                 .WithThumbnail(emoji.Url)
                 .WithDescription(string.Format(description, Formatter.InlineCode(oldEmojiName ?? emoji.Name), Formatter.InlineCode(emoji.Name)))
