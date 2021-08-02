@@ -134,6 +134,36 @@ namespace AkkoBot.Services.Events
                 await webhook.ExecuteAsync(_logGenerator.GetMessageBulkDeleteLog(messages, stream, eventArgs));
         }
 
+        public async Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.Emojis, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var target = (eventArgs.EmojisBefore.Count > eventArgs.EmojisAfter.Count)
+                ? eventArgs.EmojisAfter.Values
+                : eventArgs.EmojisBefore.Values;
+
+            var emoji = eventArgs.EmojisAfter.Values
+                .Concat(eventArgs.EmojisBefore.Values)
+                .Except(target)
+                .FirstOrDefault();
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+            {
+                await webhook.ExecuteAsync(
+                    _logGenerator.GetEmojiUpdateLog(
+                        eventArgs.Guild,
+                        emoji,
+                        eventArgs.EmojisBefore.Count - eventArgs.EmojisAfter.Count,
+                        eventArgs.EmojisBefore.Values.FirstOrDefault(x => x.Id == emoji.Id)?.Name
+                    )
+                );
+            }
+        }
+
         /// <summary>
         /// Gets the guildlog for the specified Discord guild.
         /// </summary>

@@ -724,3 +724,8 @@ before: Before
 after: After
 edited_at: Edited at
 log_messages_deleted: Messages deleted
+log_emoji_edited: Emoji {0} has been changed to {1}.
+log_emoji_added: Emoji {0} has been added.
+log_emoji_deleted: Emoji {0} has been removed.
+log_emoji_edited_simple: Emoji {0} has been modified.
+log_emoji_title: Emoji updated

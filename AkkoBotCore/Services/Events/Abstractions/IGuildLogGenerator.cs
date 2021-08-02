@@ -38,5 +38,21 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Occurs when <paramref name="messages"/> or <paramref name="stream"/> or <paramref name="eventArgs"/> are <see langword="null"/> or the message collection is empty.
         /// </exception>
         DiscordWebhookBuilder GetMessageBulkDeleteLog(IEnumerable<DiscordMessage> messages, Stream stream, MessageBulkDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="GuildEmojisUpdateEventArgs"/> event.
+        /// </summary>
+        /// <param name="server">The server the event took place.</param>
+        /// <param name="emoji">The emoji that got added/edited/deleted.</param>
+        /// <param name="action">
+        /// Amount of emojis before minus amount of emojis after. Less than 0 means the emoji was added, more than 0 means the emoji was deleted and 0 means the emoji was modified.
+        /// </param>
+        /// <param name="oldEmojiName">The previous name of the emoji - only relevant if the emoji was modified.</param>
+        /// <returns></returns>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentException">
+        /// Occurs when <paramref name="server"/> or <paramref name="emoji"/> are <see langword="null"/>.
+        /// </exception>
+        DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string oldEmojiName = null);
     }
 }

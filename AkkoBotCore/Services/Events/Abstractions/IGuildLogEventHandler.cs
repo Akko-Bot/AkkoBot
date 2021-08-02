@@ -28,5 +28,10 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs messages deleted in bulk.
         /// </summary>
         Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs addition, edit or removal of a guild's emoji.
+        /// </summary>
+        Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs);
     }
 }

@@ -77,6 +77,8 @@ namespace AkkoBot.Core.Services
             _shardedClient.MessageDeleted += _guildLogger.LogDeletedMessageAsync;
 
             _shardedClient.MessagesBulkDeleted += _guildLogger.LogBulkDeletedMessagesAsync;
+
+            _shardedClient.GuildEmojisUpdated += _guildLogger.LogEmojiUpdateAsync;
             /* End Of Test*/
 
             #region Bot Events
