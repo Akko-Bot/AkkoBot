@@ -196,7 +196,7 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
                         "{4}: {5}",
                         "region", server.VoiceRegion.Name,
                         "verification_level", server.VerificationLevel.ToString().ToLowerInvariant(),
-                        "created_at", server.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))
+                        "created_on", server.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))
                     ),
                     true
                 )

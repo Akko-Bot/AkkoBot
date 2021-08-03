@@ -101,8 +101,8 @@ namespace AkkoBot.Commands.Modules.Utilities
                 embed.WithTitle(context.FormatLocalized("repeater") + $" #{repeater.Id}")
                     .WithDescription(Formatter.BlockCode(repeater.Content, "yaml"))
                     .AddField("interval", repeater.Interval.ToString(@"%d\d\ %h\h\ %m\m\ %s\s"), true)
-                    .AddField("triggers_in", (timer?.ElapseIn ?? dbTimer.ElapseIn).ToString(@"%d\d\ %h\h\ %m\m\ %s\s"), true)
-                    .AddField("triggers_at", (timer?.ElapseAt ?? dbTimer.ElapseAt).ToOffset(context.GetTimeZone().BaseUtcOffset).ToString(), true)
+                    .AddField("triggers_on", (timer?.ElapseAt ?? dbTimer.ElapseAt).ToOffset(context.GetTimeZone().BaseUtcOffset).ToDiscordTimestamp(), true)
+                    .AddField("triggers_in", DateTimeOffset.Now.Add(timer?.ElapseIn ?? dbTimer.ElapseIn).ToDiscordTimestamp(DiscordTimestamp.RelativeTime), true)
                     .AddField("author", member?.GetFullname() ?? dbUser.FullName, true)
                     .AddField("channel", $"<#{repeater.ChannelId}>", true);
             }
@@ -143,7 +143,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 embed.WithTitle("repeater_list_title")
                     .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, "[...]"))), true)
                     .AddField("channel", string.Join("\n", repeaters.Select(x => $"<#{x.ChannelId}>")), true)
-                    .AddField("triggers_in", string.Join("\n", timers.Select(x => x?.ElapseIn.ToString(@"%d\d\ %h\h\ %m\m\ %s\s") ?? context.FormatLocalized("repeat_over_24h"))), true);
+                    .AddField("triggers_in", string.Join("\n", timers.Select(x => (x is null) ? context.FormatLocalized("repeat_over_24h") : DateTimeOffset.Now.Add(x.ElapseIn).ToDiscordTimestamp(DiscordTimestamp.RelativeTime))), true);
 
                 await context.RespondLocalizedAsync(embed);
             }

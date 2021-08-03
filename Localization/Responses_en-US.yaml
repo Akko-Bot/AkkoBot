@@ -384,7 +384,7 @@ cooldown: Cooldown
 cooldown_empty: No cooldowns were found.
 cooldown_title_global: Global Cooldowns
 cooldown_title_server: Server Cooldowns
-created_at: Created at
+created_on: Created on
 days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'
 db_cache: Database Cache
@@ -406,7 +406,7 @@ error_hierarchy: This command can only be used on users with a role lower to min
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
-expires_at: Expires at
+expires_on: Expires on
 exportcommands_description: Successfully exported {0} commands.
 farewell_channel_removed: The farewell channel has been successfully removed.
 farewell_channel_set: The farewell message will be sent to the {0} channel.
@@ -500,7 +500,7 @@ is_invite_only: Invites
 is_mod: Is a Moderator
 is_not_active: Is Not Active
 is_url_only: URLs
-joined_at: Joined At
+joined_on: Joined On
 joinrole_added: The {0} role has been added to the list of join roles.
 joinrole_error: Integration roles cannot be added.
 joinrole_limit: Limit of 3 join roles has been reached.
@@ -656,7 +656,7 @@ timezone_list: Time Zones
 total: Total
 total_of: '{0} total'
 trigger_time: Triggers Within
-triggers_at: Triggers At
+triggers_on: Triggers On
 triggers_in: Triggers In
 type: Type
 unban_not_found: This user is not banned.
@@ -716,13 +716,13 @@ arg_guildlog_type: The type of event to be logged.
 arg_webhook_name: The name of the webhook.
 message_deleted: Message deleted
 author_mention: Author mention
-deleted_at: Deleted at
+deleted_on: Deleted on
 cmd_config_webhooklogname: Sets the default name to be used on the webhooks for guild logs.
 arg_webhooklogname: The default name for the webhooks.
 message_edited: Message edited
 before: Before
 after: After
-edited_at: Edited at
+edited_on: Edited on
 log_messages_deleted: Messages deleted
 log_emoji_edited: Emoji {0} has been changed to {1}.
 log_emoji_added: Emoji {0} has been added.
@@ -730,6 +730,11 @@ log_emoji_deleted: Emoji {0} has been removed.
 log_emoji_edited_simple: Emoji {0} has been modified.
 log_emoji_title: Emoji updated
 log_invite_created_title: Invite created
-expires_in: Expires in
+expires_on: Expires on
 log_invite_deleted_title: Invite deleted
 invite_check_title: Server invite
+moderator: Moderator
+banned_on: Banned on
+log_unban_title: Unbanned user
+unbanned_on: Unbanned on
+expires: Expires

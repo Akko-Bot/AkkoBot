@@ -43,5 +43,15 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs invite deletion.
         /// </summary>
         Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs user ban.
+        /// </summary>
+        Task LogBannedUserAsync(DiscordClient client, GuildBanAddEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs user unban
+        /// </summary>
+        Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs);
     }
 }

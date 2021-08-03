@@ -83,6 +83,10 @@ namespace AkkoBot.Core.Services
             _shardedClient.InviteCreated += _guildLogger.LogCreatedInviteAsync;
 
             _shardedClient.InviteDeleted += _guildLogger.LogDeletedInviteAsync;
+
+            _shardedClient.GuildBanAdded += _guildLogger.LogBannedUserAsync;
+
+            _shardedClient.GuildBanRemoved += _guildLogger.LogUnbannedUserAsync;
             /* End Of Test*/
 
             #region Bot Events

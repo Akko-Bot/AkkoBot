@@ -66,20 +66,15 @@ namespace AkkoBot.Services.Database.Entities
         Emojis = 1 << 9,
 
         /// <summary>
-        /// Guild update.
-        /// </summary>
-        GuildUpdate = 1 << 10,
-
-        /// <summary>
         /// User presence update.
         /// </summary>
-        UserPresence = 1 << 11,
+        UserPresence = 1 << 10,
 
         /// <summary>
         /// All events.
         /// </summary>
         All = Unknown | ChannelEvents | BanEvents | MemberEvents | MessageEvents| VoiceEvents
-            | RoleEvents | InviteEvents | Integration | Emojis | GuildUpdate | UserPresence
+            | RoleEvents | InviteEvents | Integration | Emojis | UserPresence
     }
 
     /// <summary>

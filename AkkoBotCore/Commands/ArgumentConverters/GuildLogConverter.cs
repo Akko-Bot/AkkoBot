@@ -22,7 +22,6 @@ namespace AkkoBot.Commands.ArgumentConverters
                 "invite" => Task.FromResult(Optional.FromValue(GuildLog.InviteEvents)),
                 "integration" => Task.FromResult(Optional.FromValue(GuildLog.Integration)),
                 "emoji" or "emojis" => Task.FromResult(Optional.FromValue(GuildLog.Emojis)),
-                "guild" => Task.FromResult(Optional.FromValue(GuildLog.GuildUpdate)),
                 "userpresence" or "presence" => Task.FromResult(Optional.FromValue(GuildLog.UserPresence)),
                 _ => Task.FromResult(Optional.FromNoValue<GuildLog>())
             };

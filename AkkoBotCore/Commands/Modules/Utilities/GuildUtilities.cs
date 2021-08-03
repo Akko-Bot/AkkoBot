@@ -75,7 +75,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             channel ??= context.Channel;
 
             var embed = _service.GetChannelInfo(new SerializableDiscordMessage(), channel)
-                .WithFooter(context.FormatLocalized("{0}: {1}", "created_at", channel.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))));
+                .WithFooter(context.FormatLocalized("{0}: {1}", "created_on", channel.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))));
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -95,8 +95,8 @@ namespace AkkoBot.Commands.Modules.Utilities
                 .AddField("is_mod", (isMod) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
                 .AddField("roles", user.Roles.Count().ToString(), true)
                 .AddField("position", user.Hierarchy.ToString(), true)
-                .AddField("created_at", user.CreationTimestamp.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), true)
-                .AddField("joined_at", user.JoinedAt.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), true);
+                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), true)
+                .AddField("joined_on", user.JoinedAt.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -108,7 +108,7 @@ namespace AkkoBot.Commands.Modules.Utilities
                 .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
                 .AddField("name", user.GetFullname(), true)
                 .AddField("id", user.Id.ToString(), true)
-                .AddField("created_at", user.CreationTimestamp.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), false);
+                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), false);
 
             await context.RespondLocalizedAsync(embed, false);
         }

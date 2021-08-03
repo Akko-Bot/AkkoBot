@@ -384,7 +384,7 @@ cooldown: Cooldown
 cooldown_empty: Nenhum cooldown foi encontrado.
 cooldown_title_global: Cooldowns Globais
 cooldown_title_server: Cooldowns do Servidor
-created_at: Criado em
+created_on: Criado em
 days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
 db_cache: Cache do Banco de Dados
@@ -406,7 +406,7 @@ error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
-expires_in: Expira em
+expires_on: Expira em
 exportcommands_description: '{0} comandos exportados com sucesso.'
 farewell_channel_removed: O canal de despedida foi removido com sucesso.
 farewell_channel_set: A mensagem de despedida será enviada no canal {0}.
@@ -500,7 +500,7 @@ is_invite_only: Convites
 is_mod: É Moderador
 is_not_active: Não Está Ativo
 is_url_only: URLs
-joined_at: Entrou Em
+joined_on: Entrou Em
 joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
 joinrole_error: Cargos de integração não podem ser adicionados.
 joinrole_limit: O limite de 3 cargos de entrada foi atingido.
@@ -656,7 +656,7 @@ timezone_list: Fusos Horários
 total: Total
 total_of: 'Total de {0}'
 trigger_time: Ativa Dentro De
-triggers_at: Data de Execução
+triggers_on: Data de Execução
 triggers_in: Executa Em
 type: Tipo
 unban_not_found: Esse usuário não está banido.

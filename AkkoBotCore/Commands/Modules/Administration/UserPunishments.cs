@@ -241,7 +241,7 @@ namespace AkkoBot.Commands.Modules.Administration
             else
             {
                 // Unban the user
-                await context.Guild.UnbanMemberAsync(user.User, reason);
+                await context.Guild.UnbanMemberAsync(user.User, $"{context.User.GetFullname()} | {reason}");
 
                 // Send unban message to the context channel
                 var embed = new SerializableDiscordMessage()
@@ -268,7 +268,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
                 foreach (var userId in toUnban)
                 {
-                    try { await context.Guild.UnbanMemberAsync(userId, context.Member.GetFullname() + " | " + context.FormatLocalized("massunban")); }
+                    try { await context.Guild.UnbanMemberAsync(userId, $"{context.Member.GetFullname()} | {context.FormatLocalized("massunban")}"); }
                     catch { failed += 1; }
 
                     await Task.Delay(AkkoEntities.SafetyDelay);

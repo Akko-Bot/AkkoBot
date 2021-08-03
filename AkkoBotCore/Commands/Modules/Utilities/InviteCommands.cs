@@ -100,7 +100,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             {
                 fields.Add(new("code", string.Join("\n", group.Select(x => x.Code)), true));
                 fields.Add(new("used", string.Join("\n", group.Select(x => context.FormatLocalized("x_times", x.Uses))), true));
-                fields.Add(new("expires_at", string.Join("\n", group.Select(x => (x.MaxAge is 0) ? "-" : x.CreatedAt.AddSeconds(x.MaxAge).ToDiscordTimestamp())), true));
+                fields.Add(new("expires_on", string.Join("\n", group.Select(x => (x.MaxAge is 0) ? "-" : x.CreatedAt.AddSeconds(x.MaxAge).ToDiscordTimestamp())), true));
             }
 
             var embed = new SerializableDiscordMessage()
@@ -124,13 +124,13 @@ namespace AkkoBot.Commands.Modules.Utilities
                     .WithDescription(guildInvite.GetInviteLink())
                     .AddField("author", guildInvite.Inviter.GetFullname(), true)
                     .AddField("code", guildInvite.Code, true)
-                    .AddField("created_at", guildInvite.CreatedAt.ToDiscordTimestamp(), true)
+                    .AddField("created_on", guildInvite.CreatedAt.ToDiscordTimestamp(), true)
                     .AddField("channel", $"<#{guildInvite.Channel.Id}>", true)
                     .AddField("invite_temporary", (guildInvite.IsTemporary) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
-                    .AddField("expires_at", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(), true)
+                    .AddField("expires_on", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(), true)
                     .AddField("used", context.FormatLocalized("x_times", guildInvite.Uses), true)
                     .AddField("uses_left", (guildInvite.MaxUses is 0) ? "-" : (guildInvite.MaxUses - guildInvite.Uses).ToString(), true)
-                    .AddField("expires_in", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(DiscordTimestamp.RelativeTime), true);
+                    .AddField("expires", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(DiscordTimestamp.RelativeTime), true);
             }
 
             await context.RespondLocalizedAsync(embed, guildInvite is null, guildInvite is null);

@@ -27,14 +27,12 @@ namespace AkkoBot.Services.Events.Common
         private readonly ILocalizer _localizer;
         private readonly IDbCache _dbCache;
         private readonly GuildLogService _logService;
-        private readonly BotConfig _botConfig;
 
-        public GuildLogGenerator(ILocalizer localizer, IDbCache dbCache, GuildLogService logService, BotConfig botConfig)
+        public GuildLogGenerator(ILocalizer localizer, IDbCache dbCache, GuildLogService logService)
         {
             _localizer = localizer;
             _dbCache = dbCache;
             _logService = logService;
-            _botConfig = botConfig;
         }
 
         public DiscordWebhookBuilder GetMessageDeleteLog(DiscordMessage message)
@@ -50,7 +48,7 @@ namespace AkkoBot.Services.Events.Common
                 .WithTitle(DiscordUserExt.GetFullname(message.Author))
                 .WithDescription($"{_localizer.GetResponseString(dbGuild.Locale, "channel")}: {message.Channel.Mention} | {message.Channel.Name}\n\n{message.Content}")
                 .AddField("author_mention", (string)message.Author.Mention, true)
-                .AddField("deleted_at", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
                 .WithFooter($"{_localizer.GetResponseString(dbGuild.Locale, "id")}: {message.Id}")
                 .WithLocalization(_localizer, dbGuild.Locale);
 
@@ -74,7 +72,7 @@ namespace AkkoBot.Services.Events.Common
                     $"{_localizer.GetResponseString(dbGuild.Locale, "after")}:\n{eventArgs.Message.Content}"
                 )
                 .AddField("author_mention", eventArgs.Message.Author.Mention, true)
-                .AddField("edited_at", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
                 .WithFooter($"{_localizer.GetResponseString(dbGuild.Locale, "id")}: {eventArgs.Message.Id}")
                 .WithLocalization(_localizer, dbGuild.Locale);
 
@@ -143,10 +141,10 @@ namespace AkkoBot.Services.Events.Common
                 .WithDescription(eventArgs.Invite.GetInviteLink())
                 .AddField("author", eventArgs.Invite.Inviter.GetFullname(), true)
                 .AddField("code", eventArgs.Invite.Code, true)
-                .AddField("created_at", eventArgs.Invite.CreatedAt.ToDiscordTimestamp(), true)
+                .AddField("created_on", eventArgs.Invite.CreatedAt.ToDiscordTimestamp(), true)
                 .AddField("channel", (dbGuild.UseEmbed) ? eventArgs.Channel.Mention : $"#{eventArgs.Channel.Name}", true)
                 .AddField("invite_temporary", (eventArgs.Invite.IsTemporary) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
-                .AddField("expires_at", (eventArgs.Invite.MaxAge is 0) ? "-" : eventArgs.Invite.CreatedAt.AddSeconds(eventArgs.Invite.MaxAge).ToDiscordTimestamp(), true)
+                .AddField("expires_on", (eventArgs.Invite.MaxAge is 0) ? "-" : eventArgs.Invite.CreatedAt.AddSeconds(eventArgs.Invite.MaxAge).ToDiscordTimestamp(), true)
                 .WithFooter($"{_localizer.FormatLocalized(dbGuild.Locale, "uses_left")}: {((eventArgs.Invite.MaxUses is 0) ? "-" : (eventArgs.Invite.MaxUses - eventArgs.Invite.Uses))}")
                 .WithLocalization(_localizer, dbGuild.Locale);
 
@@ -166,7 +164,49 @@ namespace AkkoBot.Services.Events.Common
                 .WithDescription(eventArgs.Invite.GetInviteLink())
                 .AddField("code", eventArgs.Invite.Code, true)
                 .AddField("channel", (dbGuild.UseEmbed) ? eventArgs.Channel.Mention : $"#{eventArgs.Channel.Name}", true)
-                .AddField("deleted_at", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetBannedUserLog(DiscordAuditLogBanEntry auditLog, GuildBanAddEventArgs eventArgs)
+        {
+            if (auditLog is null)
+                throw new ArgumentNullException(nameof(auditLog), "Audit log cannot be null.");
+            else if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.ErrorColor)
+                .WithTitle("ban_title")
+                .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
+                .AddField("moderator", auditLog.UserResponsible.GetFullname(), true)
+                .AddField("reason", auditLog.Reason, true)
+                .AddField("banned_on", DateTimeOffset.Now.ToDiscordTimestamp())
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetUnbannedUserLog(DiscordAuditLogBanEntry auditLog, GuildBanRemoveEventArgs eventArgs)
+        {
+            if (auditLog is null)
+                throw new ArgumentNullException(nameof(auditLog), "Audit log cannot be null.");
+            else if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_unban_title")
+                .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
+                .AddField("moderator", auditLog.UserResponsible.GetFullname(), true)
+                .AddField("reason", auditLog.Reason, true)
+                .AddField("unbanned_on", DateTimeOffset.Now.ToDiscordTimestamp())
                 .WithLocalization(_localizer, dbGuild.Locale);
 
             return GetStandardMessage(message, dbGuild);

@@ -193,6 +193,32 @@ namespace AkkoBot.Services.Events
                 await webhook.ExecuteAsync(_logGenerator.GetDeletedInviteLog(eventArgs));
         }
 
+        public async Task LogBannedUserAsync(DiscordClient client, GuildBanAddEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.BanEvents, out var guildLog) || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+            var auditLog = (await eventArgs.Guild.GetAuditLogsAsync(1, null, AuditLogActionType.Ban))[0];
+
+            if (auditLog is DiscordAuditLogBanEntry banLog && webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetBannedUserLog(banLog, eventArgs));
+        }
+
+        public async Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.BanEvents, out var guildLog) || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+            var auditLog = (await eventArgs.Guild.GetAuditLogsAsync(1, null, AuditLogActionType.Unban))[0];
+
+            if (auditLog is DiscordAuditLogBanEntry unbanLog && webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetUnbannedUserLog(unbanLog, eventArgs));
+        }
+
         /// <summary>
         /// Checks if the provided ids are from an ignored context.
         /// </summary>
