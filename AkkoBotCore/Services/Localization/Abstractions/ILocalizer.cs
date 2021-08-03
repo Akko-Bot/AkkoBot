@@ -68,5 +68,14 @@ namespace AkkoBot.Services.Localization.Abstractions
         /// Clears the cache and loads all response strings again.
         /// </summary>
         void ReloadLocalizedStrings();
+
+        /// <summary>
+        /// Localizes a response string that contains string formatters.
+        /// </summary>
+        /// <param name="locale">The locale to localize to.</param>
+        /// <param name="key">The response key to be localized.</param>
+        /// <param name="args">Variables to be included into the formatted response string.</param>
+        /// <returns>A formatted and localized response string.</returns>
+        string FormatLocalized(string locale, string key, params object[] args);
     }
 }

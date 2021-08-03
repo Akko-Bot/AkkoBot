@@ -127,7 +127,7 @@ namespace AkkoBot.Config
         /// <summary>
         /// Defines the maximum amount of time that an interactive command waits for user input.
         /// </summary>
-        [YamlMember(Description = @"Defines the maximum amount of time that an interactive command waits for user input. Defaults to ""00:00:30"".")]
+        [YamlMember(Description = @"Defines the maximum amount of time that an interactive command waits for user input. Defaults to ""00:01:00"".")]
         public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(60);
 
         public override IReadOnlyDictionary<string, string> GetSettings()

@@ -4,6 +4,7 @@ using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
+using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Events.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -13,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AkkoBot.Services.Events.Common
@@ -38,7 +40,7 @@ namespace AkkoBot.Services.Events.Common
         public DiscordWebhookBuilder GetMessageDeleteLog(DiscordMessage message)
         {
             if (message is null)
-                throw new ArgumentException("Deleted message cannot be null.", nameof(message));
+                throw new ArgumentNullException(nameof(message), "Deleted message cannot be null.");
 
             _dbCache.Guilds.TryGetValue((ulong)message.Channel.Guild.Id, out var dbGuild);
 
@@ -52,15 +54,13 @@ namespace AkkoBot.Services.Events.Common
                 .WithFooter($"{_localizer.GetResponseString(dbGuild.Locale, "id")}: {message.Id}")
                 .WithLocalization(_localizer, dbGuild.Locale);
 
-            return (dbGuild.UseEmbed)
-                ? webhookMessage.BuildWebhookMessage()
-                : new DiscordWebhookBuilder() { Content = webhookMessage.Deconstruct() };
+            return GetStandardMessage(webhookMessage, dbGuild);
         }
 
         public DiscordWebhookBuilder GetMessageUpdateLog(MessageUpdateEventArgs eventArgs)
         {
             if (eventArgs.MessageBefore is null)
-                throw new ArgumentException("Previous state of an edited message cannot be null.", nameof(eventArgs));
+                throw new ArgumentNullException(nameof(eventArgs), "Previous state of an edited message cannot be null.");
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
@@ -78,9 +78,7 @@ namespace AkkoBot.Services.Events.Common
                 .WithFooter($"{_localizer.GetResponseString(dbGuild.Locale, "id")}: {eventArgs.Message.Id}")
                 .WithLocalization(_localizer, dbGuild.Locale);
 
-            return (dbGuild.UseEmbed)
-                ? message.BuildWebhookMessage()
-                : new DiscordWebhookBuilder() { Content = message.Deconstruct() };
+            return GetStandardMessage(message, dbGuild);
         }
 
         public DiscordWebhookBuilder GetMessageBulkDeleteLog(IEnumerable<DiscordMessage> messages, Stream stream, MessageBulkDeleteEventArgs eventArgs)
@@ -90,7 +88,7 @@ namespace AkkoBot.Services.Events.Common
             else if (!stream.CanWrite)
                 throw new ArgumentException("Stream must allow writing.", nameof(stream));
             else if (eventArgs is null)
-                throw new ArgumentException("Event arguments cannot be null.", nameof(eventArgs));
+                throw new ArgumentNullException(nameof(eventArgs), "Event arguments cannot be null.");
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
@@ -108,7 +106,7 @@ namespace AkkoBot.Services.Events.Common
         public DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string oldEmojiName = null)
         {
             if (server is null || emoji is null)
-                throw new ArgumentException((server is null) ? "Discord guild cannot be null" : "Emoji cannot be null.", (server is null) ? nameof(server) : nameof(emoji));
+                throw new ArgumentNullException((server is null) ? nameof(server) : nameof(emoji), (server is null) ? "Discord guild cannot be null" : "Emoji cannot be null.");
 
             _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
 
@@ -129,9 +127,59 @@ namespace AkkoBot.Services.Events.Common
                 .AddField(AkkoConstants.ValidWhitespace, DateTimeOffset.Now.ToDiscordTimestamp())
                 .WithLocalization(_localizer, dbGuild.Locale);
 
-            return (dbGuild.UseEmbed)
-               ? message.BuildWebhookMessage()
-               : new DiscordWebhookBuilder() { Content = message.Deconstruct() };
+            return GetStandardMessage(message, dbGuild);
         }
+
+        public DiscordWebhookBuilder GetCreatedInviteLog(InviteCreateEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_invite_created_title")
+                .WithDescription(eventArgs.Invite.GetInviteLink())
+                .AddField("author", eventArgs.Invite.Inviter.GetFullname(), true)
+                .AddField("code", eventArgs.Invite.Code, true)
+                .AddField("created_at", eventArgs.Invite.CreatedAt.ToDiscordTimestamp(), true)
+                .AddField("channel", (dbGuild.UseEmbed) ? eventArgs.Channel.Mention : $"#{eventArgs.Channel.Name}", true)
+                .AddField("invite_temporary", (eventArgs.Invite.IsTemporary) ? AkkoEntities.SuccessEmoji.Name : AkkoEntities.FailureEmoji.Name, true)
+                .AddField("expires_at", (eventArgs.Invite.MaxAge is 0) ? "-" : eventArgs.Invite.CreatedAt.AddSeconds(eventArgs.Invite.MaxAge).ToDiscordTimestamp(), true)
+                .WithFooter($"{_localizer.FormatLocalized(dbGuild.Locale, "uses_left")}: {((eventArgs.Invite.MaxUses is 0) ? "-" : (eventArgs.Invite.MaxUses - eventArgs.Invite.Uses))}")
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetDeletedInviteLog(InviteDeleteEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.ErrorColor)
+                .WithTitle("log_invite_deleted_title")
+                .WithDescription(eventArgs.Invite.GetInviteLink())
+                .AddField("code", eventArgs.Invite.Code, true)
+                .AddField("channel", (dbGuild.UseEmbed) ? eventArgs.Channel.Mention : $"#{eventArgs.Channel.Name}", true)
+                .AddField("deleted_at", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        /// <summary>
+        /// Returns the appropriate webhook message for the guild's embed setting.
+        /// </summary>
+        /// <param name="message">The webhook message to send.</param>
+        /// <param name="dbGuild">The guild settings.</param>
+        /// <returns>The webhook message.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private DiscordWebhookBuilder GetStandardMessage(SerializableDiscordMessage message, GuildConfigEntity dbGuild)
+            => (dbGuild.UseEmbed) ? message.BuildWebhookMessage() : new DiscordWebhookBuilder() { Content = message.Deconstruct() };
     }
 }

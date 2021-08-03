@@ -44,5 +44,10 @@ namespace AkkoBot.Common
         /// Represents a whitespace character that is not detected as such.
         /// </summary>
         public const string ValidWhitespace = "\u200B";
+
+        /// <summary>
+        /// Represents the first part of a Discord guild invite link.
+        /// </summary>
+        public const string DiscordInviteLinkBase = "https://discord.gg/";
     }
 }

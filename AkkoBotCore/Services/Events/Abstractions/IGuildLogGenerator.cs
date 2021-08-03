@@ -16,7 +16,7 @@ namespace AkkoBot.Services.Events.Abstractions
         /// </summary>
         /// <param name="message">The message that got deleted.</param>
         /// <returns>The guild log message.</returns>
-        /// <exception cref="ArgumentException">Occurs when <paramref name="message"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="message"/> is <see langword="null"/>.</exception>
         DiscordWebhookBuilder GetMessageDeleteLog(DiscordMessage message);
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace AkkoBot.Services.Events.Abstractions
         /// </summary>
         /// <param name="eventArgs">The event argument.</param>
         /// <returns>The guild log message.</returns>
-        /// <exception cref="ArgumentException">Occurs when <see cref="MessageUpdateEventArgs.MessageBefore"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <see cref="MessageUpdateEventArgs.MessageBefore"/> is <see langword="null"/>.</exception>
         DiscordWebhookBuilder GetMessageUpdateLog(MessageUpdateEventArgs eventArgs);
 
         /// <summary>
@@ -35,8 +35,9 @@ namespace AkkoBot.Services.Events.Abstractions
         /// <param name="eventArgs">The event argument.</param>
         /// <returns>The guild log message.</returns>
         /// <exception cref="ArgumentException">
-        /// Occurs when <paramref name="messages"/> or <paramref name="stream"/> or <paramref name="eventArgs"/> are <see langword="null"/> or the message collection is empty.
+        /// Occurs when <paramref name="messages"/> or <paramref name="stream"/> are <see langword="null"/> or the message collection is empty.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
         DiscordWebhookBuilder GetMessageBulkDeleteLog(IEnumerable<DiscordMessage> messages, Stream stream, MessageBulkDeleteEventArgs eventArgs);
 
         /// <summary>
@@ -50,9 +51,25 @@ namespace AkkoBot.Services.Events.Abstractions
         /// <param name="oldEmojiName">The previous name of the emoji - only relevant if the emoji was modified.</param>
         /// <returns></returns>
         /// <returns>The guild log message.</returns>
-        /// <exception cref="ArgumentException">
+        /// <exception cref="ArgumentNullException">
         /// Occurs when <paramref name="server"/> or <paramref name="emoji"/> are <see langword="null"/>.
         /// </exception>
         DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string oldEmojiName = null);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="InviteCreateEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetCreatedInviteLog(InviteCreateEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="InviteDeleteEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetDeletedInviteLog(InviteDeleteEventArgs eventArgs);
     }
 }

@@ -121,6 +121,21 @@ namespace AkkoBot.Services.Localization
             }
         }
 
+        public string FormatLocalized(string locale, string key, params object[] args)
+        {
+            for (var index = 0; index < args.Length; index++)
+            {
+                if (args[index] is string arg)
+                    args[index] = GetResponseString(locale, arg);
+                else if (args[index] is null)
+                    args[index] = string.Empty;
+            }
+
+            key = GetResponseString(locale, key);
+
+            return string.Format(key, args);
+        }
+
         public void Dispose()
         {
             foreach (var stringGroup in _localizedStrings.Values.Cast<Dictionary<string, string>>())

@@ -406,7 +406,7 @@ error_hierarchy: This command can only be used on users with a role lower to min
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
-expires_in: Expires in
+expires_at: Expires at
 exportcommands_description: Successfully exported {0} commands.
 farewell_channel_removed: The farewell channel has been successfully removed.
 farewell_channel_set: The farewell message will be sent to the {0} channel.
@@ -729,3 +729,7 @@ log_emoji_added: Emoji {0} has been added.
 log_emoji_deleted: Emoji {0} has been removed.
 log_emoji_edited_simple: Emoji {0} has been modified.
 log_emoji_title: Emoji updated
+log_invite_created_title: Invite created
+expires_in: Expires in
+log_invite_deleted_title: Invite deleted
+invite_check_title: Server invite

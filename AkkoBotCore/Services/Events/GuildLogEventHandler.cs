@@ -169,6 +169,30 @@ namespace AkkoBot.Services.Events
             }
         }
 
+        public async Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.InviteEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetCreatedInviteLog(eventArgs));
+        }
+
+        public async Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.InviteEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetDeletedInviteLog(eventArgs));
+        }
+
         /// <summary>
         /// Checks if the provided ids are from an ignored context.
         /// </summary>

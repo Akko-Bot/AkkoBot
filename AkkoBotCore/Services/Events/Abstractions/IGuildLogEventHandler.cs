@@ -33,5 +33,15 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs addition, edit or removal of a guild's emoji.
         /// </summary>
         Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs invite creation.
+        /// </summary>
+        Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs invite deletion.
+        /// </summary>
+        Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs);
     }
 }
