@@ -40,14 +40,14 @@ namespace AkkoBot.Services.Events.Common
             if (message is null)
                 throw new ArgumentNullException(nameof(message), "Deleted message cannot be null.");
 
-            _dbCache.Guilds.TryGetValue((ulong)message.Channel.Guild.Id, out var dbGuild);
+            _dbCache.Guilds.TryGetValue(message.Channel.Guild.Id, out var dbGuild);
 
             var webhookMessage = new SerializableDiscordMessage()
-                .WithColor((string)((message.Author as DiscordMember)?.Color.ToString()))
-                .WithAuthor("message_deleted", (string)message.JumpLink.AbsoluteUri)
+                .WithColor((message.Author as DiscordMember)?.Color.ToString())
+                .WithAuthor("message_deleted", message.JumpLink.AbsoluteUri)
                 .WithTitle(DiscordUserExt.GetFullname(message.Author))
                 .WithDescription($"{_localizer.GetResponseString(dbGuild.Locale, "channel")}: {message.Channel.Mention} | {message.Channel.Name}\n\n{message.Content}")
-                .AddField("author_mention", (string)message.Author.Mention, true)
+                .AddField("author_mention", message.Author.Mention, true)
                 .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
                 .WithFooter($"{_localizer.GetResponseString(dbGuild.Locale, "id")}: {message.Id}")
                 .WithLocalization(_localizer, dbGuild.Locale);
@@ -271,6 +271,72 @@ namespace AkkoBot.Services.Events.Common
             message.AddField("id", eventArgs.RoleAfter.Id.ToString(), true)
                 .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
                 .AddField("permissions", string.Join(", ", eventArgs.RoleAfter.Permissions.ToLocalizedStrings(_localizer, dbGuild.Locale)))
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetCreatedChannelLog(ChannelCreateEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+            
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_channelcreated_title")
+                .WithDescription($"{eventArgs.Channel.Mention} | {eventArgs.Channel.Name}")
+                .AddField("type", eventArgs.Channel.Type.ToString(), true)
+                .AddField("id", eventArgs.Channel.Id.ToString(), true)
+                .AddField("created_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetDeletedChannelLog(ChannelDeleteEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_channeldeleted_title")
+                .WithDescription($"{eventArgs.Channel.Mention} | {eventArgs.Channel.Name}")
+                .AddField("type", eventArgs.Channel.Type.ToString(), true)
+                .AddField("id", eventArgs.Channel.Id.ToString(), true)
+                .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetEditedChannelLog(ChannelUpdateEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_channeledited_title");
+
+            if (eventArgs.ChannelBefore.Name.Equals(eventArgs.ChannelAfter.Name, StringComparison.Ordinal))
+                message.WithDescription($"{eventArgs.ChannelAfter.Mention} | {eventArgs.ChannelAfter.Name}");
+            else
+            {
+                message.AddField("old_name", eventArgs.ChannelBefore.Name, true)
+                .AddField("new_name", eventArgs.ChannelAfter.Name, true);
+            }
+
+            message.AddField("id", eventArgs.ChannelAfter.Id.ToString(), true)
+                .AddField("type", eventArgs.ChannelAfter.Type.ToString(), true)
+                .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
                 .WithLocalization(_localizer, dbGuild.Locale);
 
             return GetStandardMessage(message, dbGuild);

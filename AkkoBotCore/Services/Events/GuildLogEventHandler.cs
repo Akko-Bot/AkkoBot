@@ -65,9 +65,10 @@ namespace AkkoBot.Services.Events
 
         public async Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null  || eventArgs.Message.Author.IsBot
+            if (eventArgs.Guild is null || eventArgs.Message.Author.IsBot
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
+                || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is true  // This check is needed because pins trigger this event
 
                 || IsIgnoredContext(eventArgs.Guild.Id, (eventArgs.Author as DiscordMember).Roles.Select(x => x.Id).Append(eventArgs.Author.Id).Append(eventArgs.Channel.Id)))
                 return;
@@ -253,6 +254,42 @@ namespace AkkoBot.Services.Events
 
             if (webhook is not null)
                 await webhook.ExecuteAsync(_logGenerator.GetEditedRoleLog(eventArgs));
+        }
+
+        public async Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.ChannelEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetCreatedChannelLog(eventArgs));
+        }
+
+        public async Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.ChannelEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetDeletedChannelLog(eventArgs));
+        }
+
+        public async Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.ChannelEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetEditedChannelLog(eventArgs));
         }
 
         /// <summary>

@@ -306,6 +306,9 @@ dotnet_naming_style.camel_case.capitalization = camel_case
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
 
+# IDE0004: Cast is redundant
+dotnet_diagnostic.IDE0004.severity = error 
+
 # IDE0058: Expression value is never used
 dotnet_diagnostic.IDE0058.severity = none
 

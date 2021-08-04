@@ -68,5 +68,20 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs role edition.
         /// </summary>
         Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs channel creation.
+        /// </summary>
+        Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs channel deletion.
+        /// </summary>
+        Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs channel edition.
+        /// </summary>
+        Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs);
     }
 }

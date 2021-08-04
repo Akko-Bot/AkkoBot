@@ -21,9 +21,9 @@ namespace AkkoBot.Services.Database.Entities
         Unknown = 1 << 0,
 
         /// <summary>
-        /// Channel create, delete, update and pin update.
+        /// Channel create, delete, and update.
         /// </summary>
-        ChannelEvents = 1 << 1,
+        ChannelEvents = 1 << 1, // There is no reliable way of getting pin updates, since the timestamp doesn't match the message timestamp.
 
         /// <summary>
         /// Ban and unban.
@@ -31,22 +31,22 @@ namespace AkkoBot.Services.Database.Entities
         BanEvents = 1 << 2,
 
         /// <summary>
-        /// Member join, leave and update.
+        /// Member join, leave, and update.
         /// </summary>
         MemberEvents = 1 << 3,
 
         /// <summary>
-        /// Message edit, delete and bulk delete.
+        /// Message edit, delete, and bulk delete.
         /// </summary>
         MessageEvents = 1 << 4,
 
         /// <summary>
-        /// Voice connect, move and disconnect.
+        /// Voice connect, move, and disconnect.
         /// </summary>
         VoiceEvents = 1 << 5,
 
         /// <summary>
-        /// Role create, delete and update.
+        /// Role create, delete, and update.
         /// </summary>
         RoleEvents = 1 << 6,
 

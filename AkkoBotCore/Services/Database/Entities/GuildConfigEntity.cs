@@ -213,7 +213,7 @@ namespace AkkoBot.Services.Database.Entities
         [NotMapped]
         public bool HasPassiveActivity
             => GatekeepRel?.IsActive is true || FilteredWordsRel?.IsActive is true || PollRel.Any(x => x.Type is PollType.Anonymous)
-            || FilteredContentRel?.Count is > 0 || VoiceRolesRel?.Count is > 0 || RepeaterRel?.Count is > 0 || GuildLogsRel?.Count is > 0;
+            || FilteredContentRel?.Count is > 0 || VoiceRolesRel?.Count is > 0 || RepeaterRel?.Count is > 0 || GuildLogsRel?.Any(x => x.IsActive) is true;
 
         public GuildConfigEntity()
         {

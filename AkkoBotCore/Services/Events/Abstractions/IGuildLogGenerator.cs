@@ -113,5 +113,29 @@ namespace AkkoBot.Services.Events.Abstractions
         /// <returns>The guild log message.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
         DiscordWebhookBuilder GetEditedRoleLog(GuildRoleUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="ChannelCreateEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetCreatedChannelLog(ChannelCreateEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="ChannelDeleteEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetDeletedChannelLog(ChannelDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="ChannelUpdateEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetEditedChannelLog(ChannelUpdateEventArgs eventArgs);
     }
 }

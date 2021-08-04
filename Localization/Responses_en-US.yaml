@@ -744,3 +744,6 @@ permissions: Permissions
 log_roleedited_title: Role edited
 old_name: Old name
 new_name: New name
+log_channelcreated_title: Channel created
+log_channeldeleted_title: Channel deleted
+log_channeledited_title: Channel edited
