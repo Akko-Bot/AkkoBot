@@ -212,6 +212,70 @@ namespace AkkoBot.Services.Events.Common
             return GetStandardMessage(message, dbGuild);
         }
 
+        public DiscordWebhookBuilder GetCreatedRoleLog(GuildRoleCreateEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_rolecreated_title")
+                .AddField("name", eventArgs.Role.Name, true)
+                .AddField("id", eventArgs.Role.Id.ToString(), true)
+                .AddField("created_on", DateTimeOffset.Now.ToDiscordTimestamp())
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetDeletedRoleLog(GuildRoleDeleteEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.ErrorColor)
+                .WithTitle("log_roledeleted_title")
+                .AddField("name", eventArgs.Role.Name, true)
+                .AddField("id", eventArgs.Role.Id.ToString(), true)
+                .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .AddField("permissions", string.Join(", ", eventArgs.Role.Permissions.ToLocalizedStrings(_localizer, dbGuild.Locale)))
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetEditedRoleLog(GuildRoleUpdateEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithTitle("log_roleedited_title");
+
+            if (eventArgs.RoleBefore.Name.Equals(eventArgs.RoleAfter.Name, StringComparison.Ordinal))
+                message.AddField("name", eventArgs.RoleAfter.Name, true);
+            else
+            {
+                message.AddField("old_name", eventArgs.RoleBefore.Name, true)
+                    .AddField("new_name", eventArgs.RoleAfter.Name, true);
+            }
+
+            message.AddField("id", eventArgs.RoleAfter.Id.ToString(), true)
+                .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .AddField("permissions", string.Join(", ", eventArgs.RoleAfter.Permissions.ToLocalizedStrings(_localizer, dbGuild.Locale)))
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
         /// <summary>
         /// Returns the appropriate webhook message for the guild's embed setting.
         /// </summary>

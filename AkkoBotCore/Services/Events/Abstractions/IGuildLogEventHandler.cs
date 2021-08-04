@@ -53,5 +53,20 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs user unban
         /// </summary>
         Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs role creation.
+        /// </summary>
+        Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs role deletion.
+        /// </summary>
+        Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs role edition.
+        /// </summary>
+        Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs);
     }
 }

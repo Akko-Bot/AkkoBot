@@ -738,3 +738,9 @@ banned_on: Banned on
 log_unban_title: Unbanned user
 unbanned_on: Unbanned on
 expires: Expires
+log_rolecreated_title: Role created
+log_roledeleted_title: Role deleted
+permissions: Permissions
+log_roleedited_title: Role edited
+old_name: Old name
+new_name: New name

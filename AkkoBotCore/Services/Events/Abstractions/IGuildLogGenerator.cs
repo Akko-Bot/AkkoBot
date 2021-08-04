@@ -89,5 +89,29 @@ namespace AkkoBot.Services.Events.Abstractions
         /// <returns>The guild log message.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="auditLog"/> or <paramref name="eventArgs"/> are <see langword="null"/>.</exception>
         DiscordWebhookBuilder GetUnbannedUserLog(DiscordAuditLogBanEntry auditLog, GuildBanRemoveEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="GuildRoleCreateEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetCreatedRoleLog(GuildRoleCreateEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="GuildRoleDeleteEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetDeletedRoleLog(GuildRoleDeleteEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="GuildRoleUpdateEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetEditedRoleLog(GuildRoleUpdateEventArgs eventArgs);
     }
 }

@@ -87,6 +87,12 @@ namespace AkkoBot.Core.Services
             _shardedClient.GuildBanAdded += _guildLogger.LogBannedUserAsync;
 
             _shardedClient.GuildBanRemoved += _guildLogger.LogUnbannedUserAsync;
+
+            _shardedClient.GuildRoleCreated += _guildLogger.LogCreatedRoleAsync;
+
+            _shardedClient.GuildRoleDeleted += _guildLogger.LogDeletedRoleAsync;
+
+            _shardedClient.GuildRoleUpdated += _guildLogger.LogEditedRoleAsync;
             /* End Of Test*/
 
             #region Bot Events

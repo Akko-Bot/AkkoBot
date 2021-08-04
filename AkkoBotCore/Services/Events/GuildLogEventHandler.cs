@@ -219,6 +219,42 @@ namespace AkkoBot.Services.Events
                 await webhook.ExecuteAsync(_logGenerator.GetUnbannedUserLog(unbanLog, eventArgs));
         }
 
+        public async Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.RoleEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetCreatedRoleLog(eventArgs));
+        }
+
+        public async Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.RoleEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetDeletedRoleLog(eventArgs));
+        }
+
+        public async Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.RoleEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetEditedRoleLog(eventArgs));
+        }
+
         /// <summary>
         /// Checks if the provided ids are from an ignored context.
         /// </summary>
