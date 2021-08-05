@@ -99,6 +99,8 @@ namespace AkkoBot.Core.Services
             _shardedClient.ChannelDeleted += _guildLogger.LogDeletedChannelAsync;
 
             _shardedClient.ChannelUpdated += _guildLogger.LogEditedChannelAsync;
+
+            _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateAsync;
             /* End Of Test*/
 
             #region Bot Events

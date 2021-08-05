@@ -1,4 +1,5 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoBot.Common;
+using AkkoBot.Extensions;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
@@ -80,42 +81,50 @@ namespace AkkoBot.Services.Events
             var user = eventArgs.User as DiscordMember;
             var toRemove = new List<VoiceRoleEntity>();
 
-            if (eventArgs.Channel is null)
+            switch (eventArgs.GetVoiceState())
             {
-                // Disconnection
-                foreach (var voiceRole in voiceRoles)
-                {
-                    if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
-                        await user.RevokeRoleAsync(role);
-                    else if (role is null)
-                        toRemove.Add(voiceRole);
-                }
-            }
-            else if (eventArgs.Before?.Channel is not null && eventArgs.After?.Channel is not null)
-            {
-                // Moved channels
-                foreach (var voiceRole in voiceRoles)
-                {
-                    eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role);
+                case UserVoiceState.Connected:
 
-                    if (voiceRole.ChannelId != user.VoiceState.Channel.Id && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
-                        await user.RevokeRoleAsync(role);
-                    else if (voiceRole.ChannelId == user.VoiceState.Channel.Id && !user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
-                        await user.GrantRoleAsync(role);
-                    else if (role is null)
-                        toRemove.Add(voiceRole);
-                }
-            }
-            else
-            {
-                // Connection
-                foreach (var voiceRole in voiceRoles.Where(x => x.ChannelId == eventArgs.Channel.Id))
-                {
-                    if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
-                        await user.GrantRoleAsync(role);
-                    else if (role is null)
-                        toRemove.Add(voiceRole);
-                }
+                    foreach (var voiceRole in voiceRoles.Where(x => x.ChannelId == eventArgs.Channel.Id))
+                    {
+                        if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && !user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
+                            await user.GrantRoleAsync(role);
+                        else if (role is null)
+                            toRemove.Add(voiceRole);
+                    }
+
+                    break;
+
+                case UserVoiceState.Disconnected:
+
+                    foreach (var voiceRole in voiceRoles)
+                    {
+                        if (eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role) && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
+                            await user.RevokeRoleAsync(role);
+                        else if (role is null)
+                            toRemove.Add(voiceRole);
+                    }
+
+                    break;
+
+                case UserVoiceState.Moved:
+
+                    foreach (var voiceRole in voiceRoles)
+                    {
+                        eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role);
+
+                        if (voiceRole.ChannelId != user.VoiceState.Channel.Id && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
+                            await user.RevokeRoleAsync(role);
+                        else if (voiceRole.ChannelId == user.VoiceState.Channel.Id && !user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
+                            await user.GrantRoleAsync(role);
+                        else if (role is null)
+                            toRemove.Add(voiceRole);
+                    }
+
+                    break;
+
+                default:
+                    return;
             }
 
             // Remove the voice role if it has been deleted.

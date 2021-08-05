@@ -12,7 +12,7 @@ namespace AkkoBot.Commands.ArgumentConverters
         {
             return input?.ToLowerInvariant() switch
             {
-                "unknown" => Task.FromResult(Optional.FromValue(GuildLog.Unknown)),
+                //"unknown" => Task.FromResult(Optional.FromValue(GuildLog.Unknown)),   // This event sends no guild-related data
                 "channel" => Task.FromResult(Optional.FromValue(GuildLog.ChannelEvents)),
                 "ban" => Task.FromResult(Optional.FromValue(GuildLog.BanEvents)),
                 "member" => Task.FromResult(Optional.FromValue(GuildLog.MemberEvents)),
@@ -22,7 +22,7 @@ namespace AkkoBot.Commands.ArgumentConverters
                 "invite" => Task.FromResult(Optional.FromValue(GuildLog.InviteEvents)),
                 "integration" => Task.FromResult(Optional.FromValue(GuildLog.Integration)),
                 "emoji" or "emojis" => Task.FromResult(Optional.FromValue(GuildLog.Emojis)),
-                "userpresence" or "presence" => Task.FromResult(Optional.FromValue(GuildLog.UserPresence)),
+                //"userpresence" or "presence" => Task.FromResult(Optional.FromValue(GuildLog.UserPresence)),   // Status changes offer nothing of value
                 _ => Task.FromResult(Optional.FromNoValue<GuildLog>())
             };
         }

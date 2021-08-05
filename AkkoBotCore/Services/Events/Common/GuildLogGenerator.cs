@@ -342,6 +342,32 @@ namespace AkkoBot.Services.Events.Common
             return GetStandardMessage(message, dbGuild);
         }
 
+        public DiscordWebhookBuilder GetVoiceStateLog(VoiceStateUpdateEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var voiceState = eventArgs.GetVoiceState();
+            var description = (voiceState) switch
+            {
+                UserVoiceState.Connected => _localizer.FormatLocalized(dbGuild.Locale, "log_voicestate_connected", eventArgs.User.Mention, Formatter.Bold(eventArgs.After.Channel.Name)),
+                UserVoiceState.Disconnected => _localizer.FormatLocalized(dbGuild.Locale, "log_voicestate_disconnected", eventArgs.User.Mention, Formatter.Bold(eventArgs.Before.Channel.Name)),
+                UserVoiceState.Moved => _localizer.FormatLocalized(dbGuild.Locale, "log_voicestate_moved", eventArgs.User.Mention, Formatter.Bold(eventArgs.Before.Channel.Name), Formatter.Bold(eventArgs.After.Channel.Name)),
+                _ => throw new ArgumentException($"Voice state of value \"{eventArgs.GetVoiceState()}\" is invalid.", nameof(eventArgs))
+            };
+
+
+            var message = new SerializableDiscordMessage()
+                .WithColor((voiceState is UserVoiceState.Disconnected) ? dbGuild.ErrorColor : dbGuild.OkColor)
+                .WithAuthor(eventArgs.User.GetFullname(), imageUrl: eventArgs.User.AvatarUrl ?? eventArgs.User.DefaultAvatarUrl)
+                .WithDescription(description)
+                .AddField(AkkoConstants.ValidWhitespace, DateTimeOffset.Now.ToDiscordTimestamp());
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
         /// <summary>
         /// Returns the appropriate webhook message for the guild's embed setting.
         /// </summary>

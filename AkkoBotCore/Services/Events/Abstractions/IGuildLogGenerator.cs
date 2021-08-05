@@ -137,5 +137,14 @@ namespace AkkoBot.Services.Events.Abstractions
         /// <returns>The guild log message.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
         DiscordWebhookBuilder GetEditedChannelLog(ChannelUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Generates a log message for a <see cref="VoiceStateUpdateEventArgs"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The event argument.</param>
+        /// <returns>The guild log message.</returns>
+        /// <exception cref="ArgumentException">Occurs when the voice state is not valid for logging.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+        DiscordWebhookBuilder GetVoiceStateLog(VoiceStateUpdateEventArgs eventArgs);
     }
 }

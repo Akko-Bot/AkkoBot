@@ -83,5 +83,10 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs channel edition.
         /// </summary>
         Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs voice state updates.
+        /// </summary>
+        Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
     }
 }
