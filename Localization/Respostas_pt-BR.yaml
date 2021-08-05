@@ -500,7 +500,7 @@ is_invite_only: Convites
 is_mod: É Moderador
 is_not_active: Não Está Ativo
 is_url_only: URLs
-joined_on: Entrou Em
+joined_on: Entrou em
 joinrole_added: O cargo {0} foi adicionado à lista de cargos de entrada.
 joinrole_error: Cargos de integração não podem ser adicionados.
 joinrole_limit: O limite de 3 cargos de entrada foi atingido.

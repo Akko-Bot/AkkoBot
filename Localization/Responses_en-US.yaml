@@ -500,7 +500,7 @@ is_invite_only: Invites
 is_mod: Is a Moderator
 is_not_active: Is Not Active
 is_url_only: URLs
-joined_on: Joined On
+joined_on: Joined on
 joinrole_added: The {0} role has been added to the list of join roles.
 joinrole_error: Integration roles cannot be added.
 joinrole_limit: Limit of 3 join roles has been reached.
@@ -750,3 +750,8 @@ log_channeledited_title: Channel edited
 log_voicestate_connected: '{0} has connected to the {1} voice channel.'
 log_voicestate_disconnected: '{0} has disconnected from the {1} voice channel.'
 log_voicestate_moved: '{0} has moved from the {1} to the {2} voice channel.'
+time_difference: Time difference
+log_joiningmember_title: User has joined
+left_on: Left on
+log_leavingmember_title: User has left
+stayed_for: Stayed for

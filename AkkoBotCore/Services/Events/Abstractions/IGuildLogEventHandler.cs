@@ -88,5 +88,15 @@ namespace AkkoBot.Services.Events.Abstractions
         /// Logs voice state updates.
         /// </summary>
         Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs user join.
+        /// </summary>
+        Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs user leave.
+        /// </summary>
+        Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs);
     }
 }

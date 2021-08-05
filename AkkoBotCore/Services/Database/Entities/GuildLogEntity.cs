@@ -31,9 +31,9 @@ namespace AkkoBot.Services.Database.Entities
         BanEvents = 1 << 2,
 
         /// <summary>
-        /// Member join, leave, and update.
+        /// Member join and leave.
         /// </summary>
-        MemberEvents = 1 << 3,
+        MemberEvents = 1 << 3,  // There is no value to logging updates.
 
         /// <summary>
         /// Message edit, delete, and bulk delete.

@@ -24,6 +24,8 @@ namespace AkkoBot.Services.Events.Common
     /// </summary>
     public class GuildLogGenerator : IGuildLogGenerator
     {
+        private readonly TimeSpan _24hours = TimeSpan.FromDays(1);
+
         private readonly ILocalizer _localizer;
         private readonly IDbCache _dbCache;
         private readonly GuildLogService _logService;
@@ -286,8 +288,8 @@ namespace AkkoBot.Services.Events.Common
 
             var message = new SerializableDiscordMessage()
                 .WithColor(dbGuild.OkColor)
-                .WithTitle("log_channelcreated_title")
-                .WithDescription($"{eventArgs.Channel.Mention} | {eventArgs.Channel.Name}")
+                .WithAuthor("log_channelcreated_title")
+                .WithTitle("#" + eventArgs.Channel.Name)
                 .AddField("type", eventArgs.Channel.Type.ToString(), true)
                 .AddField("id", eventArgs.Channel.Id.ToString(), true)
                 .AddField("created_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
@@ -305,8 +307,9 @@ namespace AkkoBot.Services.Events.Common
 
             var message = new SerializableDiscordMessage()
                 .WithColor(dbGuild.OkColor)
-                .WithTitle("log_channeldeleted_title")
-                .WithDescription($"{eventArgs.Channel.Mention} | {eventArgs.Channel.Name}")
+                .WithAuthor("log_channeldeleted_title")
+                .WithTitle("#" + eventArgs.Channel.Name)
+                .WithDescription(eventArgs.Channel.Topic)
                 .AddField("type", eventArgs.Channel.Type.ToString(), true)
                 .AddField("id", eventArgs.Channel.Id.ToString(), true)
                 .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
@@ -324,11 +327,13 @@ namespace AkkoBot.Services.Events.Common
 
             var message = new SerializableDiscordMessage()
                 .WithColor(dbGuild.OkColor)
-                .WithTitle("log_channeledited_title");
+                .WithAuthor("log_channeledited_title")
+                .WithTitle("#" + eventArgs.ChannelAfter.Name);
+
+            if (eventArgs.ChannelBefore.Topic.Equals(eventArgs.ChannelAfter.Topic, StringComparison.Ordinal))
+                message.WithDescription(eventArgs.ChannelAfter.Topic);
 
             if (eventArgs.ChannelBefore.Name.Equals(eventArgs.ChannelAfter.Name, StringComparison.Ordinal))
-                message.WithDescription($"{eventArgs.ChannelAfter.Mention} | {eventArgs.ChannelAfter.Name}");
-            else
             {
                 message.AddField("old_name", eventArgs.ChannelBefore.Name, true)
                 .AddField("new_name", eventArgs.ChannelAfter.Name, true);
@@ -355,7 +360,7 @@ namespace AkkoBot.Services.Events.Common
                 UserVoiceState.Connected => _localizer.FormatLocalized(dbGuild.Locale, "log_voicestate_connected", eventArgs.User.Mention, Formatter.Bold(eventArgs.After.Channel.Name)),
                 UserVoiceState.Disconnected => _localizer.FormatLocalized(dbGuild.Locale, "log_voicestate_disconnected", eventArgs.User.Mention, Formatter.Bold(eventArgs.Before.Channel.Name)),
                 UserVoiceState.Moved => _localizer.FormatLocalized(dbGuild.Locale, "log_voicestate_moved", eventArgs.User.Mention, Formatter.Bold(eventArgs.Before.Channel.Name), Formatter.Bold(eventArgs.After.Channel.Name)),
-                _ => throw new ArgumentException($"Voice state of value \"{eventArgs.GetVoiceState()}\" is invalid.", nameof(eventArgs))
+                _ => throw new ArgumentException($"Voice state of value \"{voiceState}\" is invalid.", nameof(eventArgs))
             };
 
 
@@ -364,6 +369,58 @@ namespace AkkoBot.Services.Events.Common
                 .WithAuthor(eventArgs.User.GetFullname(), imageUrl: eventArgs.User.AvatarUrl ?? eventArgs.User.DefaultAvatarUrl)
                 .WithDescription(description)
                 .AddField(AkkoConstants.ValidWhitespace, DateTimeOffset.Now.ToDiscordTimestamp());
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetJoiningMemberLog(GuildMemberAddEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+            _dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper);
+
+            var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.CreationTimestamp);
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
+                .WithTitle("log_joiningmember_title")
+                .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
+                .AddField("created_on", eventArgs.Member.CreationTimestamp.ToDiscordTimestamp(), true)
+                .AddField("joined_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .WithFooter(
+                    ((timeDifference < (gatekeeper?.AntiAltTime ?? _24hours))
+                        ? $"{_localizer.FormatLocalized(dbGuild.Locale, "time_difference")}: {GetSmallestTimeString(timeDifference, dbGuild.Locale)} | "
+                        : string.Empty) +
+
+                    $"{_localizer.FormatLocalized(dbGuild.Locale, "id")}: {eventArgs.Member.Id}"
+                )
+                .WithLocalization(_localizer, dbGuild.Locale);
+
+            return GetStandardMessage(message, dbGuild);
+        }
+
+        public DiscordWebhookBuilder GetLeavingMemberLog(GuildMemberRemoveEventArgs eventArgs)
+        {
+            if (eventArgs is null)
+                throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+
+            var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.JoinedAt);
+            var message = new SerializableDiscordMessage()
+                .WithColor(dbGuild.OkColor)
+                .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
+                .WithTitle("log_leavingmember_title")
+                .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
+                .AddField("created_on", eventArgs.Member.CreationTimestamp.ToDiscordTimestamp(), true)
+                .AddField("left_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+                .WithFooter(
+                    $"{_localizer.FormatLocalized(dbGuild.Locale, "stayed_for")}: {GetSmallestTimeString(timeDifference, dbGuild.Locale)} | " + 
+                    $"{_localizer.FormatLocalized(dbGuild.Locale, "id")}: {eventArgs.Member.Id}"
+                )
+                .WithLocalization(_localizer, dbGuild.Locale);
 
             return GetStandardMessage(message, dbGuild);
         }
@@ -377,5 +434,22 @@ namespace AkkoBot.Services.Events.Common
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private DiscordWebhookBuilder GetStandardMessage(SerializableDiscordMessage message, GuildConfigEntity dbGuild)
             => (dbGuild.UseEmbed) ? message.BuildWebhookMessage() : new DiscordWebhookBuilder() { Content = message.Deconstruct() };
+
+        /// <summary>
+        /// Returns the smallest time string for the specified time span.
+        /// </summary>
+        /// <param name="time">The time span.</param>
+        /// <param name="locale">Locale to translate the time to.</param>
+        /// <returns>The time string.</returns>
+        private string GetSmallestTimeString(TimeSpan time, string locale)
+        {
+            return (time.TotalDays >= 1.0)
+                ? $"{time.TotalDays:0.00} {_localizer.FormatLocalized(locale, "days")}"
+                : (time.TotalHours >= 1.0)
+                    ? $"{time.TotalHours:0.00} {_localizer.FormatLocalized(locale, "hours")}"
+                    : (time.TotalMinutes >= 1.0)
+                        ? $"{time.TotalMinutes:0.00} {_localizer.FormatLocalized(locale, "minutes")}"
+                        : $"{time.TotalSeconds:0.00} {_localizer.FormatLocalized(locale, "seconds")}";
+        }
     }
 }

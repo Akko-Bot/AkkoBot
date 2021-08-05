@@ -68,8 +68,8 @@ namespace AkkoBot.Core.Services
         /// <exception cref="InvalidOperationException"/>
         public void RegisterEvents()
         {
-            // TODO: REMOVE THIS
-            /* Test Log Events*/
+            #region Log Events
+
             _shardedClient.MessageCreated += _guildLogger.CacheMessageOnCreationAsync;
 
             _shardedClient.MessageUpdated += _guildLogger.LogUpdatedMessageAsync;
@@ -101,7 +101,12 @@ namespace AkkoBot.Core.Services
             _shardedClient.ChannelUpdated += _guildLogger.LogEditedChannelAsync;
 
             _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateAsync;
-            /* End Of Test*/
+
+            _shardedClient.GuildMemberAdded += _guildLogger.LogJoiningMemberAsync;
+
+            _shardedClient.GuildMemberRemoved += _guildLogger.LogLeavingMemberAsync;
+
+            #endregion
 
             #region Bot Events
 

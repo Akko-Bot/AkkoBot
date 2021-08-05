@@ -304,6 +304,30 @@ namespace AkkoBot.Services.Events
                 await webhook.ExecuteAsync(_logGenerator.GetVoiceStateLog(eventArgs));
         }
 
+        public async Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MemberEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetJoiningMemberLog(eventArgs));
+        }
+
+        public async Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
+        {
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MemberEvents, out var guildLog)
+                || !guildLog.IsActive)
+                return;
+
+            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetLeavingMemberLog(eventArgs));
+        }
+
         /// <summary>
         /// Checks if the provided ids are from an ignored context.
         /// </summary>
