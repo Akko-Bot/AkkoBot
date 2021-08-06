@@ -202,7 +202,13 @@ namespace AkkoBot.Commands.Modules.Utilities
                 var permissionOverwrites = new List<DiscordOverwriteBuilder>(channel.PermissionOverwrites.Count);
 
                 foreach (var overwrite in channel.PermissionOverwrites)
-                    permissionOverwrites.Add(await new DiscordOverwriteBuilder().FromAsync(overwrite));
+                {
+                    if (overwrite.Type is OverwriteType.Member)
+                        permissionOverwrites.Add(await new DiscordOverwriteBuilder(await overwrite.GetMemberAsync()).FromAsync(overwrite));
+                    else
+                        permissionOverwrites.Add(await new DiscordOverwriteBuilder(await overwrite.GetRoleAsync()).FromAsync(overwrite));
+                }
+
 
                 var newChannel = await context.Guild.CreateChannelAsync(
                     channel.Name, channel.Type, channel.Parent, channel.Topic,

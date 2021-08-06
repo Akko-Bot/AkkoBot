@@ -125,7 +125,7 @@ namespace AkkoBot.Commands.Modules.Utilities
             }
             _ = (_service.DeserializeEmbed(newMessage, out var dMsg))
                 ? await message.ModifyAsync(dMsg)
-                : await message.ModifyAsync(newMessage, null);
+                : await message.ModifyAsync(newMessage);
 
             await context.Message.CreateReactionAsync(AkkoEntities.SuccessEmoji);
         }

@@ -274,8 +274,9 @@ namespace AkkoBot.Models.Serializable
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordEmbedBuilder BuildEmbed(IEnumerable<SerializableEmbedField> fields = null)
         {
-            if (fields is not null)
-                Fields = fields.ToList();
+            var localFields = (fields is not null)
+                ? fields.ToList()
+                : null;
 
             if (!HasValidEmbed())
                 return null;
@@ -295,23 +296,25 @@ namespace AkkoBot.Models.Serializable
                 Description = this.Body?.Description,
                 ImageUrl = this.Body?.ImageUrl,
 
-                Footer = new EmbedFooter()
-                {
-                    Text = this.Footer?.Text,
-                    IconUrl = this.Footer?.ImageUrl
-                },
+                Footer = (Footer is null) 
+                    ? null
+                    : new EmbedFooter()
+                    {
+                        Text = this.Footer?.Text,
+                        IconUrl = this.Footer?.ImageUrl
+                    },
 
                 Color = (string.IsNullOrWhiteSpace(this.Color)) ? Optional.FromNoValue<DiscordColor>() : new DiscordColor(Color),
                 Timestamp = this.Timestamp
             };
 
-            if (Fields is not null)
+            if (localFields is not null)
             {
                 // Embeds can't have more than 25 fields
-                if (Fields.Count > 25)
-                    Fields.RemoveRange(24, Fields.Count - 25);
+                if (localFields.Count > 25)
+                    localFields.RemoveRange(24, localFields.Count - 25);
 
-                foreach (var field in Fields)
+                foreach (var field in localFields)
                     embed.AddField(field.Title, field.Text, field.Inline);
             }
 

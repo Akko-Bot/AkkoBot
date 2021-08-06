@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Commands.Common;
 using AkkoBot.Commands.Formatters;
+using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Core.Common.Abstractions;
 using AkkoBot.Core.Services;
@@ -431,11 +432,14 @@ namespace AkkoBot.Core.Common
             // Setup client interactivity
             var interactivityOptions = new InteractivityConfiguration()
             {
-                PaginationBehaviour = PaginationBehaviour.WrapAround,   // Sets whether paginated responses should wrap from first page to last page and vice-versa
-                PaginationDeletion = PaginationDeletion.DeleteEmojis,   // Sets whether emojis or the paginated message should be deleted after timeout
-                PollBehaviour = PollBehaviour.KeepEmojis,               // Sets whether emojis should be deleted after a poll ends
-                Timeout = TimeSpan.FromSeconds(timeout ?? 30.0),        // Sets how long it takes for an interactive response to timeout
-                // setup customized paginated emojis
+                AckPaginationButtons = true,
+                ResponseBehavior = InteractionResponseBehavior.Ignore,      // Sets whether interactive messages should ignore or respond to invalid input
+                ButtonBehavior = ButtonPaginationBehavior.DeleteButtons,    // Sets what should happen to buttons when an interaction is done running.
+                PaginationBehaviour = PaginationBehaviour.WrapAround,       // Sets whether paginated responses should wrap from first page to last page and vice-versa
+                PaginationDeletion = PaginationDeletion.DeleteEmojis,       // Sets whether emojis or the paginated message should be deleted after timeout
+                PollBehaviour = PollBehaviour.KeepEmojis,                   // Sets whether emojis should be deleted after a poll ends
+                Timeout = TimeSpan.FromSeconds(timeout ?? 30.0),            // Sets how long it takes for an interactive response to timeout
+                PaginationButtons = AkkoEntities.PaginationButtons
             };
 
             var shardedClients = new DiscordShardedClient(botConfig);   // Initialize the sharded clients

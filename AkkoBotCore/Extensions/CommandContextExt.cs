@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Extensions
@@ -206,7 +207,12 @@ namespace AkkoBot.Extensions
                 ? context.GenerateLocalizedPagesByFields(message, maxFields)
                 : ConvertToContentPages(context.GenerateLocalizedPagesByFields(message, maxFields));
 
-            await context.Channel.SendPaginatedMessageAsync(context.User, pages, timeoutoverride: settings.InteractiveTimeout);
+            await context.Channel.SendPaginatedMessageAsync(
+                context.User,
+                pages,
+                AkkoEntities.PaginationButtons,
+                token: new CancellationTokenSource(settings.InteractiveTimeout ?? context.Services.GetService<BotConfig>().InteractiveTimeout ?? TimeSpan.FromSeconds(30)).Token
+            );
         }
 
         /// <summary>
@@ -245,7 +251,12 @@ namespace AkkoBot.Extensions
                 ? context.GenerateLocalizedPagesByFields(message, fields, maxFields)
                 : ConvertToContentPages(context.GenerateLocalizedPagesByFields(message, fields, maxFields));
 
-            await context.Channel.SendPaginatedMessageAsync(context.User, pages, timeoutoverride: settings.InteractiveTimeout);
+            await context.Channel.SendPaginatedMessageAsync(
+                context.User,
+                pages,
+                AkkoEntities.PaginationButtons,
+                token: new CancellationTokenSource(settings.InteractiveTimeout ?? context.Services.GetService<BotConfig>().InteractiveTimeout ?? TimeSpan.FromSeconds(30)).Token
+            );
         }
 
         /// <summary>

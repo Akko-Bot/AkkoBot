@@ -1,4 +1,7 @@
+using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.EventHandling;
 using System;
 
 namespace AkkoBot.Common
@@ -75,5 +78,17 @@ namespace AkkoBot.Common
         /// </summary>
         /// <value>"png", "gif".</value>
         public static string[] SupportedEmojiFormats { get; } = { "png", "gif" };
+
+        /// <summary>
+        /// Defines the buttons to be used on paginated messages.
+        /// </summary>
+        public static PaginationButtons PaginationButtons { get; } = new()
+        {
+            Stop = new DiscordButtonComponent(ButtonStyle.Danger, "stop", null, false, new DiscordComponentEmoji(862259725785497620)),
+            Left = new DiscordButtonComponent(ButtonStyle.Secondary, "left", null, false, new DiscordComponentEmoji(862259522478800916)),
+            Right = new DiscordButtonComponent(ButtonStyle.Secondary, "right", null, false, new DiscordComponentEmoji(862259691212242974)),
+            SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "skip_left", null, false, new DiscordComponentEmoji(862259605464023060)),
+            SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "skip_right", null, false, new DiscordComponentEmoji(862259654403031050))
+        };
     }
 }
