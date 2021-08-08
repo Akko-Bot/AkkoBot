@@ -5,9 +5,11 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
 using AkkoBot.Services.Localization.Abstractions;
+using ConcurrentCollections;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using LinqToDB;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -43,12 +45,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// Starts logging of a guild event.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="channel">The channel where </param>
+        /// <param name="channel">The channel where log are being output.</param>
         /// <param name="logType">The type of guild event to generate logs for.</param>
         /// <param name="name">The name of the webhook.</param>
         /// <param name="avatar">The image stream of the webhook's avatar.</param>
         /// <returns><see langword="true"/> if the guild log was created, <see langword="false"/> is it was updated.</returns>
-        public async Task<bool> AddLogAsync(CommandContext context, DiscordChannel channel, GuildLog logType, string name = null, Stream avatar = null)
+        /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
+        public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLog logType, string name = null, Stream avatar = null)
         {
             if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
                 throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
@@ -100,6 +103,51 @@ namespace AkkoBot.Commands.Modules.Administration.Services
             _webhookClient.TryAdd(webhook);
 
             return result;
+        }
+
+        /// <summary>
+        /// Stops logging of a guild event.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="logType">The type of guild event to generate logs for.</param>
+        /// <param name="deleteEntry"><see langword="true"/> to remove the entry from the database, <see langword="false"/> to update it.</param>
+        /// <returns><see langword="true"/> if the guild log was successfully disabled, <see langword="false"/> otherwise or if it is already disabled.</returns>
+        public async Task<bool> StopLogAsync(CommandContext context, GuildLog logType, bool deleteEntry = false)
+        {
+            if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
+                return false;
+
+            var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType);
+
+            if (guildLog is null || (!guildLog.IsActive && !deleteEntry))
+                return false;
+
+            // Update the cache
+            if (deleteEntry)
+                guildLogs.TryRemove(guildLog);
+            else
+                guildLog.IsActive = false;
+
+            // Update the database entry
+            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            
+            return (deleteEntry)
+                ? await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId) is not 0
+                : await db.GuildLogs.UpdateAsync(
+                    x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId,
+                    _ => new() { IsActive = false }
+                ) is not 0;
+        }
+
+        /// <summary>
+        /// Gets the cached guild logs of the specified Discord guild.
+        /// </summary>
+        /// <param name="server">The Discord guild.</param>
+        /// <returns>The guild logs.</returns>
+        public IReadOnlyCollection<GuildLogEntity> GetGuildLogs(DiscordGuild server)
+        {
+            _dbCache.GuildLogs.TryGetValue(server.Id, out var guildLogs);
+            return guildLogs ?? new ConcurrentHashSet<GuildLogEntity>(1, 0);
         }
 
         /// <summary>

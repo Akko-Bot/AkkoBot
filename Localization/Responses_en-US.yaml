@@ -1,6 +1,7 @@
 add_role: Add Role
 addrole: Add Role
 addrole_enum: received a punishment role
+after: After
 alias: Alias
 alias_error: No alias was found.
 alias_list_title_global: Global Aliases
@@ -57,6 +58,7 @@ arg_fw_word: A word.
 arg_fw_words: Multiple words, separated by space.
 arg_gatekeep_bulktime: The waiting time. Default is `5s`.
 arg_greetdel_time: The deletion time. Maximum of `2m`.
+arg_guildlog_type: The type of log event.
 arg_infraction: The infraction to be added to the user's modlog.
 arg_int: An integer number.
 arg_invite_temporary: Defines whether invited users get automatically kicked from the server once they disconnect from Discord. This setting doesn't work if they receive a role. Defaults to `false`.
@@ -105,19 +107,25 @@ arg_warnp_rem_amount: The amount of warnings of the punishment to be removed.
 arg_warnp_role: A role to be added or removed from the user, if applicable.
 arg_warnp_time: For how long the punishment should last. Leave it empty to make it permanent.
 arg_warnp_type: The type of punishment to be applied.
+arg_webhook_name: The name of the webhook.
+arg_webhooklogname: The default name for the webhooks.
 author: Author
+author_mention: Author mention
 auto_punish: Punishment | {0} | {1}
 autocommand_empty: No autocommands were found.
 autocommand_title: List of Autocommands
 autoslowmode_disabled: Automatic slow mode has been disabled.
 autoslowmode_enabled: Slow mode will be automatically enabled when a user sends {0} messages within {1} seconds, limiting users to one message every {2} seconds for {3} seconds.
+autoslowmode_title: Autoslowmode Settings
 ban: Ban
 ban_enum: banned
 ban_notification: You have been banned from the {0} server.
 ban_title: User Banned
 banned_for: Banned for
+banned_on: Banned on
 bantemplate_reset: The ban template has been successfully removed.
 bantemplate_set: The ban template has been successfully set.
+before: Before
 bitrate: Bitrate
 bl_added: Successfully added {0} {1} {2} to the blacklist.
 bl_added_range: '{0} IDs were added to the blacklist.'
@@ -201,6 +209,7 @@ cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_reloadlocales: Reloads the response strings available to the bot.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
+cmd_config_webhooklogname: Sets the default name to be used on the webhooks for guild logs.
 cmd_cooldown: Groups commands related to command cooldowns.
 cmd_cooldown_add: Sets the cooldown for a command. Use it in direct message with the bot to make the cooldown global.
 cmd_cooldown_list: Lists all active cooldowns on this server. Use it in direct message with the bot to list global cooldowns.
@@ -287,6 +296,11 @@ cmd_listroles: Lists the roles of this server. Provide a user to see the user's 
 cmd_listservers: Lists the servers serviced by the specified shard. Provide no parameter to list the servers on the current shard.
 cmd_liststatus: Lists all rotating statuses and their corresponding ID.
 cmd_lockchannel: Locks the current channel so users can't send messages to it. Users with permission to Kick Members, Ban Members or Manage Channels are immune.
+cmd_log: Groups commands for managing guild logs. Log events are restricted to one channel at a time.
+cmd_log_edit: Edits the webhook that sends logs to the specified channel.
+cmd_log_list: Lists the available log events and the channel they are currently active on.
+cmd_log_start: Starts logging on the specified channel. Use `log list` to see the list of events available for logging. Provide no channel to output the logs in the current channel.
+cmd_log_stop: Stops logging of the specified log event.
 cmd_massban: Bans multiple users from the server.
 cmd_massunban: Unbans multiple users from the server.
 cmd_modlog: Shows notices and infractions of a user.
@@ -336,6 +350,7 @@ cmd_roleid: Shows the ID of the specified role.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Providing no parameter to sanitize the original nickname.
 cmd_sanitizenames: Toggles whether nicknames should have special characters removed from the beginning.
+cmd_savechat: Saves the last messages sent in a text channel to a file. Bot messages are ignored. Users with no bot ownership are limited to 100 messages. Provide no paraameters to save the last 100 messages from the current channel.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
 cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_search: Searches for a command with the specified keyword.
@@ -392,6 +407,7 @@ deafen_success: User {0} can no longer hear other users speaking in voice channe
 deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
+deleted_on: Deleted on
 deleted_role: Deleted role
 delmsgoncmd_disabled: Automatic deletion of messages has been disabled. Commands will only be deleted if they are executed in a context with an ignored ID.
 delmsgoncmd_enabled: Automatic deletion of messages has been enabled. Commands will be deleted by default unless if they are executed in a context with an ignored ID.
@@ -399,6 +415,7 @@ denied: Denied
 description: Description
 disabled: disabled
 duration: Duration
+edited_on: Edited on
 emoji_list_title: Server Emojis
 emojis: Emojis
 enabled: enabled
@@ -406,6 +423,8 @@ error_hierarchy: This command can only be used on users with a role lower to min
 error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
+expires: Expires
+expires_on: Expires on
 expires_on: Expires on
 exportcommands_description: Successfully exported {0} commands.
 farewell_channel_removed: The farewell channel has been successfully removed.
@@ -489,6 +508,7 @@ infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
 interval: Interval
 invalid_color: The specified color code is invalid.
+invite_check_title: Server invite
 invite_list_title: List of server invites
 invite_not_found: Invite not found.
 invite_temporary: Is temporary
@@ -514,9 +534,40 @@ kick_title: User Kicked
 language: Language
 ldc_empty: No command has been disabled.
 ldc_title: Disabled Commands
+left_on: Left on
 listservers_title: List of servers on Shard {0}
 locales_title: Available Languages
 lockchannel_reason: Channel Lockdown
+log_channel_name: Channel name
+log_channel_topic: Channel topic
+log_channelcreated_title: Channel created
+log_channeldeleted_title: Channel deleted
+log_channeledited_title: Channel edited
+log_emoji_added: Emoji {0} has been added.
+log_emoji_deleted: Emoji {0} has been removed.
+log_emoji_edited: Emoji {0} has been changed to {1}.
+log_emoji_edited_simple: Emoji {0} has been modified.
+log_emoji_title: Emoji updated
+log_invite_created_title: Invite created
+log_invite_deleted_title: Invite deleted
+log_joiningmember_title: User has joined
+log_leavingmember_title: User has left
+log_list_title: Server Logs
+log_message_deleted_title: Message deleted
+log_message_edited_title: Message edited
+log_messages_deleted: Messages deleted
+log_messages_logged: Messages logged
+log_rolecreated_title: Role created
+log_roledeleted_title: Role deleted
+log_roleedited_title: Role edited
+log_start: Log Start
+log_started: Started logging {0} on channel {1}.
+log_stopped_failure: There is no active logging for {0}.
+log_stopped_success: Successfully stopped logging of {0}.
+log_unban_title: Unbanned user
+log_voicestate_connected: '{0} has connected to the {1} voice channel.'
+log_voicestate_disconnected: '{0} has disconnected from the {1} voice channel.'
+log_voicestate_moved: '{0} has moved from the {1} to the {2} voice channel.'
 low: Low
 massban: Massban
 massban_description: Banning {0} users.
@@ -530,6 +581,7 @@ members: Members
 message: Message
 messages: Messages
 minutes: Minutes
+moderator: Moderator
 modlog_description: '{0} notices, {1} warnings, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
 modroles: Moderator Roles
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
@@ -539,12 +591,14 @@ mute: Mute
 mute_enum: muted
 mute_success: User {0} has been muted.
 name: Name
+new_name: New name
 news: News
 nickname: Nickname
 none: None
 notice_success: Notice added successfully.
 nsfw: NSFW
 nsfw_toggle: NSFW has been {0} on this channel.
+old_name: Old name
 online_since: Online since
 owner: Owner
 owners: Owners
@@ -584,6 +638,7 @@ perm_use_external_emojis: Use External Emojis
 perm_use_voice: Connect
 perm_use_voice_detection: Voice Detection
 perm_view_audit_log: View Audit Log
+permissions: Permissions
 poll: Poll
 poll_anonymous_error: There is an anonymous poll already active in this channel.
 poll_anonymous_footer: You can also use the {0} command in direct message to vote on this poll.
@@ -644,8 +699,10 @@ softban: Soft-ban
 softban_enum: soft-banned
 sqlexec_success: Query successfully run in {0} ms. {1} rows affected.
 sqlselect_title: Query successfully run in {0} ms. {1} rows returned.
+stayed_for: Stayed for
 store: Store
 text: Text
+time_difference: Time difference
 timedban_notification: You have been banned from the {0} server for {0}.
 timedban_title: Temporary Ban
 timedmute: Expired Mute
@@ -656,11 +713,12 @@ timezone_list: Time Zones
 total: Total
 total_of: '{0} total'
 trigger_time: Triggers Within
-triggers_on: Triggers On
 triggers_in: Triggers In
+triggers_on: Triggers On
 type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.
+unbanned_on: Unbanned on
 unknown: Unknown
 unlockchannel_reason: Lockdown Lifted
 unmute_success: User {0} has been unmuted.
@@ -702,56 +760,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-
-autoslowmode_title: Autoslowmode Settings
-
-log_channel_name: Channel name
-log_channel_topic: Channel topic
-log_messages_logged: Messages logged
-log_start: Log Start
-cmd_savechat: Saves the last messages sent in a text channel to a file. Bot messages are ignored. Users with no bot ownership are limited to 100 messages. Provide no paraameters to save the last 100 messages from the current channel.
-
-cmd_log: Starts logging on the specified channel. Use {TODO} to see the list of events available for logging. Provide no channel to output the logs in the current channel.
-arg_guildlog_type: The type of event to be logged.
-arg_webhook_name: The name of the webhook.
-message_deleted: Message deleted
-author_mention: Author mention
-deleted_on: Deleted on
-cmd_config_webhooklogname: Sets the default name to be used on the webhooks for guild logs.
-arg_webhooklogname: The default name for the webhooks.
-message_edited: Message edited
-before: Before
-after: After
-edited_on: Edited on
-log_messages_deleted: Messages deleted
-log_emoji_edited: Emoji {0} has been changed to {1}.
-log_emoji_added: Emoji {0} has been added.
-log_emoji_deleted: Emoji {0} has been removed.
-log_emoji_edited_simple: Emoji {0} has been modified.
-log_emoji_title: Emoji updated
-log_invite_created_title: Invite created
-expires_on: Expires on
-log_invite_deleted_title: Invite deleted
-invite_check_title: Server invite
-moderator: Moderator
-banned_on: Banned on
-log_unban_title: Unbanned user
-unbanned_on: Unbanned on
-expires: Expires
-log_rolecreated_title: Role created
-log_roledeleted_title: Role deleted
-permissions: Permissions
-log_roleedited_title: Role edited
-old_name: Old name
-new_name: New name
-log_channelcreated_title: Channel created
-log_channeldeleted_title: Channel deleted
-log_channeledited_title: Channel edited
-log_voicestate_connected: '{0} has connected to the {1} voice channel.'
-log_voicestate_disconnected: '{0} has disconnected from the {1} voice channel.'
-log_voicestate_moved: '{0} has moved from the {1} to the {2} voice channel.'
-time_difference: Time difference
-log_joiningmember_title: User has joined
-left_on: Left on
-log_leavingmember_title: User has left
-stayed_for: Stayed for

@@ -276,7 +276,7 @@ namespace AkkoBot.Models.Serializable
         {
             var localFields = (fields is not null)
                 ? fields.ToList()
-                : null;
+                : Fields;
 
             if (!HasValidEmbed())
                 return null;

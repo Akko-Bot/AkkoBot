@@ -56,25 +56,20 @@ namespace AkkoBot.Services.Database.Entities
         InviteEvents = 1 << 7,
 
         /// <summary>
-        /// Integration updated.
-        /// </summary>
-        Integration = 1 << 8,
-
-        /// <summary>
         /// Emoji updated.
         /// </summary>
-        Emojis = 1 << 9,
+        EmojiEvents = 1 << 8,
 
         /// <summary>
         /// User presence update.
         /// </summary>
-        UserPresence = 1 << 10,
+        UserPresence = 1 << 9,
 
         /// <summary>
         /// All events.
         /// </summary>
-        All = Unknown | ChannelEvents | BanEvents | MemberEvents | MessageEvents| VoiceEvents
-            | RoleEvents | InviteEvents | Integration | Emojis | UserPresence
+        All = Unknown | ChannelEvents | BanEvents | MemberEvents | MessageEvents
+            | VoiceEvents | RoleEvents | InviteEvents | EmojiEvents | UserPresence
     }
 
     /// <summary>

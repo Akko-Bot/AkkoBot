@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AkkoBot.Commands.Modules.Utilities.Services
@@ -86,11 +87,12 @@ namespace AkkoBot.Commands.Modules.Utilities.Services
         /// Creates a GET request to the specified URL and returns the result as a stream.
         /// </summary>
         /// <param name="url">The URL to make the GET request.</param>
+        /// <param name="cToken">The cancellation token.</param>
         /// <returns>A <see cref="Stream"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
-        public async Task<Stream> GetOnlineStreamAsync(string url)
+        public async Task<Stream> GetOnlineStreamAsync(string url, CancellationToken cToken = default)
         {
             // Stream needs to be seekable
-            try { return await (await _httpClient.GetAsync(url)).Content.ReadAsStreamAsync(); }
+            try { return await (await _httpClient.GetAsync(url, cToken)).Content.ReadAsStreamAsync(cToken); }
             catch { return null; }
         }
 

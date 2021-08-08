@@ -142,7 +142,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.Emojis, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.EmojiEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -335,7 +335,7 @@ namespace AkkoBot.Services.Events
         /// <param name="ids">The IDs to be checked.</param>
         /// <returns><see langword="true"/> if at least one of the IDs is ignored or if the guild is not cached, <see langword="false"/> otherwise.</returns>
         private bool IsIgnoredContext(ulong sid, params ulong[] ids)
-            => IsIgnoredContext(sid, ids);
+            => IsIgnoredContext(sid, ids.AsEnumerable());
 
         /// <summary>
         /// Checks if the provided ids are from an ignored context.

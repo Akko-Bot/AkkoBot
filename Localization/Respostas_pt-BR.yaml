@@ -1,6 +1,7 @@
 add_role: Adicionar Cargo
 addrole: Adicionar Cargo
 addrole_enum: recebeu um cargo de punição
+after: Depois
 alias: Atalho
 alias_error: Nenhum atalho de comando foi encontrado.
 alias_list_title_global: Atalhos de Comando Globais
@@ -57,6 +58,7 @@ arg_fw_word: Uma palavra.
 arg_fw_words: Múltiplas palavras, separadas por espaço.
 arg_gatekeep_bulktime: Tempo de espera. O padrão é `5s`.
 arg_greetdel_time: O tempo de exclusão. Máximo de `2m`.
+arg_guildlog_type: O tipo de evento de servidor.
 arg_infraction: A infração a ser adicionada ao modlog desse usuário.
 arg_int: Um número inteiro.
 arg_invite_temporary: Determina se usuários que utilizarem esse convite serão automaticamente expulsos do servidor quando se disconectarem do Discord. Essa configuração não funciona se eles receberem um cargo de servidor. O padrão é `false`.
@@ -105,19 +107,25 @@ arg_warnp_rem_amount: A quantidade de advertências da punição a ser removida.
 arg_warnp_role: Um cargo a ser adicionado ou removido do usuário, se aplicável.
 arg_warnp_time: Por quanto tempo a punição deve durar. Deixe em branco para torná-la permanente.
 arg_warnp_type: O tipo de punição a ser aplicada.
+arg_webhook_name: O nome do webhook.
+arg_webhooklogname: O nome padrão dos webhooks.
 author: Autor
+author_mention: Menção do Autor
 auto_punish: Punição | {0} | {1}
 autocommand_empty: Nenhum comando automático foi encontrado.
 autocommand_title: Lista de Comandos Automáticos
 autoslowmode_disabled: O modo lento automático foi desativado.
 autoslowmode_enabled: O modo lento será automaticamente ativado quando um usuário enviar {0} mensagens em {1} segundos, limitando usuários a uma mensagem a cada {2} segundos por {3} segundos.
+autoslowmode_title: Configurações do Modo Lento Automático
 ban: Banir
 ban_enum: banido
 ban_notification: Você foi banido do servidor {0}.
 ban_title: Usuário Banido
 banned_for: Banido por
+banned_on: Banido em
 bantemplate_reset: O modelo de notificação de banimento foi removido com sucesso.
 bantemplate_set: O modelo de notificação de banimento foi definido com sucesso.
+before: Antes
 bitrate: Bitrate
 bl_added: '{0} {1} {2} foi adicionado à lista negra.'
 bl_added_range: '{0} IDs foram adicionados à lista negra.'
@@ -201,6 +209,7 @@ cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_reloadlocales: Recarrega os textos de resposta disponíveis ao bot.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
+cmd_config_webhooklogname: Define o nome padrão a ser utilizado por webhooks para registros de servidor.
 cmd_cooldown: Agrupa comandos relacionados a cooldowns.
 cmd_cooldown_add: Define o cooldown para um comando. Use em mensagem direta com o bot para criar um cooldown global.
 cmd_cooldown_list: Lista todos os cooldowns ativos nesse servidor. Use em mensagem direta com o bot para listar os cooldowns globais.
@@ -287,6 +296,11 @@ cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir 
 cmd_listservers: Exibe os servidores na shard especificada. Forneça nenhum parâmetro para listar os servidores na shard atual.
 cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
 cmd_lockchannel: Tranca o canal atual para impedir que usuários enviem mensagens. Usuários com permissão para Expulsar Membros, Banir Membros ou Gerenciar Canais possuem imunidade.
+cmd_log: Agrupa comandos para gerenciar registros de servidor. Eventos são limitados a um canal por vez.
+cmd_log_edit: Modifica o webhook que envia registros no canal especificado.
+cmd_log_list: Exibe a lista de eventos disponíveis para registro e o canal onde estão atualmente ativos.
+cmd_log_start: Inicia registros de servidor no canal especificado. Use `log list` para visualizar a lista de eventos disponíveis para registrar. Forneça nenhum canal para gravar os registros no canal atual.
+cmd_log_stop: Encerra o registro do evento especificado.
 cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_modlog: Exibe anotações e infrações de um usuário.
@@ -336,6 +350,7 @@ cmd_roleid: Exibe od ID do cargo especificado.
 cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_sanitizedname: Define o apelido a ser designado a usuários que tiverem caracteres especiais no início de seu apelido. Forneça nenhum parâmetro para sanitizar o apelido original.
 cmd_sanitizenames: Ativa ou desativa a sanitização de apelidos que começam com caracteres especiais.
+cmd_savechat: Salva em um arquivo as últimas mensagens enviadas a um canal de texto. Mensagens de bots são ignoradas. Usuários sem autoria do bot são limitados a 100 mensagens. Forneça nenhum parâmetro para salvar as 100 últimas mensagens do canal atual.
 cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
 cmd_search: Busca por um comando com a palavra-chave especificada.
@@ -392,6 +407,7 @@ deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de
 deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
+deleted_on: Excluído em
 deleted_role: Cargo excluído
 delmsgoncmd_disabled: A exclusão automática de comandos foi desativada. Comandos serão excluídos somente se forem executados em um context que contenha um ID ignorado.
 delmsgoncmd_enabled: A exclusão automática de comandos foi ativada. Comandos serão excluídos a não ser que sejam executados em um contexto que contenha um ID ignorado.
@@ -399,6 +415,7 @@ denied: Negado
 description: Descrição
 disabled: desativado
 duration: Duração
+edited_on: Alterado em
 emoji_list_title: Emojis do Servidor
 emojis: Emojis
 enabled: ativado
@@ -406,6 +423,8 @@ error_hierarchy: Esse comando só pode ser usado em usuários com um cargo menor
 error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
+expires: Expira
+expires_on: Expira em
 expires_on: Expira em
 exportcommands_description: '{0} comandos exportados com sucesso.'
 farewell_channel_removed: O canal de despedida foi removido com sucesso.
@@ -489,6 +508,7 @@ infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
 interval: Intervalo
 invalid_color: O código de cor especificado é inválido.
+invite_check_title: Convite de servidor
 invite_list_title: Lista de convites do servidor
 invite_not_found: Convite não encontrado.
 invite_temporary: É temporário
@@ -514,9 +534,40 @@ kick_title: Usuário Expulso
 language: Idioma
 ldc_empty: Nenhum comando foi desativado.
 ldc_title: Comandos Desativados
+left_on: Saiu em
 listservers_title: Lista de servidores na Shard {0}
 locales_title: Idiomas Disponíveis
 lockchannel_reason: Lockdown de Canal
+log_channel_name: Nome do canal
+log_channel_topic: Tópico do canal
+log_channelcreated_title: Canal criado
+log_channeldeleted_title: Canal excluído
+log_channeledited_title: Canal alterado
+log_emoji_added: Emoji {0} foi adicionado.
+log_emoji_deleted: Emoji {0} foi removido.
+log_emoji_edited: Emoji {0} foi alterado para {1}.
+log_emoji_edited_simple: Emoji {0} foi modificado.
+log_emoji_title: Emoji atualizado
+log_invite_created_title: Convite criado
+log_invite_deleted_title: Convite excluído
+log_joiningmember_title: Usuário entrou
+log_leavingmember_title: Usuário saiu
+log_list_title: Registros do Servidor
+log_message_deleted_title: Mensagem excluída
+log_message_edited_title: Mensagem alterada
+log_messages_deleted: Mensagens excluídas
+log_messages_logged: Mensagens registradas
+log_rolecreated_title: Cargo criado
+log_roledeleted_title: Cargo excluído
+log_roleedited_title: Cargo alterado
+log_start: Início do Log
+log_started: Registrando {0} no canal {1}.
+log_stopped_failure: Não há registro ativo para {0}.
+log_stopped_success: Registro de {0} encerrado.
+log_unban_title: Usuário desbanido
+log_voicestate_connected: '{0} conectou ao canal de voz {1}.'
+log_voicestate_disconnected: '{0} desconectou do canal de voz {1}.'
+log_voicestate_moved: '{0} moveu-se do canal de voz {1} para o canal {2}.'
 low: Baixo
 massban: Banimento em Massa
 massban_description: Banindo {0} usuários.
@@ -530,6 +581,7 @@ members: Membros
 message: Mensagem
 messages: Mensagens
 minutes: Minutos
+moderator: Moderador
 modlog_description: '{0} anotações, {1} advertências, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
 modroles: Cargos de Moderador
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
@@ -539,12 +591,14 @@ mute: Silenciar
 mute_enum: silenciado
 mute_success: Usuário {0} foi silenciado.
 name: Nome
+new_name: Nome novo
 news: Anúncios
 nickname: Apelido
 none: Nenhum
 notice_success: Anotação adicionada com sucesso.
 nsfw: NSFW
 nsfw_toggle: NSFW foi {0} nesse canal.
+old_name: Nome antigo
 online_since: Online desde
 owner: Dono
 owners: Donos
@@ -584,6 +638,7 @@ perm_use_external_emojis: Usar Emojis Externos
 perm_use_voice: Conectar
 perm_use_voice_detection: Detecção de Voz
 perm_view_audit_log: Visualizar o Registro de Auditoria
+permissions: Permissões
 poll: Enquete
 poll_anonymous_error: Já existe uma enquete anônima ativa nesse canal.
 poll_anonymous_footer: Você também pode usar o comando {0} em mensagem direta para votar nessa enquete.
@@ -644,8 +699,10 @@ softban: Expulsar e Excluir
 softban_enum: expulso
 sqlexec_success: Instrução executada com sucesso em {0} ms. {1} linhas alteradas.
 sqlselect_title: Instrução executada com sucesso em {0} ms. {1} linhas retornadas.
+stayed_for: Permaneceu por
 store: Loja
 text: Texto
+time_difference: Diferença de tempo
 timedban_notification: Você foi banido do servidor {0} por {0}.
 timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
@@ -656,11 +713,12 @@ timezone_list: Fusos Horários
 total: Total
 total_of: 'Total de {0}'
 trigger_time: Ativa Dentro De
-triggers_on: Data de Execução
 triggers_in: Executa Em
+triggers_on: Data de Execução
 type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.
+unbanned_on: Desbanido em
 unknown: Desconhecido
 unlockchannel_reason: Lockdown Suspenso
 unmute_success: Usuário {0} pode falar novamente.
@@ -702,11 +760,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-
-autoslowmode_title: Configurações do Modo Lento Automático
-
-log_channel_name: Nome do canal
-log_channel_topic: Tópico do canal
-log_messages_logged: Mensagens registradas
-log_start: Início do Log
-cmd_savechat: Salva em um arquivo as últimas mensagens enviadas a um canal de texto. Mensagens de bots são ignoradas. Usuários sem autoria do bot são limitados a 100 mensagens. Forneça nenhum parâmetro para salvar as 100 últimas mensagens do canal atual.

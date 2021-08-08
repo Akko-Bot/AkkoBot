@@ -242,7 +242,7 @@ namespace AkkoBot.Commands.Formatters
         /// <returns>A string with all localized attributes separated by a newline.</returns>
         /// <exception cref="InvalidCastException">Occurs when the attribute argument is not of type <see cref="Permissions"/>.</exception>
         private string GetLocalizedPermissions(CommandContext context, IEnumerable<CustomAttributeTypedArgument> permissions)
-            => string.Join("\n", permissions.SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(context)));
+            => string.Join("\n", permissions.Where(x => x.ArgumentType == typeof(Permissions)).SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(context)));
 
         /// <summary>
         /// Gets the title of the help message.

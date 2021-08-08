@@ -46,7 +46,7 @@ namespace AkkoBot.Services.Events.Common
 
             var webhookMessage = new SerializableDiscordMessage()
                 .WithColor((message.Author as DiscordMember)?.Color.ToString())
-                .WithAuthor("message_deleted", message.JumpLink.AbsoluteUri)
+                .WithAuthor("log_message_deleted_title", message.JumpLink.AbsoluteUri)
                 .WithTitle(DiscordUserExt.GetFullname(message.Author))
                 .WithDescription($"{_localizer.GetResponseString(dbGuild.Locale, "channel")}: {message.Channel.Mention} | {message.Channel.Name}\n\n{message.Content}")
                 .AddField("author_mention", message.Author.Mention, true)
@@ -66,7 +66,7 @@ namespace AkkoBot.Services.Events.Common
 
             var message = new SerializableDiscordMessage()
                 .WithColor((eventArgs.Message.Author as DiscordMember)?.Color.ToString())
-                .WithAuthor("message_edited", eventArgs.Message.JumpLink.AbsoluteUri)
+                .WithAuthor("log_message_edited_title", eventArgs.Message.JumpLink.AbsoluteUri)
                 .WithTitle(eventArgs.Message.Author.GetFullname())
                 .WithDescription(
                     $"{_localizer.GetResponseString(dbGuild.Locale, "channel")}: {eventArgs.Message.Channel.Mention} | {eventArgs.Message.Channel.Name}\n\n" +

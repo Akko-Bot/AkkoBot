@@ -13,15 +13,14 @@ namespace AkkoBot.Commands.ArgumentConverters
             return input?.ToLowerInvariant() switch
             {
                 //"unknown" => Task.FromResult(Optional.FromValue(GuildLog.Unknown)),   // This event sends no guild-related data
-                "channel" => Task.FromResult(Optional.FromValue(GuildLog.ChannelEvents)),
-                "ban" => Task.FromResult(Optional.FromValue(GuildLog.BanEvents)),
-                "member" => Task.FromResult(Optional.FromValue(GuildLog.MemberEvents)),
-                "message" => Task.FromResult(Optional.FromValue(GuildLog.MessageEvents)),
-                "voice" => Task.FromResult(Optional.FromValue(GuildLog.VoiceEvents)),
-                "role" => Task.FromResult(Optional.FromValue(GuildLog.RoleEvents)),
-                "invite" => Task.FromResult(Optional.FromValue(GuildLog.InviteEvents)),
-                "integration" => Task.FromResult(Optional.FromValue(GuildLog.Integration)),
-                "emoji" or "emojis" => Task.FromResult(Optional.FromValue(GuildLog.Emojis)),
+                "channelevents" or "channel" or "channels" => Task.FromResult(Optional.FromValue(GuildLog.ChannelEvents)),
+                "banevents" or "ban" => Task.FromResult(Optional.FromValue(GuildLog.BanEvents)),
+                "memberevents" or "member" or "members" => Task.FromResult(Optional.FromValue(GuildLog.MemberEvents)),
+                "messageevents" or "message" or "messages" => Task.FromResult(Optional.FromValue(GuildLog.MessageEvents)),
+                "voiceevents" or "voice" => Task.FromResult(Optional.FromValue(GuildLog.VoiceEvents)),
+                "roleevents" or "role" or "roles" => Task.FromResult(Optional.FromValue(GuildLog.RoleEvents)),
+                "inviteevents" or "invite" or "invites" => Task.FromResult(Optional.FromValue(GuildLog.InviteEvents)),
+                "emojievents" or "emoji" or "emojis" => Task.FromResult(Optional.FromValue(GuildLog.EmojiEvents)),
                 //"userpresence" or "presence" => Task.FromResult(Optional.FromValue(GuildLog.UserPresence)),   // Status changes offer nothing of value
                 _ => Task.FromResult(Optional.FromNoValue<GuildLog>())
             };
