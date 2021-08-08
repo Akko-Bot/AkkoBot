@@ -1,45 +1,10 @@
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    /// <summary>
-    /// Represents the type of punishment to be applied to a user.
-    /// </summary>
-    public enum PunishmentType
-    {
-        /// <summary>
-        /// Mutes the user.
-        /// </summary>
-        Mute,
-
-        /// <summary>
-        /// Kicks the user.
-        /// </summary>
-        Kick,
-
-        /// <summary>
-        /// Soft-bans the user.
-        /// </summary>
-        Softban,
-
-        /// <summary>
-        /// Bans the user.
-        /// </summary>
-        Ban,
-
-        /// <summary>
-        /// Adds a role to the user.
-        /// </summary>
-        AddRole,
-
-        /// <summary>
-        /// Removes a role from the user.
-        /// </summary>
-        RemoveRole
-    }
-
     /// <summary>
     /// Stores punishments to be automatically applied once a user reaches a certain amount of warnings.
     /// </summary>

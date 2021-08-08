@@ -4,6 +4,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -49,7 +50,7 @@ namespace AkkoBot.Services.Events
         public Task CacheMessageOnCreationAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author.IsBot
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog.IsActive)
                 return Task.CompletedTask;
 
             if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
@@ -66,7 +67,7 @@ namespace AkkoBot.Services.Events
         public async Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author.IsBot
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
                 || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is true  // This check is needed because pins trigger this event
 
@@ -96,7 +97,7 @@ namespace AkkoBot.Services.Events
         public async Task LogDeletedMessageAsync(DiscordClient client, MessageDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
                 || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
                 || !messageCache.TryGet(x => x.Id == eventArgs.Message.Id, out var message)
@@ -115,7 +116,7 @@ namespace AkkoBot.Services.Events
         public async Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Messages.All(x => x.Author?.IsBot is not false)
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MessageEvents, out var guildLog)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
                 || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
                 || IsIgnoredContext(eventArgs.Guild.Id, eventArgs.Channel.Id))
@@ -142,7 +143,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.EmojiEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -172,7 +173,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.InviteEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -184,7 +185,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.InviteEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -197,7 +198,7 @@ namespace AkkoBot.Services.Events
         public async Task LogBannedUserAsync(DiscordClient client, GuildBanAddEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.BanEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -210,7 +211,7 @@ namespace AkkoBot.Services.Events
         public async Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.BanEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -222,7 +223,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.RoleEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -234,7 +235,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.RoleEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -246,7 +247,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.RoleEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -258,7 +259,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.ChannelEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -270,7 +271,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.ChannelEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -282,7 +283,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.ChannelEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -295,7 +296,7 @@ namespace AkkoBot.Services.Events
         public async Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
         {
             if (eventArgs.Before == eventArgs.After || eventArgs.Guild is null
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.VoiceEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -306,7 +307,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MemberEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -318,7 +319,7 @@ namespace AkkoBot.Services.Events
 
         public async Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLog.MemberEvents, out var guildLog)
+            if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog)
                 || !guildLog.IsActive)
                 return;
 
@@ -364,7 +365,7 @@ namespace AkkoBot.Services.Events
         /// <param name="logType">The type of guild log to get.</param>
         /// <param name="guildLog">The resulting guild log.</param>
         /// <returns><see langword="true"/> if the guild log was found, <see langword="false"/> otherwise.</returns>
-        private bool TryGetGuildLog(ulong sid, GuildLog logType, out GuildLogEntity guildLog)
+        private bool TryGetGuildLog(ulong sid, GuildLogType logType, out GuildLogEntity guildLog)
         {
             _dbCache.GuildLogs.TryGetValue(sid, out var guildLogs);
             guildLog = guildLogs?.FirstOrDefault(x => logType.HasFlag(x.Type));
@@ -401,7 +402,7 @@ namespace AkkoBot.Services.Events
                     _dbCache.GuildLogs.TryRemove(server.Id, out _);
 
                 // Remove logged messages
-                if (guildLog.Type is GuildLog.MessageEvents && _akkoCache.GuildMessageCache.TryRemove(server.Id, out var messageCache))
+                if (guildLog.Type is GuildLogType.MessageEvents && _akkoCache.GuildMessageCache.TryRemove(server.Id, out var messageCache))
                     messageCache.Clear();
 
                 return null;

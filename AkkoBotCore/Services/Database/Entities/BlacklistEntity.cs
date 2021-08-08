@@ -1,36 +1,11 @@
 ﻿using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    /// <summary>
-    /// Determines the type of the blacklisted entity.
-    /// </summary>
-    public enum BlacklistType
-    {
-        /// <summary>
-        /// Represents a Discord user.
-        /// </summary>
-        User,
-
-        /// <summary>
-        /// Represents a Discord channel.
-        /// </summary>
-        Channel,
-
-        /// <summary>
-        /// Represents a Discord guild.
-        /// </summary>
-        Server,
-
-        /// <summary>
-        /// Represents a blacklisted entity that was not specified.
-        /// </summary>
-        Unspecified
-    }
-
     /// <summary>
     /// Stores a user, channel, or guild blacklisted from the bot.
     /// </summary>

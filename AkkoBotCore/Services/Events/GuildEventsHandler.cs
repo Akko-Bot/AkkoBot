@@ -7,6 +7,7 @@ using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using AkkoBot.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;

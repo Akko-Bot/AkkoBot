@@ -3,6 +3,7 @@ using AkkoBot.Common;
 using AkkoBot.Config;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

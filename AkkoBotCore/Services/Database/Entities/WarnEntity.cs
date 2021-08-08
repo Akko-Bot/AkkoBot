@@ -1,27 +1,12 @@
 using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    /// <summary>
-    /// Represents the type of a warning.
-    /// </summary>
-    public enum WarnType
-    {
-        /// <summary>
-        /// Represents a note about a user or incident.
-        /// </summary>
-        Notice,
-
-        /// <summary>
-        /// Represents a warning.
-        /// </summary>
-        Warning
-    }
-
     /// <summary>
     /// Stores warnings issued to users on Discord guilds.
     /// </summary>

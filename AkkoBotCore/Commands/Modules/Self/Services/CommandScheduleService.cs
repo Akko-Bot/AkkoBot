@@ -3,6 +3,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;

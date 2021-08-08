@@ -1,6 +1,7 @@
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;
 using LinqToDB;

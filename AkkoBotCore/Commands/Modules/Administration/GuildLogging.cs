@@ -5,6 +5,7 @@ using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -24,18 +25,20 @@ namespace AkkoBot.Commands.Modules.Administration
     {
         private readonly GuildLogService _service;
         private readonly UtilitiesService _utilities;
+        private readonly DiscordWebhookClient _webhookClient;
 
-        public GuildLogging(GuildLogService service, UtilitiesService utilities)
+        public GuildLogging(GuildLogService service, UtilitiesService utilities, DiscordWebhookClient webhookClient)
         {
             _service = service;
             _utilities = utilities;
+            _webhookClient = webhookClient;
         }
 
         [GroupCommand, Command("start")]
         [Description("cmd_log_start")]
         public async Task StartLogAsync(
             CommandContext context,
-            [Description("arg_guildlog_type")] GuildLog logType,
+            [Description("arg_guildlog_type")] GuildLogType logType,
             [Description("arg_discord_channel")] DiscordChannel channel = null,
             [Description("arg_webhook_name")] string webhookName = null,
             [Description("arg_emoji_url")] string avatarUrl = null)
@@ -55,7 +58,7 @@ namespace AkkoBot.Commands.Modules.Administration
 
         [Command("stop")]
         [Description("cmd_log_stop")]
-        public async Task StopLogAsync(CommandContext context, [Description("arg_guildlog_type")] GuildLog logType)
+        public async Task StopLogAsync(CommandContext context, [Description("arg_guildlog_type")] GuildLogType logType)
         {
             var result = await _service.StopLogAsync(context, logType);
             var message = new SerializableDiscordMessage()
@@ -81,8 +84,8 @@ namespace AkkoBot.Commands.Modules.Administration
                 return;
             }
 
-            var webhook = (await channel.GetWebhooksAsync())
-                .FirstOrDefault(x => x.Id == guildLog.WebhookId);
+            await _webhookClient.TryAddAsync(guildLog.WebhookId, context.Client);
+            var webhook = _webhookClient.GetRegisteredWebhook(guildLog.WebhookId);
 
             if (webhook is null)
             {
@@ -111,8 +114,8 @@ namespace AkkoBot.Commands.Modules.Administration
                 .WithDescription(
                     string.Join(
                         "\n",
-                        Enum.GetValues<GuildLog>()
-                            .Where(x => x is not GuildLog.None and not GuildLog.All and not GuildLog.Unknown and not GuildLog.UserPresence)
+                        Enum.GetValues<GuildLogType>()
+                            .Where(x => x is not GuildLogType.None and not GuildLogType.All and not GuildLogType.Unknown and not GuildLogType.UserPresence)
                             .Select(x => $"{x}\t{GetChannelMention(context.Guild, guildLogs.FirstOrDefault(y => y.Type == x))}")
                     )
                 );

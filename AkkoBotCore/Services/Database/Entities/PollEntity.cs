@@ -1,5 +1,6 @@
 ﻿using AkkoBot.Common;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Enums;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -8,27 +9,6 @@ using System.Threading.Tasks;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    /// <summary>
-    /// Represents the type of a poll.
-    /// </summary>
-    public enum PollType
-    {
-        /// <summary>
-        /// Represents a "yes or no" poll.
-        /// </summary>
-        Simple,
-
-        /// <summary>
-        /// Represents a poll with up to 10 options that are voted on through reactions.
-        /// </summary>
-        Numeric,
-
-        /// <summary>
-        /// Represents a poll with unlimited options that are voted through Discord messages.
-        /// </summary>
-        Anonymous
-    }
-
     /// <summary>
     /// Stores data related to a Discord guild poll.
     /// </summary>

@@ -1,32 +1,12 @@
 ﻿using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Database.Abstractions;
+using AkkoBot.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace AkkoBot.Services.Database.Entities
 {
-    /// <summary>
-    /// Represents the type of an automatic command.
-    /// </summary>
-    public enum AutoCommandType
-    {
-        /// <summary>
-        /// Represents an autocommand that runs once at startup.
-        /// </summary>
-        Startup,
-
-        /// <summary>
-        /// Represents an autocommand that runs once at a specific time.
-        /// </summary>
-        Scheduled,
-
-        /// <summary>
-        /// Represents an autocommand that runs multiple times at specific intervals of time.
-        /// </summary>
-        Repeated
-    }
-
     /// <summary>
     /// Stores command data and the context it should be automatically sent to.
     /// </summary>

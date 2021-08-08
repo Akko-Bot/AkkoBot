@@ -5,6 +5,7 @@ using AkkoBot.Services.Caching;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Timers.Abstractions;
 using DSharpPlus;

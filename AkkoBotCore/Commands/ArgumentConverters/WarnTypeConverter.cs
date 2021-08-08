@@ -1,4 +1,4 @@
-using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;

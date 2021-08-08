@@ -7,6 +7,7 @@ using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

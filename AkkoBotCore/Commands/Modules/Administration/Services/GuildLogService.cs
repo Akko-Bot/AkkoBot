@@ -4,6 +4,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database;
 using AkkoBot.Services.Database.Entities;
+using AkkoBot.Services.Database.Enums;
 using AkkoBot.Services.Localization.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus;
@@ -45,13 +46,13 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// Starts logging of a guild event.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="channel">The channel where log are being output.</param>
+        /// <param name="channel">The channel where logs are being output.</param>
         /// <param name="logType">The type of guild event to generate logs for.</param>
         /// <param name="name">The name of the webhook.</param>
         /// <param name="avatar">The image stream of the webhook's avatar.</param>
         /// <returns><see langword="true"/> if the guild log was created, <see langword="false"/> is it was updated.</returns>
         /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
-        public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLog logType, string name = null, Stream avatar = null)
+        public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string name = null, Stream avatar = null)
         {
             if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
                 throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
@@ -112,7 +113,7 @@ namespace AkkoBot.Commands.Modules.Administration.Services
         /// <param name="logType">The type of guild event to generate logs for.</param>
         /// <param name="deleteEntry"><see langword="true"/> to remove the entry from the database, <see langword="false"/> to update it.</param>
         /// <returns><see langword="true"/> if the guild log was successfully disabled, <see langword="false"/> otherwise or if it is already disabled.</returns>
-        public async Task<bool> StopLogAsync(CommandContext context, GuildLog logType, bool deleteEntry = false)
+        public async Task<bool> StopLogAsync(CommandContext context, GuildLogType logType, bool deleteEntry = false)
         {
             if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
                 return false;
