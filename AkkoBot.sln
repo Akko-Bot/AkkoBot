@@ -3,14 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoBot", "AkkoBotCore\AkkoBot.csproj", "{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoBot", "AkkoBot\AkkoBot.csproj", "{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41F5902D-FF91-4E4D-897D-ED9DBA4B484E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoTests", "AkkoTests\AkkoTests.csproj", "{6EF07F6A-3756-4274-9DD3-D8729A077476}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoTests", "AkkoTests\AkkoTests.csproj", "{6EF07F6A-3756-4274-9DD3-D8729A077476}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoDatabase", "AkkoDatabase\AkkoDatabase.csproj", "{0A9DC5A7-1555-43D6-97C9-436C1A977992}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoEntities", "AkkoEntities\AkkoEntities.csproj", "{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +30,14 @@ Global
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A9DC5A7-1555-43D6-97C9-436C1A977992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A9DC5A7-1555-43D6-97C9-436C1A977992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A9DC5A7-1555-43D6-97C9-436C1A977992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A9DC5A7-1555-43D6-97C9-436C1A977992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

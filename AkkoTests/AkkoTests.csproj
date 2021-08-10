@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AkkoBotCore\AkkoBot.csproj" />
+    <ProjectReference Include="..\AkkoBot\AkkoBot.csproj" />
   </ItemGroup>
 
 </Project>

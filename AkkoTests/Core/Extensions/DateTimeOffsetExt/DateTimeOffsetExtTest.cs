@@ -1,4 +1,4 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoEntities.Extensions;
 using System;
 using Xunit;
 

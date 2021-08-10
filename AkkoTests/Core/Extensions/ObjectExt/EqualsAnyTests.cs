@@ -1,4 +1,4 @@
-﻿using AkkoBot.Extensions;
+﻿using AkkoEntities.Extensions;
 using AkkoTests.Entities;
 using System.Collections.Generic;
 using System.Linq;
