@@ -1,7 +1,7 @@
-using AkkoEntities.Common;
+using AkkoCore.Common;
 using System;
 
-namespace AkkoEntities.Extensions
+namespace AkkoCore.Extensions
 {
     public static class DateTimeOffsetExt
     {

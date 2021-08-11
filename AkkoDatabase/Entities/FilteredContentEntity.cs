@@ -1,5 +1,5 @@
 ﻿using AkkoDatabase.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

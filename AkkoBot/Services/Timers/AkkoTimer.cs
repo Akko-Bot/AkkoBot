@@ -1,6 +1,6 @@
 using AkkoBot.Services.Timers.Abstractions;
 using AkkoDatabase.Entities;
-using AkkoEntities.Common;
+using AkkoCore.Common;
 using System;
 using System.Threading.Tasks;
 using System.Timers;

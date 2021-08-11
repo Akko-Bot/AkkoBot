@@ -1,7 +1,7 @@
 using AkkoBot.Common;
 using AkkoBot.Services.Localization.Abstractions;
-using AkkoEntities.Common;
-using AkkoEntities.Extensions;
+using AkkoCore.Common;
+using AkkoCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

@@ -4,7 +4,7 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;

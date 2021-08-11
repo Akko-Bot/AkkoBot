@@ -1,9 +1,9 @@
 using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Services.Localization.Abstractions;
-using AkkoEntities.Config;
-using AkkoEntities.Config.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Config;
+using AkkoCore.Config.Abstractions;
+using AkkoCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;

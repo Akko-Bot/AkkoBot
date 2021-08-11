@@ -1,6 +1,6 @@
 using System;
 
-namespace AkkoEntities.Abstractions
+namespace AkkoCore.Abstractions
 {
     /// <summary>
     /// Contains information about how a message should be sent.

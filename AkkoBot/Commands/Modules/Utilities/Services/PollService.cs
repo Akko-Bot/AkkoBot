@@ -5,7 +5,7 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
 using AkkoDatabase.Enums;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;

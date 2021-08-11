@@ -1,4 +1,4 @@
-﻿using AkkoEntities.Extensions;
+﻿using AkkoCore.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;

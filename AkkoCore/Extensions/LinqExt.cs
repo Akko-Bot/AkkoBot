@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoEntities.Extensions
+namespace AkkoCore.Extensions
 {
     public static class LinqExt
     {

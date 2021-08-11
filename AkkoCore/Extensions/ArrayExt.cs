@@ -1,4 +1,4 @@
-﻿namespace AkkoEntities.Extensions
+﻿namespace AkkoCore.Extensions
 {
     public static class ArrayExt
     {

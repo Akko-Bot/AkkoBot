@@ -1,4 +1,4 @@
-﻿namespace AkkoEntities.Enums
+﻿namespace AkkoCore.Enums
 {
     /// <summary>
     /// Represents the connection status of a Discord user when they interact with voice channels.

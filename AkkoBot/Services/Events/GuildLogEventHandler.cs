@@ -5,7 +5,7 @@ using AkkoBot.Services.Events.Abstractions;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
 using AkkoDatabase.Enums;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;

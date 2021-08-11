@@ -1,5 +1,5 @@
 ﻿using AkkoDatabase.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;

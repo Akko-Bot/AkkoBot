@@ -1,7 +1,7 @@
-﻿using AkkoEntities.Extensions;
+﻿using AkkoCore.Extensions;
 using System;
 
-namespace AkkoEntities.Common
+namespace AkkoCore.Common
 {
     /// <summary>
     /// Calculates the time interval from <see cref="DateTimeOffset.Now"/> to the next time of day specified.

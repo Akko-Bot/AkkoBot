@@ -2,8 +2,8 @@
 using AkkoBot.Models.Serializable.EmbedParts;
 using AkkoBot.Services;
 using AkkoBot.Services.Localization.Abstractions;
-using AkkoEntities.Common;
-using AkkoEntities.Extensions;
+using AkkoCore.Common;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using System;

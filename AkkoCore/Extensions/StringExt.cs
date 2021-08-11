@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AkkoEntities.Extensions
+namespace AkkoCore.Extensions
 {
     public static class StringExt
     {

@@ -1,5 +1,5 @@
 using AkkoDatabase.Entities;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using ConcurrentCollections;
 using System;
 using System.Collections.Concurrent;

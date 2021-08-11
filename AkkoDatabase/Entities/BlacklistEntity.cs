@@ -1,6 +1,6 @@
 ﻿using AkkoDatabase.Abstractions;
 using AkkoDatabase.Enums;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 

@@ -5,7 +5,7 @@ using AkkoBot.Services.Localization.Abstractions;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
 using AkkoDatabase.Enums;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using ConcurrentCollections;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;

@@ -1,6 +1,6 @@
 ﻿using AkkoBot.Common;
 using AkkoDatabase;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;

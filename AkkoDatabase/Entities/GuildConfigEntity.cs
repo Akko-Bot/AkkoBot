@@ -1,9 +1,9 @@
 ﻿using AkkoDatabase.Abstractions;
 using AkkoDatabase.Enums;
-using AkkoEntities.Abstractions;
-using AkkoEntities.Common;
-using AkkoEntities.Config;
-using AkkoEntities.Extensions;
+using AkkoCore.Abstractions;
+using AkkoCore.Common;
+using AkkoCore.Config;
+using AkkoCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

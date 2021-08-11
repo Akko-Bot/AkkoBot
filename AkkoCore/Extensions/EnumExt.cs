@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace AkkoEntities.Extensions
+namespace AkkoCore.Extensions
 {
     public static class EnumExt
     {

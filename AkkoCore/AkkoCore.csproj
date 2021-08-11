@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConcurrentHashSet" Version="1.2.0" />
+    <PackageReference Include="DSharpPlus" Version="4.1.0" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />
   </ItemGroup>

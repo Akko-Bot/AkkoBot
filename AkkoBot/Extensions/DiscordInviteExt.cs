@@ -1,4 +1,4 @@
-﻿using AkkoEntities.Common;
+﻿using AkkoCore.Common;
 using DSharpPlus.Entities;
 
 namespace AkkoBot.Extensions

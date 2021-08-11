@@ -1,5 +1,5 @@
 using AkkoBot.Services.Logging.Abstractions;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text;

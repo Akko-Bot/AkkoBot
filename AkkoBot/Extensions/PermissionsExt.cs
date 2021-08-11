@@ -1,5 +1,5 @@
 ﻿using AkkoBot.Services.Localization.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using System;

@@ -1,5 +1,5 @@
 ﻿using AkkoBot.Extensions;
-using AkkoEntities.Common;
+using AkkoCore.Common;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;

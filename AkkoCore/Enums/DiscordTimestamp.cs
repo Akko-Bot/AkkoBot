@@ -1,4 +1,4 @@
-﻿namespace AkkoEntities.Common
+﻿namespace AkkoCore.Common
 {
     /// <summary>
     /// Defines the format used for Discord markdown timestamps.

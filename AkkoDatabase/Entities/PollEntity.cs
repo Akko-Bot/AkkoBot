@@ -1,6 +1,6 @@
 ﻿using AkkoDatabase.Abstractions;
 using AkkoDatabase.Enums;
-using AkkoEntities.Common;
+using AkkoCore.Common;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;

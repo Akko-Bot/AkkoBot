@@ -1,6 +1,6 @@
 ﻿using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using System.Threading.Tasks;

@@ -3,7 +3,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Events.Abstractions;
 using AkkoDatabase.Entities;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;

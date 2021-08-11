@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AkkoEntities.Extensions
+namespace AkkoCore.Extensions
 {
     public static class ObjectExt
     {

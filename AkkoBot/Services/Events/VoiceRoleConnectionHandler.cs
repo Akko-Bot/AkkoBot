@@ -4,7 +4,7 @@ using AkkoBot.Services.Database.Queries;
 using AkkoBot.Services.Events.Abstractions;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
-using AkkoEntities.Enums;
+using AkkoCore.Enums;
 using ConcurrentCollections;
 using DSharpPlus;
 using DSharpPlus.Entities;

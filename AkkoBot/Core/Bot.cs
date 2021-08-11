@@ -1,6 +1,6 @@
 ﻿using AkkoBot.Common;
 using AkkoBot.Core.Common;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using DSharpPlus;
 using Microsoft.Extensions.Logging;
 using System;

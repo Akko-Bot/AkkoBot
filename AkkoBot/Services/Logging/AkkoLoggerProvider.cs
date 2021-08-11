@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Services.Logging.Abstractions;
 using AkkoBot.Services.Logging.Loggers;
-using AkkoEntities.Config;
-using AkkoEntities.Extensions;
+using AkkoCore.Config;
+using AkkoCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;

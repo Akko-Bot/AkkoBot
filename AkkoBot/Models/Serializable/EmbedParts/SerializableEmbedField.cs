@@ -1,5 +1,5 @@
-﻿using AkkoEntities.Common;
-using AkkoEntities.Extensions;
+﻿using AkkoCore.Common;
+using AkkoCore.Extensions;
 using DSharpPlus.Entities;
 
 namespace AkkoBot.Models.Serializable.EmbedParts

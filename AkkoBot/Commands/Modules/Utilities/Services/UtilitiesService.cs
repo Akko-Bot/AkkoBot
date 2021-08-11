@@ -3,7 +3,7 @@ using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;

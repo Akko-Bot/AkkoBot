@@ -1,5 +1,5 @@
-﻿using AkkoEntities.Abstractions;
-using AkkoEntities.Extensions;
+﻿using AkkoCore.Abstractions;
+using AkkoCore.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;

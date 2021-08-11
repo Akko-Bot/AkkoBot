@@ -1,6 +1,6 @@
 ﻿using AkkoDatabase.Abstractions;
-using AkkoEntities.Common;
-using AkkoEntities.Extensions;
+using AkkoCore.Common;
+using AkkoCore.Extensions;
 using DSharpPlus.CommandsNext;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;

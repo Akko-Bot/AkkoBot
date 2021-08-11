@@ -1,5 +1,5 @@
 using AkkoBot.Services.Logging;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;

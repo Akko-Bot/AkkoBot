@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Commands.Attributes;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Localization.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

@@ -1,4 +1,4 @@
-namespace AkkoEntities.Common
+namespace AkkoCore.Common
 {
     /// <summary>
     /// Groups constants that are used across the entire project.

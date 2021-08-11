@@ -1,4 +1,4 @@
-﻿using AkkoEntities.Enums;
+﻿using AkkoCore.Enums;
 using DSharpPlus.EventArgs;
 
 namespace AkkoBot.Extensions

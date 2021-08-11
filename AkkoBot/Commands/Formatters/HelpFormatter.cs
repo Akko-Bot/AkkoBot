@@ -4,7 +4,7 @@ using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Localization.Abstractions;
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

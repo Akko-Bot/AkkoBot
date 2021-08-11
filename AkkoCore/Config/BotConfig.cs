@@ -1,12 +1,12 @@
-﻿using AkkoEntities.Abstractions;
-using AkkoEntities.Common;
-using AkkoEntities.Extensions;
+﻿using AkkoCore.Abstractions;
+using AkkoCore.Common;
+using AkkoCore.Extensions;
 using ConcurrentCollections;
 using System;
 using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
-namespace AkkoEntities.Config
+namespace AkkoCore.Config
 {
     /// <summary>
     /// Stores settings related to the bot.

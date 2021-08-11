@@ -4,7 +4,7 @@ using AkkoBot.Services.Caching.Abstractions;
 using AkkoBot.Services.Database.Queries;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;

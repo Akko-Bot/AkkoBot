@@ -1,8 +1,8 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Extensions;
-using AkkoEntities.Common;
-using AkkoEntities.Config;
-using AkkoEntities.Extensions;
+using AkkoCore.Common;
+using AkkoCore.Config;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;

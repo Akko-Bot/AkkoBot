@@ -1,4 +1,4 @@
-using AkkoEntities.Config;
+using AkkoCore.Config;
 using Microsoft.Extensions.Logging;
 
 namespace AkkoBot.Services.Logging.Abstractions

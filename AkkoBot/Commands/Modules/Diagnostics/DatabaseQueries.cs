@@ -4,7 +4,7 @@ using AkkoBot.Commands.Modules.Diagnostics.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Services;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;

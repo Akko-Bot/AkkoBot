@@ -1,4 +1,4 @@
-﻿using AkkoEntities.Extensions;
+﻿using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;

@@ -1,8 +1,8 @@
-﻿using AkkoEntities.Abstractions;
+﻿using AkkoCore.Abstractions;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 
-namespace AkkoEntities.Config
+namespace AkkoCore.Config
 {
     /// <summary>
     /// Stores data and settings related to how the bot logs command usage.

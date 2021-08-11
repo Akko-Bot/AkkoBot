@@ -4,7 +4,7 @@ using AkkoBot.Common;
 using AkkoBot.Extensions;
 using AkkoBot.Models.Serializable;
 using AkkoBot.Models.Serializable.EmbedParts;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

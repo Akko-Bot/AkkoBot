@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Common;
-using AkkoEntities.Config;
-using AkkoEntities.Config.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Config;
+using AkkoCore.Config.Abstractions;
+using AkkoCore.Extensions;
 using System;
 using System.IO;
 using YamlDotNet.Serialization;

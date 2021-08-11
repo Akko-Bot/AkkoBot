@@ -6,7 +6,7 @@ using AkkoBot.Services.Timers.Abstractions;
 using AkkoDatabase;
 using AkkoDatabase.Entities;
 using AkkoDatabase.Enums;
-using AkkoEntities.Common;
+using AkkoCore.Common;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using LinqToDB;

@@ -1,7 +1,7 @@
 ﻿using AkkoBot.Commands.Modules.Administration.Services;
 using AkkoBot.Extensions;
 using AkkoBot.Services.Events.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;

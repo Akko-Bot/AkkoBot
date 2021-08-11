@@ -3,7 +3,7 @@ using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace AkkoEntities.Extensions
+namespace AkkoCore.Extensions
 {
     public static class YamlExt
     {

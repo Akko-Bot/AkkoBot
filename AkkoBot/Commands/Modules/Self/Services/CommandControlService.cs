@@ -1,9 +1,9 @@
 ﻿using AkkoBot.Commands.Abstractions;
 using AkkoBot.Common;
 using AkkoBot.Services.Caching.Abstractions;
-using AkkoEntities.Config;
-using AkkoEntities.Config.Abstractions;
-using AkkoEntities.Extensions;
+using AkkoCore.Config;
+using AkkoCore.Config.Abstractions;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using System;
