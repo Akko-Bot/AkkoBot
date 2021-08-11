@@ -44,7 +44,7 @@ namespace AkkoEntities.Extensions
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
         public static string MaxLength(this string text, int maxLength, string append)
-            => text.Length <= maxLength
+            => (text.Length <= maxLength)
                 ? text
                 : (text.MaxLength(Math.Max(0, maxLength - append.Length)) + append)[..maxLength];
 
@@ -84,14 +84,19 @@ namespace AkkoEntities.Extensions
         /// <returns>This <see cref="string"/> converted to snake_case.</returns>
         public static string ToSnakeCase(this string text)
         {
-            var buffer = new StringBuilder(text);
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
 
-            for (var index = 1; index < buffer.Length; index++)
+            var buffer = new StringBuilder();
+
+            for (var index = 0; index < text.Length; index++)
             {
-                if (char.IsUpper(buffer[index]) && !char.IsUpper(buffer[index - 1]))
-                    buffer.Insert(index++, '_');
-            }
+                if (index != text.Length - 1 && char.IsUpper(text[index]) && !char.IsUpper(text[index + 1]) && !char.IsWhiteSpace(text[index + 1]))
+                    buffer.Append('_');
 
+                buffer.Append(char.ToLowerInvariant(text[index]));
+            }
+            
             if (buffer[0] == '_')
                 buffer.Remove(0, 1);
 
@@ -99,7 +104,7 @@ namespace AkkoEntities.Extensions
                 .Replace("_ ", "_")
                 .Replace("__", "_");
 
-            return buffer.ToString().ToLowerInvariant();
+            return buffer.ToString();
         }
 
         /// <summary>
@@ -238,28 +243,29 @@ namespace AkkoEntities.Extensions
         /// <returns>This string sanitized to an emoji name.</returns>
         public static string SanitizeEmojiName(this string text)
         {
-            var result = new StringBuilder(text.Trim(':'));
+            if (text.Length < 2)
+                return "emoji";
 
-            foreach (var character in result.ToString())
+            var result = new StringBuilder();
+
+            foreach (var character in text)
             {
-                if (char.IsPunctuation(character) && character is not '_')
-                    result.Replace(character.ToString(), string.Empty);
+                if (character is '_' || !char.IsPunctuation(character))
+                    result.Append(character);
             }
 
-            if (result.Length < 2)
-            {
-                result.Clear();
-                result.Append("emoji");
-            }
+            // Emoji names have a max length of 50 characters
+            if (result.Length > 50)
+                result.Remove(0, 50);
 
-            return result.ToString().MaxLength(50);
+            return result.ToString();
         }
 
         /// <summary>
         /// Removes punctuation and symbol characters from the beginning of this username.
         /// </summary>
         /// <param name="text">This string.</param>
-        /// <returns>A sanitized username..</returns>
+        /// <returns>A sanitized username.</returns>
         public static string SanitizeUsername(this string text)
         {
             var index = 0;

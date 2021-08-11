@@ -7,7 +7,8 @@ namespace AkkoBot.Extensions
 {
     public static class DiscordClientExt
     {
-        private static readonly PropertyInfo _messageCacheProp = typeof(DiscordClient).GetProperty("MessageCache", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly PropertyInfo _messageCacheProp = typeof(DiscordClient)
+            .GetProperty("MessageCache", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /// <summary>
         /// Gets the message cache of this client.

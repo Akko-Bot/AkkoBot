@@ -19,7 +19,7 @@ namespace AkkoBot.Commands.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var cmdCooldown = context.Services.GetService<ICommandCooldown>();
+            var cmdCooldown = context.Services.GetRequiredService<ICommandCooldown>();
 
             if (!cmdCooldown.ContainsCommand(context.Command, context.Guild))
             {

@@ -19,7 +19,7 @@ namespace AkkoBot.Commands.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var botConfig = context.Services.GetService<BotConfig>();
+            var botConfig = context.Services.GetRequiredService<BotConfig>();
             return Task.FromResult(botConfig.EnableHelp);
         }
     }

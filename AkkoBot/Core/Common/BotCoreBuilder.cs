@@ -317,7 +317,7 @@ namespace AkkoBot.Core.Common
             var cmdHandlers = await GetCommandHandlersAsync(shardedClient, services, isCaseSensitive, withDms, withMentionPrefix);
 
             // Register the events
-            var events = services.GetService<IDiscordEventManager>();
+            var events = services.GetRequiredService<IDiscordEventManager>();
             events.RegisterStartupEvents();
             events.RegisterEvents();
 
@@ -409,7 +409,7 @@ namespace AkkoBot.Core.Common
                 IgnoreExtraArguments = false,                   // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                            // Sets the dependencies used by the command modules
                 EnableDefaultHelp = false,                      // Sets whether the bot should use the default help command from the library
-                PrefixResolver = services.GetService<IPrefixResolver>().ResolvePrefixAsync   // Sets the prefix, defined by the users
+                PrefixResolver = services.GetRequiredService<IPrefixResolver>().ResolvePrefixAsync   // Sets the prefix, defined by the users
             };
 
             // Initialize the command handlers

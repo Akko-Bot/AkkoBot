@@ -4,13 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace AkkoBot.Extensions
 {
     public static class MemoryUtilsExt
     {
-        private static readonly int _pointerSize = Marshal.SizeOf<IntPtr>();
+        private static readonly int _pointerSize = Unsafe.SizeOf<IntPtr>();
         private static readonly string[] _excludedNamespaces = new string[] { "System.Reflection", "System.Threading" };
 
         //private static readonly string[] _excludedNamespaces = new string[] { "System" };
@@ -48,9 +49,8 @@ namespace AkkoBot.Extensions
             // If object is null, just return its pointer reference
             if (obj is null)
                 return _pointerSize;
-            else if (excludedTypes is null)
-                throw new ArgumentNullException(nameof(excludedTypes), $"{nameof(excludedTypes)} cannot be null.");
 
+            excludedTypes ??= Enumerable.Empty<Type>();
             var result = 0L;
             var objType = obj.GetType();
 

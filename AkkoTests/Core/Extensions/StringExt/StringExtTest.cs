@@ -80,7 +80,7 @@ namespace AkkoTests.Core.Extensions.StringExt
         [InlineData("Long Channel Name", "long channel name")]
         [InlineData("Double  space!", "double  space!")]
         [InlineData("ALL CAPS", "all caps")]
-        [InlineData("SOMECaps", "somecaps")]
+        [InlineData("SOMECaps", "some_caps")]
         [InlineData("has_Underscore", "has_underscore")]
         [InlineData("has_ Underscore", "has_underscore")]
         [InlineData("has_ underscore", "has_underscore")]

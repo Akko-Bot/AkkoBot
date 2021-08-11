@@ -44,7 +44,7 @@ namespace AkkoBot.Services
         /// <param name="id">The user ID to be checked.</param>
         /// <returns><see langword="true"/> if the user is a bot owner, <see langword="false"/> otherwise.</returns>
         public static bool IsOwner(CommandContext context, ulong id)
-            => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetService<Credentials>().OwnerIds.Contains(id);
+            => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetRequiredService<Credentials>().OwnerIds.Contains(id);
 
         /// <summary>
         /// Checks if the specified time format is valid.
@@ -107,16 +107,21 @@ namespace AkkoBot.Services
         /// </summary>
         /// <param name="abstraction">The type implemented by all classes.</param>
         /// <returns>A collection of types.</returns>
-        internal static IEnumerable<Type> GetImplementables(Type abstraction)
+        /// <exception cref="ArgumentException">Occurs when <paramref name="abstraction"/> is not an abstraction.</exception>
+        internal static IEnumerable<Type> GetConcreteTypesOf(Type abstraction)
         {
+            // TODO: add overload with namespace filtering
+            if (!abstraction.IsAbstract || !abstraction.IsInterface)
+                throw new ArgumentException("Type must be an interface or an abstract class.", nameof(abstraction));
+
             return AppDomain.CurrentDomain.GetAssemblies()          // Get all assemblies associated with the project
-                .SelectMany(assemblies => assemblies.GetTypes())    // Get all the types in those assemblies
-                .Where(types =>
-                    abstraction.IsAssignableFrom(types)             // Filter to find any concrete type that can be assigned to the specified abstraction
-                    && !types.IsInterface
-                    && !types.IsAbstract
-                    && !types.IsNested
-                    && types.Namespace.Contains("AkkoBot")
+                .SelectMany(assembly => assembly.GetTypes())        // Get all the types in those assemblies
+                .Where(type =>
+                    abstraction.IsAssignableFrom(type)              // Filter to find any concrete type that can be assigned to the specified abstraction
+                    && !type.IsInterface
+                    && !type.IsAbstract
+                    && !type.IsNested
+                    && type.Namespace.Contains("AkkoBot")
             );
         }
 
@@ -149,13 +154,13 @@ namespace AkkoBot.Services
         /// <returns>The localized message content, embed, and the message settings.</returns>
         internal static (SerializableDiscordMessage, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordMessage embed, bool isError)
         {
-            var dbCache = context.Services.GetService<IDbCache>();
-            var localizer = context.Services.GetService<ILocalizer>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : context.Services.GetService<BotConfig>();
+                : context.Services.GetRequiredService<BotConfig>();
 
             embed.Color ??= (isError) ? settings.ErrorColor : settings.OkColor;
             embed.WithLocalization(localizer, settings.Locale);

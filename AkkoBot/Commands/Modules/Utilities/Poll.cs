@@ -82,6 +82,7 @@ namespace AkkoBot.Commands.Modules.Utilities
 
         [GroupCommand, Command("status"), Aliases("check", "result")]
         [Description("cmd_poll_status")]
+        [RequireGuild]
         public async Task ShowPollStatusAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
         {
             var polls = _service.GetPolls(context.Guild);

@@ -37,12 +37,12 @@ namespace AkkoBot.Extensions
         /// <returns>The interaction between the user and the message.</returns>
         public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, SerializableDiscordMessage message, string expectedResponseKey, Func<Task> action, bool isMarked = true, bool isError = false)
         {
-            var dbCache = context.Services.GetService<IDbCache>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
 
             // Get the timeout
             var timeout = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild.InteractiveTimeout
-                : context.Services.GetService<BotConfig>().InteractiveTimeout;
+                : context.Services.GetRequiredService<BotConfig>().InteractiveTimeout;
 
             // Send the question
             var question = await context.RespondLocalizedAsync(message, isMarked, isError);
@@ -123,24 +123,14 @@ namespace AkkoBot.Extensions
         /// <returns>A formatted and localized response string.</returns>
         public static string FormatLocalized(this CommandContext context, string key, params object[] args)
         {
-            var dbCache = context.Services.GetService<IDbCache>();
-            var localizer = context.Services.GetService<ILocalizer>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
 
             var locale = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild.Locale
-                : context.Services.GetService<BotConfig>().Locale;
+                : context.Services.GetRequiredService<BotConfig>().Locale;
 
-            for (var index = 0; index < args.Length; index++)
-            {
-                if (args[index] is string arg)
-                    args[index] = localizer.GetResponseString(locale, arg);
-                else if (args[index] is null)
-                    args[index] = string.Empty;
-            }
-
-            key = localizer.GetResponseString(locale, key);
-
-            return string.Format(key, args);
+            return localizer.FormatLocalized(locale, key, args);
         }
 
         /// <summary>
@@ -165,12 +155,12 @@ namespace AkkoBot.Extensions
                 return;
             }
 
-            var dbCache = context.Services.GetService<IDbCache>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : context.Services.GetService<BotConfig>();
+                : context.Services.GetRequiredService<BotConfig>();
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPages(input, message, maxLength)
@@ -198,12 +188,12 @@ namespace AkkoBot.Extensions
                 return;
             }
 
-            var dbCache = context.Services.GetService<IDbCache>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : context.Services.GetService<BotConfig>();
+                : context.Services.GetRequiredService<BotConfig>();
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPagesByFields(message, maxFields)
@@ -213,7 +203,7 @@ namespace AkkoBot.Extensions
                 context.User,
                 pages,
                 AkkoStatics.PaginationButtons,
-                token: new CancellationTokenSource(settings.InteractiveTimeout ?? context.Services.GetService<BotConfig>().InteractiveTimeout ?? TimeSpan.FromSeconds(30)).Token
+                token: new CancellationTokenSource(settings.InteractiveTimeout ?? context.Services.GetRequiredService<BotConfig>().InteractiveTimeout ?? TimeSpan.FromSeconds(30)).Token
             );
         }
 
@@ -242,12 +232,12 @@ namespace AkkoBot.Extensions
             else if (maxFields > 25)
                 throw new ArgumentException("Embeds cannot have more than 25 fields.", nameof(maxFields));
 
-            var dbCache = context.Services.GetService<IDbCache>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
 
             // Get the message settings (guild or dm)
             IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
                 ? dbGuild
-                : context.Services.GetService<BotConfig>();
+                : context.Services.GetRequiredService<BotConfig>();
 
             var pages = (settings.UseEmbed)
                 ? context.GenerateLocalizedPagesByFields(message, fields, maxFields)
@@ -257,7 +247,7 @@ namespace AkkoBot.Extensions
                 context.User,
                 pages,
                 AkkoStatics.PaginationButtons,
-                token: new CancellationTokenSource(settings.InteractiveTimeout ?? context.Services.GetService<BotConfig>().InteractiveTimeout ?? TimeSpan.FromSeconds(30)).Token
+                token: new CancellationTokenSource(settings.InteractiveTimeout ?? context.Services.GetRequiredService<BotConfig>().InteractiveTimeout ?? TimeSpan.FromSeconds(30)).Token
             );
         }
 
@@ -272,8 +262,7 @@ namespace AkkoBot.Extensions
         /// <returns>A collection of paginable embeds.</returns>
         private static IEnumerable<Page> GenerateLocalizedPagesByFields(this CommandContext context, SerializableDiscordMessage message, IEnumerable<SerializableEmbedField> fields, int maxFields)
         {
-            var localizer = context.Services.GetService<ILocalizer>();
-
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
             var result = new List<Page>();
             var serializableFields = fields.ToArray();
 
@@ -306,8 +295,8 @@ namespace AkkoBot.Extensions
         public static string GetLocaleKey(this CommandContext context)
         {
             return (context.Guild is null)
-                ? context.Services.GetService<BotConfig>().BotPrefix
-                : context.Services.GetService<IDbCache>().Guilds[context.Guild.Id].Prefix;
+                ? context.Services.GetRequiredService<BotConfig>().BotPrefix
+                : context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].Prefix;
         }
 
         /// <summary>
@@ -320,7 +309,7 @@ namespace AkkoBot.Extensions
             if (context.Guild is null)
                 return TimeZoneInfo.Local;
 
-            var dbCache = context.Services.GetService<IDbCache>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
             return GeneralService.GetTimeZone(dbCache.Guilds[context.Guild.Id].Timezone, true);
         }
 
@@ -335,7 +324,7 @@ namespace AkkoBot.Extensions
         /// <returns>A collection of paginable embeds.</returns>
         private static IEnumerable<Page> GenerateLocalizedPages(this CommandContext context, string input, SerializableDiscordMessage message, int maxLength)
         {
-            var localizer = context.Services.GetService<ILocalizer>();
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
             var amount = input.Length / maxLength;
             var inputLength = input.Length;
 
@@ -370,7 +359,7 @@ namespace AkkoBot.Extensions
         /// <returns>A collection of paginable embeds.</returns>
         private static IEnumerable<Page> GenerateLocalizedPagesByFields(this CommandContext context, SerializableDiscordMessage message, int maxFields)
         {
-            var localizer = context.Services.GetService<ILocalizer>();
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
 
             var result = new List<Page>();
             var splitFields = message.Fields.SplitInto(maxFields).ToArray();

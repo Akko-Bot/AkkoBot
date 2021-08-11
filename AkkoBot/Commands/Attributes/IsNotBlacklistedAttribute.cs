@@ -19,7 +19,7 @@ namespace AkkoBot.Commands.Attributes
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var dbCache = context.Services.GetService<IDbCache>();
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
 
             return Task.FromResult(
                 !dbCache.Blacklist.Contains(context.Channel.Id)

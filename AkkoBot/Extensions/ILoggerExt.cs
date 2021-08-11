@@ -10,6 +10,8 @@ namespace AkkoBot.Extensions
 {
     public static class ILoggerExt
     {
+        private static readonly EventId _commandEvent = new(LoggerEvents.Misc.Id, "Command");
+
         /// <summary>
         /// Logs command execution to the console.
         /// </summary>
@@ -20,11 +22,11 @@ namespace AkkoBot.Extensions
         /// <param name="exception">The excetion that occurred during command execution.</param>
         public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = "", Exception exception = null)
         {
-            var logConfig = context.Services.GetService<LogConfig>();
+            var logConfig = context.Services.GetRequiredService<LogConfig>();
 
             logger.Log(
                 level,
-                new EventId(LoggerEvents.Misc.Id, "Command"),
+                _commandEvent,
                 new LogData(context, message),
                 exception,
                 LogStrategy.GetLogStrategy(logConfig.LogFormat)

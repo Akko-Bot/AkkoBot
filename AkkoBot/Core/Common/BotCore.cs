@@ -42,7 +42,7 @@ namespace AkkoBot.Core.Common
         private void RegisterCommandModules()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var converters = GeneralService.GetImplementables(typeof(IArgumentConverter));
+            var converters = GeneralService.GetConcreteTypesOf(typeof(IArgumentConverter));
             var cogs = GeneralService.GetCogs();
 
             // Loop through the list of selected assemblies and register
