@@ -79,10 +79,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
             var result = _botConfig.DisabledCommands.TryRemove(cmd.QualifiedName);
 
             // Register the command - Reflection is needed because CommandsNextExtension doesn't have a sane registration method for commands that are already built
-            var registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
-
             foreach (var cmdHandler in (await _clients.GetCommandsNextAsync()).Values)
-                registrationMethod?.Invoke(cmdHandler, new object[] { cmd });
+                _registrationMethod?.Invoke(cmdHandler, new object[] { cmd });
 
             _configLoader.SaveConfig(_botConfig, AkkoEnvironment.BotConfigPath);
 

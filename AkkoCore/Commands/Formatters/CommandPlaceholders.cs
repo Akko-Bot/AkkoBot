@@ -32,13 +32,13 @@ namespace AkkoCore.Commands.Formatters
             ["bot.creationdate"] = (context) => context.Client.CurrentUser.CreationTimestamp,
             ["bot.avatar"] = (context) => context.Client.CurrentUser.AvatarUrl,
             ["bot.status"] = (context) => context.Client.CurrentUser.Presence.Status,
-            ["bot.prefix"] = (context) => context.Services.GetService<BotConfig>().BotPrefix,
+            ["bot.prefix"] = (context) => context.Services.GetRequiredService<BotConfig>().BotPrefix,
             ["bot.latency"] = (context) => context.Client.Ping,
             ["bot.shard"] = (context) => context.Client.ShardId,
             ["bot.shardcount"] = (context) => context.Client.ShardCount,
             ["bot.servercount"] = (context) => context.Client.Guilds.Count,
-            ["bot.servertotal"] = (context) => context.CommandsNext.Services.GetService<DiscordShardedClient>().ShardClients.Values.Sum(client => client.Guilds.Count),
-            ["bot.usercount"] = (context) => context.CommandsNext.Services.GetService<DiscordShardedClient>().ShardClients.Values.Sum(client => client.Guilds.Values.Sum(server => server.MemberCount)),
+            ["bot.servertotal"] = (context) => context.CommandsNext.Services.GetRequiredService<DiscordShardedClient>().ShardClients.Values.Sum(client => client.Guilds.Count),
+            ["bot.usercount"] = (context) => context.CommandsNext.Services.GetRequiredService<DiscordShardedClient>().ShardClients.Values.Sum(client => client.Guilds.Values.Sum(server => server.MemberCount)),
 
             /* Server Placeholders */
 
@@ -95,7 +95,7 @@ namespace AkkoCore.Commands.Formatters
 
             /* Miscelaneous */
 
-            ["rng"] = (context) => context.Services.GetService<Random>().Next(),
+            ["rng"] = (context) => context.Services.GetRequiredService<Random>().Next(),
             ["cmd.argument"] = (context) => context.RawArgumentString,
 
             /* Ban Template Placeholders - Only works on ban templates */
@@ -205,14 +205,14 @@ namespace AkkoCore.Commands.Formatters
                 if (x > y)
                     (x, y) = (y, x);
 
-                return context.Services.GetService<Random>().Next(x, y);
+                return context.Services.GetRequiredService<Random>().Next(x, y);
             },
 
             ["choose"] = (context, parameter) =>
             {
                 return (parameter is not string[] arguments || arguments.Length == 0)
                     ? null
-                    : arguments[context.Services.GetService<Random>().Next(0, arguments.Length)].Trim();
+                    : arguments[context.Services.GetRequiredService<Random>().Next(0, arguments.Length)].Trim();
             },
 
             ["cmd.argument"] = (context, parameter) =>

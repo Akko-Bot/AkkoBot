@@ -15,7 +15,7 @@ namespace AkkoCore.Commands.ArgumentConverters
             if (!ulong.TryParse(input, out var sid))
                 return Task.FromResult(Optional.FromNoValue<DiscordGuild>());
 
-            var clients = ctx.Services.GetService<DiscordShardedClient>();
+            var clients = ctx.Services.GetRequiredService<DiscordShardedClient>();
             var server = clients.ShardClients.Values.SelectMany(client => client.Guilds.Values).FirstOrDefault(server => server.Id == sid);
 
             return (server is null)

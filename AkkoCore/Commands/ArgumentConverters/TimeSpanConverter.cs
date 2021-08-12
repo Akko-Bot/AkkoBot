@@ -43,7 +43,7 @@ namespace AkkoCore.Commands.ArgumentConverters
                     continue;
 
                 var type = (groupValue.EndsWith("mo")) ? "mo" : groupValue[(groupValue.Length - 1)..];
-                int.TryParse(groupValue[..(groupValue.Length - 1)], NumberStyles.Integer, CultureInfo.InvariantCulture, out var number);
+                int.TryParse(groupValue.AsSpan()[..(groupValue.Length - 1)], NumberStyles.Integer, CultureInfo.InvariantCulture, out var number);
 
                 var toAdd = type switch
                 {

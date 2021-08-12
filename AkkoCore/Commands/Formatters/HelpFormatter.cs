@@ -99,9 +99,10 @@ namespace AkkoCore.Commands.Formatters
             }
 
             if (stringBuilder.Length is not 0)
+            {
                 _helpMessage.AddField("requires", stringBuilder.ToString());
-
-            stringBuilder.Clear();
+                stringBuilder.Clear();
+            }
 
             // If this is a group, there are no arguments to be shown
             if (cmd is CommandGroup)
@@ -124,12 +125,10 @@ namespace AkkoCore.Commands.Formatters
                 }
 
                 // Format full command name + <arguments>
-                stringBuilder.Append($"`{context.Prefix}{cmd.QualifiedName}");
+                stringBuilder.Append(context.Prefix + cmd.QualifiedName);
 
                 foreach (var argument in overload.Arguments)
-                {
                     stringBuilder.Append($" <{argument.Name}>");
-                }
 
                 stringBuilder.AppendLine("`");
 

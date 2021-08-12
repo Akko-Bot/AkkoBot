@@ -102,7 +102,7 @@ namespace AkkoCore.Services
         }
 
         /// <summary>
-        /// Gets a collection of all concrete classes of the specified type in the AkkoBot namespace.
+        /// Gets a collection of all concrete classes of the specified type in the current calling assembly.
         /// </summary>
         /// <param name="abstraction">The type implemented by all classes.</param>
         /// <returns>A collection of types.</returns>

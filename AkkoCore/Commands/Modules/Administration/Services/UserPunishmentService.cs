@@ -75,9 +75,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             return (_utilitiesService.DeserializeEmbed(template, out var message) || message is not null)
                 ? await user.SendMessageSafelyAsync(message)                                    // Send database ban notification
-                : string.IsNullOrWhiteSpace(template)                                   // If template is not serializable
-                    ? await SendPunishmentDmAsync(context, user, "ban_notification", reason)        // Send default ban notification
-                    : await user.SendMessageSafelyAsync(template);                          // Send database ban notification (no embed)
+                : string.IsNullOrWhiteSpace(template)                                           // If template is not serializable
+                    ? await SendPunishmentDmAsync(context, user, "ban_notification", reason)    // Send default ban notification
+                    : await user.SendMessageSafelyAsync(template);                              // Send database ban notification (no embed)
         }
 
         /// <summary>

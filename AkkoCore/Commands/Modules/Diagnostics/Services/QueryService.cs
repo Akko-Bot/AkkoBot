@@ -35,8 +35,7 @@ namespace AkkoCore.Commands.Modules.Diagnostics.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            var clock = new Stopwatch();
-            clock.Start();
+            var clock = Stopwatch.StartNew();
             var rows = await db.Database.ExecuteSqlRawAsync(query);
             clock.Stop();
 
@@ -63,8 +62,7 @@ namespace AkkoCore.Commands.Modules.Diagnostics.Services
             using var command = connection.CreateCommand();
             command.CommandText = query;
 
-            var clock = new Stopwatch();
-            clock.Start();  // Start counting query execution time.
+            var clock = Stopwatch.StartNew();   // Start counting query execution time.
             using var reader = await command.ExecuteReaderAsync();
 
             // Get the column names

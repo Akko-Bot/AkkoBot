@@ -202,7 +202,7 @@ namespace AkkoCore.Core.Common
         /// <typeparam name="T">The abstraction implemented by <paramref name="implementation"/>.</typeparam>
         /// <param name="implementation">The service implementation.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithSingletonService<T>(object implementation)
+        public BotCoreBuilder WithSingletonService<T>(T implementation)
         {
             _cmdServices.AddSingleton(typeof(T), implementation);
             return this;
@@ -353,7 +353,6 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton(_creds),
                 ServiceDescriptor.Singleton(_botConfig),
                 ServiceDescriptor.Singleton(_logConfig),
-                //ServiceDescriptor.Singleton<IBotLifetime, BotLifetime>(),
 
                 // > Caching
                 ServiceDescriptor.Singleton<IDbCache, AkkoDbCache>(),

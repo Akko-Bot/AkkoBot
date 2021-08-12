@@ -45,7 +45,7 @@ namespace AkkoCore.Core
             // Initialize bot configuration
             _botCore = await new BotCoreBuilder(creds, botConfig, logConfig)
                 .WithSingletonService<IConfigLoader>(configLoader)
-                .WithSingletonService<IBotLifetime>(_lifetime)
+                .WithSingletonService(_lifetime)
                 .WithDefaultLogging()
                 .WithDefaultServices()
                 .WithDefaultDbContext()

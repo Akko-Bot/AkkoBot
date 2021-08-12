@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace AkkoBot
 {
-    public class Program
+    internal class Program
     {
         private static bool _restartBot = true;
         private static CancellationTokenSource _shutdownToken;
