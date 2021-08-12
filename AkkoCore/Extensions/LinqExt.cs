@@ -272,7 +272,7 @@ namespace AkkoCore.Extensions
                 result[index].Add(element);
 
                 if (++count != collectionCount && result[index].Count >= amount && ++index <= collectionCount - 1)
-                    result.Add(new List<T>(Math.Min(amount, collectionCount - amount * index)));
+                    result.Add(new List<T>(Math.Min(amount, collectionCount - (amount * index))));
             }
 
             return result;

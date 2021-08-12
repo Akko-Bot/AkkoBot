@@ -1,4 +1,4 @@
-﻿using AkkoBot.Core;
+﻿using AkkoCore.Core;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
 using LinqToDB.Mapping;
@@ -9,8 +9,8 @@ namespace AkkoBot
 {
     public class Program
     {
-        public static bool RestartBot { get; internal set; } = true;
-        public static CancellationTokenSource ShutdownToken { get; private set; }
+        private static bool _restartBot = true;
+        private static CancellationTokenSource _shutdownToken;
 
         // Entry point.
         private static void Main()
@@ -22,17 +22,17 @@ namespace AkkoBot
             Console.WriteLine($"Pid: {Environment.ProcessId}");
 
             // Start the bot.
-            while (RestartBot)
+            while (_restartBot)
             {
-                ShutdownToken = new();
-                var bot = new Bot(ShutdownToken.Token);
+                _shutdownToken = new();
+                var bot = new Bot(_shutdownToken);
 
                 // Run the bot
-                bot.RunAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                _restartBot = bot.RunAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
                 // Clean-up
                 bot.Dispose();
-                ShutdownToken.Dispose();
+                _shutdownToken.Dispose();
             }
         }
     }

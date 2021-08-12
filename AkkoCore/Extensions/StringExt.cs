@@ -96,7 +96,7 @@ namespace AkkoCore.Extensions
 
                 buffer.Append(char.ToLowerInvariant(text[index]));
             }
-            
+
             if (buffer[0] == '_')
                 buffer.Remove(0, 1);
 
