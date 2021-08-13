@@ -117,7 +117,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                     // Have to use .Bold for the IDs because .InlineCode misaligns the embed fields
                     embed.AddField("message", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + x.Content.Replace("\n", string.Empty).MaxLength(50, "[...]")).ToArray()), true)
                         .AddField("channel", string.Join("\n", group.Select(x => (x.IsPrivate) ? "private" : $"<#{x.ChannelId}>").ToArray()), true)
-                        .AddField("triggers_in", string.Join("\n", group.Select(x => x.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m")).ToArray()), true);
+                        .AddField("triggers_in", string.Join("\n", group.Select(x => DateTimeOffset.Now.Add(x.ElapseIn).ToDiscordTimestamp(DiscordTimestamp.RelativeTime)).ToArray()), true);
                 }
 
                 await context.RespondPaginatedByFieldsAsync(embed, 3);

@@ -90,8 +90,8 @@ namespace AkkoCore.Services.Localization
         /// <returns>The locale of the response string's file, <see langword="null"/> if no match occured.</returns>
         private string GetFileLocale(string filePath)
         {
-            var match = _localeRegex.Match(filePath).Groups.Values.LastOrDefault();
-            return match?.Value;
+            var group = _localeRegex.Match(filePath).Groups.Values.LastOrDefault();
+            return group?.Value;
         }
 
         /// <summary>

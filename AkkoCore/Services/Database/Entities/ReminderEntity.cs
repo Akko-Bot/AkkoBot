@@ -4,6 +4,7 @@ using AkkoCore.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AkkoCore.Services.Database.Entities
 {
@@ -62,5 +63,13 @@ namespace AkkoCore.Services.Database.Entities
         /// The time and date this reminder should be sent.
         /// </summary>
         public DateTimeOffset ElapseAt { get; init; }
+
+        /// <summary>
+        /// How long until this reminder is triggered.
+        /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
+        [NotMapped]
+        public TimeSpan ElapseIn
+            => ElapseAt.Subtract(DateTimeOffset.Now);
     }
 }

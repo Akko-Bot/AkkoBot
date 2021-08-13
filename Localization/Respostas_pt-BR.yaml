@@ -166,7 +166,8 @@ cmd_autoslowmode_ignoreclear: Remove todos os IDs ignorados para o modo lento au
 cmd_autoslowmode_list: Exibe as configurações do modo lento automático nesse servidor.
 cmd_autoslowmode_set: Ativa o modo lento automático no servidor. Quando um usuário enviar uma certa quantidade de mensagens num espaço de tempo, o modo lento será automaticamente ativado no canal onde as mensagens foram enviadas. Usuários com permissão para GerenciarMensagens ou GerenciarCanais não ativam o modo lento. Canais onde o modo lento já está ativado não são afetados. Forneça nenhum parâmetro para desativar.
 cmd_ban: Bane um usuário.
-cmd_bantemplate: Define o modelo de notificação de banimento a ser enviado a usuários que forem banidos do servidor. Forneça nenhum parâmetro para utilizar a notificação de banimento padrão.
+cmd_bantemplate: Define o modelo de notificação de banimento a ser enviado a usuários que forem banidos do servidor. Forneça nenhum parâmetro para receber a notificação de banimento em mensagem direta.
+cmd_bantemplateclear: Define a notificação de banimento para o valor padrão.
 cmd_bl_addmany: Adiciona múltiplos IDs à lista negra.
 cmd_bl_check: Checa se o ID especificado está na lista negra.
 cmd_bl_removemany: Remove múltiplos IDs da lista negra.

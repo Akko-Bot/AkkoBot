@@ -28,8 +28,7 @@ namespace AkkoCore.Services.Logging
 
         public void CacheLogging(string logEntry)
         {
-            var encodedEntry = Encoding.UTF8.GetBytes(logEntry);
-            _logStream.Write(encodedEntry);
+            _logStream.Write(Encoding.UTF8.GetBytes(logEntry));
 
             if (_logStream.Length / _mb > FileSizeLimitMB || DateTimeOffset.Now.Subtract(_time) > TimeSpan.FromDays(1))
                 DumpToFile();

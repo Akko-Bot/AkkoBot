@@ -1,6 +1,8 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Administration.Services;
+using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services;
@@ -21,9 +23,13 @@ namespace AkkoCore.Commands.Modules.Administration
     public class GuildConfig : AkkoCommandModule
     {
         private readonly GuildConfigService _service;
+        private readonly UserPunishmentService _punishService;
 
-        public GuildConfig(GuildConfigService service)
-            => _service = service;
+        public GuildConfig(GuildConfigService service, UserPunishmentService punishService)
+        {
+            _service = service;
+            _punishService = punishService;
+        }
 
         [Command("embed")]
         [Description("cmd_guild_embed")]
@@ -165,16 +171,33 @@ namespace AkkoCore.Commands.Modules.Administration
         [Command("bantemplate")]
         [Description("cmd_bantemplate")]
         [RequireUserPermissions(Permissions.BanMembers)]
+        [RequireBotPermissions(Permissions.AddReactions)]
         public async Task SetBanTemplateAsync(CommandContext context, [RemainingText, Description("arg_bantemplate")] string banTemplate = "")
         {
+            if (string.IsNullOrWhiteSpace(banTemplate))
+            {
+                var message = await _punishService.SendBanDmAsync(context, context.Member, "reason");
+                await context.Message.CreateReactionAsync((message is not null) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
+
+                return;
+            }
+
             var result = await _service.SetPropertyAsync(context.Guild, x => x.BanTemplate = banTemplate);
 
             var embed = new SerializableDiscordMessage()
-                .WithDescription(
-                    (string.IsNullOrWhiteSpace(result))
-                        ? "bantemplate_reset"
-                        : context.FormatLocalized("bantemplate_set", Formatter.InlineCode(result))
-                );
+                .WithDescription(context.FormatLocalized("bantemplate_set", Formatter.InlineCode(result)));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("bantemplateclear")]
+        [Description("cmd_bantemplateclear")]
+        public async Task ClearBanTemplateAsync(CommandContext context)
+        {
+            await _service.SetPropertyAsync(context.Guild, x => x.BanTemplate = default);
+
+            var embed = new SerializableDiscordMessage()
+                .WithDescription("bantemplate_reset");
 
             await context.RespondLocalizedAsync(embed);
         }

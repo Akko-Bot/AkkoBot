@@ -125,7 +125,7 @@ namespace AkkoCore.Commands.Formatters
                 }
 
                 // Format full command name + <arguments>
-                stringBuilder.Append(context.Prefix + cmd.QualifiedName);
+                stringBuilder.Append('`' + context.Prefix + cmd.QualifiedName);
 
                 foreach (var argument in overload.Arguments)
                     stringBuilder.Append($" <{argument.Name}>");

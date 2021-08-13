@@ -263,7 +263,7 @@ namespace AkkoCore.Core.Common
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultDbContext()
         {
-            var assemblyName = Assembly.GetExecutingAssembly().FullName;
+            var assemblyName = Assembly.GetEntryAssembly().FullName;
 
             // Apply pending database migrations
             using var dbContext = new AkkoDbContext(

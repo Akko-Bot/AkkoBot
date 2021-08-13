@@ -53,8 +53,16 @@ namespace AkkoCore.Extensions
             if (content is null && embed is null)
                 return null;
 
-            try { return await member.SendMessageAsync(content, embed); }
-            catch { return null; }
+            try
+            {
+                return (embed is null)
+                    ? await member.SendMessageAsync(content)
+                    : await member.SendMessageAsync(content, embed);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

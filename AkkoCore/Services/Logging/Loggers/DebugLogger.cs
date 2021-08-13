@@ -51,6 +51,7 @@ namespace AkkoCore.Services.Logging.Loggers
                     _fileLogger.CacheLogging(log);
 
                 Console.ResetColor();
+                logBuilder.Clear();
             }
         }
 

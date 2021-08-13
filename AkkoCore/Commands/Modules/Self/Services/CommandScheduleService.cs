@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -184,7 +185,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
                 case AutoCommandType.Scheduled:
                 case AutoCommandType.Repeated:
                     _akkoCache.Timers.TryGetValue(dbEntry.TimerIdFK.Value, out var timer);
-                    return timer.ElapseAt.Subtract(DateTimeOffset.Now).ToString(@"%d\d\ %h\h\ %m\m");
+                    return DateTimeOffset.Now.Add(timer.ElapseIn).ToDiscordTimestamp(DiscordTimestamp.RelativeTime);
 
                 default:
                     throw new NotImplementedException($"Command of type {dbEntry.Type} has not been implemented.");

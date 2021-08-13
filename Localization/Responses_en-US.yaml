@@ -166,7 +166,8 @@ cmd_autoslowmode_ignoreclear: Removes all ignored IDs for the automatic slow mod
 cmd_autoslowmode_list: Lists the settings for the automatic slow mode on this server.
 cmd_autoslowmode_set: Enables automatic slowmode for the server. When a user sends a certain amount of messages within the specified time frame, slow mode will be automatically enabled in the channel the messages were sent. Users with permission to ManageMessages or ManageChannels will not trigger the slow mode. Channels that already have slow mode enabled are unaffected. Provide no parameter to disable.
 cmd_ban: Bans a user.
-cmd_bantemplate: Sets a customized notification message to be sent to users when they are banned from the server. Provide no parameter to use the default ban notification message.
+cmd_bantemplate: Sets a customized notification message to be sent to users when they are banned from the server. Provide no parameter to receive the current ban template in direct message.
+cmd_bantemplateclear: Sets the notification message for banned users to the default.
 cmd_bl_addmany: Adds multiple IDs to the blacklist.
 cmd_bl_check: Checks if the specified ID is blacklisted.
 cmd_bl_removemany: Removes multiple IDs from the blacklist.
