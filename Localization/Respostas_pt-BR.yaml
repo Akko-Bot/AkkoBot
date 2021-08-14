@@ -109,6 +109,7 @@ arg_warnp_time: Por quanto tempo a punição deve durar. Deixe em branco para to
 arg_warnp_type: O tipo de punição a ser aplicada.
 arg_webhook_name: O nome do webhook.
 arg_webhooklogname: O nome padrão dos webhooks.
+attachment: Anexo
 author: Autor
 author_mention: Menção do Autor
 auto_punish: Punição | {0} | {1}
@@ -244,6 +245,7 @@ cmd_fc_img: Ativa ou desativa a exclusão automática de qualquer mensagem que n
 cmd_fc_invite: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha um convite de servidor no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_list: Exibe todos os filtros de conteúdo ativos nesse servidor.
 cmd_fc_remove: Remove um filtro de conteúdo.
+cmd_fc_sticker: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha uma figurinha no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fc_url: Ativa ou desativa a exclusão automática de qualquer mensagem que não contenha uma URL no canal especificado. Forneça nenhum parâmetro para ativar ou desativar a exclusão no canal atual.
 cmd_fw: Agrupa comandos que filtram palavras indesejáveis do servidor.
 cmd_fw_add: Adiciona uma palavra ao filtro de palavras. Mensagens que contenham qualquer palavra proibida serão automaticamente excluídas. O filtro ignora caixa alta. Utilize asterisco `*` ao final de uma palavra para filtrar qualquer palavra que inicie com a palavra especificada, no início para filtrar qualquer palavra que termine com a palavra especificada ou ambos para filtrar qualquer palavra que contenha a palavra especificada. Utilize nenhum asterisco para filtrar palavras exatas.
@@ -440,6 +442,7 @@ fc_command_toggle: O filtro de comandos foi {0} no canal {1}.
 fc_img_toggle: O filtro de imagens foi {0} no canal {1}.
 fc_invite_toggle: O filtro de convites foi {0} no canal {1}.
 fc_list_empty: Não há filtros de conteúdo ativos nesse servidor.
+fc_sticker_toggle: Filtro de figurinha foi {0} em {0}.
 fc_url_toggle: O filtro de URL foi {0} no canal {1}.
 features: Recursos
 filter_invites: convites
@@ -501,6 +504,7 @@ ignored_ids_add: '{0} IDs foram adicionados à lista de IDs ignorados.'
 ignored_ids_empty: Não há IDs ignorados.
 ignored_ids_list: Lista de IDs ignorados.
 ignored_ids_remove: '{0} IDs foram removidos da lista de IDs ignorados.'
+image: Imagem
 info: Info
 infraction: Infração
 infractions_empty: Esse usuário não possui infrações.
@@ -509,15 +513,12 @@ infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
 interval: Intervalo
 invalid_color: O código de cor especificado é inválido.
+invite: Convite
 invite_check_title: Convite de servidor
 invite_list_title: Lista de convites do servidor
 invite_not_found: Convite não encontrado.
 invite_temporary: É temporário
 is_active: Está Ativo
-is_attachment_only: Anexos
-is_command_only: Comandos
-is_image_only: Imagens
-is_invite_only: Convites
 is_mod: É Moderador
 is_not_active: Não Está Ativo
 is_url_only: URLs
@@ -701,6 +702,7 @@ softban_enum: expulso
 sqlexec_success: Instrução executada com sucesso em {0} ms. {1} linhas alteradas.
 sqlselect_title: Instrução executada com sucesso em {0} ms. {1} linhas retornadas.
 stayed_for: Permaneceu por
+sticker: Figurinha
 store: Loja
 text: Texto
 time_difference: Diferença de tempo
@@ -728,6 +730,7 @@ unwarn_all: Todas as advertências do usuário {0} foram removidas.
 unwarn_failure: A infração de ID {0} não foi encontrada.
 unwarn_success: A advertência número {0} do usuário {1} foi removida.
 uptime: Tempo Online
+url: URL
 usage: Uso
 used: Utilizado
 user: Usuário

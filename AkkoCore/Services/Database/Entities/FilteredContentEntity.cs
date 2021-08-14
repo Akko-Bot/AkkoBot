@@ -1,9 +1,7 @@
-﻿using AkkoCore.Extensions;
-using AkkoCore.Services.Database.Abstractions;
+﻿using AkkoCore.Services.Database.Abstractions;
+using AkkoCore.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace AkkoCore.Services.Database.Entities
 {
@@ -29,37 +27,9 @@ namespace AkkoCore.Services.Database.Entities
         public ulong ChannelId { get; init; }
 
         /// <summary>
-        /// Determines whether only messages with attachments are allowed.
+        /// Contains the type of content for which this filter is active.
         /// </summary>
-        public bool IsAttachmentOnly { get; set; }
-
-        /// <summary>
-        /// Determines whether only messages with images are allowed.
-        /// </summary>
-        public bool IsImageOnly { get; set; }
-
-        /// <summary>
-        /// Determines whether only messages with URLs are allowed.
-        /// </summary>
-        public bool IsUrlOnly { get; set; }
-
-        /// <summary>
-        /// Determines whether only messages with server invites are allowed.
-        /// </summary>
-        public bool IsInviteOnly { get; set; }
-
-        /// <summary>
-        /// Determines whether only messages with valid commands are allowed.
-        /// </summary>
-        public bool IsCommandOnly { get; set; }
-
-        /// <summary>
-        /// Gets the name of all currently active content filters.
-        /// </summary>
-        /// <remarks>This property is not mapped.</remarks>
-        [NotMapped]
-        public IEnumerable<string> ActiveFilters
-            => Filters.Where(x => x.Value).Select(x => x.Key);
+        public ContentFilter ContentType { get; set; }
 
         /// <summary>
         /// Checks whether this filter is active.
@@ -68,21 +38,6 @@ namespace AkkoCore.Services.Database.Entities
         /// <value><see langword="true"/> if active, <see langword="false"/> otherwise.</value>
         [NotMapped]
         public bool IsActive
-            => IsAttachmentOnly || IsImageOnly || IsUrlOnly || IsInviteOnly || IsCommandOnly;
-
-        /// <summary>
-        /// Gets the content filters and the value they are currently set to.
-        /// </summary>
-        /// <remarks> This property is not mapped.</remarks>
-        /// <value>The filters' name and their corresponding value.</value>
-        [NotMapped]
-        public IReadOnlyDictionary<string, bool> Filters => new Dictionary<string, bool>()
-        {
-            [nameof(IsAttachmentOnly).ToSnakeCase()] = IsAttachmentOnly,
-            [nameof(IsImageOnly).ToSnakeCase()] = IsImageOnly,
-            [nameof(IsUrlOnly).ToSnakeCase()] = IsUrlOnly,
-            [nameof(IsInviteOnly).ToSnakeCase()] = IsInviteOnly,
-            [nameof(IsCommandOnly).ToSnakeCase()] = IsCommandOnly
-        };
+            => ContentType is not ContentFilter.None;
     }
 }

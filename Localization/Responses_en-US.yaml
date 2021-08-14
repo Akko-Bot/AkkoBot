@@ -109,6 +109,7 @@ arg_warnp_time: For how long the punishment should last. Leave it empty to make 
 arg_warnp_type: The type of punishment to be applied.
 arg_webhook_name: The name of the webhook.
 arg_webhooklogname: The default name for the webhooks.
+attachment: Attachment
 author: Author
 author_mention: Author mention
 auto_punish: Punishment | {0} | {1}
@@ -244,6 +245,7 @@ cmd_fc_img: Toggles deletion of any message that doesn't contain an image in the
 cmd_fc_invite: Toggles deletion of any message that doesn't contain a server invite in the specified channel. Provide no parameter to toggle deletion in the current channel.
 cmd_fc_list: Lists all content filters currently active in this server.
 cmd_fc_remove: Removes a content filter.
+cmd_fc_sticker: Toggles deletion of any message that doesn't contain a sticker in the specified channel. Provide no parameter to toggle deletion in the current channel.
 cmd_fc_url: Toggles deletion of any message that doesn't contain a URL in the specified channel. Provide no parameter to toggle deletion in the current channel.
 cmd_fw: Groups commands that filter out undesirable words from the server.
 cmd_fw_add: Adds a word to the word filter. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the beginning to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
@@ -440,6 +442,7 @@ fc_command_toggle: Command filter has been {0} on {1}.
 fc_img_toggle: Image filter has been {0} on {1}.
 fc_invite_toggle: Invite filter has been {0} on {1}.
 fc_list_empty: There are no content filters active in this server.
+fc_sticker_toggle: Sticker filter has been {0} on {1}.
 fc_url_toggle: URL filter has been {0} on {1}.
 features: Features
 filter_invites: invites
@@ -501,6 +504,7 @@ ignored_ids_add: Added {0} IDs to the list of ignored IDs.
 ignored_ids_empty: There is no ignored ID.
 ignored_ids_list: List of ignored IDs.
 ignored_ids_remove: Removed {0} IDs from the list of ignored IDs.
+image: Image
 info: Info
 infraction: Infraction
 infractions_empty: There are no infractions to show.
@@ -509,15 +513,12 @@ infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
 interval: Interval
 invalid_color: The specified color code is invalid.
+invite: Invite
 invite_check_title: Server invite
 invite_list_title: List of server invites
 invite_not_found: Invite not found.
 invite_temporary: Is temporary
 is_active: Is Active
-is_attachment_only: Attachments
-is_command_only: Commands
-is_image_only: Images
-is_invite_only: Invites
 is_mod: Is a Moderator
 is_not_active: Is Not Active
 is_url_only: URLs
@@ -701,6 +702,7 @@ softban_enum: soft-banned
 sqlexec_success: Query successfully run in {0} ms. {1} rows affected.
 sqlselect_title: Query successfully run in {0} ms. {1} rows returned.
 stayed_for: Stayed for
+sticker: Sticker
 store: Store
 text: Text
 time_difference: Time difference
@@ -728,6 +730,7 @@ unwarn_all: Removed all warnings from {0}.
 unwarn_failure: Infraction of ID {0} was not found.
 unwarn_success: Removed warning {0} from {1}.
 uptime: Uptime
+url: URL
 usage: Usage
 used: Used
 user: User

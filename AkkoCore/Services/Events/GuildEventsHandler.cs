@@ -41,6 +41,11 @@ namespace AkkoCore.Services.Events
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
 
+        private static readonly Regex _urlRegex = new(
+            @"https?:\/\/\S{2,}",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
         private readonly ConcurrentDictionary<(ulong, ulong, ulong), (int, DateTimeOffset)> _slowmodeRegister = new();
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -299,18 +304,19 @@ namespace AkkoCore.Services.Events
 
             var prefix = _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
-            // Check if message contains a valid content. If it doesn't, delete it.
-            if ((filter.IsAttachmentOnly && eventArgs.Message.Attachments.Count == 0)
-                || (filter.IsUrlOnly && !eventArgs.Message.Content.Contains(new string[2] { "http://", "https://" }, StringComparison.OrdinalIgnoreCase))
-                || (filter.IsInviteOnly && !HasInvite(eventArgs.Message))
-                || (filter.IsImageOnly && !HasImage(eventArgs.Message))
-                || (filter.IsCommandOnly && client.GetCommandsNext().FindCommand(eventArgs.Message.Content[prefix.Length..], out _) is null))
+            // Check if message contains a valid content. If it does, leave it alone.
+            if ((filter.ContentType.HasFlag(ContentFilter.Attachment) && eventArgs.Message.Attachments.Count is not 0)
+                || (filter.ContentType.HasFlag(ContentFilter.Url) && _urlRegex.IsMatch(eventArgs.Message.Content))
+                || (filter.ContentType.HasFlag(ContentFilter.Invite) && HasInvite(eventArgs.Message))
+                || (filter.ContentType.HasFlag(ContentFilter.Image) && HasImage(eventArgs.Message))
+                || (filter.ContentType.HasFlag(ContentFilter.Sticker) && eventArgs.Message.Stickers.Count is not 0)
+                || (filter.ContentType.HasFlag(ContentFilter.Command) && client.GetCommandsNext().FindCommand(eventArgs.Message.Content[prefix.Length..], out _) is not null))
             {
-                eventArgs.Handled = true;
-                return eventArgs.Message.DeleteAsync();
+                return Task.CompletedTask;
             }
 
-            return Task.CompletedTask;
+            eventArgs.Handled = true;
+            return eventArgs.Message.DeleteAsync();
         }
 
         public async Task PollVoteAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
