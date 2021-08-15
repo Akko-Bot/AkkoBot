@@ -342,6 +342,6 @@ ASALocalRun/
 healthchecksdb
 
 # Akko specific files
-Creds/**
+Config/**
 Cogs/**
 Logs/**

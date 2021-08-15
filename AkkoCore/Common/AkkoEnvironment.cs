@@ -17,7 +17,7 @@ namespace AkkoCore.Common
         /// <summary>
         /// Gets the fully qualified path for the directory where the credentials file is stored.
         /// </summary>
-        public static string CredsDirectory { get; } = CurrentDirectory + "Creds" + Path.DirectorySeparatorChar;
+        public static string ConfigDirectory { get; } = CurrentDirectory + "Config" + Path.DirectorySeparatorChar;
 
         /// <summary>
         /// Gets the fully qualified path for the directory where the log files are stored.
@@ -37,17 +37,17 @@ namespace AkkoCore.Common
         /// <summary>
         /// Gets the fully qualified path for the credentials file.
         /// </summary>
-        public static string CredsPath { get; } = CredsDirectory + "credentials.yaml";
+        public static string CredsPath { get; } = ConfigDirectory + "credentials.yaml";
 
         /// <summary>
         /// Gets the fully qualified path for the bot's configuration file.
         /// </summary>
-        public static string BotConfigPath { get; } = CredsDirectory + "bot_config.yaml";
+        public static string BotConfigPath { get; } = ConfigDirectory + "bot_config.yaml";
 
         /// <summary>
         /// Gets the fully qualified path for the log configuration file.
         /// </summary>
-        public static string LogConfigPath { get; } = CredsDirectory + "log_config.yaml";
+        public static string LogConfigPath { get; } = ConfigDirectory + "log_config.yaml";
 
         /// <summary>
         /// Gets either the absolute or relative path for <paramref name="filePath"/>.
