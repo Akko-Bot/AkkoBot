@@ -130,32 +130,6 @@ namespace AkkoCore.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed);
         }
 
-        [Command("invites"), Aliases("invite")]
-        [Description("cmd_fw_invites")]
-        [RequireUserPermissions(Permissions.ManageGuild)]
-        public async Task ToggleInviteRemovalAsync(CommandContext context)
-        {
-            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
-
-            var embed = new SerializableDiscordMessage()
-                .WithDescription(context.FormatLocalized("fw_invite_toggle", (success) ? "enabled" : "disabled"));
-
-            await context.RespondLocalizedAsync(embed);
-        }
-
-        [Command("stickers")]
-        [Description("cmd_fw_stickers")]
-        [RequireUserPermissions(Permissions.ManageGuild)]
-        public async Task ToggleStickerRemovalAsync(CommandContext context)
-        {
-            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
-
-            var embed = new SerializableDiscordMessage()
-                .WithDescription(context.FormatLocalized("fw_sticker_toggle", (success) ? "enabled" : "disabled"));
-
-            await context.RespondLocalizedAsync(embed);
-        }
-
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_fw_list")]
         public async Task ListFilteredWordsAsync(CommandContext context)
