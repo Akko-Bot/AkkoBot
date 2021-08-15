@@ -1,13 +1,13 @@
 ﻿using AkkoCore.Common;
-using AkkoCore.Config;
 using AkkoCore.Config.Abstractions;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using System;
 using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace AkkoCore.Core.Common
+namespace AkkoCore.Config
 {
     /// <summary>
     /// Saves and loads Yaml configuration files.
@@ -54,9 +54,11 @@ namespace AkkoCore.Core.Common
         /// <returns>The <typeparamref name="T"/> that has been serialized.</returns>
         private T CreateConfigFile<T>(string filePath) where T : new()
         {
+            var fileDirectory = AkkoEnvironment.GetFileDirectoryPath(filePath);
+
             // Ensure the folder exists
-            if (!Directory.Exists(AkkoEnvironment.GetFileDirectoryPath(filePath)))
-                Directory.CreateDirectory(AkkoEnvironment.GetFileDirectoryPath(filePath));
+            if (!Directory.Exists(fileDirectory))
+                Directory.CreateDirectory(fileDirectory);
 
             // Serialize to a file
             var result = new T();

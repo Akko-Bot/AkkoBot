@@ -1,4 +1,6 @@
-﻿namespace AkkoCore.Config.Abstractions
+﻿using AkkoCore.Config.Models;
+
+namespace AkkoCore.Config.Abstractions
 {
     public interface IConfigLoader
     {

@@ -4,6 +4,7 @@ using AkkoCore.Commands.Formatters;
 using AkkoCore.Common;
 using AkkoCore.Config;
 using AkkoCore.Config.Abstractions;
+using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
 using AkkoCore.Core.Services;
 using AkkoCore.Extensions;
@@ -27,6 +28,7 @@ using DSharpPlus.Interactivity.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -261,6 +263,7 @@ namespace AkkoCore.Core.Common
         /// </summary>
         /// <remarks>This database context has a direct dependency with EF Core and Npgsql.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        /// <exception cref="NpgsqlException">Occurs when it's not possible to establish a connection with the database.</exception>
         public BotCoreBuilder WithDefaultDbContext()
         {
             var assemblyName = Assembly.GetEntryAssembly().FullName;

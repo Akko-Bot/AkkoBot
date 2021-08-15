@@ -1,4 +1,4 @@
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Services.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
 using System;

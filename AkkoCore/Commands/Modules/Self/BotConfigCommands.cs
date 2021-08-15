@@ -3,7 +3,7 @@ using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Commands.Modules.Self.Services;
 using AkkoCore.Common;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services;

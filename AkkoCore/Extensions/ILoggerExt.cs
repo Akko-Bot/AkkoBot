@@ -1,4 +1,4 @@
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Services.Logging;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;

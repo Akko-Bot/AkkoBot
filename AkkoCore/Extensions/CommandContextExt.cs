@@ -1,6 +1,6 @@
 using AkkoCore.Abstractions;
 using AkkoCore.Common;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services;

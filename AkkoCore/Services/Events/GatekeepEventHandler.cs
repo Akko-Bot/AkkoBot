@@ -1,6 +1,6 @@
 ﻿using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database.Enums;

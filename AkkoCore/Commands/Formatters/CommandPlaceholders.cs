@@ -1,6 +1,6 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Common;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;

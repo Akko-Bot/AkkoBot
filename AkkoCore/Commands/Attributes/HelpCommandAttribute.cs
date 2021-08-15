@@ -1,4 +1,4 @@
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Microsoft.Extensions.DependencyInjection;

@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,7 +21,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT'">
-    <Exec Command="xcopy &quot;$(SolutionDir)Localization&quot; &quot;$(TargetDir)..\Localization&quot; /i /e /R /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)Config&quot; &quot;$(TargetDir)..\Config&quot; /i /e /R /Y" />
+    <Exec Command="xcopy &quot;$(ProjectDir)Data\Localization&quot; &quot;$(TargetDir)Data\Localization&quot; /i /e /R /Y" />
   </Target>
 
 </Project>

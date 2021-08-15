@@ -1,6 +1,6 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;

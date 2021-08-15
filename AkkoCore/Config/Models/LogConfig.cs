@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 
-namespace AkkoCore.Config
+namespace AkkoCore.Config.Models
 {
     /// <summary>
     /// Stores data and settings related to how the bot logs command usage.

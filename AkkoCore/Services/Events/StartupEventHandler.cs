@@ -1,5 +1,5 @@
 using AkkoCore.Commands.Modules.Self.Services;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching;
 using AkkoCore.Services.Caching.Abstractions;

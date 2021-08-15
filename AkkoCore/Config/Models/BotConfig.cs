@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
-namespace AkkoCore.Config
+namespace AkkoCore.Config.Models
 {
     /// <summary>
     /// Stores settings related to the bot.

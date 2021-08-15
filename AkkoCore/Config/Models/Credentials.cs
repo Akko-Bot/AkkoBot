@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AkkoCore.Config
+namespace AkkoCore.Config.Models
 {
     /// <summary>
     /// A class that represents a credentials file.

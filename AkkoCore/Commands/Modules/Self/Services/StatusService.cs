@@ -1,7 +1,7 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Common;
-using AkkoCore.Config;
 using AkkoCore.Config.Abstractions;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;

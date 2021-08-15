@@ -1,4 +1,4 @@
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Services.Database.Entities;
 using ConcurrentCollections;
 using System;

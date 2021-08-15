@@ -1,4 +1,4 @@
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
 using AkkoCore.Services.Caching.Abstractions;
 using DSharpPlus.CommandsNext;

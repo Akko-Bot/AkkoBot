@@ -1,5 +1,5 @@
 ﻿using AkkoCore.Common;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -41,7 +41,7 @@ namespace AkkoBot.Services.Database.Design
         private Credentials LoadCredentials(string filePath)
         {
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"It was not possible to locate the credentials file at {filePath}.");
+                throw new FileNotFoundException($"It was not possible to locate the credentials file at \"{filePath}\".");
 
             // Open the file and deserialize it.
             using var reader = new StreamReader(File.OpenRead(filePath));

@@ -1,10 +1,12 @@
 ﻿using AkkoCore.Common;
 using AkkoCore.Config;
 using AkkoCore.Config.Abstractions;
+using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
 using AkkoCore.Core.Common;
 using DSharpPlus;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,43 +44,50 @@ namespace AkkoCore.Core
             var botConfig = configLoader.LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath);
             var logConfig = configLoader.LoadConfig<LogConfig>(AkkoEnvironment.LogConfigPath);
 
-            // Initialize bot configuration
-            _botCore = await new BotCoreBuilder(creds, botConfig, logConfig)
-                .WithSingletonService<IConfigLoader>(configLoader)
-                .WithSingletonService(_lifetime)
-                .WithDefaultLogging()
-                .WithDefaultServices()
-                .WithDefaultDbContext()
-                .BuildDefaultAsync();
-
-            return await ConnectAsync(_lifetime, _cTokenSource.Token);
-        }
-
-        /// <summary>
-        /// Connects this bot to Discord.
-        /// </summary>
-        /// <param name="cToken">Cancellation token to signal the bot to stop running.</param>
-        private async Task<bool> ConnectAsync(IBotLifetime lifetime, CancellationToken cToken)
-        {
             try
             {
+                // Initialize bot configuration
+                _botCore = await new BotCoreBuilder(creds, botConfig, logConfig)
+                    .WithSingletonService<IConfigLoader>(configLoader)
+                    .WithSingletonService(_lifetime)
+                    .WithDefaultLogging()
+                    .WithDefaultServices()
+                    .WithDefaultDbContext()
+                    .BuildDefaultAsync();
+
                 // Connect to Discord
                 await _botCore.BotShardedClient.StartAsync();
 
                 // Block the program until it is closed.
-                await Task.Delay(Timeout.Infinite, cToken);
+                await Task.Delay(Timeout.Infinite, _cTokenSource.Token);
             }
             catch (TaskCanceledException)
             {
                 Console.WriteLine();
 
-                if (lifetime.RestartBot)
+                if (_lifetime.RestartBot)
                 {
                     _botCore.BotShardedClient.Logger.LogWarning(
                         new EventId(LoggerEvents.ConnectionClose.Id, "Restart"),
                         @"A restart has been requested."
                     );
                 }
+            }
+            catch (NpgsqlException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                Console.WriteLine(
+                    "An error has occurred while attempting to establish a connection with the database. " +
+                    "Make sure your credentials are correct and that you don't have " +
+                    "a firewall or any external software blocking the connection." + Environment.NewLine +
+                    ex.Message
+                );
+
+                Console.ResetColor();
+                Console.WriteLine(Environment.NewLine + "Press Enter to exit.");
+
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
@@ -93,7 +102,7 @@ namespace AkkoCore.Core
                 Console.ReadLine();
             }
 
-            return lifetime.RestartBot;
+            return _lifetime.RestartBot;
         }
 
         public void Dispose()

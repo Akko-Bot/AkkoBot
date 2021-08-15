@@ -1,7 +1,7 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
-using AkkoCore.Config;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Models.Serializable.EmbedParts;

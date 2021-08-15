@@ -18,12 +18,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoTests", "AkkoTests\Akko
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoCore", "AkkoCore\AkkoCore.csproj", "{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localization", "{1B69A9B2-590F-4D34-A049-CE05C75ABD64}"
-	ProjectSection(SolutionItems) = preProject
-		Localization\Responses_en-US.yaml = Localization\Responses_en-US.yaml
-		Localization\Respostas_pt-BR.yaml = Localization\Respostas_pt-BR.yaml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
