@@ -63,6 +63,13 @@ namespace AkkoCore.Commands.Modules.Utilities
         }
 
         [Command("add")]
+        public async Task AddEmojiAttachmentsAsync(CommandContext context)
+        {
+            var success = await _service.AddGuildEmojisAsync(context, context.Message.Attachments);
+            await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
+        }
+
+        [Command("add")]
         [Description("cmd_emoji_add")]
         [RequirePermissions(Permissions.ManageEmojis)]
         public async Task AddEmojisAsync(CommandContext context, [Description("arg_emojis")] params DiscordEmoji[] emojis)
@@ -96,13 +103,6 @@ namespace AkkoCore.Commands.Modules.Utilities
             [Description("arg_emoji_name")] string name)
         {
             var success = await _service.AddGuildEmojiAsync(context, emoji, name);
-            await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
-        }
-
-        [Command("add")]
-        public async Task AddEmojiAttachmentsAsync(CommandContext context)
-        {
-            var success = await _service.AddGuildEmojisAsync(context, context.Message.Attachments);
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 

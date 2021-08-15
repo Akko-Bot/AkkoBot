@@ -348,6 +348,7 @@ namespace AkkoCore.Core.Common
         {
             // Add the clients to the IoC container
             _cmdServices.AddSingleton(shardedClient);
+            _cmdServices.AddHttpClient();   // Adds the default IHttpClientFactory
 
             var servicesList = new ServiceDescriptor[]
             {
@@ -373,7 +374,6 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton<IAntiAltActions, AntiAltActions>(),
                 ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
                 ServiceDescriptor.Singleton(_ => new DiscordWebhookClient(loggerFactory: _loggerFactory, minimumLogLevel: LogLevel.None)),
-                ServiceDescriptor.Singleton(_ => new HttpClient()),
                 ServiceDescriptor.Singleton(_ => new Random()),
 
                 // > Commands

@@ -23,14 +23,14 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     public class UtilitiesService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly DiscordShardedClient _shardedClient;
-        private readonly HttpClient _httpClient;
 
-        public UtilitiesService(IServiceScopeFactory scopeFactory, DiscordShardedClient shardedClient, HttpClient httpClient)
+        public UtilitiesService(IServiceScopeFactory scopeFactory, IHttpClientFactory httpClientFactory, DiscordShardedClient shardedClient)
         {
             _scopeFactory = scopeFactory;
+            _httpClientFactory = httpClientFactory;
             _shardedClient = shardedClient;
-            _httpClient = httpClient;
         }
 
         /// <summary>
@@ -91,8 +91,10 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns>A <see cref="Stream"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
         public async Task<Stream> GetOnlineStreamAsync(string url, CancellationToken cToken = default)
         {
+            var httpClient = _httpClientFactory.CreateClient();
+
             // Stream needs to be seekable
-            try { return await (await _httpClient.GetAsync(url, cToken)).Content.ReadAsStreamAsync(cToken); }
+            try { return await (await httpClient.GetAsync(url, cToken)).Content.ReadAsStreamAsync(cToken); }
             catch { return null; }
         }
 
@@ -148,7 +150,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             foreach (var attachment in attachments)
             {
                 // Check if file extension is supported
-                if (!attachment.FileName.Contains('.') || !attachment.FileName[attachment.FileName.LastIndexOf('.')..].StartsWith(AkkoStatics.SupportedEmojiFormats, StringComparison.InvariantCultureIgnoreCase))
+                if (!attachment.FileName.Contains('.') || !attachment.FileName[(attachment.FileName.LastIndexOf('.') + 1)..].StartsWith(AkkoStatics.SupportedEmojiFormats, StringComparison.InvariantCultureIgnoreCase))
                     continue;
 
                 var name = attachment.FileName.RemoveExtension();

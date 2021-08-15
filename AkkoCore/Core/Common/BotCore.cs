@@ -75,7 +75,6 @@ namespace AkkoCore.Core.Common
             CommandExt[0].Services.GetService<IDbCache>()?.Dispose();
             CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
             CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();
-            CommandExt[0].Services.GetService<HttpClient>()?.Dispose();
             CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
 
             // Dispose scoped
