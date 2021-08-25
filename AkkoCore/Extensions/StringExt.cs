@@ -353,5 +353,30 @@ namespace AkkoCore.Extensions
 
             return result;
         }
+
+        /// <summary>
+        /// Checks if this string and <paramref name="sample"/> contain the same first word.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="sample">The string to compare to.</param>
+        /// <param name="comparisonType">The type of string comparison to be used.</param>
+        /// <returns><see langword="true"/> if both strings contain the same first word, <see cref="false"/> otherwise.</returns>
+        public static bool HasFirstWordOf(this string text, string sample, StringComparison comparisonType = StringComparison.Ordinal)
+        {
+            var textIndex = text.IndexOf(' ', StringComparison.InvariantCulture) - 1;
+            var sampleIndex = sample.IndexOf(' ', StringComparison.InvariantCulture) - 1;
+
+            if (textIndex is -2)
+                textIndex = text.Length - 1;
+
+            if (sampleIndex is -2)
+                sampleIndex = sample.Length - 1;
+
+            var firstTextWord = text.AsSpan()[..textIndex];
+
+            var firstSampleWord = sample.AsSpan()[..sampleIndex];
+
+            return firstTextWord.Equals(firstSampleWord, comparisonType);
+        }
     }
 }

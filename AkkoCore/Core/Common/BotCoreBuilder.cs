@@ -32,7 +32,6 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -392,7 +391,8 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>(),
                 ServiceDescriptor.Singleton<IGatekeepEventHandler, GatekeepEventHandler>(),
                 ServiceDescriptor.Singleton<IGuildLogEventHandler, GuildLogEventHandler>(),
-                ServiceDescriptor.Singleton<IGuildLogGenerator, GuildLogGenerator>()
+                ServiceDescriptor.Singleton<IGuildLogGenerator, GuildLogGenerator>(),
+                ServiceDescriptor.Singleton<ITagEventHandler, TagEventHandler>()
             };
 
             foreach (var service in servicesList)

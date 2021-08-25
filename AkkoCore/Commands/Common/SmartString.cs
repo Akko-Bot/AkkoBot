@@ -15,7 +15,6 @@ namespace AkkoCore.Commands.Common
     /// </summary>
     public class SmartString
     {
-        private readonly bool _sanitizeRoles;
         private static readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
         private static readonly Regex _defaultPlaceholderRegex = new(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
         private readonly StringBuilder _contentBuilder;
@@ -34,6 +33,18 @@ namespace AkkoCore.Commands.Common
         public bool IsParsed { get; private set; }
 
         /// <summary>
+        /// Determines whether roles should be sanitized or not.
+        /// </summary>
+        public bool SanitizeRoles { get; set; }
+
+        /// <summary>
+        /// Gets the number of characters of this <see cref="SmartString"/>.
+        /// </summary>
+        /// <remarks>This forces the string to be parsed if it hasn't been already.</remarks>
+        public int Length
+            => Content.Length;
+
+        /// <summary>
         /// The current content of this <see cref="SmartString"/>.
         /// </summary>
         public string Content
@@ -42,10 +53,10 @@ namespace AkkoCore.Commands.Common
             {
                 if (!IsParsed)
                 {
-                    ParsePlaceholders();
+                    ParsePlaceholders(_context, _contentBuilder, ParseRegex, _formatter);
 
-                    if (_sanitizeRoles)
-                        SanitizeRoleMentions();
+                    if (SanitizeRoles)
+                        SanitizeRoleMentions(_context, _contentBuilder, _roleRegex);
 
                     IsParsed = true;
 
@@ -84,7 +95,7 @@ namespace AkkoCore.Commands.Common
         {
             _context = context;
             _contentBuilder = new(content ?? context.RawArgumentString);
-            _sanitizeRoles = sanitizeRoles;
+            SanitizeRoles = sanitizeRoles;
             ParseRegex = regex ?? _defaultPlaceholderRegex;
             _formatter = formatter ?? context.CommandsNext.Services.GetRequiredService<IPlaceholderFormatter>();
         }
@@ -99,55 +110,140 @@ namespace AkkoCore.Commands.Common
             => Content.Equals(text, comparisonType);
 
         /// <summary>
+        /// Replaces all occurrences of a specified string in this instance with another specified string.
+        /// </summary>
+        /// <param name="oldValue">The string to be replaced.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        public SmartString Replace(string oldValue, string newValue)
+        {
+            if (IsParsed)
+                _contentBuilder.Append(_parsedContent);
+
+            _contentBuilder.Replace(oldValue, newValue ?? string.Empty);
+            IsParsed = false;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Parses the specified string without changing the internal state of this <see cref="SmartString"/>.
+        /// </summary>
+        /// <param name="input">The string to be parsed.</param>
+        /// <param name="context">The command context.</param>
+        /// <param name="sanitizeRoles">
+        /// <see langword="true"/> to sanitize roles, <see langword="false"/> to not sanitize roles or <see langword="null"/>
+        /// to use the setting of this <see cref="SmartString"/>.
+        /// </param>
+        /// <param name="placeholderRegex">
+        /// The regex to match the command placeholders or <see langword="null"/>
+        /// to use the regex set in this <see cref="SmartString"/>.
+        /// </param>
+        /// <param name="formatter">
+        /// The formatter to parse the command placeholders or <see langword="null"/>
+        /// to use the formatter set in this <see cref="SmartString"/>.
+        /// </param>
+        /// <returns>The parsed <paramref name="input"/>.</returns>
+        public string Parse(string input, CommandContext context = default, bool? sanitizeRoles = default, Regex placeholderRegex = default, IPlaceholderFormatter formatter = default)
+        {
+            context ??= _context;
+            placeholderRegex ??= ParseRegex;
+            formatter ??= context.Services.GetRequiredService<IPlaceholderFormatter>();
+
+            var result = new StringBuilder(input);
+
+            result = ParsePlaceholders(context, result, placeholderRegex, formatter);
+
+            if (sanitizeRoles ?? SanitizeRoles)
+                result = SanitizeRoleMentions(context, result, _roleRegex);
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Parses the specified string for command placeholders.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="input">The string to be parsed.</param>
+        /// <param name="sanitizeRoles"><see langword="true"/> to sanitize roles, <see langword="false"/> to not sanitize roles.</param>
+        /// <param name="placeholderRegex">The regex to match the command placeholders or <see langword="null"/> to use the default regex.</param>
+        /// <param name="formatter">The formatter to parse the command placeholders or <see langword="null"/> to use the default formatter.</param>
+        /// <returns>The parsed <paramref name="input"/>.</returns>
+        public static string Parse(CommandContext context, string input, bool sanitizeRoles = false, Regex placeholderRegex = default, IPlaceholderFormatter formatter = default)
+        {
+            if (context is null || input is null)
+                throw new ArgumentNullException((context is null) ? nameof(context) : nameof(input), "Command context and input cannot be null.");
+
+            placeholderRegex ??= _defaultPlaceholderRegex;
+            formatter ??= context.Services.GetRequiredService<IPlaceholderFormatter>();
+
+            var result = new StringBuilder(input);
+
+            result = ParsePlaceholders(context, result, placeholderRegex, formatter);
+
+            if (sanitizeRoles)
+                result = SanitizeRoleMentions(context, result, _roleRegex);
+
+            return result.ToString();
+        }
+
+        /// <summary>
         /// Parses the placeholders from the user input into the string value they represent.
         /// </summary>
-        /// <returns><see langword="true"/> if a placeholder was found in the user input, <see langword="false"/> otherwise.</returns>
-        private bool ParsePlaceholders()
+        /// <param name="context">The command context.</param>
+        /// <param name="contentBuilder">The string builder that contains the input to be processed.</param>
+        /// <param name="placeholderRegex">The regex for matching command placeholders.</param>
+        /// <param name="formatter">The formatter that parses command placeholders.</param>
+        /// <returns>The processed <paramref name="contentBuilder"/></returns>
+        private static StringBuilder ParsePlaceholders(CommandContext context, StringBuilder contentBuilder, Regex placeholderRegex, IPlaceholderFormatter formatter)
         {
-            var matches = ParseRegex.Matches(_contentBuilder.ToString());
+            var matches = placeholderRegex.Matches(contentBuilder.ToString());
 
             if (matches.Count == 0)
-                return false;
+                return contentBuilder;
 
             foreach (Match match in matches)
             {
-                if (_formatter.TryParse(_context, match, out var result) && result is not null)
-                    _contentBuilder.Replace(match.ToString(), result.ToString());
+                if (formatter.TryParse(context, match, out var result) && result is not null)
+                    contentBuilder.Replace(match.ToString(), result.ToString());
             }
 
-            return true;
+            return contentBuilder;
         }
 
         /// <summary>
         /// Removes role mentions for roles that are above the user in the hierarchy.
         /// </summary>
-        /// <returns><see langword="true"/> if a role mention was found, <see langword="false"/> otherwise.</returns>
-        private bool SanitizeRoleMentions()
+        /// <param name="context">The command context.</param>
+        /// <param name="contentBuilder">The string builder that contains the input to be processed.</param>
+        /// <param name="roleRegex">The regex for matching Discord roles.</param>
+        /// <returns>The processed <paramref name="contentBuilder"/>.</returns>
+        private static StringBuilder SanitizeRoleMentions(CommandContext context, StringBuilder contentBuilder, Regex roleRegex)
         {
-            var matches = _roleRegex.Matches(_contentBuilder.ToString());
+            var matches = roleRegex.Matches(contentBuilder.ToString());
 
-            if (_context.Guild is null || matches.Count == 0)
-                return false;
+            if (context.Guild is null || matches.Count == 0)
+                return contentBuilder;
 
-            var canMentionAll = _context.Member.PermissionsIn(_context.Channel).HasPermission(Permissions.MentionEveryone);
+            var canMentionAll = context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.MentionEveryone);
 
             // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
-            if (_context.Member.Hierarchy != int.MaxValue && !canMentionAll)
+            if (context.Member.Hierarchy != int.MaxValue && !canMentionAll)
             {
-                _contentBuilder.Replace("@everyone", Formatter.InlineCode("@everyone"));
-                _contentBuilder.Replace("@here", Formatter.InlineCode("@here"));
+                contentBuilder.Replace("@everyone", Formatter.InlineCode("@everyone"));
+                contentBuilder.Replace("@here", Formatter.InlineCode("@here"));
             }
 
-            if (_context.Services.GetRequiredService<IDbCache>().Guilds[_context.Guild.Id].PermissiveRoleMention)
+            if (context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].PermissiveRoleMention)
             {
                 // Sanitize by role hierarchy - Permissive
                 foreach (Match match in matches)
                 {
                     if (ulong.TryParse(match.Groups[1].Value, out var rid)
-                        && _context.Guild.Roles.TryGetValue(rid, out var role)
+                        && context.Guild.Roles.TryGetValue(rid, out var role)
                         && !role.IsMentionable
-                        && _context.Member.Hierarchy <= role.Position)
-                        _contentBuilder.Replace(match.Groups[0].Value, $"@{role.Name}");
+                        && context.Member.Hierarchy <= role.Position)
+                        contentBuilder.Replace(match.Groups[0].Value, $"@{role.Name}");
                 }
             }
             else
@@ -156,14 +252,14 @@ namespace AkkoCore.Commands.Common
                 foreach (Match match in matches)
                 {
                     if (ulong.TryParse(match.Groups[1].Value, out var rid)
-                        && _context.Guild.Roles.TryGetValue(rid, out var role)
+                        && context.Guild.Roles.TryGetValue(rid, out var role)
                         && !role.IsMentionable
                         && !canMentionAll)
-                        _contentBuilder.Replace(match.Groups[0].Value, $"@{role.Name}");
+                        contentBuilder.Replace(match.Groups[0].Value, $"@{role.Name}");
                 }
             }
 
-            return true;
+            return contentBuilder;
         }
 
         /* Operator Overloads */
@@ -198,7 +294,7 @@ namespace AkkoCore.Commands.Common
 
         public static implicit operator string(SmartString x) => x?.Content;
 
-        public static implicit operator Optional<string>(SmartString x) => x?.Content;
+        public static implicit operator Optional<string>(SmartString x) => x?.Content ?? Optional.FromNoValue<string>();
 
         /* Overrides */
 

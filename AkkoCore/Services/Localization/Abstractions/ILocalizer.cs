@@ -30,6 +30,16 @@ namespace AkkoCore.Services.Localization.Abstractions
         bool ContainsResponse(string locale, string response);
 
         /// <summary>
+        /// Gets pairs of response keys and strings whose keys contain <paramref name="keyPart"/>.
+        /// </summary>
+        /// <param name="locale">The locale of the response string.</param>
+        /// <param name="keyPart">A part of the response key.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="locale"/> or <paramref name="keyPart"/> are <see langword="null"/>.</exception>
+        /// <exception cref="KeyNotFoundException">Occurs when <paramref name="locale"/> is not a valid locale.</exception>
+        public IEnumerable<KeyValuePair<string, string>> GetResponsePairsByPartialKey(string locale, string keyPart);
+
+        /// <summary>
         /// Gets a collection of the specified response strings.
         /// </summary>
         /// <param name="locale">The desired locale.</param>

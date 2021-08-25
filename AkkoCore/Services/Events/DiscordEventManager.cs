@@ -20,10 +20,12 @@ namespace AkkoCore.Services.Events
         private readonly ICommandLogHandler _cmdLogHandler;
         private readonly IGatekeepEventHandler _gatekeeper;
         private readonly IGuildLogEventHandler _guildLogger;
+        private readonly ITagEventHandler _tagEventHandler;
         private readonly DiscordShardedClient _shardedClient;
 
         public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
-            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, IGuildLogEventHandler guildLogger, DiscordShardedClient shardedClient)
+            IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, IGuildLogEventHandler guildLogger, ITagEventHandler tagEventsHandler,
+            DiscordShardedClient shardedClient)
         {
             _startup = startup;
             _voiceRoleHandler = vcRoleHandler;
@@ -33,6 +35,7 @@ namespace AkkoCore.Services.Events
             _cmdLogHandler = cmdLogHandler;
             _gatekeeper = gatekeeper;
             _guildLogger = guildLogger;
+            _tagEventHandler = tagEventsHandler;
             _shardedClient = shardedClient;
         }
 
@@ -167,6 +170,18 @@ namespace AkkoCore.Services.Events
 
             // Assign role on channel join/leave
             _shardedClient.VoiceStateUpdated += _voiceRoleHandler.VoiceRoleAsync;
+
+            // Send global tags
+            _shardedClient.MessageCreated += _tagEventHandler.ExecuteGlobalTagAsync;
+
+            // Send global emoji tags
+            _shardedClient.MessageCreated += _tagEventHandler.ExecuteGlobalEmojiTagAsync;
+
+            // Send guild tags
+            _shardedClient.MessageCreated += _tagEventHandler.ExecuteGuildTagAsync;
+
+            // Send guild emoji tags
+            _shardedClient.MessageCreated += _tagEventHandler.ExecuteGuildEmojiTagAsync;
 
             #endregion Bot Events
 

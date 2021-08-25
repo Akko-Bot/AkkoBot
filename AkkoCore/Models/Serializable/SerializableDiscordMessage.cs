@@ -188,8 +188,12 @@ namespace AkkoCore.Models.Serializable
         /// <param name="body">The body of the field.</param>
         /// <param name="inline">Sets whether the field should be inlined or not.</param>
         /// <returns>This message builder.</returns>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="title"/> or <paramref name="body"/> are <see langword="null"/> or empty.</exception>
         public SerializableDiscordMessage AddField(string title, string body, bool inline = false)
         {
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(body))
+                throw new ArgumentException($"{nameof(title)} and {nameof(body)} cannot be null or empty.");
+
             Fields ??= new();
             Fields.Add(new(title, body, inline));
 

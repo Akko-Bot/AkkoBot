@@ -30,6 +30,8 @@ namespace AkkoCore.Services.Database
         public DbSet<AutoSlowmodeEntity> AutoSlowmode { get; init; }
         public DbSet<GuildLogEntity> GuildLogs { get; init; }
 
+        public DbSet<TagEntity> Tags { get; init; }
+
         public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
         {
         }
@@ -157,6 +159,14 @@ namespace AkkoCore.Services.Database
             modelBuilder.Entity<GuildLogEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.GuildLogsRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Guild -> Tags
+            modelBuilder.Entity<TagEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.TagsRel)
                 .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);

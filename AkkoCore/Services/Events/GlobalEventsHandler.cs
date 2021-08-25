@@ -85,12 +85,12 @@ namespace AkkoCore.Services.Events
             // Get a string that parses its placeholders automatically
             var cmdHandler = client.GetCommandsNext();
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, prefix, null);
-            var parsedMsg = new SmartString(dummyCtx, string.Empty);
+            
 
             // Local function to determine the correct alias from the user input
             bool AliasSelector(AliasEntity alias)
             {
-                parsedMsg.Content = alias.Alias;
+                var parsedMsg = SmartString.Parse(dummyCtx, alias.Alias);
 
                 return (alias.IsDynamic && eventArgs.Message.Content.StartsWith(parsedMsg, StringComparison.InvariantCultureIgnoreCase))
                     || (!alias.IsDynamic && eventArgs.Message.Content.Equals(parsedMsg, StringComparison.InvariantCultureIgnoreCase));
@@ -103,9 +103,9 @@ namespace AkkoCore.Services.Events
                 return;
 
             var cmd = cmdHandler.FindCommand(
-                (parsedMsg.IsParsed && !alias.IsDynamic)
+                (!alias.IsDynamic)
                     ? alias.FullCommand
-                    : alias.ParseAliasInput(parsedMsg, eventArgs.Message.Content),
+                    : alias.ParseAliasInput(SmartString.Parse(dummyCtx, alias.Alias), eventArgs.Message.Content),
                 out var args
             );
 

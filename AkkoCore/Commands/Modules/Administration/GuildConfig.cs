@@ -275,6 +275,17 @@ namespace AkkoCore.Commands.Modules.Administration
             await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);
         }
 
+        [Command("ignoreglobaltags")]
+        [Description("cmd_guild_ignoreglobaltags")]
+        public async Task ToggleIgnoreGlobalTagsAsync(CommandContext context)
+        {
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.IgnoreGlobalTags = !x.IgnoreGlobalTags);
+            var embed = new SerializableDiscordMessage()
+                .WithDescription(context.FormatLocalized("ignore_global_list_description", (!result) ? "enabled" : "disabled"));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_guild_list")]
         public async Task ListGuildConfigsAsync(CommandContext context)

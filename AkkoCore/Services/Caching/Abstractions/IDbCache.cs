@@ -98,6 +98,15 @@ namespace AkkoCore.Services.Caching.Abstractions
         ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; }
 
         /// <summary>
+        /// Stores all tags.
+        /// </summary>
+        /// <remarks>
+        /// The <see langword="ulong"/> is the ID of the Discord guild if the tag is specific to a guild
+        /// or zero if it is a global tag. <see cref="ConcurrentHashSet{T}"/> is a collection of tags.
+        /// </remarks>
+        ConcurrentDictionary<ulong, ConcurrentHashSet<TagEntity>> Tags { get; }
+
+        /// <summary>
         /// Safely gets a database guild.
         /// </summary>
         /// <param name="sid">The GuildId of the database entry.</param>

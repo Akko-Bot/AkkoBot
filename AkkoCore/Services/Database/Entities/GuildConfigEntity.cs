@@ -4,6 +4,7 @@ using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Abstractions;
 using AkkoCore.Services.Database.Enums;
+using DSharpPlus;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -89,6 +90,11 @@ namespace AkkoCore.Services.Database.Entities
         /// The list of guild logs.
         /// </summary>
         public List<GuildLogEntity> GuildLogsRel { get; init; }
+
+        /// <summary>
+        /// The list of guild tags.
+        /// </summary>
+        public List<TagEntity> TagsRel { get; init; }
 
         /// <summary>
         /// The IDs of the roles that should be assigned to a Discord user when they join the guild.
@@ -188,6 +194,16 @@ namespace AkkoCore.Services.Database.Entities
         /// Determines whether command messages should be automatically deleted.
         /// </summary>
         public bool DeleteCmdOnMessage { get; set; } = false;
+
+        /// <summary>
+        /// Determines whether all global tags should be ignored in this guild.
+        /// </summary>
+        public bool IgnoreGlobalTags { get; set; } = false;
+
+        /// <summary>
+        /// Determines the minimum set of permissions required from a user for them to trigger a tag.
+        /// </summary>
+        public Permissions MinimumTagPermissions { get; set; } = Permissions.None;
 
         /// <summary>
         /// The ID of the mute role of this guild.

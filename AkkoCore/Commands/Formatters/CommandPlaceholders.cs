@@ -133,7 +133,8 @@ namespace AkkoCore.Commands.Formatters
         /// </summary>
         protected readonly Dictionary<string, Func<CommandContext, object, object>> parameterizedActions = new()
         {
-            /* Discord Timestamps */
+            #region Discord Timestamps
+
             ["date.shortdateandtime"] = (context, parameter) =>
             {
                 return parameter is not string[] arguments || arguments.Length != 1
@@ -190,14 +191,16 @@ namespace AkkoCore.Commands.Formatters
                     : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.RelativeTime);
             },
 
-            /* Miscelaneous */
+            #endregion
+
+            #region Miscelaneous
 
             ["remaining.text"] = (context, endMatchIndex) => context.RawArgumentString[(int)endMatchIndex..].Trim(),
 
             ["rng"] = (context, parameter) =>
             {
                 // If array is the wrong length or contains invalid arguments, quit
-                if (parameter is not string[] arguments || arguments.Length is < 1 or > 2
+                if (parameter is not string[] arguments || arguments.Length is not 1 and not 2
                     | (!arguments.TryGetValue(0, out var first) & !arguments.TryGetValue(1, out var second))
                     | (!int.TryParse(first, out var x) & !int.TryParse(second, out var y)))
                     return null;
@@ -223,6 +226,8 @@ namespace AkkoCore.Commands.Formatters
                     ? null
                     : context.RawArguments[index];
             }
+
+            #endregion
         };
 
         public virtual bool TryParse(CommandContext context, Match match, out object result)

@@ -71,6 +71,7 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
+arg_permission: A Discord [permission](https://www.google.com/).
 arg_poll_id: ID of the poll.
 arg_poll_qanswer: The question and the answers, separated by a semicolon `;`.
 arg_poll_question: A question.
@@ -90,6 +91,12 @@ arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
 arg_sql: A valid SQL query.
 arg_stream_url: The URL of the stream.
+arg_tag_behavior: The tag behavior.
+arg_tag_clearold_time: Time the tag hasn't been used.
+arg_tag_ids: Multiple tag IDs, separated by space.
+arg_tag_keyword: Any text present in the tag's response.
+arg_tag_response: The tag's response.
+arg_tag_trigger: The tag's trigger.
 arg_time_of_day: Time of day, in `HH:mm` format (24 hours).
 arg_timed_ban: For how long the user should remain banned.
 arg_timed_mute: For how long the user should remain muted. Default is __1h__.
@@ -127,6 +134,7 @@ banned_on: Banned on
 bantemplate_reset: The ban template has been successfully removed.
 bantemplate_set: The ban template has been successfully set.
 before: Before
+behaviors: Behaviors
 bitrate: Bitrate
 bl_added: Successfully added {0} {1} {2} to the blacklist.
 bl_added_range: '{0} IDs were added to the blacklist.'
@@ -247,20 +255,20 @@ cmd_fc_list: Lists all content filters currently active in this server.
 cmd_fc_remove: Removes a content filter.
 cmd_fc_sticker: Toggles deletion of any message that doesn't contain a sticker in the specified channel. Provide no parameter to toggle deletion in the current channel.
 cmd_fc_url: Toggles deletion of any message that doesn't contain a URL in the specified channel. Provide no parameter to toggle deletion in the current channel.
+cmd_filterinvite: Toggles the automatic deletion of messages containing invites on the server.
+cmd_filtersticker: Toggles the automatic deletion of messages containing stickers on the server.
 cmd_fw: Groups commands that filter out undesirable words from the server.
 cmd_fw_add: Adds a word to the word filter. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the beginning to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
 cmd_fw_addignore: Adds a user, channel and/or role IDs to the list of ignored IDs, disabling the word filter for them.
 cmd_fw_addmany: Adds multiple words to the list of filtered words. Separate them with space. Messages that contain any filtered word will be automatically deleted. Matches are case-insensitive. Use asterisk `*` at the end of the word to match any word that begins with the specified word, at the end to match any word that ends with the specified word or both to match any word that contains the specified word. Use no asterisk for exact matches.
 cmd_fw_clear: Removes all words from the list of filtered words.
 cmd_fw_enable: Toggles the automatic deletion of messages containing filtered words on the server. Also affects the automatic deletion of stickers and server invites.
-cmd_filterinvite: Toggles the automatic deletion of messages containing invites on the server.
 cmd_fw_list: Lists all filtered words in the server and the users, channels, and roles ignored by the word filter.
 cmd_fw_message: Sets the notification message to be automatically sent when a filtered message gets deleted.
 cmd_fw_notify: Toggles whether the notification message should be sent when a filtered message gets deleted.
 cmd_fw_remove: Removes a word from the list of filtered words.
 cmd_fw_removeignore: Removes a user, channel and/or role IDs from the list of ignored IDs.
 cmd_fw_removemany: Removes multiple words from the list of filtered words. Separate them with space.
-cmd_filtersticker: Toggles the automatic deletion of messages containing stickers on the server.
 cmd_fw_warn: Toggles whether filtered messages should automatically issue a warning to the offending user.
 cmd_gatekeepbulktime: Sets how long the bot should wait before sending a bulk greeting or farewell message when multiple users join or leave the server simultaneously.
 cmd_globalcmd: Toggles activation of a command.
@@ -277,6 +285,7 @@ cmd_guild_delmsgoncmd_listignored: Lists the ignored IDs.
 cmd_guild_delmsgoncmd_toggle: Toggles automatic deletion of command messages.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.
 cmd_guild_errorcolor: Sets the color used on embeds that return an error message on this server.
+cmd_guild_ignoreglobaltags: Toggles whether global tags are allowed to be executed in this server.
 cmd_guild_list: Shows the server's current settings.
 cmd_guild_locale: Changes the language the bot should use in this server. Provide no parameter to see the list of available languages.
 cmd_guild_okcolor: Sets the color used on embeds for this server.
@@ -369,6 +378,21 @@ cmd_settopic: Sets the topic for the current text channel.
 cmd_slowmode: Sets how frequently users are allowed to send messages in this text channel. Provide no parameter to disable.
 cmd_sql: Runs a SQL query on the database.
 cmd_sudo: Executes a command as the specified user.
+cmd_tag: Groups commands for managing tags. Tags are customized responses sent by the bot when a user types its trigger. Tags are specific to the servers they are created in, except when they are created in direct message with the bot. Creating global tags requires bot ownership.
+cmd_tag_add: Creates a tag with the specified trigger and response.
+cmd_tag_addignore: Adds a user, channel and/or role IDs to the list of ignored IDs for the specified tag.
+cmd_tag_behavior: Toggles the behavior the specified tag should present when a user triggers it. Possible values are `Delete`, `Anywhere`, `DirectMessage` and `SanitizeRole`.
+cmd_tag_clear: Removes all tags that meet the specified criteria. Provide no parameter to remove all tags from this server. Use this command in direct message to remove global tags.
+cmd_tag_clearold: Removes all tags from the bot that haven't been used in a while.
+cmd_tag_editresponse: Edits the response of the specified tag.
+cmd_tag_edittrigger: Edits the trigger of the specified tag.
+cmd_tag_info: Shows information about the specified tag.
+cmd_tag_list: Lists the tags available in this server according to the specified criteria. Use this command in direct message to list global tags.
+cmd_tag_permission: Toggles the permission required for the user to execute the specified tag. Permissions can be stacked.
+cmd_tag_react: Creates a tag with the specified trigger and reaction emoji.
+cmd_tag_remove: Removes the tag with the specified ID.
+cmd_tag_removeignore: Removes a user, channel and/or role IDs from the list of ignored IDs for the specified tag.
+cmd_tag_search: Searches for tags that contain the specified keyword in its response.
 cmd_timedban: Temporarily bans a user from the server.
 cmd_timezone: Shows the time zone used in this server.
 cmd_timezones: Lists all time zones available to the bot.
@@ -445,19 +469,19 @@ fc_list_empty: There are no content filters active in this server.
 fc_sticker_toggle: Sticker filter has been {0} on {1}.
 fc_url_toggle: URL filter has been {0} on {1}.
 features: Features
+fi_toggle: Automatic removal of server invites has been {0}.
 filter_invites: invites
 filter_stickers: stickers
+fs_toggle: Automatic removal of stickers has been {0}.
 fw_default_notification: Your message contains a banned word and has been removed. Watch your language.
 fw_default_warn: Used a banned word.
 fw_extra_filters: Extra filters
 fw_ignored_channels: Ignored Channels
 fw_ignored_roles: Ignored Roles
 fw_ignored_users: Ignored Users
-fi_toggle: Automatic removal of server invites has been {0}.
 fw_list_empty: There are no filtered words.
 fw_list_title: List of Filtered Words
 fw_notify: The notification for filtered messages has been {0}.
-fs_toggle: Automatic removal of stickers has been {0}.
 fw_stickers_notification: Stickers are not allowed in this server.
 fw_toggle: The word filter has been {0} on this server.
 fw_warn: Automatic warnings for filtered messages has been {0}.
@@ -499,6 +523,7 @@ high: High
 highest: Highest
 hours: Hours
 id: ID
+ignore_global_list_description: Execution of global tags has been {0}.
 ignored_ids: Ignored IDs
 ignored_ids_add: Added {0} IDs to the list of ignored IDs.
 ignored_ids_empty: There is no ignored ID.
@@ -614,7 +639,6 @@ perm_ban_members: Ban Members
 perm_bot_owner: Bot Ownership
 perm_change_nickname: Change Nickname
 perm_create_instant_invite: Create Invite
-perm_create_invite: Create Invite
 perm_deafen_members: Deafen Members
 perm_embed_links: Embed Links
 perm_kick_members: Kick Members
@@ -624,6 +648,7 @@ perm_manage_guild: Manage Server
 perm_manage_messages: Manage Messages
 perm_manage_nicknames: Manage Nicknames
 perm_manage_roles: Manage Roles
+perm_manage_threads: Manage Threads
 perm_manage_webhooks: Manage Webhooks
 perm_mention_everyone: Mention Everyone
 perm_move_members: Move Members
@@ -637,6 +662,10 @@ perm_send_tts_messages: Send TTS Messages
 perm_speak: Speak
 perm_stream: Stream
 perm_use_external_emojis: Use External Emojis
+perm_use_external_stickers: Use External Stickers
+perm_use_private_threads: Use Private Threads
+perm_use_public_threads: Use Public Threads
+perm_use_slash_commands: Use Slash Commands (Comandos de Aplicações)
 perm_use_voice: Connect
 perm_use_voice_detection: Voice Detection
 perm_view_audit_log: View Audit Log
@@ -665,6 +694,7 @@ q_no: 'no'
 q_operation_length_seconds: This operation will take at least {0} seconds.
 q_sql_query: run this query
 q_yes: 'yes'
+reaction: Reaction
 reason: Reason
 region: Region
 reminder_list_empty: No reminder was found.
@@ -704,6 +734,20 @@ sqlselect_title: Query successfully run in {0} ms. {1} rows returned.
 stayed_for: Stayed for
 sticker: Sticker
 store: Store
+tag: Tag
+tag_delete_all_tags: delete all tags
+tag_delete_all_user_tags: delete all tags from user {0}
+tag_delete_id_tags: delete {0} tags
+tag_delete_old_tags: delete tags that weren't used in the last {0} days
+tag_delete_success: Successfully deleted {0} tags.
+tag_delete_trigger_tags: delete tags with the {0} trigger
+tag_delete_trigger_user_tags: delete tags from user {0} with the {1} trigger
+tag_global_list_title: List of Global Tags
+tag_list_empty: No tags were found.
+tag_list_title: List of Server Tags
+tag_not_found: Tag not found.
+tag_permission_add: Added permission {0} to tag {1}.
+tag_permission_remove: Removed permission {0} from tag {1}.
 text: Text
 time_difference: Time difference
 timedban_notification: You have been banned from the {0} server for {0}.
@@ -715,6 +759,7 @@ timers: Timers
 timezone_list: Time Zones
 total: Total
 total_of: '{0} total'
+trigger: Trigger
 trigger_time: Triggers Within
 triggers_in: Triggers In
 triggers_on: Triggers On

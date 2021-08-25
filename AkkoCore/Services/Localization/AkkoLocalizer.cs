@@ -32,6 +32,9 @@ namespace AkkoCore.Services.Localization
         public AkkoLocalizer()
             => LoadLocalizedStrings();
 
+        public IEnumerable<KeyValuePair<string, string>> GetResponsePairsByPartialKey(string locale, string keyPart)
+            => _localizedStrings[locale].Where(x => x.Key.Contains(keyPart, StringComparison.Ordinal));
+
         public string GetResponseString(CultureInfo locale, string response)
             => GetResponseString(locale.Name, response);
 

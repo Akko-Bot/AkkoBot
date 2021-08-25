@@ -45,7 +45,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             => _localizer.Locales;
 
         /// <summary>
-        /// Gets or sets the specified guild setting.
+        /// Sets the specified guild setting.
         /// </summary>
         /// <typeparam name="T">The type of the setting to be returned.</typeparam>
         /// <param name="server">The target guild.</param>

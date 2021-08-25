@@ -35,6 +35,7 @@ namespace AkkoCore.Services.Database
         public ConcurrentDictionary<ulong, GatekeepEntity> Gatekeeping { get; private set; }
         public ConcurrentDictionary<ulong, AutoSlowmodeEntity> AutoSlowmode { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<TagEntity>> Tags { get; private set; }
 
         public AkkoDbCache(IServiceScopeFactory scopeFactory)
         {
@@ -51,6 +52,14 @@ namespace AkkoCore.Services.Database
                 .SplitBy(x => x.GuildId ?? default)
                 .Select(x => x.ToConcurrentHashSet())
                 .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
+
+            Tags = new();
+            Tags.TryAdd(    // Load global tags
+                default,
+                dbContext.Tags
+                    .Where(x => !x.GuildIdFK.HasValue)
+                    .ToConcurrentHashSet()
+            );
 
             //The properties below are specific to a guild and are cached on demand
             Guilds = new();
@@ -120,6 +129,9 @@ namespace AkkoCore.Services.Database
             if (dbGuild.GuildLogsRel.Count is not 0)
                 GuildLogs.TryAdd(dbGuild.GuildId, dbGuild.GuildLogsRel.ToConcurrentHashSet());
 
+            if (dbGuild.TagsRel.Count is not 0)
+                Tags.TryAdd(dbGuild.GuildId, dbGuild.TagsRel.ToConcurrentHashSet());
+
             return true;
         }
 
@@ -136,11 +148,13 @@ namespace AkkoCore.Services.Database
             Repeaters.TryRemove(sid, out var voiceRoles);
             Polls.TryRemove(sid, out var polls);
             GuildLogs.TryRemove(sid, out var guildLogs);
+            Tags.TryRemove(sid, out var guildTags);
 
             filters?.Clear();
             voiceRoles?.Clear();
             polls?.Clear();
             guildLogs?.Clear();
+            guildTags?.Clear();
 
             return dbGuild is not null;
         }
@@ -206,6 +220,14 @@ namespace AkkoCore.Services.Database
 
                         GuildLogs.Clear();
                     }
+
+                    if (Tags is not null)
+                    {
+                        foreach (var group in Tags.Values)
+                            group.Clear();
+
+                        Tags.Clear();
+                    }
                 }
 
                 Blacklist = null;
@@ -220,6 +242,7 @@ namespace AkkoCore.Services.Database
                 Gatekeeping = null;
                 AutoSlowmode = null;
                 GuildLogs = null;
+                Tags = null;
 
                 _isDisposed = true;
             }

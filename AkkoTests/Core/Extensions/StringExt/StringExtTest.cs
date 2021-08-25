@@ -161,5 +161,17 @@ namespace AkkoTests.Core.Extensions.StringExt
         [InlineData("hello hello", 'h', 1, 0)]
         public void LastOccurrenceOfTest(string caller, char character, int match, int result)
             => Assert.Equal(result, caller.LastOccurrenceOf(character, match));
+
+        [Theory]
+        [InlineData("!hello", "!hello", StringComparison.Ordinal, true)]
+        [InlineData("!hellow", "!hello", StringComparison.Ordinal, false)]
+        [InlineData("!hello", "!hellow", StringComparison.Ordinal, false)]
+        [InlineData("!hello", "!hello there", StringComparison.Ordinal, true)]
+        [InlineData("!hello there", "!hello", StringComparison.Ordinal, true)]
+        [InlineData("!hello", "!heLLO", StringComparison.Ordinal, false)]
+        [InlineData("!hello", "!heLLo", StringComparison.OrdinalIgnoreCase, true)]
+        [InlineData("!hello", "!hellow there", StringComparison.Ordinal, false)]
+        public void HasFirstWordOfTest(string caller, string callee, StringComparison comparisonType, bool result)
+            => Assert.Equal(result, caller.HasFirstWordOf(callee, comparisonType));
     }
 }
