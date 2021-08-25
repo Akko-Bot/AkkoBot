@@ -56,7 +56,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             // Save the new entry to the database
             var newEntry = new AliasEntity()
             {
-                GuildId = context.Guild?.Id,
+                GuildIdFK = context.Guild?.Id,
                 IsDynamic = ((cmd is CommandGroup c) && c.Children.Count > 1)     // This is not perfect but it will do for now
                     || cmd.Overloads.Any(x => x.Arguments.Count > args.Split(' ').Length - ((string.IsNullOrWhiteSpace(args)) ? 1 : 0)),
 
@@ -65,7 +65,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 Arguments = args ?? string.Empty
             };
 
-            var guildId = newEntry.GuildId ?? default;
+            var guildId = newEntry.GuildIdFK ?? default;
             var trackedEntity = db.Upsert(newEntry);
             var dbEntry = trackedEntity.Entity as AliasEntity;
 

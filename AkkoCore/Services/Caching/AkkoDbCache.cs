@@ -48,10 +48,13 @@ namespace AkkoCore.Services.Database
             PlayingStatuses = dbContext.PlayingStatuses.Where(x => x.RotationTime != TimeSpan.Zero).ToList();
 
             // The properties below can either be global or specific to a guild
-            Aliases = dbContext.Aliases
-                .SplitBy(x => x.GuildId ?? default)
-                .Select(x => x.ToConcurrentHashSet())
-                .ToConcurrentDictionary(x => x.FirstOrDefault().GuildId ?? default);
+            Aliases = new();
+            Aliases.TryAdd( // Load global aliases
+                default,
+                dbContext.Aliases
+                    .Where(x => !x.GuildIdFK.HasValue)
+                    .ToConcurrentHashSet()
+            );
 
             Tags = new();
             Tags.TryAdd(    // Load global tags
@@ -114,6 +117,9 @@ namespace AkkoCore.Services.Database
             if (dbGuild.AutoSlowmodeRel is not null)
                 AutoSlowmode.TryAdd(dbGuild.GuildId, dbGuild.AutoSlowmodeRel);
 
+            if (dbGuild.AliasRel.Count is not 0)
+                Aliases.TryAdd(dbGuild.GuildId, dbGuild.AliasRel.ToConcurrentHashSet());
+
             if (dbGuild.FilteredContentRel.Count is not 0)
                 FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
 
@@ -144,12 +150,14 @@ namespace AkkoCore.Services.Database
 
             FilteredContent.TryRemove(sid, out _);
             AutoSlowmode.TryRemove(sid, out _);
+            Aliases.TryRemove(sid, out var aliases);
             VoiceRoles.TryRemove(sid, out var filters);
             Repeaters.TryRemove(sid, out var voiceRoles);
             Polls.TryRemove(sid, out var polls);
             GuildLogs.TryRemove(sid, out var guildLogs);
             Tags.TryRemove(sid, out var guildTags);
 
+            aliases?.Clear();
             filters?.Clear();
             voiceRoles?.Clear();
             polls?.Clear();

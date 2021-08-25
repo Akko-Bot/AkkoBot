@@ -19,10 +19,16 @@ namespace AkkoCore.Services.Database.Entities
         private string _arguments;
 
         /// <summary>
+        /// The settings of the Discord guild this tag is associated with.
+        /// </summary>
+        /// <remarks>This property is <see langword="null"/> for global aliases.</remarks>
+        public GuildConfigEntity GuildConfigRel { get; init; }
+
+        /// <summary>
         /// The ID of the Discord guild associated with this alias.
         /// </summary>
         /// <remarks>This property is <see langword="null"/> if the alias is global.</remarks>
-        public ulong? GuildId { get; init; }
+        public ulong? GuildIdFK { get; init; }
 
         /// <summary>
         /// Defines whether this alias accepts additional parameters.
@@ -81,7 +87,7 @@ namespace AkkoCore.Services.Database.Entities
         /* Overrides */
 
         public static bool operator ==(AliasEntity x, AliasEntity y)
-            => x.GuildId == y.GuildId && x.IsDynamic == y.IsDynamic && x.Alias == y.Alias && x.Command == y.Command && x.Arguments == y.Arguments;
+            => x.GuildIdFK == y.GuildIdFK && x.IsDynamic == y.IsDynamic && x.Alias == y.Alias && x.Command == y.Command && x.Arguments == y.Arguments;
 
         public static bool operator !=(AliasEntity x, AliasEntity y)
             => !(x == y);

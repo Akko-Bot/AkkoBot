@@ -82,11 +82,9 @@ namespace AkkoCore.Services.Events
                 ? _botConfig.BotPrefix
                 : _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
-            // Get a string that parses its placeholders automatically
             var cmdHandler = client.GetCommandsNext();
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, prefix, null);
             
-
             // Local function to determine the correct alias from the user input
             bool AliasSelector(AliasEntity alias)
             {

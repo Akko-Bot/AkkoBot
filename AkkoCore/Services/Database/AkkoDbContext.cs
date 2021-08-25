@@ -46,9 +46,6 @@ namespace AkkoCore.Services.Database
             modelBuilder.Entity<PlayingStatusEntity>()
                 .HasIndex(x => x.Id);
 
-            modelBuilder.Entity<AliasEntity>()
-                .HasIndex(x => x.Id);
-
             modelBuilder.Entity<CommandCooldownEntity>()
                 .HasIndex(x => x.Id);
 
@@ -58,6 +55,14 @@ namespace AkkoCore.Services.Database
 
             modelBuilder.Entity<GuildConfigEntity>()
                 .HasAlternateKey(x => x.GuildId);
+
+            // Guild -> Aliases
+            modelBuilder.Entity<AliasEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.AliasRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Guild -> Muted User
             modelBuilder.Entity<MutedUserEntity>()

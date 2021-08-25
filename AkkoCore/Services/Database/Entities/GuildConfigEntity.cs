@@ -42,6 +42,11 @@ namespace AkkoCore.Services.Database.Entities
         public AutoSlowmodeEntity AutoSlowmodeRel { get; init; }
 
         /// <summary>
+        /// The aliases associated with this Discord guild.
+        /// </summary>
+        public List<AliasEntity> AliasRel { get; init; }
+
+        /// <summary>
         /// The timers associated with this Discord guild.
         /// </summary>
         public List<TimerEntity> TimerRel { get; init; }

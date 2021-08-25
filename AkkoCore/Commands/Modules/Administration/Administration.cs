@@ -196,7 +196,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var prefix = (context.Guild is null)
                 ? _botService.GetOrSetProperty(x => x.BotPrefix)
-                : await _guildService.SetPropertyAsync(context.Guild, x => x?.Prefix);
+                : _guildService.GetGuildSettings(context.Guild).Prefix;
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
             var embed = new SerializableDiscordMessage()
