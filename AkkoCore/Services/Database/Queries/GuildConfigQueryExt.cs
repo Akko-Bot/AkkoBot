@@ -10,12 +10,13 @@ namespace AkkoCore.Services.Database.Queries
         /// Includes all navigation properties relevant for caching of a <see cref="GuildConfigEntity"/>.
         /// </summary>
         /// <param name="query">This query.</param>
-        /// <remarks>Included properties: TagsRel, AliasRel, GatekeepRel, FilteredWordsRel, FilteredContentRel, VoiceRolesRel, RepeaterRel, PollRel, AutoSlowmodeRel</remarks>
+        /// <remarks>Included properties: AliasRel, CommandCooldownRel, TagsRel, GatekeepRel, FilteredWordsRel, FilteredContentRel, VoiceRolesRel, RepeaterRel, PollRel, AutoSlowmodeRel</remarks>
         /// <returns>A query that includes the aforementioned navigation properties.</returns>
         public static IQueryable<GuildConfigEntity> IncludeCacheable(this IQueryable<GuildConfigEntity> query)
         {
             return query
                 .Include(x => x.AliasRel)
+                .Include(x => x.CommandCooldownRel)
                 .Include(x => x.TagsRel)
                 .Include(x => x.GatekeepRel)
                 .Include(x => x.FilteredWordsRel)

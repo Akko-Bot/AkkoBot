@@ -1,5 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
-using AkkoCore.Services.Timers.Abstractions;
+﻿using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -33,10 +32,5 @@ namespace AkkoCore.Services.Caching.Abstractions
         /// </summary>
         /// <remarks>This property is lazily initialized on startup.</remarks>
         ITimerManager Timers { get; }
-
-        /// <summary>
-        /// Manages command cooldown.
-        /// </summary>
-        ICommandCooldown CooldownCommands { get; }
     }
 }

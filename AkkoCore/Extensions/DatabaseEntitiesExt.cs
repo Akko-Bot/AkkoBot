@@ -1,5 +1,4 @@
-﻿using AkkoCore.Commands.Common;
-using AkkoCore.Services.Database.Entities;
+﻿using AkkoCore.Services.Database.Entities;
 
 namespace AkkoCore.Extensions
 {

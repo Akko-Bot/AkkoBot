@@ -48,7 +48,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 command = command[context.Prefix.Length..];
 
             var success = (context.Guild is not null || GeneralService.IsOwner(context, context.User.Id))
-                && await _service.RemoveCommandCooldownAsync(command, context.Guild);
+                && await _service.RemoveCommandCooldownAsync(command, context.Guild?.Id);
 
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }

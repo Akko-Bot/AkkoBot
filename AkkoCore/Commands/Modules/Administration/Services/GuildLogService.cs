@@ -5,6 +5,7 @@ using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Enums;
+using AkkoCore.Services.Database.Queries;
 using AkkoCore.Services.Localization.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus;
@@ -88,12 +89,12 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             }
 
             // Update entry
+            db.GuildLogs.Upsert(guildLog);
             guildLog.ChannelId = channel.Id;
             guildLog.WebhookId = webhook.Id;
             guildLog.IsActive = true;
             guildLog.Type = logType;
 
-            db.Update(guildLog);
             await db.SaveChangesAsync();
 
             // Update cache

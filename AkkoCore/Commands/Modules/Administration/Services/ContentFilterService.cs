@@ -3,6 +3,7 @@ using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
+using AkkoCore.Services.Database.Queries;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,9 +34,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <typeparam name="T">The type of the selected data.</typeparam>
         /// <param name="server">The Discord guild.</param>
         /// <param name="channel">The Discord channel.</param>
-        /// <param name="selector">A method to define which property is going to be updated.</param>
+        /// <param name="setter">A method to define which property is going to be updated.</param>
         /// <returns>The updated property.</returns>
-        public async Task<T> SetContentFilterAsync<T>(DiscordGuild server, DiscordChannel channel, Func<FilteredContentEntity, T> selector)
+        public async Task<T> SetContentFilterAsync<T>(DiscordGuild server, DiscordChannel channel, Func<FilteredContentEntity, T> setter)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
@@ -49,10 +50,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 ?? await db.FilteredContent.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
                 ?? new() { GuildIdFK = server.Id, ChannelId = channel.Id };
 
-            var result = selector(dbFilter);
-
             // Update the database
-            db.Update(dbFilter);
+            db.FilteredContent.Upsert(dbFilter);
+            var result = setter(dbFilter);
             await db.SaveChangesAsync();
 
             // Update the cache

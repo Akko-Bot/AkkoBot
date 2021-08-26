@@ -5,6 +5,7 @@ using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Enums;
+using AkkoCore.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
@@ -119,10 +120,9 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
+            db.Polls.Attach(poll);
             poll.Votes[vote - 1]++;
             poll.Voters.Add((long)user.Id);
-
-            db.Update(poll);
 
             return await db.SaveChangesAsync() is not 0;
         }

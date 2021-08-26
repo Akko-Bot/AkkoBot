@@ -47,6 +47,11 @@ namespace AkkoCore.Services.Database.Entities
         public List<AliasEntity> AliasRel { get; init; }
 
         /// <summary>
+        /// The command cooldowns associated with this Discord guild.
+        /// </summary>
+        public List<CommandCooldownEntity> CommandCooldownRel { get; init; }
+
+        /// <summary>
         /// The timers associated with this Discord guild.
         /// </summary>
         public List<TimerEntity> TimerRel { get; init; }

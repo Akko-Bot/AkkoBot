@@ -18,7 +18,7 @@ arg_alias_remove: The alias to be removed.
 arg_antialt_time: The time difference between when the user joined the server and when their account was created.
 arg_autocommand_id: The ID of the autocommand.
 arg_autocommand_time: Time until the command activation.
-arg_autoslowmode_duration: For how long the slow mode is going to last. Setting it to `0s` to makes the slow mode permanent.
+arg_autoslowmode_duration: For how long the slow mode is going to last. Setting it to `0s` makes the slow mode permanent.
 arg_autoslowmode_interval: How frequently users will be able to send messages after the slow mode is triggered.
 arg_autoslowmode_messages: The amount of messages that need to be sent in rapid succession in order to trigger the slow mode. Minimum of `2`.
 arg_autoslowmode_time: The time frame within successive messages need to be sent in order for the slow mode to be triggered.

@@ -7,7 +7,6 @@ using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Enums;
 using AkkoCore.Services.Database.Queries;
-using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
@@ -45,6 +44,9 @@ namespace AkkoCore.Services.Events
         public Task LoadInitialStateAsync(DiscordClient client, ReadyEventArgs eventArgs)
             => Task.CompletedTask;
 
+        public Task InitializeTimersAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+            => _akkoCache.Timers.CreateClientTimersAsync(client);
+
         public async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
@@ -60,18 +62,6 @@ namespace AkkoCore.Services.Events
                 // Save the new guilds to the database
                 await db.BulkCopyAsync(100, newGuilds);
             }
-        }
-
-        public Task InitializeTimersAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
-        {
-            if (_akkoCache is AkkoCache cache)
-            {
-                var cmdHandler = client.GetCommandsNext();
-                cache.Timers ??= cmdHandler.Services.GetService<ITimerManager>();
-                return cache.Timers.CreateClientTimersAsync(client);
-            }
-
-            return Task.CompletedTask;
         }
 
         // Filters need to be cached even if the server has no activity, because they could be disabled but

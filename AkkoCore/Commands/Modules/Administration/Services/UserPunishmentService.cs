@@ -285,7 +285,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             db.Add(notice);
             db.Upsert(occurrence);
-            db.Update(dbTimer);
+            db.Add(dbTimer);
 
             await db.SaveChangesAsync();
 

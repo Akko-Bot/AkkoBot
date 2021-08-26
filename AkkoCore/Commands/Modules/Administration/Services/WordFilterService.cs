@@ -3,8 +3,10 @@ using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
+using AkkoCore.Services.Database.Queries;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -35,11 +37,10 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
+            if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
+                filteredWords = await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid) ?? new() { GuildIdFK = sid };
 
-            filteredWords ??= await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid)
-                ?? new() { GuildIdFK = sid };
-
+            var entityState = db.FilteredWords.Upsert(filteredWords);
             var amount = filteredWords.Words.Count;
 
             // Add the new words to the db entry
@@ -51,14 +52,15 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             // If a word got added
             if (amount != filteredWords.Words.Count)
-            {
+            {              
+                // Save to the database
+                await db.SaveChangesAsync();
+
                 // Update the cache
                 _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
-
-                // Save to the database
-                db.Update(filteredWords);
-                await db.SaveChangesAsync();
             }
+
+            entityState.State = EntityState.Detached;
 
             return amount != filteredWords.Words.Count;
         }
@@ -73,11 +75,10 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
+            if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
+                filteredWords = await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid) ?? new() { GuildIdFK = sid };
 
-            filteredWords ??= await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid)
-                ?? new() { GuildIdFK = sid };
-
+            var entityState = db.FilteredWords.Upsert(filteredWords);
             var amount = filteredWords.IgnoredIds.Count;
 
             foreach (var id in ids)
@@ -89,13 +90,14 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             // If an ID got added
             if (amount != filteredWords.IgnoredIds.Count)
             {
+                // Save to the database
+                await db.SaveChangesAsync();
+
                 // Update the cache
                 _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
-
-                // Save to the database
-                db.Update(filteredWords);
-                await db.SaveChangesAsync();
             }
+
+            entityState.State = EntityState.Detached;
 
             return amount != filteredWords.IgnoredIds.Count;
         }
@@ -111,20 +113,17 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            _dbCache.FilteredWords.TryGetValue(sid, out var filteredWords);
+            if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
+                filteredWords = await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid) ?? new() { GuildIdFK = sid };
 
-            filteredWords ??= await db.FilteredWords.FirstOrDefaultAsyncEF(x => x.GuildIdFK == sid)
-                ?? new() { GuildIdFK = sid };
-
+            db.FilteredWords.Upsert(filteredWords);
             var result = action(filteredWords);
+
+            // Update the database
+            await db.SaveChangesAsync();
 
             // Update the cache
             _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
-
-            // I don't know which property has been changed,
-            // so I need to use EF Core here
-            db.Update(filteredWords);
-            await db.SaveChangesAsync();
 
             return result;
         }

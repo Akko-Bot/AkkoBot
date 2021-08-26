@@ -195,7 +195,6 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequireUserPermissions(Permissions.ManageMessages | Permissions.ManageGuild)]
         public async Task ClearTagsAsync(CommandContext context)
         {
-            
             var question = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("q_are_you_sure", "tag_delete_all_tags", "q_yes", "q_no"));
 
@@ -362,7 +361,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             });
         }
 
-        #endregion
+        #endregion Clear
 
         #region List and Search
 
@@ -424,7 +423,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             await SendTagListAsync(context, new SmartString(context, string.Empty), tags);
         }
 
-        #endregion
+        #endregion List and Search
 
         /// <summary>
         /// Sends the list of tags of the current context.

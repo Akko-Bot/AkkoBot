@@ -46,9 +46,6 @@ namespace AkkoCore.Services.Database
             modelBuilder.Entity<PlayingStatusEntity>()
                 .HasIndex(x => x.Id);
 
-            modelBuilder.Entity<CommandCooldownEntity>()
-                .HasIndex(x => x.Id);
-
             #endregion Global Configuration
 
             #region Guild Configuration
@@ -60,6 +57,14 @@ namespace AkkoCore.Services.Database
             modelBuilder.Entity<AliasEntity>()
                 .HasOne(x => x.GuildConfigRel)
                 .WithMany(x => x.AliasRel)
+                .HasForeignKey(x => x.GuildIdFK)
+                .HasPrincipalKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Guild -> Command Cooldown
+            modelBuilder.Entity<CommandCooldownEntity>()
+                .HasOne(x => x.GuildConfigRel)
+                .WithMany(x => x.CommandCooldownRel)
                 .HasForeignKey(x => x.GuildIdFK)
                 .HasPrincipalKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Cascade);

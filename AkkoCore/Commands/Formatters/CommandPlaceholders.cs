@@ -191,7 +191,7 @@ namespace AkkoCore.Commands.Formatters
                     : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.RelativeTime);
             },
 
-            #endregion
+            #endregion Discord Timestamps
 
             #region Miscelaneous
 
@@ -227,7 +227,7 @@ namespace AkkoCore.Commands.Formatters
                     : context.RawArguments[index];
             }
 
-            #endregion
+            #endregion Miscelaneous
         };
 
         public virtual bool TryParse(CommandContext context, Match match, out object result)

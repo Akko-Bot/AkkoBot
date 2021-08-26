@@ -84,7 +84,7 @@ namespace AkkoCore.Services.Events
 
             var cmdHandler = client.GetCommandsNext();
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, prefix, null);
-            
+
             // Local function to determine the correct alias from the user input
             bool AliasSelector(AliasEntity alias)
             {

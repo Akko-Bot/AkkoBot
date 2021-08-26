@@ -14,12 +14,12 @@ namespace AkkoCore.Commands.Abstractions
         /// <summary>
         /// Collection of qualified names of all global commands with a cooldown.
         /// </summary>
-        public IEnumerable<KeyValuePair<string, TimeSpan>> Commands { get; }
+        IReadOnlyDictionary<string, TimeSpan> GlobalCommands { get; }
 
         /// <summary>
         /// Collection of qualified names of all server commands with a cooldown.
         /// </summary>
-        public IEnumerable<KeyValuePair<(string, ulong), TimeSpan>> GuildCommands { get; }
+        IReadOnlyDictionary<(string, ulong), TimeSpan> GuildCommands { get; }
 
         /// <summary>
         /// Checks if the specified command has a cooldown.
@@ -27,7 +27,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="cmd">The command to be checked.</param>
         /// <param name="server">The Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <returns><see langword="true"/> if it has a cooldown, <see langword="false"/> otherwise.</returns>
-        public bool ContainsCommand(Command cmd, DiscordGuild server = null);
+        bool ContainsCommand(Command cmd, DiscordGuild server = null);
 
         /// <summary>
         /// Adds a command cooldown.
@@ -36,7 +36,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="duration">The time the cooldown should last.</param>
         /// <param name="server">The Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <returns><see langword="true"/> if the cooldown was successfully added, <see langword="false"/> otherwise.</returns>
-        public bool AddCommand(Command cmd, TimeSpan duration, DiscordGuild server = null);
+        bool AddCommand(Command cmd, TimeSpan duration, DiscordGuild server = null);
 
         /// <summary>
         /// Removes a command cooldown.
@@ -44,7 +44,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="qualifiedCommand">The qualified name of the command to be removed.</param>
         /// <param name="sid">The ID of the Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <returns><see langword="true"/> if the cooldown was successfully removed, <see langword="false"/> otherwise.</returns>
-        public bool RemoveCommand(string qualifiedCommand, ulong? sid);
+        bool RemoveCommand(string qualifiedCommand, ulong? sid);
 
         /// <summary>
         /// Adds a user to the cooldown list for a certain command.
@@ -52,7 +52,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="cmd">The command to be put on cooldown.</param>
         /// <param name="user">The user to be put on cooldown.</param>
         /// <returns><see langword="true"/> if the user was successfully added, <see langword="false"/> otherwise.</returns>
-        public bool AddUser(Command cmd, DiscordUser user);
+        bool AddUser(Command cmd, DiscordUser user);
 
         /// <summary>
         /// Checks if a user has an active cooldown for the specified command.
@@ -62,13 +62,20 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="server">The Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <remarks>In case a command has a global and a server cooldown, the longest will apply.</remarks>
         /// <returns><see langword="true"/> if the user has an active cooldown for <paramref name="cmd"/>, <see langword="false"/> otherwise.</returns>
-        public bool IsOnCooldown(Command cmd, DiscordUser user, DiscordGuild server = null);
+        bool IsOnCooldown(Command cmd, DiscordUser user, DiscordGuild server = null);
 
         /// <summary>
         /// Initializes this object with entries from the database.
         /// </summary>
         /// <param name="dbCommands">Collection of entries to be loaded into memory.</param>
         /// <returns>This <see cref="ICommandCooldown"/>.</returns>
-        public ICommandCooldown LoadFromEntities(IEnumerable<CommandCooldownEntity> dbCommands);
+        ICommandCooldown LoadFromEntities(IEnumerable<CommandCooldownEntity> dbCommands);
+
+        /// <summary>
+        /// Removes command cooldowns with entries from the database.
+        /// </summary>
+        /// <param name="dbCommands">Collection of entries to be loaded into memory.</param>
+        /// <returns>This <see cref="ICommandCooldown"/>.</returns>
+        ICommandCooldown UnloadFromEntities(IEnumerable<CommandCooldownEntity> dbCommands);
     }
 }

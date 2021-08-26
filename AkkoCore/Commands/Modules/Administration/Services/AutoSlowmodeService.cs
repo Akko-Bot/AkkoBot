@@ -3,6 +3,7 @@ using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
+using AkkoCore.Services.Database.Queries;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,13 +36,11 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<AutoSlowmodeEntity, T> selector)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            _dbCache.AutoSlowmode.TryGetValue(server.Id, out var slowmode);
+            if (!_dbCache.AutoSlowmode.TryGetValue(server.Id, out var slowmode))
+                slowmode = await db.AutoSlowmode.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id) ?? new() { GuildIdFK = server.Id };
 
-            slowmode ??= await db.AutoSlowmode.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id)
-                ?? new() { GuildIdFK = server.Id };
+            db.AutoSlowmode.Upsert(slowmode);
             var result = selector(slowmode);
-
-            db.Update(slowmode);
             await db.SaveChangesAsync();
 
             if (slowmode.IsActive)

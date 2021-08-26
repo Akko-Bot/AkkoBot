@@ -44,7 +44,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (string.IsNullOrWhiteSpace(trigger) || string.IsNullOrWhiteSpace(response)
                 || (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id)))
                 return false;
-            
+
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
             var dbTag = new TagEntity()
@@ -172,21 +172,10 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                 return default;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            var result = setter(dbTag);
 
-            await db.Tags.UpdateAsync(
-                x => x.Id == id,
-                _ => new TagEntity()
-                {
-                    AllowedPerms = dbTag.AllowedPerms,
-                    Behavior = dbTag.Behavior,
-                    IsEmoji = dbTag.IsEmoji,
-                    IgnoredIds = dbTag.IgnoredIds,
-                    Response = dbTag.Response,
-                    Trigger = dbTag.Trigger,
-                    
-                }
-            );
+            db.Tags.Attach(dbTag);
+            var result = setter(dbTag);
+            await db.SaveChangesAsync();
 
             return result;
         }

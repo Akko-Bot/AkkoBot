@@ -5,7 +5,7 @@ using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Queries;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
+using LinqToDB;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -41,7 +41,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             var newEntry = new CommandCooldownEntity()
             {
-                GuildId = server?.Id,
+                GuildIdFK = server?.Id,
                 Command = cmd.QualifiedName,
                 Cooldown = time
             };
@@ -59,23 +59,14 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// Removes a command cooldown from the database.
         /// </summary>
         /// <param name="qualifiedCommand">The qualified name of the command.</param>
-        /// <param name="server">The Discord guild associated with this cooldown, <see langword="null"/> if the cooldown is global.</param>
+        /// <param name="id">The ID of the Discord guild associated with this cooldown, <see langword="null"/> if the cooldown is global.</param>
         /// <returns><see langword="true"/> if the cooldown was successfully removed, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> RemoveCommandCooldownAsync(string qualifiedCommand, DiscordGuild server = null)
+        public async Task<bool> RemoveCommandCooldownAsync(string qualifiedCommand, ulong? id = default)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
 
-            var dbEntry = (server is null)
-                ? await db.CommandCooldown.FirstOrDefaultAsync(x => x.Command == qualifiedCommand)
-                : await db.CommandCooldown.FirstOrDefaultAsync(x => x.Command == qualifiedCommand && x.GuildId == server.Id);
-
-            if (dbEntry is null)
-                return false;
-
-            db.Remove(dbEntry);
-            _cmdCooldown.RemoveCommand(dbEntry.Command, server?.Id);
-
-            return await db.SaveChangesAsync() is not 0;
+            return _cmdCooldown.RemoveCommand(qualifiedCommand, id)
+                && await db.CommandCooldown.DeleteAsync(x => x.Command == qualifiedCommand && x.GuildIdFK == id) is not 0;
         }
 
         /// <summary>
@@ -86,7 +77,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         public IEnumerable<KeyValuePair<string, TimeSpan>> GetCooldownCommands(DiscordGuild server = null)
         {
             return (server is null)
-                ? _cmdCooldown.Commands
+                ? _cmdCooldown.GlobalCommands
                 : _cmdCooldown.GuildCommands.Where(x => x.Key.Item2 == server.Id).Select(x => KeyValuePair.Create(x.Key.Item1, x.Value));
         }
     }

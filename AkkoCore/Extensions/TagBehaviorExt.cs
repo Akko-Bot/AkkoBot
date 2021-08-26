@@ -16,7 +16,7 @@ namespace AkkoCore.Extensions
         {
             var result = new StringBuilder();
             var allValues = Enum.GetValues<TagBehavior>()
-                .Where(x => behavior.HasFlag(x));           
+                .Where(x => behavior.HasFlag(x));
 
             foreach (var value in allValues)
             {

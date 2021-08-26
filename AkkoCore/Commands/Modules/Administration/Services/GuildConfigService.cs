@@ -3,11 +3,14 @@ using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
+using AkkoCore.Services.Database.Queries;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Administration.Services
@@ -54,10 +57,13 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
         {
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
-            var dbGuild = _dbCache.Guilds.GetOrAdd(server.Id, sid => new GuildConfigEntity() { GuildId = sid });
-            var result = selector(dbGuild);
+            var dbGuild = _dbCache.Guilds.GetOrAdd(
+                server.Id,
+                sid => db.GuildConfig.IncludeCacheable().FirstOrDefault(x => x.GuildId == server.Id) ?? new GuildConfigEntity() { GuildId = sid }
+            );
 
-            db.GuildConfig.Update(dbGuild);
+            db.GuildConfig.Upsert(dbGuild);
+            var result = selector(dbGuild);
             await db.SaveChangesAsync();
 
             return result;

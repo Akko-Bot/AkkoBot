@@ -29,6 +29,7 @@ namespace AkkoCore.Services.Events
         private const string _remainingTextPlaceholder = "{remaining.text}";
         private readonly TimeSpan _updateTime = TimeSpan.FromDays(1);
         private readonly EventId _tagLogEvent = new(98, nameof(TagEventHandler));
+
         private readonly Regex _emojiRegex = new(
             @"<a?:(\S+?):(\d+?)>",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
@@ -219,7 +220,7 @@ namespace AkkoCore.Services.Events
         /// <returns><see langword="true"/> if the tag is elegible for execution, <see langword="false"/> otherwise.</returns>
         private bool FilterEmojiTags(string parsedTrigger, MessageCreateEventArgs eventArgs, TagEntity dbTag)
         {
-            if (!dbTag.IsEmoji 
+            if (!dbTag.IsEmoji
                 || (eventArgs.Guild is not null
                 && dbTag.AllowedPerms is not Permissions.None
                 && !(eventArgs.Author as DiscordMember).PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | dbTag.AllowedPerms)))

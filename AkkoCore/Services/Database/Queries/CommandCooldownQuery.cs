@@ -24,8 +24,8 @@ namespace AkkoCore.Services.Database.Queries
         /// <returns>The tracked entity.</returns>
         public static EntityEntry Upsert(this DbSet<CommandCooldownEntity> table, CommandCooldownEntity newEntry)
         {
-            var oldEntry = table.Local.FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Command == newEntry.Command)
-                ?? table.AsNoTracking().FirstOrDefault(x => x.GuildId == newEntry.GuildId && x.Command == newEntry.Command);
+            var oldEntry = table.Local.FirstOrDefault(x => x.GuildIdFK == newEntry.GuildIdFK && x.Command == newEntry.Command)
+                ?? table.AsNoTracking().FirstOrDefault(x => x.GuildIdFK == newEntry.GuildIdFK && x.Command == newEntry.Command);
 
             if (oldEntry is null)
                 return table.Add(newEntry);

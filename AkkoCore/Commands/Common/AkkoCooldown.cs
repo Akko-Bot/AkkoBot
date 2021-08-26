@@ -1,10 +1,14 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Extensions;
+using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AkkoCore.Commands.Common
 {
@@ -17,8 +21,14 @@ namespace AkkoCore.Commands.Common
         private ConcurrentDictionary<(string, ulong), TimeSpan> _serverCooldown = new();
         private ConcurrentDictionary<(string, ulong), DateTimeOffset> _recentUsers = new();
 
-        public IEnumerable<KeyValuePair<string, TimeSpan>> Commands => _globalCooldown;
-        public IEnumerable<KeyValuePair<(string, ulong), TimeSpan>> GuildCommands => _serverCooldown;
+        public IReadOnlyDictionary<string, TimeSpan> GlobalCommands => _globalCooldown;
+        public IReadOnlyDictionary<(string, ulong), TimeSpan> GuildCommands => _serverCooldown;
+
+        public AkkoCooldown(IServiceScopeFactory scopeFactory)
+        {
+            using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            LoadFromEntities(db.CommandCooldown.Where(x => !x.GuildIdFK.HasValue));
+        }
 
         public bool ContainsCommand(Command cmd, DiscordGuild server = null)
         {
@@ -58,10 +68,23 @@ namespace AkkoCore.Commands.Common
         {
             foreach (var dbCmd in dbCommands)
             {
-                if (!dbCmd.GuildId.HasValue)
+                if (!dbCmd.GuildIdFK.HasValue)
                     _globalCooldown.AddOrUpdate(dbCmd.Command, dbCmd.Cooldown, (_, _) => dbCmd.Cooldown);
                 else
-                    _serverCooldown.AddOrUpdate((dbCmd.Command, dbCmd.GuildId.Value), dbCmd.Cooldown, (_, _) => dbCmd.Cooldown);
+                    _serverCooldown.AddOrUpdate((dbCmd.Command, dbCmd.GuildIdFK.Value), dbCmd.Cooldown, (_, _) => dbCmd.Cooldown);
+            }
+
+            return this;
+        }
+
+        public ICommandCooldown UnloadFromEntities(IEnumerable<CommandCooldownEntity> dbCommands)
+        {
+            foreach (var dbCmd in dbCommands)
+            {
+                if (!dbCmd.GuildIdFK.HasValue)
+                    _globalCooldown.TryRemove(dbCmd.Command, out _);
+                else
+                    _serverCooldown.TryRemove((dbCmd.Command, dbCmd.GuildIdFK.Value), out _);
             }
 
             return this;

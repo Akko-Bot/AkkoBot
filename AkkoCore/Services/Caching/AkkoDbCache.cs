@@ -1,4 +1,5 @@
-﻿using AkkoCore.Config.Models;
+﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database.Entities;
@@ -36,10 +37,13 @@ namespace AkkoCore.Services.Database
         public ConcurrentDictionary<ulong, AutoSlowmodeEntity> AutoSlowmode { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<TagEntity>> Tags { get; private set; }
+        public ICommandCooldown CommandCooldown { get; private set; }
 
-        public AkkoDbCache(IServiceScopeFactory scopeFactory)
+        public AkkoDbCache(IServiceScopeFactory scopeFactory, ICommandCooldown commandCooldown)
         {
             _scopeFactory = scopeFactory;
+            CommandCooldown = commandCooldown;
+
             using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var dbContext);
 
             // The properties below are global
@@ -138,6 +142,9 @@ namespace AkkoCore.Services.Database
             if (dbGuild.TagsRel.Count is not 0)
                 Tags.TryAdd(dbGuild.GuildId, dbGuild.TagsRel.ToConcurrentHashSet());
 
+            if (dbGuild.CommandCooldownRel.Count is not 0)
+                CommandCooldown.LoadFromEntities(dbGuild.CommandCooldownRel);
+
             return true;
         }
 
@@ -156,6 +163,9 @@ namespace AkkoCore.Services.Database
             Polls.TryRemove(sid, out var polls);
             GuildLogs.TryRemove(sid, out var guildLogs);
             Tags.TryRemove(sid, out var guildTags);
+
+            if (dbGuild.CommandCooldownRel.Count is not 0)
+                CommandCooldown.UnloadFromEntities(dbGuild.CommandCooldownRel);
 
             aliases?.Clear();
             filters?.Clear();
@@ -188,6 +198,7 @@ namespace AkkoCore.Services.Database
                     FilteredContent?.Clear();
                     Gatekeeping?.Clear();
                     AutoSlowmode?.Clear();
+                    CommandCooldown?.Dispose();
 
                     if (Aliases is not null)
                     {
@@ -251,6 +262,7 @@ namespace AkkoCore.Services.Database
                 AutoSlowmode = null;
                 GuildLogs = null;
                 Tags = null;
+                CommandCooldown = null;
 
                 _isDisposed = true;
             }
