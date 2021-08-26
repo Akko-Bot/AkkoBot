@@ -75,7 +75,7 @@ namespace AkkoCore.Services.Timers
 
         public bool TryUpdate(IAkkoTimer timer)
         {
-            if (!_timers.TryGetValue(timer.Id, out var oldTimer) && _timers.TryUpdate(timer.Id, timer, oldTimer))
+            if (_timers.TryGetValue(timer.Id, out var oldTimer) && _timers.TryUpdate(timer.Id, timer, oldTimer))
             {
                 timer.OnDispose += TimerAutoRemoval;
                 oldTimer.OnDispose -= TimerAutoRemoval;

@@ -11,6 +11,7 @@ using AkkoCore.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -285,7 +286,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             db.Add(notice);
             db.Upsert(occurrence);
-            db.Add(dbTimer);
+            db.Upsert(dbTimer);
 
             await db.SaveChangesAsync();
 

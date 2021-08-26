@@ -57,7 +57,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 await db.SaveChangesAsync();
 
                 // Update the cache
-                _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
+                _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (_, _) => filteredWords);
             }
 
             entityState.State = EntityState.Detached;
@@ -94,7 +94,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 await db.SaveChangesAsync();
 
                 // Update the cache
-                _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
+                _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (_, _) => filteredWords);
             }
 
             entityState.State = EntityState.Detached;
@@ -123,7 +123,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             await db.SaveChangesAsync();
 
             // Update the cache
-            _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (x, y) => filteredWords);
+            _dbCache.FilteredWords.AddOrUpdate(sid, filteredWords, (_, _) => filteredWords);
 
             return result;
         }
