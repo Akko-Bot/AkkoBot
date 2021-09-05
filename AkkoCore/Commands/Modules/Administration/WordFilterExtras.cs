@@ -22,7 +22,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleInviteRemovalAsync(CommandContext context)
         {
-            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
 
             var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fi_toggle", (success) ? "enabled" : "disabled"));
@@ -35,7 +35,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleStickerRemovalAsync(CommandContext context)
         {
-            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
 
             var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fs_toggle", (success) ? "enabled" : "disabled"));

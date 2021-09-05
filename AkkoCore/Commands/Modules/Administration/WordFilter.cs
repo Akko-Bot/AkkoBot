@@ -26,7 +26,16 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task AddWordAsync(CommandContext context, [RemainingText, Description("arg_fw_word")] string word)
         {
-            var success = await _service.AddFilteredWordsAsync(context.Guild.Id, word);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x =>
+            {
+                var contains = x.Words.Contains(word);
+
+                if (!contains)
+                    x.Words.Add(word);
+
+                return !contains;
+            });
+
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
@@ -35,7 +44,19 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task AddManyWordsAsync(CommandContext context, [Description("arg_fw_words")] params string[] words)
         {
-            var success = await _service.AddFilteredWordsAsync(context.Guild.Id, words);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x =>
+            {
+                var amount = x.Words.Count;
+
+                foreach (var word in words)
+                {
+                    if (!x.Words.Contains(word))
+                        x.Words.Add(word);
+                }
+
+                return amount != x.Words.Count;
+            });
+
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
@@ -44,7 +65,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task SetNotificationMessageAsync(CommandContext context, [RemainingText, Description("arg_fw_message")] string message)
         {
-            await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.NotificationMessage = message);
+            await _service.SetWordFilterAsync(context.Guild.Id, x => x.NotificationMessage = message);
             await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
         }
 
@@ -53,7 +74,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleNotificationAsync(CommandContext context)
         {
-            var isEnabled = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.NotifyOnDelete = !x.NotifyOnDelete);
+            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.NotifyOnDelete = !x.NotifyOnDelete);
             var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fw_notify", (isEnabled) ? "enabled" : "disabled"));
 
@@ -65,7 +86,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleWarnOnDeleteAsync(CommandContext context)
         {
-            var isEnabled = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.WarnOnDelete = !x.WarnOnDelete);
+            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.WarnOnDelete = !x.WarnOnDelete);
             var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fw_warn", (isEnabled) ? "enabled" : "disabled"));
 
@@ -77,7 +98,19 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task AddIgnoredIdAsync(CommandContext context, [Description("arg_fw_ids")] params ulong[] ids)
         {
-            var success = await _service.AddIgnoredIdsAsync(context.Guild.Id, ids);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x =>
+            {
+                var amount = x.IgnoredIds.Count;
+
+                foreach (var id in ids)
+                {
+                    if (!x.IgnoredIds.Contains((long)id))
+                        x.IgnoredIds.Add((long)id);
+                }
+
+                return amount != x.IgnoredIds.Count;
+            });
+
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
@@ -86,8 +119,8 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task RemoveIgnoredIdAsync(CommandContext context, [Description("arg_fw_ids")] params ulong[] ids)
         {
-            var result = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.IgnoredIds.RemoveAll(x => ids.Contains((ulong)x)));
-            await context.Message.CreateReactionAsync((result is not 0) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
+            var result = await _service.SetWordFilterAsync(context.Guild.Id, x => x.IgnoredIds.RemoveAll(x => ids.Contains((ulong)x)) is not 0);
+            await context.Message.CreateReactionAsync((result) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
         [Command("remove"), Aliases("rm")]
@@ -95,7 +128,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task RemoveWordAsync(CommandContext context, [RemainingText, Description("arg_fw_word")] string word)
         {
-            var success = await _service.RemoveFilteredWordsAsync(context.Guild.Id, word);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Words.Remove(word));
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
@@ -104,7 +137,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task RemoveManyWordsAsync(CommandContext context, [Description("arg_fw_words")] params string[] words)
         {
-            var success = await _service.RemoveFilteredWordsAsync(context.Guild.Id, words);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Words.RemoveAll(y => words.Contains(y)) is not 0);
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
@@ -113,7 +146,14 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ClearWordsAsync(CommandContext context)
         {
-            var success = await _service.ClearFilteredWordsAsync(context.Guild.Id);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => 
+            {
+                var amount = x.Words.Count;
+                x.Words.Clear();
+
+                return amount != x.Words.Count;
+            });
+
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
@@ -122,7 +162,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task EnableAsync(CommandContext context)
         {
-            var success = await _service.SetWordFilterSettingsAsync(context.Guild.Id, x => x.IsActive = !x.IsActive);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.IsActive = !x.IsActive);
 
             var embed = new SerializableDiscordMessage()
                 .WithDescription(context.FormatLocalized("fw_toggle", (success) ? "enabled" : "disabled"));
