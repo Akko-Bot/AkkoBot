@@ -21,11 +21,12 @@ namespace AkkoCore.Services.Events
         private readonly IGatekeepEventHandler _gatekeeper;
         private readonly IGuildLogEventHandler _guildLogger;
         private readonly ITagEventHandler _tagEventHandler;
+        private readonly ICommandHandler _commandHandler;
         private readonly DiscordShardedClient _shardedClient;
 
         public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
             IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, IGuildLogEventHandler guildLogger, ITagEventHandler tagEventsHandler,
-            DiscordShardedClient shardedClient)
+            ICommandHandler commandHandler, DiscordShardedClient shardedClient)
         {
             _startup = startup;
             _voiceRoleHandler = vcRoleHandler;
@@ -36,6 +37,7 @@ namespace AkkoCore.Services.Events
             _gatekeeper = gatekeeper;
             _guildLogger = guildLogger;
             _tagEventHandler = tagEventsHandler;
+            _commandHandler = commandHandler;
             _shardedClient = shardedClient;
         }
 
@@ -110,6 +112,9 @@ namespace AkkoCore.Services.Events
             #endregion Log Events
 
             #region Bot Events
+
+            // Handle commands
+            _shardedClient.MessageCreated += _commandHandler.HandleCommandAsync;
 
             // Save guild on join
             _shardedClient.GuildCreated += _guildLoader.AddGuildOnJoinAsync;

@@ -376,6 +376,7 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton(_ => new Random()),
 
                 // > Commands
+                ServiceDescriptor.Singleton<ICommandHandler, AkkoCommandHandler>(),
                 ServiceDescriptor.Singleton<IPlaceholderFormatter, CommandPlaceholders>(),
                 ServiceDescriptor.Transient<IHelpFormatter, HelpFormatter>(),
                 ServiceDescriptor.Singleton<IPrefixResolver, PrefixResolver>(),
@@ -423,6 +424,7 @@ namespace AkkoCore.Core.Common
                 IgnoreExtraArguments = false,                   // Sets whether the bot ignores extra arguments on commands or not
                 Services = services,                            // Sets the dependencies used by the command modules
                 EnableDefaultHelp = false,                      // Sets whether the bot should use the default help command from the library
+                UseDefaultCommandHandler = false,               // Sets whether the bot uses the D#+ built-in command handler or not
                 PrefixResolver = services.GetRequiredService<IPrefixResolver>().ResolvePrefixAsync   // Sets the prefix, defined by the users
             };
 
