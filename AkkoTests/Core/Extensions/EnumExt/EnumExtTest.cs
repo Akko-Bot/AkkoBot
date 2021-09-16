@@ -64,7 +64,7 @@ namespace AkkoTests.Core.Extensions.EnumExt
         [InlineData(TestEnum.None | TestEnum.B, TestEnum.A | TestEnum.C | TestEnum.None, false)]
         [InlineData(TestEnum.None | TestEnum.B, TestEnum.A | TestEnum.C | TestEnum.D, false)]
         [InlineData(TestEnum.A | TestEnum.B, TestEnum.C | TestEnum.D | TestEnum.E, false)]
-        public void HasOneFlagTests<T>(T caller, T calle, bool result) where T : struct, Enum
+        internal void HasOneFlagTests<T>(T caller, T calle, bool result) where T : struct, Enum
             => Assert.Equal(result, caller.HasOneFlag(calle));
 
         [Theory]
@@ -73,7 +73,7 @@ namespace AkkoTests.Core.Extensions.EnumExt
         [InlineData(TestEnum.A | TestEnum.B | TestEnum.C, "A")]
         [InlineData(TestEnum.A | TestEnum.B | TestEnum.C, "A", "B")]
         [InlineData(TestEnum.A, "A", "B", "C")]
-        public void ToFlagStringTestTrue<T>(T enumGroup, params string[] responses) where T : struct, Enum
+        internal void ToFlagStringTestTrue<T>(T enumGroup, params string[] responses) where T : struct, Enum
         {
             var actualStrings = enumGroup.ToStrings().ToArray();
             Assert.Contains(responses, x => actualStrings.Contains(x));
@@ -85,10 +85,21 @@ namespace AkkoTests.Core.Extensions.EnumExt
         [InlineData(TestEnum.A | TestEnum.B | TestEnum.C, "D")]
         [InlineData(TestEnum.A | TestEnum.B | TestEnum.C, "D", "E")]
         [InlineData(TestEnum.A, "None", "B", "C")]
-        public void ToFlagStringTestFalse<T>(T enumGroup, params string[] responses) where T : struct, Enum
+        internal void ToFlagStringTestFalse<T>(T enumGroup, params string[] responses) where T : struct, Enum
         {
             var actualStrings = enumGroup.ToStrings().ToArray();
             Assert.DoesNotContain(responses, x => actualStrings.Contains(x));
+        }
+
+        [Theory]
+        [InlineData(TestEnum.A, TestEnum.A)]
+        [InlineData(TestEnum.A | TestEnum.B, TestEnum.A, TestEnum.B)]
+        [InlineData(TestEnum.A | TestEnum.B, TestEnum.None, TestEnum.A, TestEnum.B)]
+        [InlineData(TestEnum.A | TestEnum.B | TestEnum.D, TestEnum.A, TestEnum.B, TestEnum.D)]
+        internal void ToFlagsTest(TestEnum enumGroup, params TestEnum[] flags) // Generic params are not supported
+        {
+            var mergedFlags = flags.ToFlags();
+            Assert.Equal(enumGroup, mergedFlags);
         }
     }
 }

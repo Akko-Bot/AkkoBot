@@ -14,7 +14,7 @@ namespace AkkoTests.Core.Extensions.ArrayExt
         [InlineData(0)]
         [InlineData(-1)]
         [InlineData(-10)]
-        public void TryGetValueTestTrue(int arraySize)
+        internal void TryGetValueTestTrue(int arraySize)
         {
             var normalizedArraySize = Math.Abs(arraySize);
             var sample = Enumerable

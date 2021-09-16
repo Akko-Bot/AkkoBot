@@ -25,12 +25,12 @@ namespace AkkoTests.Core.Extensions.ObjectExt
         [InlineData(999, "D", false)]
         [InlineData(4, "C", false)]
         [InlineData(2, null, false)]
-        public void EqualsAnyTest(int id, string name, bool result)
+        internal void EqualsAnyTest(int id, string name, bool result)
             => Assert.Equal(result, new MockObject(id, name).EqualsAny(_dummies));
 
         [Theory]
         [InlineData(null, false)]
-        public void EqualsAnyNullTests(object thisObject, bool result)
+        internal void EqualsAnyNullTests(object thisObject, bool result)
         {
             Assert.Equal(result, thisObject.EqualsAny(_dummies));
             Assert.Equal(result, _dummies.EqualsAny(thisObject));

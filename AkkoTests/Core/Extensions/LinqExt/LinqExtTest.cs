@@ -39,7 +39,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void ToConcurrentDictionaryTest()
+        internal void ToConcurrentDictionaryTest()
         {
             var sample = _dummies.ToConcurrentDictionary(x => x.Id);
 
@@ -61,7 +61,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void ToConcurrentHashSetTest()
+        internal void ToConcurrentHashSetTest()
         {
             var sample = _dummies.ToConcurrentHashSet();
 
@@ -80,7 +80,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void ContainsSubcollectionTest()
+        internal void ContainsSubcollectionTest()
         {
             Assert.True(_dummies.ContainsSubcollection(_dummiesSubcollectionTrue));
             Assert.False(_dummies.ContainsSubcollection(_dummiesSubcollectionFalse));
@@ -93,7 +93,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void ContainsOneTest()
+        internal void ContainsOneTest()
         {
             Assert.True(_dummies.ContainsOne(new MockObject(0, char.ConvertFromUtf32(65))));
             Assert.True(_dummies.ContainsOne(_dummiesSubcollectionTrue));
@@ -108,7 +108,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void DistinctByTest()
+        internal void DistinctByTest()
         {
             var sample = _dummies
                 .Concat(_dummiesSubcollectionTrue)
@@ -146,7 +146,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void ExceptByTest()
+        internal void ExceptByTest()
         {
             // Should only contain odd ids
             var sample = _dummies
@@ -179,7 +179,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void IntersectByTest()
+        internal void IntersectByTest()
         {
             // Should only contain even ids
             var sample = _dummies
@@ -212,7 +212,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void FillTest()
+        internal void FillTest()
         {
             var sample = new string[] { "Some strings", "This should create 5 slots" }
                 .Select(x => x.Split(' '))
@@ -240,7 +240,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void SplitIntoTest()
+        internal void SplitIntoTest()
         {
             var sample = _dummiesWithNull.SplitInto(5);
 
@@ -271,7 +271,7 @@ namespace AkkoTests.Core.Extensions.LinqExt
         }
 
         [Fact]
-        public void SplitByTest()
+        internal void SplitByTest()
         {
             var counter = 1;
             var sample = _dummies

@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Extensions;
+using DSharpPlus;
 using System;
 using Xunit;
 
@@ -6,6 +7,8 @@ namespace AkkoTests.Core.Extensions.DateTimeOffsetExt
 {
     public class DateTimeOffsetExtTest
     {
+        private readonly DateTimeOffset _now = DateTimeOffset.Now;
+
         [Theory] // Offset is in minutes
         [InlineData(0, 0)]
         [InlineData(0, 0.9)]
@@ -16,7 +19,7 @@ namespace AkkoTests.Core.Extensions.DateTimeOffsetExt
         [InlineData(123, 123.456789)]
         [InlineData(600, 600.000001)]
         [InlineData(1, 1.000000001)]
-        public void StartOfDayTest(int goodOffset, double badOffset)
+        internal void StartOfDayTest(int goodOffset, double badOffset)
         {
             var today = DateTimeOffset.Now;
 
@@ -38,7 +41,18 @@ namespace AkkoTests.Core.Extensions.DateTimeOffsetExt
         [InlineData(123, 123.456789)]
         [InlineData(600, 600.000001)]
         [InlineData(1, 1.000000001)]
-        public void OffsetCorrectionTest(int expected, double actual)
+        internal void OffsetCorrectionTest(int expected, double actual)
             => Assert.Equal(TimeSpan.FromMinutes(expected), DateTimeOffset.Now.StartOfDay(TimeSpan.FromMinutes(actual)).Offset);
+
+        [Theory]
+        [InlineData(TimestampFormat.LongDate)]
+        [InlineData(TimestampFormat.LongDateTime)]
+        [InlineData(TimestampFormat.LongTime)]
+        [InlineData(TimestampFormat.RelativeTime)]
+        [InlineData(TimestampFormat.ShortDate)]
+        [InlineData(TimestampFormat.ShortDateTime)]
+        [InlineData(TimestampFormat.ShortTime)]
+        internal void DiscordTimestampTest(TimestampFormat format)
+            => Assert.True(_now.ToDiscordTimestamp(format).Equals($"<t:{_now.ToUnixTimeSeconds()}:{(char)format}>", StringComparison.Ordinal));
     }
 }
