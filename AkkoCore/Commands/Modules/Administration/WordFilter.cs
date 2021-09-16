@@ -146,7 +146,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ClearWordsAsync(CommandContext context)
         {
-            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => 
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x =>
             {
                 var amount = x.Words.Count;
                 x.Words.Clear();

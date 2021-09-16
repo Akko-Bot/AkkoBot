@@ -1,14 +1,11 @@
-﻿using AkkoCore.Commands.Common;
-using AkkoCore.Config.Models;
+﻿using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
-using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events

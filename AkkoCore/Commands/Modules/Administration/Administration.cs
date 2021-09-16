@@ -39,7 +39,7 @@ namespace AkkoCore.Commands.Modules.Administration
             _guildService = guildService;
             _botService = botService;
         }
-        
+
         [Command("sudo")]
         [Description("cmd_sudo")]
         [BotOwner, RequireGuild, Hidden]
@@ -57,7 +57,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
                 return;
             }
-                       
+
             var fakeContext = context.CommandsNext.CreateFakeContext(user, context.Channel, context.Prefix + command, context.Prefix, cmd, args);
 
             if (_commandHandler.CheckAndExecuteAsync(fakeContext) is null)

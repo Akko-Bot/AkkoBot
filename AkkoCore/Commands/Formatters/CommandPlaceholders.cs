@@ -1,5 +1,4 @@
 ﻿using AkkoCore.Commands.Abstractions;
-using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using DSharpPlus;

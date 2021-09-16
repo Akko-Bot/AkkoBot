@@ -20,7 +20,7 @@ namespace AkkoCore.Services.Database.Entities
         /// The settings of the Discord guild this command permission override is associated with.
         /// </summary>
         public GuildConfigEntity GuildConfigRel { get; init; }
-        
+
         /// <summary>
         /// The list of user IDs allowed to run this command.
         /// </summary>
