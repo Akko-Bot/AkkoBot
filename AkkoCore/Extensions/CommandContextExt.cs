@@ -180,7 +180,7 @@ namespace AkkoCore.Extensions
         /// </remarks>
         public static async Task RespondPaginatedByFieldsAsync(this CommandContext context, SerializableDiscordMessage message, int maxFields = 5)
         {
-            if (message.Fields.Count <= maxFields)
+            if (message.Fields is null || message.Fields.Count <= maxFields)
             {
                 await context.RespondLocalizedAsync(message, false);
                 return;

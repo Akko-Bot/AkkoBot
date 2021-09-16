@@ -4,6 +4,8 @@ using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;
+using AkkoCore.Services.Database.Entities;
+using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -24,14 +26,16 @@ namespace AkkoCore.Commands.Formatters
         private readonly SerializableDiscordMessage _helpMessage = new();
         private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
+        private readonly ICommandHandler _commandHandler;
         private readonly BotConfig _botConfig;
 
         public bool IsErroed { get; private set; }
 
-        public HelpFormatter(IDbCache dbCache, ILocalizer localizer, BotConfig botConfig)
+        public HelpFormatter(IDbCache dbCache, ILocalizer localizer, ICommandHandler commandHandler, BotConfig botConfig)
         {
             _dbCache = dbCache;
             _localizer = localizer;
+            _commandHandler = commandHandler;
             _botConfig = botConfig;
         }
 
@@ -85,6 +89,7 @@ namespace AkkoCore.Commands.Formatters
                 .WithDescription(cmd.Description);
 
             // Add requirements
+            _commandHandler.GetActiveOverride(context.Guild?.Id, cmd, out var permOverride);
             var stringBuilder = new StringBuilder();
             var requirements = cmd.GetRequirements();
 
@@ -94,9 +99,12 @@ namespace AkkoCore.Commands.Formatters
                     stringBuilder.AppendLine(context.FormatLocalized("perm_bot_owner"));
                 else if (att.AttributeType == typeof(RequireDirectMessageAttribute))
                     stringBuilder.AppendLine(context.FormatLocalized("perm_require_dm"));
-                else
-                    stringBuilder.AppendLine(GetLocalizedPermissions(context, att.ConstructorArguments));
+                else if (permOverride is null || !permOverride.IsActive)
+                    stringBuilder.AppendLine(GetLocalizedAttributePermissions(context, att.ConstructorArguments));
             }
+
+            if (permOverride is not null && permOverride.IsActive)
+                stringBuilder = GetLocalizedPermissionOverrides(context, stringBuilder, permOverride);
 
             if (stringBuilder.Length is not 0)
             {
@@ -240,8 +248,56 @@ namespace AkkoCore.Commands.Formatters
         /// <param name="permissions">Collection of attributes to have their permissions taken from.</param>
         /// <returns>A string with all localized attributes separated by a newline.</returns>
         /// <exception cref="InvalidCastException">Occurs when the attribute argument is not of type <see cref="Permissions"/>.</exception>
-        private string GetLocalizedPermissions(CommandContext context, IEnumerable<CustomAttributeTypedArgument> permissions)
+        private string GetLocalizedAttributePermissions(CommandContext context, IEnumerable<CustomAttributeTypedArgument> permissions)
             => string.Join("\n", permissions.Where(x => x.ArgumentType == typeof(Permissions)).SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(context)));
+
+        /// <summary>
+        /// Adds the localized overriden permissions to the suplied <paramref name="stringBuilder"/>.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="stringBuilder">The supplied string builder.</param>
+        /// <param name="permOverride">The permission override.</param>
+        /// <returns>The supplied <paramref name="stringBuilder"/> with all overriden permissions.</returns>
+        private StringBuilder GetLocalizedPermissionOverrides(CommandContext context, StringBuilder stringBuilder, PermissionOverrideEntity permOverride)
+        {
+            if (permOverride.AllowedUserIds.Count is not 0)
+            {
+                stringBuilder.AppendLine(
+                    context.FormatLocalized(
+                        "**{0}**: {1}",
+                        "users",
+                        string.Join(", ", _dbCache.Users.Values.Where(x => permOverride.AllowedUserIds.Contains((long)x.UserId)).Select(x => x.FullName))
+                    )
+                );
+            }
+
+            if (permOverride.AllowedRoleIds.Count is not 0)
+            {
+                stringBuilder.AppendLine(
+                    context.FormatLocalized(
+                        "**{0}**: {1}",
+                        "roles",
+                        string.Join(", ", context.Guild.Roles.Values.Where(x => permOverride.AllowedRoleIds.Contains((long)x.Id)).Select(x => x.Name))
+                    )
+                );
+            }
+
+            if (permOverride.AllowedChannelIds.Count is not 0)
+            {
+                stringBuilder.AppendLine(
+                    context.FormatLocalized(
+                        "**{0}**: {1}",
+                        "channels",
+                        string.Join(", ", context.Guild.Channels.Values.Where(x => permOverride.AllowedChannelIds.Contains((long)x.Id)).Select(x => x.Mention))
+                    )
+                );
+            }
+
+            if (permOverride.Permissions is not Permissions.None)
+                stringBuilder.AppendLine(string.Join('\n', permOverride.Permissions.ToLocalizedStrings(context)));
+
+            return stringBuilder;
+        }
 
         /// <summary>
         /// Gets the title of the help message.

@@ -71,7 +71,8 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
-arg_permission: A Discord [permission](https://www.google.com/).
+arg_permission: A Discord [permission](https://www.google.com/), wrapped around quotation marks.
+arg_permissions: Discord [permissions](https://www.google.com/), wrapped around quotation marks and separated by space.
 arg_poll_id: ID of the poll.
 arg_poll_qanswer: The question and the answers, separated by a semicolon `;`.
 arg_poll_question: A question.
@@ -322,6 +323,14 @@ cmd_moveuser: Moves a user to another voice channel. Provide no channel to force
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
+cmd_override: Groups commands for managing permission overrides. Use them to modify the permissions required for a command to be run. Using it in direct message with the bot requires bot ownership and makes the override global. Server overrides always take precedence over global overrides. Bot ownership cannot be overriden.
+cmd_override_channel: Toggles command usage for the specified channel.
+cmd_override_clear: Removes all permission overrides from the specified command.
+cmd_override_clearall: Removes all permission overrides from this server. Using it in direct message removes all global overrides.
+cmd_override_list: Lists the permission overrides in this server or the global overrides if used in direct message with the bot.
+cmd_override_permission: Sets the permissions required for the specified command.
+cmd_override_role: Toggles command usage for the specified role.
+cmd_override_user: Toggles command usage for the specified user.
 cmd_playingstatus: Groups commands to manage the bot's playing status.
 cmd_poll: Groups commands for managing polls.
 cmd_poll_forcestop: Forces a poll to stop. Use this if you have accidentally deleted a poll and can't close it anymore.
@@ -627,6 +636,17 @@ nsfw: NSFW
 nsfw_toggle: NSFW has been {0} on this channel.
 old_name: Old name
 online_since: Online since
+override_channel_add: The command {0} is now restricted to the channel {1}.
+override_channel_remove: The command {0} is not restricted to the channel {1} anymore.
+override_clearall: Successfully removed {0} permission overrides.
+override_global_list_title: List of Global Permission Overrides
+override_list_description: Use {0} on the commands listed below to learn what permissions they require.
+override_list_empty: No permission override was found.
+override_list_title: List of Server Permission Overrides
+override_role_add: The command {0} is now restricted to the role {1}.
+override_role_remove: The command {0} is not restricted to the role {1} anymore.
+override_user_add: The command {0} is now restricted to the user {1}.
+override_user_remove: The command {0} is not restricted to the user {1} anymore.
 owner: Owner
 owners: Owners
 pages: Page {0}/{1}
@@ -692,6 +712,7 @@ q_blclear: remove all blacklist entries
 q_deleteallroles: delete {0} roles
 q_no: 'no'
 q_operation_length_seconds: This operation will take at least {0} seconds.
+q_override_clearall: remove all permission overrides
 q_sql_query: run this query
 q_yes: 'yes'
 reaction: Reaction
@@ -781,6 +802,7 @@ used: Used
 user: User
 user_limit: User Limit
 userroles_title: "{0}'s roles"
+users: Users
 uses_left: Uses left
 value: Value
 vanity_url: Vanity URL

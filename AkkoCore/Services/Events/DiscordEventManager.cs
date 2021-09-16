@@ -116,6 +116,9 @@ namespace AkkoCore.Services.Events
             // Handle commands
             _shardedClient.MessageCreated += _commandHandler.HandleCommandAsync;
 
+            // Catch aliased commands and execute them
+            _shardedClient.MessageCreated += _commandHandler.HandleCommandAliasAsync;
+
             // Save guild on join
             _shardedClient.GuildCreated += _guildLoader.AddGuildOnJoinAsync;
 
@@ -154,9 +157,6 @@ namespace AkkoCore.Services.Events
 
             // Show prefix regardless of current config
             _shardedClient.MessageCreated += _globalEventsHandler.DefaultPrefixAsync;
-
-            // Catch aliased commands and execute them
-            _shardedClient.MessageCreated += _globalEventsHandler.HandleCommandAliasAsync;
 
             // Enables and disables channel slow mode
             _shardedClient.MessageCreated += _guildEventsHandler.AutoSlowmodeAsync;

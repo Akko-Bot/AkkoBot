@@ -37,6 +37,7 @@ namespace AkkoCore.Services.Database
         public ConcurrentDictionary<ulong, AutoSlowmodeEntity> AutoSlowmode { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; private set; }
         public ConcurrentDictionary<ulong, ConcurrentHashSet<TagEntity>> Tags { get; private set; }
+        public ConcurrentDictionary<ulong, ConcurrentHashSet<PermissionOverrideEntity>> PermissionOverrides { get; private set; }
         public ICommandCooldown CommandCooldown { get; private set; }
 
         public AkkoDbCache(IServiceScopeFactory scopeFactory, ICommandCooldown commandCooldown)
@@ -64,6 +65,14 @@ namespace AkkoCore.Services.Database
             Tags.TryAdd(    // Load global tags
                 default,
                 dbContext.Tags
+                    .Where(x => !x.GuildIdFK.HasValue)
+                    .ToConcurrentHashSet()
+            );
+
+            PermissionOverrides = new();
+            PermissionOverrides.TryAdd(    // Load global command permission overrides
+                default,
+                dbContext.PermissionOverride
                     .Where(x => !x.GuildIdFK.HasValue)
                     .ToConcurrentHashSet()
             );
@@ -142,6 +151,9 @@ namespace AkkoCore.Services.Database
             if (dbGuild.TagsRel.Count is not 0)
                 Tags.TryAdd(dbGuild.GuildId, dbGuild.TagsRel.ToConcurrentHashSet());
 
+            if (dbGuild.PermissionOverrideRel.Count is not 0)
+                PermissionOverrides.TryAdd(dbGuild.GuildId, dbGuild.PermissionOverrideRel.ToConcurrentHashSet());
+
             if (dbGuild.CommandCooldownRel.Count is not 0)
                 CommandCooldown.LoadFromEntities(dbGuild.CommandCooldownRel);
 
@@ -163,6 +175,7 @@ namespace AkkoCore.Services.Database
             Polls.TryRemove(sid, out var polls);
             GuildLogs.TryRemove(sid, out var guildLogs);
             Tags.TryRemove(sid, out var guildTags);
+            PermissionOverrides.TryRemove(sid, out var permOverrides);
 
             if (dbGuild.CommandCooldownRel.Count is not 0)
                 CommandCooldown.UnloadFromEntities(dbGuild.CommandCooldownRel);
@@ -173,6 +186,7 @@ namespace AkkoCore.Services.Database
             polls?.Clear();
             guildLogs?.Clear();
             guildTags?.Clear();
+            permOverrides?.Clear();
 
             return dbGuild is not null;
         }
@@ -247,6 +261,14 @@ namespace AkkoCore.Services.Database
 
                         Tags.Clear();
                     }
+
+                    if (PermissionOverrides is not null)
+                    {
+                        foreach (var group in PermissionOverrides.Values)
+                            group.Clear();
+
+                        PermissionOverrides.Clear();
+                    }
                 }
 
                 Blacklist = null;
@@ -263,6 +285,7 @@ namespace AkkoCore.Services.Database
                 GuildLogs = null;
                 Tags = null;
                 CommandCooldown = null;
+                PermissionOverrides = null;
 
                 _isDisposed = true;
             }

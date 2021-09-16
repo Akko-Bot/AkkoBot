@@ -71,7 +71,8 @@ arg_mention: Um ID ou menção válido do Discord.
 arg_module: Um módulo válido.
 arg_nickname: O novo apelido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
-arg_permission: Uma [permissão](https://www.google.com/) do Discord.
+arg_permission: Uma [permissão](https://www.google.com/) do Discord, dentro de aspas.
+arg_permissions: '[Permissões](https://www.google.com/) do Discord, dentro de aspas e separados por espaço.'
 arg_poll_id: ID da enquete.
 arg_poll_qanswer: A pergunta e as respostas, separadas por ponto-vírgula `;`.
 arg_poll_question: Uma pergunta.
@@ -322,6 +323,14 @@ cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal pa
 cmd_mute: Silencia um usuário nos canais de voz e texto.
 cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
+cmd_override: Agrupa comandos que gerenciam permissões personalizadas. Use-os para modificar as permissões necessárias para executar um comando. Usá-los em mensagem direta com o bot exige autoria do bot e torna a permissão global. Permissões personalizadas de servidor sempre terão prioridade sobre permissões personalizadas globais. Autoria do bot não é removível.
+cmd_override_channel: Ativa ou desativa exclusividade de uso do comando para o canal especificado.
+cmd_override_clear: Remove todas as permissões personalizadas do comando especificado.
+cmd_override_clearall: Remove todas as permissões personalizadas desse servidor. Use em mensagem direta com o bot para remover todas as permissões globais personalizadas.
+cmd_override_list: Exibe as permissões personalizadas desse servidor, ou as permissões globais se utilizado em mensagem direta com o bot.
+cmd_override_permission: Define as permissões necessárias para o comando especificado.
+cmd_override_role: Ativa ou desativa exclusividade de uso do comando para o cargo especificado.
+cmd_override_user: Ativa ou desativa exclusividade de uso do comando para o usuário especificado.
 cmd_playingstatus: Agrupa comands para gerenciar o status do bot.
 cmd_poll: Agrupa comandos para gerenciar enquetes.
 cmd_poll_forcestop: Força uma enquete a encerrar. Use esse comando se você acidentalmente excluir uma enquete e não puder encerrá-la.
@@ -627,6 +636,17 @@ nsfw: NSFW
 nsfw_toggle: NSFW foi {0} nesse canal.
 old_name: Nome antigo
 online_since: Online desde
+override_channel_add: O comando {0} está agora restrito ao canal {1}.
+override_channel_remove: O comando {0} não está mais restrito ao canal {1}.
+override_clearall: '{0} permissões personalizadas foram removidas.'
+override_global_list_title: Lista de Permissões Globais Personalizadas
+override_list_description: Utilize {0} nos comandos abaixo para descobrir quais permissões eles exigem.
+override_list_empty: Nenhuma permissão personalizada foi encontrada.
+override_list_title: Lista de Permissões Personalizadas do Servidor
+override_role_add: O comand {0} está agora restrito ao cargo {1}.
+override_role_remove: O comando {0} não está mais restrito ao cargo {1}.
+override_user_add: O comando {0} está agora restrito ao usuário {1}.
+override_user_remove: O comando {0} não está mais restrito ao usuário {1}.
 owner: Dono
 owners: Donos
 pages: Página {0}/{1}
@@ -692,6 +712,7 @@ q_blclear: remover todos os registros da lista negra
 q_deleteallroles: excluir {0} cargos
 q_no: 'não'
 q_operation_length_seconds: Essa operação levará pelo menos {0} segundos.
+q_override_clearall: remover todas as permissões personalizadas
 q_sql_query: executar essa instrução
 q_yes: 'sim'
 reaction: Reação
@@ -781,6 +802,7 @@ used: Utilizado
 user: Usuário
 user_limit: Limite de Usuários
 userroles_title: 'Cargos do {0}'
+users: Usuários
 uses_left: Usos restantes
 value: Valor
 vanity_url: Vanity URL

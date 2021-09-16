@@ -107,6 +107,15 @@ namespace AkkoCore.Services.Caching.Abstractions
         ConcurrentDictionary<ulong, ConcurrentHashSet<TagEntity>> Tags { get; }
 
         /// <summary>
+        /// Stores all command permission overrides.
+        /// </summary>
+        /// <remarks>
+        /// The <see langword="ulong"/> is the ID of the Discord guild if the override is specific to a guild
+        /// or zero if it is a global override. <see cref="ConcurrentHashSet{T}"/> is a collection of permission overrides.
+        /// </remarks>
+        ConcurrentDictionary<ulong, ConcurrentHashSet<PermissionOverrideEntity>> PermissionOverrides { get; }
+
+        /// <summary>
         /// Safely gets a database guild.
         /// </summary>
         /// <param name="sid">The GuildId of the database entry.</param>

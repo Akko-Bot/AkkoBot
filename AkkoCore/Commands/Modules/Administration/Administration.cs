@@ -6,6 +6,7 @@ using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services;
+using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -18,6 +19,7 @@ namespace AkkoCore.Commands.Modules.Administration
 {
     public class Administration : AkkoCommandModule
     {
+        private readonly ICommandHandler _commandHandler;
         private readonly GuildConfigService _guildService;
         private readonly BotConfigService _botService;
 
@@ -31,15 +33,16 @@ namespace AkkoCore.Commands.Modules.Administration
         /// </summary>
         private const Permissions _lockPerms = Permissions.SendMessages | Permissions.AddReactions;
 
-        public Administration(GuildConfigService guildService, BotConfigService botService)
+        public Administration(ICommandHandler commandHandler, GuildConfigService guildService, BotConfigService botService)
         {
+            _commandHandler = commandHandler;
             _guildService = guildService;
             _botService = botService;
         }
-
-        [BotOwner, RequireGuild, Hidden]
+        
         [Command("sudo")]
         [Description("cmd_sudo")]
+        [BotOwner, RequireGuild, Hidden]
         public async Task SudoAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordUser user,
@@ -54,13 +57,10 @@ namespace AkkoCore.Commands.Modules.Administration
 
                 return;
             }
+                       
+            var fakeContext = context.CommandsNext.CreateFakeContext(user, context.Channel, context.Prefix + command, context.Prefix, cmd, args);
 
-            var fakeContext = context.CommandsNext.CreateFakeContext(user, context.Channel, command, context.Prefix, cmd, args);
-            var failedChecks = await cmd.RunChecksAsync(fakeContext, false);
-
-            if (!failedChecks.Any())
-                await cmd.ExecuteAsync(fakeContext);
-            else
+            if (_commandHandler.CheckAndExecuteAsync(fakeContext) is null)
             {
                 var embed = new SerializableDiscordMessage().WithDescription("command_check_failed");
                 await context.RespondLocalizedAsync(embed, isError: true);

@@ -122,16 +122,7 @@ namespace AkkoCore.Commands.Modules.Help
                 keyword = keyword[context.Prefix.Length..];
 
             var embed = new SerializableDiscordMessage();
-            var cmds = context.CommandsNext.RegisteredCommands.Values
-                .Concat(
-                    context.CommandsNext.RegisteredCommands.Values
-                        .Where(x => x is CommandGroup)
-                        .SelectMany(x => (x as CommandGroup).Children)
-                )
-                .Where(
-                    x => x.QualifiedName.Contains(keyword, StringComparison.OrdinalIgnoreCase)
-                        || x.Aliases.Any(x => x.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                )
+            var cmds = context.CommandsNext.GetAllCommands(keyword)
                 .DistinctBy(x => x.QualifiedName)
                 .OrderBy(x => x.QualifiedName);
 

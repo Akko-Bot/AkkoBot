@@ -101,8 +101,8 @@ namespace AkkoCore.Services.Timers
         /// </summary>
         private void TriggerAction(object obj, ElapsedEventArgs args)
         {
-            if (_isDisposed) // Stop the callback from doing work if
-                return;      // it got triggered before disposal
+            if (_isDisposed) // Prevent the callback from doing work
+                return;      // if it got triggered before disposal
 
             // Update the internal clock
             _internalTimer.Interval = Interval.TotalMilliseconds;

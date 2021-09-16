@@ -18,10 +18,5 @@ namespace AkkoCore.Services.Events
         /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
         /// </summary>
         Task DefaultPrefixAsync(DiscordClient client, MessageCreateEventArgs eventArgs);
-
-        /// <summary>
-        /// Executes commands that are mapped to aliases.
-        /// </summary>
-        Task HandleCommandAliasAsync(DiscordClient client, MessageCreateEventArgs eventArgs);
     }
 }

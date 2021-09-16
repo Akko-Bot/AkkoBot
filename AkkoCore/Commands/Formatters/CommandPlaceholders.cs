@@ -45,6 +45,8 @@ namespace AkkoCore.Commands.Formatters
             ["server.id"] = (context) => context.Guild?.Id,
             ["server.name"] = (context) => context.Guild?.Name,
             ["server.members"] = (context) => context.Guild?.MemberCount,
+            ["server.boosters"] = (context) => context.Guild.PremiumSubscriptionCount ?? 0,
+            ["server.boostlevel"] = (context) => (int)context.Guild.PremiumTier,
             ["server.defaultchannel"] = (context) => context.Guild?.GetDefaultChannel().Mention,
             ["server.prefix"] = (context) => context.Prefix,
             ["p"] = (context) => context.Prefix,

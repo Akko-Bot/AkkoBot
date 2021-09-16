@@ -107,6 +107,11 @@ namespace AkkoCore.Services.Database.Entities
         public List<TagEntity> TagsRel { get; init; }
 
         /// <summary>
+        /// The list of permission overrides.
+        /// </summary>
+        public List<PermissionOverrideEntity> PermissionOverrideRel { get; init; }
+
+        /// <summary>
         /// The IDs of the roles that should be assigned to a Discord user when they join the guild.
         /// </summary>
         public List<long> JoinRoles { get; init; } = new();
