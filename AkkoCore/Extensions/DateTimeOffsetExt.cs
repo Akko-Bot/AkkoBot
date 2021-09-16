@@ -1,4 +1,4 @@
-using AkkoCore.Common;
+using DSharpPlus;
 using System;
 
 namespace AkkoCore.Extensions
@@ -21,7 +21,7 @@ namespace AkkoCore.Extensions
         /// <param name="date">This date time.</param>
         /// <param name="format">The timestamp format.</param>
         /// <returns>A Discord markdown timestamp.</returns>
-        public static string ToDiscordTimestamp(this DateTimeOffset date, DiscordTimestamp format = DiscordTimestamp.ShortDateAndTime)
+        public static string ToDiscordTimestamp(this DateTimeOffset date, TimestampFormat format = TimestampFormat.ShortDateTime)
             => $"<t:{date.ToUnixTimeSeconds()}:{(char)format}>";
     }
 }

@@ -130,7 +130,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                     .AddField("expires_on", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(), true)
                     .AddField("used", context.FormatLocalized("x_times", guildInvite.Uses), true)
                     .AddField("uses_left", (guildInvite.MaxUses is 0) ? "-" : (guildInvite.MaxUses - guildInvite.Uses).ToString(), true)
-                    .AddField("expires", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(DiscordTimestamp.RelativeTime), true);
+                    .AddField("expires", (guildInvite.MaxAge is 0) ? "-" : guildInvite.CreatedAt.AddSeconds(guildInvite.MaxAge).ToDiscordTimestamp(TimestampFormat.RelativeTime), true);
             }
 
             await context.RespondLocalizedAsync(embed, guildInvite is null, guildInvite is null);

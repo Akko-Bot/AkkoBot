@@ -87,13 +87,13 @@ namespace AkkoCore.Commands.Formatters
             ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name,
 
             /* Discord Timestamps */
-            ["datenow.shortdateandtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.ShortDateAndTime),
-            ["datenow.shortdate"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.ShortDate),
-            ["datenow.shorttime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.ShortTime),
-            ["datenow.longdateandtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.LongDateAndTime),
-            ["datenow.longdate"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.LongDate),
-            ["datenow.longtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.LongTime),
-            ["datenow.relativetime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(DiscordTimestamp.RelativeTime),
+            ["datenow.shortdateandtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.ShortDateTime),
+            ["datenow.shortdate"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.ShortDate),
+            ["datenow.shorttime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.ShortTime),
+            ["datenow.longdateandtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.LongDateTime),
+            ["datenow.longdate"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.LongDate),
+            ["datenow.longtime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.LongTime),
+            ["datenow.relativetime"] = (context) => DateTimeOffset.Now.ToDiscordTimestamp(TimestampFormat.RelativeTime),
 
             /* Miscelaneous */
 
@@ -142,7 +142,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.ShortDateAndTime);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.ShortDateTime);
             },
 
             ["date.shortdate"] = (context, parameter) =>
@@ -150,7 +150,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.ShortDate);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.ShortDate);
             },
 
             ["date.shorttime"] = (context, parameter) =>
@@ -158,7 +158,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.ShortTime);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.ShortTime);
             },
 
             ["date.longdateandtime"] = (context, parameter) =>
@@ -166,7 +166,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.LongDateAndTime);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.LongDateTime);
             },
 
             ["date.longdate"] = (context, parameter) =>
@@ -174,7 +174,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.LongDate);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.LongDate);
             },
 
             ["date.longtime"] = (context, parameter) =>
@@ -182,7 +182,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.LongTime);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.LongTime);
             },
 
             ["date.relativetime"] = (context, parameter) =>
@@ -190,7 +190,7 @@ namespace AkkoCore.Commands.Formatters
                 return parameter is not string[] arguments || arguments.Length != 1
                     || !long.TryParse(arguments[0], out var unixSeconds)
                     ? null
-                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(DiscordTimestamp.RelativeTime);
+                    : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.RelativeTime);
             },
 
             #endregion Discord Timestamps
