@@ -81,31 +81,5 @@ namespace AkkoCore.Commands.Modules.Basic
 
             await context.RespondLocalizedAsync(embed, false);
         }
-
-        [Command("test")]
-        public async Task GenerateBigMsgAsync(CommandContext context)
-        {
-            var google = "https://www.google.com/";
-            var resultingMessage = new SerializableDiscordMessage() { Content = "This is the content." };
-            var bigEmbed = new SerializableDiscordEmbed()
-                .WithAuthor(context.User.GetFullname(), google, context.User.AvatarUrl)
-                .WithThumbnail(context.User.AvatarUrl)
-                .WithColor("FFF000")
-                .WithTitle("This is the title")
-                .WithDescription("This is the description")
-                .WithImageUrl(context.User.DefaultAvatarUrl)
-                .WithFooter("Footer text", context.User.AvatarUrl)
-                .AddField("Field 1", "Body", true)
-                .AddField("Field 2", "Body", true)
-                .AddField("Field 3", "Body", false); 
-
-
-            var justImageEmbed = new SerializableDiscordEmbed()
-                .WithImageUrl("https://cdn.discordapp.com/attachments/881721906535997450/888200882884317234/result.png");
-
-            resultingMessage.AddEmbeds(new[] { bigEmbed, justImageEmbed });
-
-            await context.RespondAsync(Formatter.BlockCode(resultingMessage.ToYaml(), "yaml"));
-        }
     }
 }

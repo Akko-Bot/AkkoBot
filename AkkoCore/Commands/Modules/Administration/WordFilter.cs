@@ -3,6 +3,7 @@ using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
+using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -74,9 +75,9 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleNotificationAsync(CommandContext context)
         {
-            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.NotifyOnDelete = !x.NotifyOnDelete);
+            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior.ToggleFlag(WordFilterBehavior.NotifyOnDelete));
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("fw_notify", (isEnabled) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("fw_notify", (isEnabled.HasFlag(WordFilterBehavior.NotifyOnDelete)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -86,9 +87,9 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleWarnOnDeleteAsync(CommandContext context)
         {
-            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.WarnOnDelete = !x.WarnOnDelete);
+            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior.ToggleFlag(WordFilterBehavior.WarnOnDelete));
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("fw_warn", (isEnabled) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("fw_warn", (isEnabled.HasFlag(WordFilterBehavior.WarnOnDelete)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -216,7 +217,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 if (members.Length != 0)
                     embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"));
 
-                if (dbEntry.FilterInvites || dbEntry.FilterStickers)
+                if (dbEntry.Behavior.HasOneFlag(WordFilterBehavior.FilterInvite | WordFilterBehavior.FilterSticker))
                 {
                     var extraFilters = dbEntry.GetSettings()
                         .Where(x => x.Key is "filter_invites" or "filter_stickers" && x.Value is "True")

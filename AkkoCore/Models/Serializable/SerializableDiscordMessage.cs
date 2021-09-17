@@ -2,10 +2,12 @@
 using AkkoCore.Extensions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using YamlDotNet.Serialization;
 
 namespace AkkoCore.Models.Serializable
 {
@@ -26,6 +28,8 @@ namespace AkkoCore.Models.Serializable
         /// <summary>
         /// Gets the first embed of this message, <see langword="null"/> if there isn't one.
         /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
+        [YamlIgnore, JsonIgnore]
         public SerializableDiscordEmbed Embed
             => (Embeds is not null && Embeds.Count is not 0) ? Embeds[0] : null;
 
@@ -41,15 +45,29 @@ namespace AkkoCore.Models.Serializable
         /// <summary>
         /// Initializes a serializable Discord message.
         /// </summary>
+        public SerializableDiscordMessage() { }
+
+        /// <summary>
+        /// Initializes a serializable Discord message.
+        /// </summary>
         /// <param name="content">The content of the message.</param>
         /// <param name="embed">The message's first embed.</param>
-        /// <param name="embeds">Additional embeds.</param>
-        public SerializableDiscordMessage(string content = default, SerializableDiscordEmbed embed = default, IEnumerable<SerializableDiscordEmbed> embeds = default)
+        public SerializableDiscordMessage(string content, SerializableDiscordEmbed embed = default)
         {
             Content = content;
 
             if (embed is not null)
                 AddEmbed(embed);
+        }
+
+        /// <summary>
+        /// Initializes a serializable Discord message.
+        /// </summary>
+        /// <param name="content">The content of the message.</param>
+        /// <param name="embeds">A collection of embeds to be included in the message.</param>
+        public SerializableDiscordMessage(string content, IEnumerable<SerializableDiscordEmbed> embeds)
+        {
+            Content = content;
 
             if (embeds is not null)
                 AddEmbeds(embeds);
@@ -122,7 +140,7 @@ namespace AkkoCore.Models.Serializable
         /// <returns>This message builder.</returns>
         public SerializableDiscordMessage AddEmbeds(IEnumerable<SerializableDiscordEmbed> embeds)
         {
-            Embeds ??= new();
+            Embeds ??= new(embeds.Count());
 
             foreach (var embed in embeds)
                 Embeds.Add(embed);

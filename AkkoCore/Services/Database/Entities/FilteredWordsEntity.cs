@@ -1,6 +1,7 @@
 ﻿using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Abstractions;
+using AkkoCore.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -51,23 +52,8 @@ namespace AkkoCore.Services.Database.Entities
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// Determines whether stickers should be filtered.
+        /// Defines the additional behaviors of this filter.
         /// </summary>
-        public bool FilterStickers { get; set; }
-
-        /// <summary>
-        /// Determines whether server invites should be filtered.
-        /// </summary>
-        public bool FilterInvites { get; set; }
-
-        /// <summary>
-        /// Determines whether the user should be notified if they said a filtered word.
-        /// </summary>
-        public bool NotifyOnDelete { get; set; }
-
-        /// <summary>
-        /// Determines whether the user should be automatically warned for saying a filtered word.
-        /// </summary>
-        public bool WarnOnDelete { get; set; }
+        public WordFilterBehavior Behavior { get; set; } = WordFilterBehavior.None;
     }
 }

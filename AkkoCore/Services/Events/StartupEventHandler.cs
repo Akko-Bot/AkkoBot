@@ -72,7 +72,7 @@ namespace AkkoCore.Services.Events
 
             var dbGuilds = await db.GuildConfig
                 .IncludeCacheable()
-                .Where(x => (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId) // Replacement for "(sid >> 22) % max", since EF Core doesn't parse bitwise operators
+                .Where(x => (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId) // Replacement for "(sid >> 22) % max", since bitwise operators do not support ulongs
                 .ToArrayAsyncEF();
 
             foreach (var dbGuild in dbGuilds)

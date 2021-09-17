@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AkkoBot.Migrations
 {
@@ -9,25 +9,6 @@ namespace AkkoBot.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "aliases",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    guild_id = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
-                    is_dynamic = table.Column<bool>(type: "boolean", nullable: false),
-                    alias = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
-                    command = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    arguments = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
-                    date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_aliases", x => x.id);
-                },
-                comment: "Stores command aliases.");
-
             migrationBuilder.CreateTable(
                 name: "blacklist",
                 columns: table => new
@@ -46,23 +27,6 @@ namespace AkkoBot.Migrations
                     table.UniqueConstraint("ak_blacklist_context_id", x => x.context_id);
                 },
                 comment: "Stores users, channels, and servers blacklisted from the bot.");
-
-            migrationBuilder.CreateTable(
-                name: "command_cooldown",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    command = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    guild_id = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
-                    cooldown = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_command_cooldown", x => x.id);
-                },
-                comment: "Stores commands whose execution is restricted by a cooldown.");
 
             migrationBuilder.CreateTable(
                 name: "discord_users",
@@ -98,9 +62,8 @@ namespace AkkoBot.Migrations
                     error_color = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false),
                     ban_template = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
                     timezone = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    use_embed = table.Column<bool>(type: "boolean", nullable: false),
-                    permissive_role_mention = table.Column<bool>(type: "boolean", nullable: false),
-                    delete_cmd_on_message = table.Column<bool>(type: "boolean", nullable: false),
+                    behavior = table.Column<int>(type: "integer", nullable: false),
+                    minimum_tag_permissions = table.Column<long>(type: "bigint", nullable: false),
                     mute_role_id = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
                     warn_expire = table.Column<TimeSpan>(type: "interval", nullable: false),
                     interactive_timeout = table.Column<TimeSpan>(type: "interval", nullable: true),
@@ -132,6 +95,31 @@ namespace AkkoBot.Migrations
                 comment: "Stores data related to the bot's Discord status.");
 
             migrationBuilder.CreateTable(
+                name: "aliases",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    guild_id_fk = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
+                    is_dynamic = table.Column<bool>(type: "boolean", nullable: false),
+                    alias = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
+                    command = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    arguments = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_aliases", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_aliases_guild_config_guild_config_rel_id",
+                        column: x => x.guild_id_fk,
+                        principalTable: "guild_config",
+                        principalColumn: "guild_id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Stores command aliases.");
+
+            migrationBuilder.CreateTable(
                 name: "auto_slowmode",
                 columns: table => new
                 {
@@ -159,6 +147,29 @@ namespace AkkoBot.Migrations
                 comment: "Stores the settings for the automatic slow mode of a Discord server.");
 
             migrationBuilder.CreateTable(
+                name: "command_cooldown",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    guild_id_fk = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
+                    command = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    cooldown = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_command_cooldown", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_command_cooldown_guild_config_guild_config_rel_id",
+                        column: x => x.guild_id_fk,
+                        principalTable: "guild_config",
+                        principalColumn: "guild_id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Stores commands whose execution is restricted by a cooldown.");
+
+            migrationBuilder.CreateTable(
                 name: "filtered_content",
                 columns: table => new
                 {
@@ -166,11 +177,7 @@ namespace AkkoBot.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     guild_id_fk = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     channel_id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
-                    is_attachment_only = table.Column<bool>(type: "boolean", nullable: false),
-                    is_image_only = table.Column<bool>(type: "boolean", nullable: false),
-                    is_url_only = table.Column<bool>(type: "boolean", nullable: false),
-                    is_invite_only = table.Column<bool>(type: "boolean", nullable: false),
-                    is_command_only = table.Column<bool>(type: "boolean", nullable: false),
+                    content_type = table.Column<int>(type: "integer", nullable: false),
                     date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -196,10 +203,7 @@ namespace AkkoBot.Migrations
                     guild_id_fk = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     notification_message = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
-                    filter_stickers = table.Column<bool>(type: "boolean", nullable: false),
-                    filter_invites = table.Column<bool>(type: "boolean", nullable: false),
-                    notify_on_delete = table.Column<bool>(type: "boolean", nullable: false),
-                    warn_on_delete = table.Column<bool>(type: "boolean", nullable: false),
+                    behavior = table.Column<int>(type: "integer", nullable: false),
                     date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -325,6 +329,33 @@ namespace AkkoBot.Migrations
                 comment: "Stores the amount of infractions commited by a user in a server.");
 
             migrationBuilder.CreateTable(
+                name: "permission_override",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    allowed_user_ids = table.Column<List<long>>(type: "bigint[]", nullable: true),
+                    allowed_channel_ids = table.Column<List<long>>(type: "bigint[]", nullable: true),
+                    allowed_role_ids = table.Column<List<long>>(type: "bigint[]", nullable: true),
+                    guild_id_fk = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
+                    command = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    permissions = table.Column<long>(type: "bigint", nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_permission_override", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_permission_override_guild_config_guild_config_rel_id",
+                        column: x => x.guild_id_fk,
+                        principalTable: "guild_config",
+                        principalColumn: "guild_id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Stores data related to permission overrides for commands.");
+
+            migrationBuilder.CreateTable(
                 name: "polls",
                 columns: table => new
                 {
@@ -351,6 +382,35 @@ namespace AkkoBot.Migrations
                         onDelete: ReferentialAction.Cascade);
                 },
                 comment: "Stores data related to a server poll.");
+
+            migrationBuilder.CreateTable(
+                name: "tags",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ignored_ids = table.Column<List<long>>(type: "bigint[]", nullable: true),
+                    guild_id_fk = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
+                    author_id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    trigger = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
+                    response = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
+                    is_emoji = table.Column<bool>(type: "boolean", nullable: false),
+                    behavior = table.Column<int>(type: "integer", nullable: false),
+                    allowed_perms = table.Column<long>(type: "bigint", nullable: false),
+                    last_day_used = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    date_added = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_tags", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_tags_guild_config_guild_config_rel_id",
+                        column: x => x.guild_id_fk,
+                        principalTable: "guild_config",
+                        principalColumn: "guild_id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Stores data related to a tag.");
 
             migrationBuilder.CreateTable(
                 name: "timers",
@@ -560,9 +620,9 @@ namespace AkkoBot.Migrations
                 comment: "Stores warnings issued to users on servers.");
 
             migrationBuilder.CreateIndex(
-                name: "ix_aliases_id",
+                name: "ix_aliases_guild_id_fk",
                 table: "aliases",
-                column: "id");
+                column: "guild_id_fk");
 
             migrationBuilder.CreateIndex(
                 name: "ix_auto_commands_timer_id_fk",
@@ -577,9 +637,9 @@ namespace AkkoBot.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_command_cooldown_id",
+                name: "ix_command_cooldown_guild_id_fk",
                 table: "command_cooldown",
-                column: "id");
+                column: "guild_id_fk");
 
             migrationBuilder.CreateIndex(
                 name: "ix_filtered_content_guild_id_fk",
@@ -614,9 +674,9 @@ namespace AkkoBot.Migrations
                 column: "guild_id_fk");
 
             migrationBuilder.CreateIndex(
-                name: "ix_playing_statuses_id",
-                table: "playing_statuses",
-                column: "id");
+                name: "ix_permission_override_guild_id_fk",
+                table: "permission_override",
+                column: "guild_id_fk");
 
             migrationBuilder.CreateIndex(
                 name: "ix_polls_guild_id_fk",
@@ -641,14 +701,14 @@ namespace AkkoBot.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_timers_guild_id_fk",
-                table: "timers",
+                name: "ix_tags_guild_id_fk",
+                table: "tags",
                 column: "guild_id_fk");
 
             migrationBuilder.CreateIndex(
-                name: "ix_timers_id",
+                name: "ix_timers_guild_id_fk",
                 table: "timers",
-                column: "id");
+                column: "guild_id_fk");
 
             migrationBuilder.CreateIndex(
                 name: "ix_timers_user_id_fk",
@@ -718,6 +778,9 @@ namespace AkkoBot.Migrations
                 name: "occurrences");
 
             migrationBuilder.DropTable(
+                name: "permission_override");
+
+            migrationBuilder.DropTable(
                 name: "playing_statuses");
 
             migrationBuilder.DropTable(
@@ -728,6 +791,9 @@ namespace AkkoBot.Migrations
 
             migrationBuilder.DropTable(
                 name: "repeaters");
+
+            migrationBuilder.DropTable(
+                name: "tags");
 
             migrationBuilder.DropTable(
                 name: "voice_roles");

@@ -97,9 +97,16 @@ namespace AkkoTests.Core.Extensions.EnumExt
         [InlineData(TestEnum.A | TestEnum.B, TestEnum.None, TestEnum.A, TestEnum.B)]
         [InlineData(TestEnum.A | TestEnum.B | TestEnum.D, TestEnum.A, TestEnum.B, TestEnum.D)]
         internal void ToFlagsTest(TestEnum enumGroup, params TestEnum[] flags) // Generic params are not supported
-        {
-            var mergedFlags = flags.ToFlags();
-            Assert.Equal(enumGroup, mergedFlags);
-        }
+            => Assert.Equal(enumGroup, flags.ToFlags());
+
+        [Theory]
+        [InlineData(TestEnum.A | TestEnum.B, TestEnum.A, TestEnum.B)]
+        [InlineData(TestEnum.A, TestEnum.B, TestEnum.A | TestEnum.B)]
+        [InlineData(TestEnum.A | TestEnum.B, TestEnum.A | TestEnum.B, TestEnum.None)]
+        [InlineData(TestEnum.A | TestEnum.C, TestEnum.B, TestEnum.A | TestEnum.B | TestEnum.C)]
+        [InlineData(TestEnum.A | TestEnum.B, TestEnum.C | TestEnum.D, TestEnum.A | TestEnum.B | TestEnum.C | TestEnum.D)]
+        //[InlineData(TestEnum.A | TestEnum.B, TestEnum.B | TestEnum.C, TestEnum.A | TestEnum.C)] // No need to support this
+        internal void ToggleFlagTest<T>(T enumGroup, T toToggle, T expectedValue) where T : struct, Enum
+            => Assert.Equal(expectedValue, enumGroup.ToggleFlag(toToggle));
     }
 }

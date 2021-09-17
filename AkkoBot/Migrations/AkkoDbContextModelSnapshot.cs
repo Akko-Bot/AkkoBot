@@ -337,17 +337,13 @@ namespace AkkoBot.Migrations
                         .HasColumnName("id")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("Behavior")
+                        .HasColumnType("integer")
+                        .HasColumnName("behavior");
+
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
-
-                    b.Property<bool>("FilterInvites")
-                        .HasColumnType("boolean")
-                        .HasColumnName("filter_invites");
-
-                    b.Property<bool>("FilterStickers")
-                        .HasColumnType("boolean")
-                        .HasColumnName("filter_stickers");
 
                     b.Property<decimal>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
@@ -365,14 +361,6 @@ namespace AkkoBot.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("notification_message");
-
-                    b.Property<bool>("NotifyOnDelete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("notify_on_delete");
-
-                    b.Property<bool>("WarnOnDelete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("warn_on_delete");
 
                     b.Property<List<string>>("Words")
                         .HasColumnType("text[]")
@@ -488,6 +476,10 @@ namespace AkkoBot.Migrations
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("ban_template");
 
+                    b.Property<int>("Behavior")
+                        .HasColumnType("integer")
+                        .HasColumnName("behavior");
+
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
@@ -495,10 +487,6 @@ namespace AkkoBot.Migrations
                     b.Property<List<long>>("DelCmdBlacklist")
                         .HasColumnType("bigint[]")
                         .HasColumnName("del_cmd_blacklist");
-
-                    b.Property<bool>("DeleteCmdOnMessage")
-                        .HasColumnType("boolean")
-                        .HasColumnName("delete_cmd_on_message");
 
                     b.Property<string>("ErrorColor")
                         .IsRequired()
@@ -513,10 +501,6 @@ namespace AkkoBot.Migrations
                     b.Property<List<long>>("GuildLogBlacklist")
                         .HasColumnType("bigint[]")
                         .HasColumnName("guild_log_blacklist");
-
-                    b.Property<bool>("IgnoreGlobalTags")
-                        .HasColumnType("boolean")
-                        .HasColumnName("ignore_global_tags");
 
                     b.Property<TimeSpan?>("InteractiveTimeout")
                         .HasColumnType("interval")
@@ -546,10 +530,6 @@ namespace AkkoBot.Migrations
                         .HasColumnType("varchar(6)")
                         .HasColumnName("ok_color");
 
-                    b.Property<bool>("PermissiveRoleMention")
-                        .HasColumnType("boolean")
-                        .HasColumnName("permissive_role_mention");
-
                     b.Property<string>("Prefix")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -560,10 +540,6 @@ namespace AkkoBot.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("timezone");
-
-                    b.Property<bool>("UseEmbed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("use_embed");
 
                     b.Property<TimeSpan>("WarnExpire")
                         .HasColumnType("interval")
@@ -804,9 +780,6 @@ namespace AkkoBot.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_playing_statuses");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_playing_statuses_id");
 
                     b.ToTable("playing_statuses");
 
@@ -1102,9 +1075,6 @@ namespace AkkoBot.Migrations
 
                     b.HasIndex("GuildIdFK")
                         .HasDatabaseName("ix_timers_guild_id_fk");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_timers_id");
 
                     b.HasIndex("UserIdFK")
                         .HasDatabaseName("ix_timers_user_id_fk");

@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    [Migration("20210825114534_AliasRel")]
-    partial class AliasRel
+    [Migration("20210917201728_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -239,15 +239,15 @@ namespace AkkoBot.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
 
-                    b.Property<decimal?>("GuildId")
+                    b.Property<decimal?>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
-                        .HasColumnName("guild_id");
+                        .HasColumnName("guild_id_fk");
 
                     b.HasKey("Id")
                         .HasName("pk_command_cooldown");
 
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_command_cooldown_id");
+                    b.HasIndex("GuildIdFK")
+                        .HasDatabaseName("ix_command_cooldown_guild_id_fk");
 
                     b.ToTable("command_cooldown");
 
@@ -339,17 +339,13 @@ namespace AkkoBot.Migrations
                         .HasColumnName("id")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("Behavior")
+                        .HasColumnType("integer")
+                        .HasColumnName("behavior");
+
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
-
-                    b.Property<bool>("FilterInvites")
-                        .HasColumnType("boolean")
-                        .HasColumnName("filter_invites");
-
-                    b.Property<bool>("FilterStickers")
-                        .HasColumnType("boolean")
-                        .HasColumnName("filter_stickers");
 
                     b.Property<decimal>("GuildIdFK")
                         .HasColumnType("numeric(20,0)")
@@ -367,14 +363,6 @@ namespace AkkoBot.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("notification_message");
-
-                    b.Property<bool>("NotifyOnDelete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("notify_on_delete");
-
-                    b.Property<bool>("WarnOnDelete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("warn_on_delete");
 
                     b.Property<List<string>>("Words")
                         .HasColumnType("text[]")
@@ -490,6 +478,10 @@ namespace AkkoBot.Migrations
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("ban_template");
 
+                    b.Property<int>("Behavior")
+                        .HasColumnType("integer")
+                        .HasColumnName("behavior");
+
                     b.Property<DateTimeOffset>("DateAdded")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_added");
@@ -497,10 +489,6 @@ namespace AkkoBot.Migrations
                     b.Property<List<long>>("DelCmdBlacklist")
                         .HasColumnType("bigint[]")
                         .HasColumnName("del_cmd_blacklist");
-
-                    b.Property<bool>("DeleteCmdOnMessage")
-                        .HasColumnType("boolean")
-                        .HasColumnName("delete_cmd_on_message");
 
                     b.Property<string>("ErrorColor")
                         .IsRequired()
@@ -515,10 +503,6 @@ namespace AkkoBot.Migrations
                     b.Property<List<long>>("GuildLogBlacklist")
                         .HasColumnType("bigint[]")
                         .HasColumnName("guild_log_blacklist");
-
-                    b.Property<bool>("IgnoreGlobalTags")
-                        .HasColumnType("boolean")
-                        .HasColumnName("ignore_global_tags");
 
                     b.Property<TimeSpan?>("InteractiveTimeout")
                         .HasColumnType("interval")
@@ -548,10 +532,6 @@ namespace AkkoBot.Migrations
                         .HasColumnType("varchar(6)")
                         .HasColumnName("ok_color");
 
-                    b.Property<bool>("PermissiveRoleMention")
-                        .HasColumnType("boolean")
-                        .HasColumnName("permissive_role_mention");
-
                     b.Property<string>("Prefix")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -562,10 +542,6 @@ namespace AkkoBot.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("timezone");
-
-                    b.Property<bool>("UseEmbed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("use_embed");
 
                     b.Property<TimeSpan>("WarnExpire")
                         .HasColumnType("interval")
@@ -719,6 +695,60 @@ namespace AkkoBot.Migrations
                         .HasComment("Stores the amount of infractions commited by a user in a server.");
                 });
 
+            modelBuilder.Entity("AkkoCore.Services.Database.Entities.PermissionOverrideEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<List<long>>("AllowedChannelIds")
+                        .HasColumnType("bigint[]")
+                        .HasColumnName("allowed_channel_ids");
+
+                    b.Property<List<long>>("AllowedRoleIds")
+                        .HasColumnType("bigint[]")
+                        .HasColumnName("allowed_role_ids");
+
+                    b.Property<List<long>>("AllowedUserIds")
+                        .HasColumnType("bigint[]")
+                        .HasColumnName("allowed_user_ids");
+
+                    b.Property<string>("Command")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("command");
+
+                    b.Property<DateTimeOffset>("DateAdded")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_added");
+
+                    b.Property<decimal?>("GuildIdFK")
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id_fk");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<long>("Permissions")
+                        .HasColumnType("bigint")
+                        .HasColumnName("permissions");
+
+                    b.HasKey("Id")
+                        .HasName("pk_permission_override");
+
+                    b.HasIndex("GuildIdFK")
+                        .HasDatabaseName("ix_permission_override_guild_id_fk");
+
+                    b.ToTable("permission_override");
+
+                    b
+                        .HasComment("Stores data related to permission overrides for commands.");
+                });
+
             modelBuilder.Entity("AkkoCore.Services.Database.Entities.PlayingStatusEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -752,9 +782,6 @@ namespace AkkoBot.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_playing_statuses");
-
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_playing_statuses_id");
 
                     b.ToTable("playing_statuses");
 
@@ -1051,9 +1078,6 @@ namespace AkkoBot.Migrations
                     b.HasIndex("GuildIdFK")
                         .HasDatabaseName("ix_timers_guild_id_fk");
 
-                    b.HasIndex("Id")
-                        .HasDatabaseName("ix_timers_id");
-
                     b.HasIndex("UserIdFK")
                         .HasDatabaseName("ix_timers_user_id_fk");
 
@@ -1235,6 +1259,18 @@ namespace AkkoBot.Migrations
                     b.Navigation("GuildConfigRel");
                 });
 
+            modelBuilder.Entity("AkkoCore.Services.Database.Entities.CommandCooldownEntity", b =>
+                {
+                    b.HasOne("AkkoCore.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
+                        .WithMany("CommandCooldownRel")
+                        .HasForeignKey("GuildIdFK")
+                        .HasConstraintName("fk_command_cooldown_guild_config_guild_config_rel_id")
+                        .HasPrincipalKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("GuildConfigRel");
+                });
+
             modelBuilder.Entity("AkkoCore.Services.Database.Entities.FilteredContentEntity", b =>
                 {
                     b.HasOne("AkkoCore.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
@@ -1309,6 +1345,18 @@ namespace AkkoBot.Migrations
                         .HasPrincipalKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GuildConfigRel");
+                });
+
+            modelBuilder.Entity("AkkoCore.Services.Database.Entities.PermissionOverrideEntity", b =>
+                {
+                    b.HasOne("AkkoCore.Services.Database.Entities.GuildConfigEntity", "GuildConfigRel")
+                        .WithMany("PermissionOverrideRel")
+                        .HasForeignKey("GuildIdFK")
+                        .HasConstraintName("fk_permission_override_guild_config_guild_config_rel_id")
+                        .HasPrincipalKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("GuildConfigRel");
                 });
@@ -1464,6 +1512,8 @@ namespace AkkoBot.Migrations
 
                     b.Navigation("AutoSlowmodeRel");
 
+                    b.Navigation("CommandCooldownRel");
+
                     b.Navigation("FilteredContentRel");
 
                     b.Navigation("FilteredWordsRel");
@@ -1475,6 +1525,8 @@ namespace AkkoBot.Migrations
                     b.Navigation("MutedUserRel");
 
                     b.Navigation("OccurrenceRel");
+
+                    b.Navigation("PermissionOverrideRel");
 
                     b.Navigation("PollRel");
 

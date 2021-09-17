@@ -6,6 +6,7 @@ using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services;
 using AkkoCore.Services.Database.Entities;
+using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -34,10 +35,10 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_guild_embed")]
         public async Task ChangeEmbedAsync(CommandContext context)
         {
-            var result = await _service.SetPropertyAsync(context.Guild, x => x.UseEmbed = !x.UseEmbed);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.Behavior.ToggleFlag(GuildConfigBehavior.UseEmbed));
 
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("guild_embed_change", (result) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("guild_embed_change", (result.HasFlag(GuildConfigBehavior.UseEmbed)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -106,10 +107,10 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageRoles)]
         public async Task ChangeRoleMentionabilityAsync(CommandContext context)
         {
-            var result = await _service.SetPropertyAsync(context.Guild, x => x.PermissiveRoleMention = !x.PermissiveRoleMention);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.Behavior.ToggleFlag(GuildConfigBehavior.PermissiveRoleMention));
 
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("guild_role_mention", (result) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("guild_role_mention", (result.HasFlag(GuildConfigBehavior.PermissiveRoleMention)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -278,11 +279,19 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_guild_ignoreglobaltags")]
         public async Task ToggleIgnoreGlobalTagsAsync(CommandContext context)
         {
-            var result = await _service.SetPropertyAsync(context.Guild, x => x.IgnoreGlobalTags = !x.IgnoreGlobalTags);
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.Behavior.ToggleFlag(GuildConfigBehavior.IgnoreGlobalTags));
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("ignore_global_list_description", (!result) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("ignore_global_list_description", (!result.HasFlag(GuildConfigBehavior.IgnoreGlobalTags)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
+        }
+
+        [Command("basetagpermission"), Aliases("mintagperm")]
+        [Description("cmd_guild_mintagperm")]
+        public async Task SetMinTagPermissionAsync(CommandContext context, [Description("arg_permissions")] params Permissions[] permissions)
+        {
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.MinimumTagPermissions = permissions.ToFlags());
+            await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
         }
 
         [GroupCommand, Command("list"), Aliases("show")]
@@ -367,10 +376,10 @@ namespace AkkoCore.Commands.Modules.Administration
             [Description("cmd_guild_delmsgoncmd_toggle")]
             public async Task ToggleDelCmdOnCmdAsync(CommandContext context)
             {
-                var result = await _service.SetPropertyAsync(context.Guild, x => x.DeleteCmdOnMessage = !x.DeleteCmdOnMessage);
+                var result = await _service.SetPropertyAsync(context.Guild, x => x.Behavior.ToggleFlag(GuildConfigBehavior.DeleteCmdOnMessage));
 
                 var embed = new SerializableDiscordEmbed()
-                    .WithDescription((result) ? "delmsgoncmd_enabled" : "delmsgoncmd_disabled");
+                    .WithDescription((result.HasFlag(GuildConfigBehavior.DeleteCmdOnMessage)) ? "delmsgoncmd_enabled" : "delmsgoncmd_disabled");
 
                 await context.RespondLocalizedAsync(embed);
             }

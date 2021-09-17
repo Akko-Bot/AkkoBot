@@ -2,6 +2,7 @@
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
+using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -22,10 +23,10 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleInviteRemovalAsync(CommandContext context)
         {
-            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior.ToggleFlag(WordFilterBehavior.FilterInvite));
 
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("fi_toggle", (success) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("fi_toggle", (success.HasFlag(WordFilterBehavior.FilterInvite)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }
@@ -35,10 +36,10 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleStickerRemovalAsync(CommandContext context)
         {
-            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
+            var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior.ToggleFlag(WordFilterBehavior.FilterSticker));
 
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("fs_toggle", (success) ? "enabled" : "disabled"));
+                .WithDescription(context.FormatLocalized("fs_toggle", (success.HasFlag(WordFilterBehavior.FilterSticker)) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
         }

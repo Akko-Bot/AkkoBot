@@ -315,10 +315,7 @@ namespace AkkoCore.Models.Serializable
         /// <returns>A <see cref="DiscordMessageBuilder"/> with the embed content and the embed.</returns>
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordMessageBuilder BuildMessage()
-        {
-            return new DiscordMessageBuilder()
-                .AddEmbed(Build());
-        }
+            => new DiscordMessageBuilder().AddEmbed(Build());
 
         /// <summary>
         /// Constructs the Discord webhook embed represented by this model.
@@ -326,10 +323,7 @@ namespace AkkoCore.Models.Serializable
         /// <returns>A <see cref="DiscordWebhookBuilder"/> with the embed content and the embed.</returns>
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordWebhookBuilder BuildWebhookMessage()
-        {
-            return new DiscordWebhookBuilder()
-                .AddEmbed(Build());
-        }
+            => new DiscordWebhookBuilder().AddEmbed(Build());
 
         /// <summary>
         /// Clears all data in this embed.

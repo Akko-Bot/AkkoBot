@@ -831,3 +831,5 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
+
+cmd_guild_mintagperm: Define as permissões mínimad necessárias para um usuário usar uma tag nesse servidor.

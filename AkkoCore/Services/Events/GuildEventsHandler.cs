@@ -200,11 +200,11 @@ namespace AkkoCore.Services.Events
             }
 
             // Send notification message, if enabled
-            if (!isDeleted || (!filteredWords.NotifyOnDelete && !filteredWords.WarnOnDelete))
+            if (!isDeleted || !filteredWords.Behavior.HasOneFlag(WordFilterBehavior.NotifyOnDelete | WordFilterBehavior.WarnOnDelete))
                 return true;
 
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
-            var toWarn = filteredWords.WarnOnDelete && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
+            var toWarn = filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete) && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
 
             var embed = new SerializableDiscordEmbed()
             {
@@ -237,7 +237,7 @@ namespace AkkoCore.Services.Events
         public Task<bool> FilterInviteAsync(DiscordClient _, MessageCreateEventArgs eventArgs)
         {
             if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
-                || !filteredWords.FilterInvites || !HasInvite(eventArgs.Message)
+                || !filteredWords.Behavior.HasFlag(WordFilterBehavior.FilterInvite) || !HasInvite(eventArgs.Message)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
@@ -254,7 +254,7 @@ namespace AkkoCore.Services.Events
         public async Task<bool> FilterStickerAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
-                || !filteredWords.FilterStickers || eventArgs.Message.Stickers.Count == 0
+                || !filteredWords.Behavior.HasFlag(WordFilterBehavior.FilterSticker) || eventArgs.Message.Stickers.Count is 0
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
@@ -266,7 +266,7 @@ namespace AkkoCore.Services.Events
             await eventArgs.Message.DeleteAsync();
 
             // Send the notification
-            if (!filteredWords.NotifyOnDelete)
+            if (!filteredWords.Behavior.HasFlag(WordFilterBehavior.NotifyOnDelete))
                 return true;
 
             var cmdHandler = client.GetCommandsNext();
@@ -352,8 +352,8 @@ namespace AkkoCore.Services.Events
             _dbCache.Guilds.TryGetValue(eventArgs.Context.Guild.Id, out var dbGuild);
             var isIgnoredContext = IsDelOnCmdIgnoredContext(dbGuild, eventArgs.Context);
 
-            if ((dbGuild.DeleteCmdOnMessage && isIgnoredContext)
-                || (!dbGuild.DeleteCmdOnMessage && !isIgnoredContext))
+            if ((dbGuild.Behavior.HasFlag(GuildConfigBehavior.DeleteCmdOnMessage) && isIgnoredContext)
+                || (!dbGuild.Behavior.HasFlag(GuildConfigBehavior.DeleteCmdOnMessage) && !isIgnoredContext))
                 return;
 
             await eventArgs.Context.Message.DeleteAsync();

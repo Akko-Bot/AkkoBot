@@ -1,5 +1,6 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Services.Caching.Abstractions;
+using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -234,7 +235,7 @@ namespace AkkoCore.Commands.Common
                 contentBuilder.Replace("@here", Formatter.InlineCode("@here"));
             }
 
-            if (context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].PermissiveRoleMention)
+            if (context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].Behavior.HasFlag(GuildConfigBehavior.PermissiveRoleMention))
             {
                 // Sanitize by role hierarchy - Permissive
                 foreach (Match match in matches)

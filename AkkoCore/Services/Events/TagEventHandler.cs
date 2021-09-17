@@ -54,12 +54,13 @@ namespace AkkoCore.Services.Events
         {
             _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild);
 
-            if (eventArgs.Author.IsBot || dbGuild?.IgnoreGlobalTags is true
-                || !_dbCache.Tags.TryGetValue(default, out var globalTags))
+            if (eventArgs.Author.IsBot || dbGuild?.Behavior.HasFlag(GuildConfigBehavior.IgnoreGlobalTags) is true
+                || !_dbCache.Tags.TryGetValue(default, out var globalTags)
+                || !HasMinimumPermission(dbGuild, eventArgs))
                 return Task.CompletedTask;
 
-            // Get the correct tag
-            var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.BotPrefix);
+                // Get the correct tag
+                var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.BotPrefix);
             var tag = globalTags
                 .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
                 .RandomElement(_rng);
@@ -73,7 +74,8 @@ namespace AkkoCore.Services.Events
         {
             if (eventArgs.Guild is null || eventArgs.Author.IsBot
                 || !_dbCache.Tags.TryGetValue(eventArgs.Guild.Id, out var dbTags)
-                || !_dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild))
+                || !_dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
+                || !HasMinimumPermission(dbGuild, eventArgs))
                 return Task.CompletedTask;
 
             // Get the correct tag
@@ -91,8 +93,10 @@ namespace AkkoCore.Services.Events
         {
             _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild);
 
-            if (eventArgs.Author.IsBot || dbGuild?.IgnoreGlobalTags is true
-                || !_dbCache.Tags.TryGetValue(default, out var globalTags))
+            if (eventArgs.Author.IsBot || dbGuild?.Behavior.HasFlag(GuildConfigBehavior.IgnoreGlobalTags) is true
+                || !_dbCache.Tags.TryGetValue(default, out var globalTags)
+
+                || !HasMinimumPermission(dbGuild, eventArgs))
                 return Task.CompletedTask;
 
             // Get the correct tag
@@ -110,7 +114,8 @@ namespace AkkoCore.Services.Events
         {
             if (eventArgs.Guild is null || eventArgs.Author.IsBot
                 || !_dbCache.Tags.TryGetValue(eventArgs.Guild.Id, out var dbTags)
-                || !_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild))
+                || !_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild)
+                || !HasMinimumPermission(dbGuild, eventArgs))
                 return Task.CompletedTask;
 
             // Get the correct tag
@@ -132,6 +137,18 @@ namespace AkkoCore.Services.Events
         /// <returns><see langword="true"/> if the trigger is already used by a guild tag, <see langword="false"/> otherwise.</returns>
         private bool HasLocalOverride(MessageCreateEventArgs eventArgs, TagEntity tag)
             => eventArgs.Guild is not null && _dbCache.Tags.TryGetValue(eventArgs.Guild.Id, out var guildTags) && guildTags.Any(x => x.Trigger.Equals(tag.Trigger));
+
+        /// <summary>
+        /// Checks if the user has the minimum permission needed to execute tags.
+        /// </summary>
+        /// <param name="dbGuild">The database guild.</param>
+        /// <param name="eventArgs">The message event arguments.</param>
+        /// <returns><see langword="true"/> if there are enough permissions, <see langword="false"/> otherwise.</returns>
+        private bool HasMinimumPermission(GuildConfigEntity dbGuild, MessageCreateEventArgs eventArgs)
+        {
+            return dbGuild is null || dbGuild.MinimumTagPermissions is Permissions.None
+                    || (eventArgs.Author as DiscordMember)?.PermissionsIn(eventArgs.Channel).HasPermission(dbGuild.MinimumTagPermissions) is true;
+        }
 
         /// <summary>
         /// Reacts to the event message with the specified tag.

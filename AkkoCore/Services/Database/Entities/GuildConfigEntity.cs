@@ -195,28 +195,12 @@ namespace AkkoCore.Services.Database.Entities
         public string Timezone { get; set; }
 
         /// <summary>
-        /// Determines whether embeds should be used in responses or not.
+        /// Defines the behavior of different features in this guild.
         /// </summary>
-        public bool UseEmbed { get; set; } = true;
+        public GuildConfigBehavior Behavior { get; set; } = GuildConfigBehavior.None;
 
         /// <summary>
-        /// Determines whether role mentions should be sanitized by hierarchy (<see langword="true"/>)
-        /// or by EveryoneServer permission (<see langword="false"/>).
-        /// </summary>
-        public bool PermissiveRoleMention { get; set; } = false;
-
-        /// <summary>
-        /// Determines whether command messages should be automatically deleted.
-        /// </summary>
-        public bool DeleteCmdOnMessage { get; set; } = false;
-
-        /// <summary>
-        /// Determines whether all global tags should be ignored in this guild.
-        /// </summary>
-        public bool IgnoreGlobalTags { get; set; } = false;
-
-        /// <summary>
-        /// Determines the minimum set of permissions required from a user for them to trigger a tag.
+        /// Determines the minimum set of permissions required from a user for them to trigger any tag.
         /// </summary>
         public Permissions MinimumTagPermissions { get; set; } = Permissions.None;
 
@@ -234,6 +218,14 @@ namespace AkkoCore.Services.Database.Entities
         /// Defines the amount of time that an interactive command waits for user input.
         /// </summary>
         public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(30);
+
+        /// <summary>
+        /// Determines whether embeds should be used in responses or not.
+        /// </summary>
+        /// <remarks>This property is not mapped.</remarks>
+        [NotMapped]
+        public bool UseEmbed
+            => Behavior.HasFlag(GuildConfigBehavior.UseEmbed);
 
         /// <summary>
         /// Determines whether this guild has any sort of passive activity that needs to be handled by events.
@@ -258,7 +250,7 @@ namespace AkkoCore.Services.Database.Entities
 
             Prefix = config.BotPrefix;
             Locale = config.Locale;
-            UseEmbed = config.UseEmbed;
+            Behavior = (config.UseEmbed) ? GuildConfigBehavior.UseEmbed : GuildConfigBehavior.None;
             OkColor = config.OkColor;
             ErrorColor = config.ErrorColor;
         }
