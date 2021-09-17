@@ -54,7 +54,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 await user.SetMuteAsync(true);
 
             // Send confirmation message
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("mute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);
@@ -82,7 +82,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 await user.SetMuteAsync(false);
 
             // Send confirmation message
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("unmute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);
@@ -171,7 +171,7 @@ namespace AkkoCore.Commands.Modules.Administration
             await context.TriggerTypingAsync();
             await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason, true);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("chatmute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);
@@ -192,7 +192,7 @@ namespace AkkoCore.Commands.Modules.Administration
             await context.TriggerTypingAsync();
             await _channelServices.RemoveOverwritesAsync(context.Guild, reason, x => x.Id == user.Id);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("chatunmute_success", Formatter.Bold(user.GetFullname())));
 
             await context.RespondLocalizedAsync(embed);

@@ -155,7 +155,7 @@ namespace AkkoCore.Commands.Modules.Self
             foreach (var group in guilds)
                 fields.Add(new(AkkoConstants.ValidWhitespace, string.Join("\n", group.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} {x.Name}")), true));
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle(context.FormatLocalized("listservers_title", context.Client.ShardId));
 
             await context.RespondPaginatedByFieldsAsync(embed, fields, 2);

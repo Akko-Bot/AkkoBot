@@ -50,7 +50,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 : await _utilities.GetOnlineStreamAsync(avatarUrl);
 
             await _service.StartLogAsync(context, channel, logType, webhookName?.MaxLength(AkkoConstants.MaxUsernameLength), avatarStream);
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("log_started", Formatter.InlineCode(logType.ToString()), channel.Mention));
 
             await context.RespondLocalizedAsync(message);
@@ -61,7 +61,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task StopLogAsync(CommandContext context, [Description("arg_guildlog_type")] GuildLogType logType)
         {
             var result = await _service.StopLogAsync(context, logType);
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized(((result) ? "log_stopped_success" : "log_stopped_failure"), Formatter.InlineCode(logType.ToString())));
 
             await context.RespondLocalizedAsync(message, isError: !result);
@@ -109,7 +109,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var guildLogs = _service.GetGuildLogs(context.Guild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithTitle("log_list_title")
                 .WithDescription(
                     string.Join(

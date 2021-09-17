@@ -36,7 +36,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.UseEmbed = !x.UseEmbed);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("guild_embed_change", (result) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -48,7 +48,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var color = GeneralService.GetColor(newColor);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (color.HasValue)
                         ? context.FormatLocalized("guild_okcolor", Formatter.InlineCode(newColor.ToUpperInvariant()))
@@ -67,7 +67,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var color = GeneralService.GetColor(newColor);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (color.HasValue)
                         ? context.FormatLocalized("guild_errorcolor", Formatter.InlineCode(newColor.ToUpperInvariant()))
@@ -91,7 +91,7 @@ namespace AkkoCore.Commands.Modules.Administration
                     : TimeSpan.FromSeconds(seconds.Value)
                 );
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (result is null)
                         ? context.FormatLocalized("guild_timeout_reset")
@@ -108,7 +108,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.PermissiveRoleMention = !x.PermissiveRoleMention);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("guild_role_mention", (result) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -121,7 +121,7 @@ namespace AkkoCore.Commands.Modules.Administration
             var locales = _service.GetLocales()
                 .OrderBy(code => code);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("locales_title")
                 .AddField("code", string.Join('\n', locales), true)
                 .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x)), true);
@@ -139,7 +139,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 await _service.SetPropertyAsync(context.Guild, x => x.Locale = responseKey);
 
             // Send the message
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (success)
                         ? context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey))
@@ -154,7 +154,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task TimezoneAsync(CommandContext context, [RemainingText, Description("arg_timezone")] string timezone)
         {
             var zone = GeneralService.GetTimeZone(timezone);
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (zone is null)
                         ? context.FormatLocalized("guild_timezone_error", Formatter.InlineCode(context.Prefix + "timezones"))
@@ -183,7 +183,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             var result = await _service.SetPropertyAsync(context.Guild, x => x.BanTemplate = banTemplate);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("bantemplate_set", Formatter.InlineCode(result)));
 
             await context.RespondLocalizedAsync(embed);
@@ -195,7 +195,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             await _service.SetPropertyAsync(context.Guild, x => x.BanTemplate = default);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("bantemplate_reset");
 
             await context.RespondLocalizedAsync(embed);
@@ -207,7 +207,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task AddJoinRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
             var dbGuild = _service.GetGuildSettings(context.Guild);
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var isInvalid = role.IsManaged || (!dbGuild.JoinRoles.Contains((long)role.Id) && dbGuild.JoinRoles.Count >= 3);
 
             if (isInvalid)
@@ -246,7 +246,7 @@ namespace AkkoCore.Commands.Modules.Administration
             }
 
             var result = await _service.SetPropertyAsync(context.Guild, x => x.JoinRoles.Remove((long)id));
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription((result) ? "joinrole_removed" : "role_not_found");
 
             await context.RespondLocalizedAsync(embed, isError: !result);
@@ -256,7 +256,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ListJoinRolesAsync(CommandContext context)
         {
             var dbGuild = _service.GetGuildSettings(context.Guild);
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var isEmpty = dbGuild.JoinRoles.Count is 0;
 
             if (isEmpty)
@@ -279,7 +279,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ToggleIgnoreGlobalTagsAsync(CommandContext context)
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.IgnoreGlobalTags = !x.IgnoreGlobalTags);
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("ignore_global_list_description", (!result) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -291,7 +291,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var settings = _service.GetGuildSettings(context.Guild).GetSettings();
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("guild_settings_title")
                 .AddField("settings", string.Join("\n", settings.Keys), true)
                 .AddField("value", string.Join("\n", settings.Values), true);
@@ -326,7 +326,7 @@ namespace AkkoCore.Commands.Modules.Administration
             {
                 var result = await _service.SetPropertyAsync(context.Guild, x => UpdateDelCmdBlacklist(x, ids));
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized((result) ? "ignored_ids_add" : "ignored_ids_remove", ids.Length));
 
                 await context.RespondLocalizedAsync(embed);
@@ -344,7 +344,7 @@ namespace AkkoCore.Commands.Modules.Administration
                     return amount;
                 });
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized((result is not 0) ? "ignored_ids_remove" : "delmsgoncmd_empty", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -356,7 +356,7 @@ namespace AkkoCore.Commands.Modules.Administration
             {
                 var dbGuild = _service.GetGuildSettings(context.Guild);
                 var idsString = string.Join(", ", dbGuild.DelCmdBlacklist);
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithTitle("ignored_ids_list")
                     .WithDescription(string.IsNullOrWhiteSpace(idsString) ? "ignored_ids_empty" : idsString);
 
@@ -369,7 +369,7 @@ namespace AkkoCore.Commands.Modules.Administration
             {
                 var result = await _service.SetPropertyAsync(context.Guild, x => x.DeleteCmdOnMessage = !x.DeleteCmdOnMessage);
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription((result) ? "delmsgoncmd_enabled" : "delmsgoncmd_disabled");
 
                 await context.RespondLocalizedAsync(embed);

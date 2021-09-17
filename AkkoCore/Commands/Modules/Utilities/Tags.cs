@@ -72,7 +72,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 return x.IgnoredIds.Count - amount;
             });
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription((result is 0) ? "ignored_ids_empty" : context.FormatLocalized("ignored_ids_add", result));
 
             await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -93,7 +93,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 return amount - x.IgnoredIds.Count;
             });
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription((result is 0) ? "ignored_ids_empty" : context.FormatLocalized("ignored_ids_remove", result));
 
             await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -150,7 +150,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                     : x.AllowedPerms | permission
             );
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((result.HasFlag(permission) ? "tag_permission_add" : "tag_permission_remove"), localizedPerm, Formatter.InlineCode($"#{tagId}")));
 
             await context.RespondLocalizedAsync(embed);
@@ -163,7 +163,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var tag = _service.GetTags(context.Guild?.Id)
                 .FirstOrDefault(x => x.Id == tagId);
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (tag is null)
                 embed.WithDescription("tag_not_found");
@@ -195,14 +195,14 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequireUserPermissions(Permissions.ManageMessages | Permissions.ManageGuild)]
         public async Task ClearTagsAsync(CommandContext context)
         {
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("q_are_you_sure", "tag_delete_all_tags", "q_yes", "q_no"));
 
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
                 var result = await _service.RemoveTagAsync(context);
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription((result is 0) ? "tag_list_empty" : context.FormatLocalized("tag_delete_success", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -213,14 +213,14 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequireUserPermissions(Permissions.ManageMessages | Permissions.ManageGuild)]
         public async Task ClearTagsAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser author)
         {
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("q_are_you_sure", context.FormatLocalized("tag_delete_all_user_tags", Formatter.Bold(author.GetFullname())), "q_yes", "q_no"));
 
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
                 var result = await _service.RemoveTagAsync(context, x => x.AuthorId == author.Id);
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription((result is 0) ? "tag_list_empty" : context.FormatLocalized("tag_delete_success", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -239,7 +239,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             if (!tagIds.Any())
             {
-                var error = new SerializableDiscordMessage()
+                var error = new SerializableDiscordEmbed()
                     .WithDescription("tag_list_empty");
 
                 await context.RespondLocalizedAsync(error, isError: true);
@@ -248,7 +248,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             smartString.Content = trigger;
 
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         "q_are_you_sure",
@@ -261,7 +261,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             {
                 var result = await _service.RemoveTagAsync(context, x => tagIds.Contains(x.Id));
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized("tag_delete_success", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -274,14 +274,14 @@ namespace AkkoCore.Commands.Modules.Utilities
         {
             if (ids.Length is 0)
             {
-                var error = new SerializableDiscordMessage()
+                var error = new SerializableDiscordEmbed()
                     .WithDescription("tag_list_empty");
 
                 await context.RespondLocalizedAsync(error, isError: true);
                 return;
             }
 
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         "q_are_you_sure",
@@ -294,7 +294,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             {
                 var result = await _service.RemoveTagAsync(context, x => ids.Contains(x.Id));
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription((result is 0) ? "tag_list_empty" : context.FormatLocalized("tag_delete_success", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -313,7 +313,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             if (!tags.Any())
             {
-                var error = new SerializableDiscordMessage()
+                var error = new SerializableDiscordEmbed()
                     .WithDescription("tag_list_empty");
 
                 await context.RespondLocalizedAsync(error, isError: true);
@@ -322,7 +322,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             smartString.Content = trigger;
 
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         "q_are_you_sure",
@@ -335,7 +335,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             {
                 var result = await _service.RemoveTagAsync(context, x => tags.Contains(x.Id));
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized("tag_delete_success", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -347,14 +347,14 @@ namespace AkkoCore.Commands.Modules.Utilities
         [BotOwner]
         public async Task ClearOldTagsAsync(CommandContext context, [Description("arg_tag_clearold_time")] TimeSpan time)
         {
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("q_are_you_sure", context.FormatLocalized("tag_delete_old_tags", time.TotalDays.ToString("0.00")), "q_yes", "q_no"));
 
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
             {
                 var result = await _service.RemoveOldTagsAsync(time);
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription((result is 0) ? "tag_list_empty" : context.FormatLocalized("tag_delete_success", result));
 
                 await context.RespondLocalizedAsync(embed, isError: result is 0);
@@ -442,7 +442,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 return;
             }
 
-            var errorEmbed = new SerializableDiscordMessage()
+            var errorEmbed = new SerializableDiscordEmbed()
                 .WithDescription("tag_list_empty");
 
             await context.RespondLocalizedAsync(errorEmbed, isError: true);
@@ -454,9 +454,9 @@ namespace AkkoCore.Commands.Modules.Utilities
         /// <param name="smartString">An empty smart string.</param>
         /// <param name="tags">The collection of tags.</param>
         /// <returns>A Discord message.</returns>
-        private SerializableDiscordMessage GetTagList(SmartString smartString, IEnumerable<TagEntity> tags)
+        private SerializableDiscordEmbed GetTagList(SmartString smartString, IEnumerable<TagEntity> tags)
         {
-            var result = new SerializableDiscordMessage();
+            var result = new SerializableDiscordEmbed();
 
             foreach (var column in tags.OrderBy(x => x.Id).SplitInto(AkkoConstants.LinesPerPage))
             {

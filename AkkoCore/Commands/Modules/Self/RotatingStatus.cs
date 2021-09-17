@@ -96,7 +96,7 @@ namespace AkkoCore.Commands.Modules.Self
 
             if (statuses.Count == 0)
             {
-                var error = new SerializableDiscordMessage()
+                var error = new SerializableDiscordEmbed()
                     .WithDescription("pstatus_error");
 
                 await context.RespondLocalizedAsync(error, isError: true);
@@ -107,7 +107,7 @@ namespace AkkoCore.Commands.Modules.Self
             var messages = string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, "[...]")).ToArray());
             var time = string.Join('\n', statuses.Select(x => x.RotationTime).ToArray());
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("pstatus_title")
                 .AddField("id", ids, true)
                 .AddField("message", messages, true)

@@ -1,7 +1,9 @@
-﻿using AkkoCore.Models.Serializable.EmbedParts;
+﻿using AkkoCore.Models.Serializable;
+using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -33,6 +35,31 @@ namespace AkkoCore.Extensions
             );
 
             return dEmbed.ToString();
+        }
+
+        /// <summary>
+        /// Constructs a serializable model of this embed.
+        /// </summary>
+        /// <param name="embed">This embed.</param>
+        /// <returns>A <see cref="SerializableDiscordEmbed"/> of this <paramref name="embed"/>.</returns>
+        public static SerializableDiscordEmbed ToSerializableEmbed(this DiscordEmbed embed)
+        {
+            var embedAuthor = (embed.Author is null) ? null : new SerializableEmbedAuthor(embed.Author.Name, embed.Author.Url?.AbsoluteUri, embed.Author.IconUrl?.ToUri().AbsoluteUri);
+            var embedTitle = (embed.Title is null) ? null : new SerializableEmbedTitle(embed.Title, embed.Url?.AbsoluteUri);
+
+            var model = new SerializableDiscordEmbed
+            {
+                Color = (!embed.Color.HasValue) ? null : embed.Color.Value.ToString(),
+                Header = (embedAuthor is null && embed.Thumbnail?.Url is null) ? null : new SerializableEmbedHeader(embedAuthor, embed.Thumbnail?.Url?.ToUri().AbsoluteUri),
+                Body = (embed.Title is null && embed.Description is null && embed.Image.Url is null) ? null : new SerializableEmbedBody(embedTitle, embed.Description, embed.Image.Url?.ToUri().AbsoluteUri),
+                Fields = (embed.Fields is null || embed.Fields.Count == 0) ? null : new List<SerializableEmbedField>(embed.Fields.Count),
+                Footer = (embed.Footer is null) ? null : new SerializableEmbedFooter(embed.Footer.Text, embed.Footer.IconUrl?.ToUri().AbsoluteUri),
+                Timestamp = embed.Timestamp
+            };
+            foreach (var field in embed.Fields)
+                model.Fields.Add(new SerializableEmbedField(field.Name, field.Value, field.Inline));
+
+            return model;
         }
     }
 }

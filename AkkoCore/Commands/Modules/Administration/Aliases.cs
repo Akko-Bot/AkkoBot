@@ -61,7 +61,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var dbAliases = _service.GetAliases(context.Guild?.Id);
             var isEmpty = dbAliases.Count is 0;
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (isEmpty)
                 embed.WithDescription("alias_error");

@@ -44,7 +44,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(message.Channel.Guild.Id, out var dbGuild);
 
-            var webhookMessage = new SerializableDiscordMessage()
+            var webhookMessage = new SerializableDiscordEmbed()
                 .WithColor((message.Author as DiscordMember)?.Color.ToString())
                 .WithAuthor("log_message_deleted_title", message.JumpLink.AbsoluteUri)
                 .WithTitle(DiscordUserExt.GetFullname(message.Author))
@@ -64,7 +64,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor((eventArgs.Message.Author as DiscordMember)?.Color.ToString())
                 .WithAuthor("log_message_edited_title", eventArgs.Message.JumpLink.AbsoluteUri)
                 .WithTitle(eventArgs.Message.Author.GetFullname())
@@ -119,7 +119,7 @@ namespace AkkoCore.Services.Events.Common
                     > 0 => _localizer.GetResponseString(dbGuild.Locale, "log_emoji_deleted")
                 };
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor((action <= 0) ? dbGuild.OkColor : dbGuild.ErrorColor)
                 .WithTitle("log_emoji_title")
                 .WithThumbnail(emoji.Url)
@@ -137,7 +137,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithTitle("log_invite_created_title")
                 .WithDescription(eventArgs.Invite.GetInviteLink())
@@ -160,7 +160,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.ErrorColor)
                 .WithTitle("log_invite_deleted_title")
                 .WithDescription(eventArgs.Invite.GetInviteLink())
@@ -181,7 +181,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.ErrorColor)
                 .WithTitle("ban_title")
                 .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
@@ -202,7 +202,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithTitle("log_unban_title")
                 .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
@@ -221,7 +221,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithTitle("log_rolecreated_title")
                 .AddField("name", eventArgs.Role.Name, true)
@@ -239,7 +239,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.ErrorColor)
                 .WithTitle("log_roledeleted_title")
                 .AddField("name", eventArgs.Role.Name, true)
@@ -258,7 +258,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithTitle("log_roleedited_title");
 
@@ -285,7 +285,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithAuthor("log_channelcreated_title")
                 .WithTitle("#" + eventArgs.Channel.Name)
@@ -304,7 +304,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithAuthor("log_channeldeleted_title")
                 .WithTitle("#" + eventArgs.Channel.Name)
@@ -324,7 +324,7 @@ namespace AkkoCore.Services.Events.Common
 
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithAuthor("log_channeledited_title")
                 .WithTitle("#" + eventArgs.ChannelAfter.Name);
@@ -362,7 +362,7 @@ namespace AkkoCore.Services.Events.Common
                 _ => throw new ArgumentException($"Voice state of value \"{voiceState}\" is invalid.", nameof(eventArgs))
             };
 
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor((voiceState is UserVoiceState.Disconnected) ? dbGuild.ErrorColor : dbGuild.OkColor)
                 .WithAuthor(eventArgs.User.GetFullname(), imageUrl: eventArgs.User.AvatarUrl ?? eventArgs.User.DefaultAvatarUrl)
                 .WithDescription(description)
@@ -380,7 +380,7 @@ namespace AkkoCore.Services.Events.Common
             _dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper);
 
             var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.CreationTimestamp);
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
                 .WithTitle("log_joiningmember_title")
@@ -407,7 +407,7 @@ namespace AkkoCore.Services.Events.Common
             _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
 
             var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.JoinedAt);
-            var message = new SerializableDiscordMessage()
+            var message = new SerializableDiscordEmbed()
                 .WithColor(dbGuild.OkColor)
                 .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
                 .WithTitle("log_leavingmember_title")
@@ -430,7 +430,7 @@ namespace AkkoCore.Services.Events.Common
         /// <param name="dbGuild">The guild settings.</param>
         /// <returns>The webhook message.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private DiscordWebhookBuilder GetStandardMessage(SerializableDiscordMessage message, GuildConfigEntity dbGuild)
+        private DiscordWebhookBuilder GetStandardMessage(SerializableDiscordEmbed message, GuildConfigEntity dbGuild)
             => (dbGuild.UseEmbed) ? message.BuildWebhookMessage() : new DiscordWebhookBuilder() { Content = message.Deconstruct() };
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace AkkoCore.Commands.Formatters
     /// </summary>
     public class HelpFormatter : IHelpFormatter
     {
-        private readonly SerializableDiscordMessage _helpMessage = new();
+        private readonly SerializableDiscordEmbed _helpMessage = new();
         private readonly IDbCache _dbCache;
         private readonly ILocalizer _localizer;
         private readonly ICommandHandler _commandHandler;
@@ -228,17 +228,16 @@ namespace AkkoCore.Commands.Formatters
                 : _botConfig.UseEmbed;
 
             if (useEmbed)
-                return _helpMessage;
+                return new(_helpMessage);
 
             _helpMessage.WithLocalization(_localizer, context.GetLocaleKey());
 
-            return new SerializableDiscordMessage()
-                .WithContent(
-                    ((_helpMessage.Body?.Title?.Text is not null) ? Formatter.Bold(_helpMessage.Body.Title.Text) + "\n" : string.Empty) +
-                    ((_helpMessage.Body?.Description is not null) ? _helpMessage.Body.Description + "\n\n" : string.Empty) +
-                    ((_helpMessage.Fields?.Count is not 0 and not null) ? string.Join("\n", _helpMessage.Fields.Select(x => $"{Formatter.Bold(x.Title)}\n{x.Text}")) + "\n\n" : string.Empty) +
-                    ((_helpMessage.Footer?.Text is not null) ? _helpMessage.Footer.Text : string.Empty)
-                );
+            return new SerializableDiscordMessage(
+                ((_helpMessage.Body?.Title?.Text is not null) ? Formatter.Bold(_helpMessage.Body.Title.Text) + "\n" : string.Empty) +
+                ((_helpMessage.Body?.Description is not null) ? _helpMessage.Body.Description + "\n\n" : string.Empty) +
+                ((_helpMessage.Fields?.Count is not 0 and not null) ? string.Join("\n", _helpMessage.Fields.Select(x => $"{Formatter.Bold(x.Title)}\n{x.Text}")) + "\n\n" : string.Empty) +
+                ((_helpMessage.Footer?.Text is not null) ? _helpMessage.Footer.Text : string.Empty)
+            );
         }
 
         /// <summary>

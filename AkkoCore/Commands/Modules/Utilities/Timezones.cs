@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task ServerTimezoneAsync(CommandContext context)
         {
             var timezone = context.GetTimeZone();
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("server_timezone", Formatter.InlineCode($"{timezone.StandardName} ({timezone.BaseUtcOffset.Hours:00}:{timezone.BaseUtcOffset.Minutes:00})")));
 
             await context.RespondLocalizedAsync(embed);
@@ -36,7 +36,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .Select(x => x.Id)
                 .SplitInto(AkkoConstants.LinesPerPage);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("timezone_list");
 
             foreach (var group in timezones)

@@ -58,7 +58,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ListCmdCooldownsAsync(CommandContext context)
         {
             var commands = _service.GetCooldownCommands(context.Guild);
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (!commands.Any())
             {

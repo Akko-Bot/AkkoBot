@@ -206,10 +206,8 @@ namespace AkkoCore.Services.Events
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
             var toWarn = filteredWords.WarnOnDelete && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
 
-            var message = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
             {
-                Content = eventArgs.Author.Mention,
-
                 Body = new()
                 {
                     Description = (string.IsNullOrWhiteSpace(filteredWords.NotificationMessage))
@@ -222,7 +220,7 @@ namespace AkkoCore.Services.Events
                     : null
             };
 
-            var notification = await dummyCtx.RespondLocalizedAsync(message, false, true);
+            var notification = await dummyCtx.RespondLocalizedAsync(embed, false, true, eventArgs.Author.Mention);
 
             // Apply warning, if enabled
             if (toWarn)
@@ -273,13 +271,12 @@ namespace AkkoCore.Services.Events
 
             var cmdHandler = client.GetCommandsNext();
 
-            var embed = new SerializableDiscordMessage()
-                .WithContent(eventArgs.Author.Mention)
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("fw_stickers_notification");
 
             var fakeContext = cmdHandler.CreateContext(eventArgs.Message, null, null);
 
-            var notification = await fakeContext.RespondLocalizedAsync(embed, false, true);
+            var notification = await fakeContext.RespondLocalizedAsync(embed, false, true, eventArgs.Author.Mention);
 
             // Delete the notification message after some time
             _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));

@@ -75,7 +75,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ToggleNotificationAsync(CommandContext context)
         {
             var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.NotifyOnDelete = !x.NotifyOnDelete);
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fw_notify", (isEnabled) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -87,7 +87,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ToggleWarnOnDeleteAsync(CommandContext context)
         {
             var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.WarnOnDelete = !x.WarnOnDelete);
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fw_warn", (isEnabled) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -164,7 +164,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.IsActive = !x.IsActive);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fw_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -182,7 +182,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             var isEmpty = dbEntry is null || words.Length == 0;
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoConstants.MaxEmbedDescriptionLength, "[...]"));
 
             if (!isEmpty)

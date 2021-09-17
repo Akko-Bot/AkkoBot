@@ -55,7 +55,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_override_clearall")]
         public async Task ClearOverridesAsync(CommandContext context)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var amount = _service.GetPermissionOverrides(context.Guild?.Id).Count;
 
             if (amount is 0)
@@ -142,7 +142,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_override_list")]
         public async Task ListOverridesAsync(CommandContext context)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var overrides = _service.GetPermissionOverrides(context.Guild?.Id)
                 .Where(x => x.IsActive);
 
@@ -223,7 +223,7 @@ namespace AkkoCore.Commands.Modules.Administration
         /// <param name="entity">The entity that was toggled.</param>
         private async Task SendToggleResponseAsync(CommandContext context, string responseKey, string command, string entity)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized(responseKey, Formatter.InlineCode(context.Prefix + command), Formatter.Bold(entity)));
 
             await context.RespondLocalizedAsync(embed);

@@ -144,7 +144,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 .ToArray();
 
             // Send the confirmation message
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle(":radioactive: " + context.FormatLocalized("massban"))
                 .WithDescription(context.FormatLocalized("massban_description", nonBanned.Length))
                 .WithFooter(context.FormatLocalized("q_operation_length_seconds", nonBanned.Length * AkkoStatics.SafetyDelay.TotalSeconds));
@@ -235,7 +235,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             if (user is null)
             {
-                var embed = new SerializableDiscordMessage().WithDescription("unban_not_found");
+                var embed = new SerializableDiscordEmbed().WithDescription("unban_not_found");
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
             else
@@ -244,7 +244,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 await context.Guild.UnbanMemberAsync(user.User, $"{context.User.GetFullname()} | {reason}");
 
                 // Send unban message to the context channel
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized("unban_success", Formatter.Bold(user.User.GetFullname())));
 
                 await context.RespondLocalizedAsync(embed);
@@ -275,7 +275,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 }
             }
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (failed == toUnban.Length)
                         ? "massunban_failed"

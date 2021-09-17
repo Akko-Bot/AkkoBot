@@ -101,7 +101,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 }
             );
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (reminders.Count == 0)
             {

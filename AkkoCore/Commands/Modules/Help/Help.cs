@@ -59,7 +59,7 @@ namespace AkkoCore.Commands.Modules.Help
                 .OrderBy(x => x)
                 .ToArray();
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("modules_title")
                 .WithDescription(string.Join("\n", namespaces))
                 .WithFooter(
@@ -90,7 +90,7 @@ namespace AkkoCore.Commands.Modules.Help
                 })
                 .ToListAsync();
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (cmdGroup.Count == 0)
             {
@@ -121,7 +121,7 @@ namespace AkkoCore.Commands.Modules.Help
             if (keyword.StartsWith(context.Prefix))
                 keyword = keyword[context.Prefix.Length..];
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var cmds = context.CommandsNext.GetAllCommands(keyword)
                 .DistinctBy(x => x.QualifiedName)
                 .OrderBy(x => x.QualifiedName);

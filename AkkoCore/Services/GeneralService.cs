@@ -145,10 +145,35 @@ namespace AkkoCore.Services
         /// Gets the localized Discord message.
         /// </summary>
         /// <param name="context">The command context.</param>
-        /// <param name="embed">The message embed.</param>
+        /// <param name="message">The message.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <returns>The localized message content, embed, and the message settings.</returns>
-        internal static (SerializableDiscordMessage, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordMessage embed, bool isError)
+        internal static (SerializableDiscordMessage, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordMessage message, bool isError)
+        {
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
+
+            // Get the message settings (guild or dm)
+            IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+                ? dbGuild
+                : context.Services.GetRequiredService<BotConfig>();
+
+            foreach (var embed in message.Embeds ?? Enumerable.Empty<SerializableDiscordEmbed>())
+                embed.Color ??= (isError) ? settings.ErrorColor : settings.OkColor;
+
+            message.WithLocalization(localizer, settings.Locale);
+
+            return (message, settings);
+        }
+
+        /// <summary>
+        /// Gets the localized Discord embed.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="embed">The embed.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
+        /// <returns>The localized embed and the message settings.</returns>
+        internal static (SerializableDiscordEmbed, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordEmbed embed, bool isError)
         {
             var dbCache = context.Services.GetRequiredService<IDbCache>();
             var localizer = context.Services.GetRequiredService<ILocalizer>();

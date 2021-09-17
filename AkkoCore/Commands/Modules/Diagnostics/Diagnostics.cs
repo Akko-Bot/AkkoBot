@@ -38,7 +38,7 @@ namespace AkkoCore.Commands.Modules.Diagnostics
                 .EnumerateFiles("*.txt", SearchOption.AllDirectories)
                 .Sum(x => x.Length);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .AddField("db_cache", $"{dbCache / _mb:0.00} MB", true)
                 .AddField("timers", $"{timers / _mb:0.00} MB", true)
                 .AddField("total", $"{GC.GetTotalMemory(false) / _mb:0.00} MB", true)

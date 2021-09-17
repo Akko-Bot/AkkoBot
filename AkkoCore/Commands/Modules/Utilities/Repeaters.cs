@@ -87,7 +87,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Description("cmd_repeat_info")]
         public async Task RepeaterInfoAsync(CommandContext context, [Description("arg_uint")] int id)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var repeater = _service.GetRepeaters(context.Guild, x => x.Id == id).FirstOrDefault();
 
             if (repeater is null)
@@ -126,7 +126,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 }
             );
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (repeaters.Count is 0)
             {

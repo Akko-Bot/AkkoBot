@@ -31,6 +31,11 @@ namespace AkkoCore.Common
         public const int MaxUsernameLength = 32;
 
         /// <summary>
+        /// Represents the maximum amount of embeds allowed in a message.
+        /// </summary>
+        public const int MaxEmbedAmount = 10;
+
+        /// <summary>
         /// Defines how many lines a paginated embed should have.
         /// </summary>
         public const int LinesPerPage = 20;

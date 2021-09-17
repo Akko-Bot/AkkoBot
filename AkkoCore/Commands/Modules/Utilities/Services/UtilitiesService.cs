@@ -43,7 +43,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         {
             try
             {
-                result = input.FromYaml<SerializableDiscordMessage>().BuildMessage();
+                result = input.FromYaml<SerializableDiscordMessage>().Build();
                 return result.Content is not null || result.Embed is not null;
             }
             catch
@@ -172,9 +172,9 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="context">The command context.</param>
         /// <param name="server">The Discord guild to get information from</param>
         /// <returns>An embed with information about the <paramref name="server"/>.</returns>
-        public SerializableDiscordMessage GetServerInfo(CommandContext context, DiscordGuild server)
+        public SerializableDiscordEmbed GetServerInfo(CommandContext context, DiscordGuild server)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle(server.Name)
                 .WithThumbnail(server.IconUrl)
                 .AddField("id", server.Id.ToString(), true)
@@ -236,7 +236,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="embed">Embed to add the information to.</param>
         /// <param name="channel">Channel to get the information from.</param>
         /// <returns>An embed with information about the Discord <paramref name="channel"/>.</returns>
-        public SerializableDiscordMessage GetChannelInfo(SerializableDiscordMessage embed, DiscordChannel channel)
+        public SerializableDiscordEmbed GetChannelInfo(SerializableDiscordEmbed embed, DiscordChannel channel)
         {
             embed.WithTitle(channel.Name)
                 .AddField("type", channel.Type.ToString().ToLowerInvariant(), true)

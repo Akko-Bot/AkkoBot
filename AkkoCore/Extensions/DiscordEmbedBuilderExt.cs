@@ -47,16 +47,14 @@ namespace AkkoCore.Extensions
         /// Constructs a serializable model of this embed.
         /// </summary>
         /// <param name="embed">This embed.</param>
-        /// <param name="content">The text content from outside the embed.</param>
-        /// <returns>A <see cref="SerializableDiscordMessage"/> of this <paramref name="embed"/>.</returns>
-        public static SerializableDiscordMessage BuildSerializableEmbed(this DiscordEmbedBuilder embed, string content = null)
+        /// <returns>A <see cref="SerializableDiscordEmbed"/> of this <paramref name="embed"/>.</returns>
+        public static SerializableDiscordEmbed ToSerializableEmbed(this DiscordEmbedBuilder embed)
         {
             var embedAuthor = (embed.Author is null) ? null : new SerializableEmbedAuthor(embed.Author.Name, embed.Author.Url, embed.Author.IconUrl);
             var embedTitle = (embed.Title is null) ? null : new SerializableEmbedTitle(embed.Title, embed.Url);
 
-            var model = new SerializableDiscordMessage
+            var model = new SerializableDiscordEmbed
             {
-                Content = content,
                 Color = (!embed.Color.HasValue) ? null : embed.Color.Value.ToString(),
                 Header = (embedAuthor is null && embed.Thumbnail?.Url is null) ? null : new SerializableEmbedHeader(embedAuthor, embed.Thumbnail?.Url),
                 Body = (embed.Title is null && embed.Description is null && embed.ImageUrl is null) ? null : new SerializableEmbedBody(embedTitle, embed.Description, embed.ImageUrl),

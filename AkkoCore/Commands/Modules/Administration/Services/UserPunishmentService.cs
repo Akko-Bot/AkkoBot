@@ -48,14 +48,14 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         public async Task<DiscordMessage> SendPunishmentDmAsync(CommandContext context, DiscordMember user, string message, string reason, TimeSpan? time = null)
         {
             // Create the notification dm
-            var dm = new SerializableDiscordMessage()
+            var dm = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized(message, Formatter.Bold(context.Guild.Name), time?.ToString(@"%d\d\ %h\h\ %m\m")));
 
             if (reason is not null)
                 dm.AddField(context.FormatLocalized("reason"), reason);
 
             // This returns null if it fails
-            return await context.SendLocalizedDmAsync(user, dm, true);
+            return await context.SendLocalizedDmAsync(user.Id, dm, true);
         }
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="emoji">Emoji name with colons or its unicode representation.</param>
         /// <param name="titleKey">The response string for the embed title.</param>
         /// <returns>An embed with basic information about the punished user.</returns>
-        public SerializableDiscordMessage GetPunishEmbed(CommandContext context, DiscordUser user, string emoji, string titleKey)
+        public SerializableDiscordEmbed GetPunishEmbed(CommandContext context, DiscordUser user, string emoji, string titleKey)
         {
-            return new SerializableDiscordMessage()
+            return new SerializableDiscordEmbed()
                 .WithTitle($"{emoji} " + context.FormatLocalized(titleKey))
                 .AddField("user", user.GetFullname(), true)
                 .AddField("id", user.Id.ToString(), true);

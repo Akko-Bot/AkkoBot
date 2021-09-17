@@ -34,7 +34,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
         public async Task CreateSimplePollAsync(CommandContext context, [RemainingText, Description("arg_poll_question")] string question)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle(context.FormatLocalized("poll_title", context.User.GetFullname()))
                 .WithDescription(Formatter.Bold(question));
 
@@ -68,7 +68,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         {
             if (_service.GetPolls(context.Guild).Any(x => x.Type is PollType.Anonymous))
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription("poll_anonymous_error");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -91,7 +91,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             if (poll is null)
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription("poll_not_found");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -126,7 +126,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             if (poll is null)
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription("poll_not_found");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -162,7 +162,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var poll = _service.GetPolls(message.Channel.Guild)
                 .FirstOrDefault(x => x.GuildIdFK == message.Channel.Guild.Id && x.ChannelId == message.Channel.Id && x.MessageId == message.Id);
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var success = poll is not null && await _service.VoteAsync(context.User, poll, option);
 
             embed.WithDescription(
@@ -180,7 +180,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task ListPollsAsync(CommandContext context)
         {
             var polls = _service.GetPolls(context.Guild);
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (!polls.Any())
             {
@@ -212,7 +212,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         /// <returns>The poll that was just created.</returns>
         private async Task<DiscordMessage> CreateNumeratedPollAsync(CommandContext context, PollType pollType, string[] qAnswers)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (qAnswers.Length < 3 || (pollType is PollType.Numeric && qAnswers.Length > 11))
             {

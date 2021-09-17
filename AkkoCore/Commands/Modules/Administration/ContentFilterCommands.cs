@@ -88,7 +88,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_fc_list")]
         public async Task ListFiltersAsync(CommandContext context)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var filters = _service.GetContentFilters(context.Guild)
                 .Where(x => x.IsActive);
 
@@ -124,7 +124,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             channel ??= context.Channel;
             var result = await _service.SetContentFilterAsync(context.Guild, channel, x => x.ContentType = (x.ContentType.HasFlag(filter)) ? x.ContentType & ~filter : x.ContentType | filter);
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized(responseKey, (result.HasFlag(filter)) ? "enabled" : "disabled", channel.Mention));
 
             return await context.RespondLocalizedAsync(embed);

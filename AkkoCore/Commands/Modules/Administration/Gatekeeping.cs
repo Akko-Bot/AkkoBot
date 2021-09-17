@@ -37,7 +37,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.SanitizeNames = !x.SanitizeNames);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("guild_sanitizenames", (result) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -50,7 +50,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.CustomSanitizedName = nickname.SanitizeUsername());
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (string.IsNullOrWhiteSpace(result))
                         ? "sanitizedname_reset"
@@ -66,7 +66,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.GreetDm = !x.GreetDm);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription((result) ? "greetdm_enabled" : "greetdm_disabled");
 
             await context.RespondLocalizedAsync(embed);
@@ -77,7 +77,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task SetGreetChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (channel is null)
                         ? "greet_channel_removed"
@@ -95,7 +95,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task SetFarewellChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (channel is null)
                         ? "farewell_channel_removed"
@@ -118,7 +118,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 return;
             }
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("greet_message_set");
 
             await _service.SetPropertyAsync(context.Guild, x => x.GreetMessage = message);
@@ -135,7 +135,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 return;
             }
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("farewell_message_set");
 
             await _service.SetPropertyAsync(context.Guild, x => x.FarewellMessage = message);
@@ -149,7 +149,7 @@ namespace AkkoCore.Commands.Modules.Administration
             if (time > TimeSpan.FromMinutes(2))
                 time = TimeSpan.FromMinutes(2);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((time == TimeSpan.Zero) ? "greetdel_disable" : "greetdel_enable", time.TotalSeconds));
 
             await _service.SetPropertyAsync(context.Guild, x => x.GreetDeleteTime = time);
@@ -163,7 +163,7 @@ namespace AkkoCore.Commands.Modules.Administration
             if (time > TimeSpan.FromMinutes(2))
                 time = TimeSpan.FromMinutes(2);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((time == TimeSpan.Zero) ? "farewelldel_disable" : "farewelldel_enable", time.TotalSeconds));
 
             await _service.SetPropertyAsync(context.Guild, x => x.FarewellDeleteTime = time);
@@ -194,7 +194,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 return true;
             });
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         (action is PunishmentType.AddRole) ? "antialt_setrole" : "antialt_set",
@@ -209,7 +209,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task DisableAntiAltAsync(CommandContext context)
         {
             await _service.SetPropertyAsync(context.Guild, x => x.AntiAlt = false);
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("antialt_disabled");
 
             await context.RespondLocalizedAsync(embed);
@@ -228,7 +228,7 @@ namespace AkkoCore.Commands.Modules.Administration
             var parsedMessage = new SmartString(context, property);
 
             if (string.IsNullOrWhiteSpace(parsedMessage))
-                await context.RespondLocalizedAsync(new SerializableDiscordMessage().WithDescription(context.FormatLocalized("guild_prop_null", propName)), isError: true);
+                await context.RespondLocalizedAsync(new SerializableDiscordEmbed().WithDescription(context.FormatLocalized("guild_prop_null", propName)), isError: true);
             else if (_utilitiesService.DeserializeEmbed(parsedMessage, out var message))
                 await context.Channel.SendMessageAsync(message);
             else

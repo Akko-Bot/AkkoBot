@@ -41,7 +41,7 @@ namespace AkkoCore.Commands.Modules.Diagnostics
         /// <param name="query">The SQL query.</param>
         private async Task SqlExecAsync(CommandContext context, string query)
         {
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("q_are_you_sure", "q_sql_query", "q_yes", "q_no"));
 
             await context.RespondInteractiveAsync(question, "q_yes", async () =>
@@ -56,7 +56,7 @@ namespace AkkoCore.Commands.Modules.Diagnostics
 
                 var (rows, time) = await result;
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized("sqlexec_success", time.ToString("0.00"), rows));
 
                 await context.RespondLocalizedAsync(embed);
@@ -102,7 +102,7 @@ namespace AkkoCore.Commands.Modules.Diagnostics
             if (task.Exception.GetBaseException() is not PostgresException exception)
                 throw task.Exception.GetBaseException();
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                     .WithDescription($"{exception.Severity} ({exception.SqlState}): {exception.MessageText}\n" + exception.Hint);
 
             await context.RespondLocalizedAsync(embed, isError: true);

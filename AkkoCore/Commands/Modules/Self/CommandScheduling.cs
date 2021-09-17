@@ -81,7 +81,7 @@ namespace AkkoCore.Commands.Modules.Self
             var reminders = (await _service.GetAutoCommandsAsync(context.User))
                 .OrderBy(x => _service.GetElapseTime(x));
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (!reminders.Any())
             {

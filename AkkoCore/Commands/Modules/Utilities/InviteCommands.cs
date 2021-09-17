@@ -103,7 +103,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 fields.Add(new("expires_on", string.Join("\n", group.Select(x => (x.MaxAge is 0) ? "-" : x.CreatedAt.AddSeconds(x.MaxAge).ToDiscordTimestamp())), true));
             }
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("invite_list_title");
 
             await context.RespondPaginatedByFieldsAsync(embed, fields, 3);
@@ -113,7 +113,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Description("cmd_invite_check")]
         public async Task CheckInviteAsync(CommandContext context, [Description("arg_discord_invite")] string invite)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var guildInvite = (await context.Guild.GetInvitesAsync()).FirstOrDefault(x => invite.Contains(x.Code, StringComparison.Ordinal));
 
             if (guildInvite is null)

@@ -33,7 +33,7 @@ namespace AkkoCore.Commands.Modules.Self
                 ? await _service.DisableGlobalCommandAsync(cmd)
                 : await _service.EnableGlobalCommandAsync(command);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         (cmd is not null || success) ? "gcmd_toggle" : "gcmd_error",
@@ -57,7 +57,7 @@ namespace AkkoCore.Commands.Modules.Self
                 ? await _service.DisableGlobalCommandsAsync(cmds)
                 : await _service.EnableGlobalCommandsAsync(module);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         (cmds.Length is not 0 || success) ? "gmod_toggle" : "gmod_error",
@@ -77,7 +77,7 @@ namespace AkkoCore.Commands.Modules.Self
                 .Select(x => Formatter.InlineCode(x.Key))
                 .ToArray();
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("ldc_title")
                 .WithDescription((cmds.Length is 0) ? "ldc_empty" : string.Join(", ", cmds));
 

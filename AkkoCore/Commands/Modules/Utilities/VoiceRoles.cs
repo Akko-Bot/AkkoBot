@@ -60,7 +60,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         {
             var voiceRoles = await _service.GetVoiceRolesAsync(context.Guild);
 
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
             var fields = new List<SerializableEmbedField>();
 
             if (voiceRoles.Count == 0)

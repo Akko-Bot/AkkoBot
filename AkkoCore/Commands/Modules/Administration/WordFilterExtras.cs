@@ -24,7 +24,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.FilterInvites = !x.FilterInvites);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fi_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);
@@ -37,7 +37,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var success = await _service.SetWordFilterAsync(context.Guild.Id, x => x.FilterStickers = !x.FilterStickers);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fs_toggle", (success) ? "enabled" : "disabled"));
 
             await context.RespondLocalizedAsync(embed);

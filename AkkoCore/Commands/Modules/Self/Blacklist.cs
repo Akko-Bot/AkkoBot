@@ -59,7 +59,7 @@ namespace AkkoCore.Commands.Modules.Self
 
             // bl_added: Successfully added {0} {1} {2} to the blacklist
             // bl_exists: '{0} {1} {2} is blacklisted already.'
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         (success) ? "bl_added" : "bl_exist",                // <- Key | Args ↓
@@ -78,7 +78,7 @@ namespace AkkoCore.Commands.Modules.Self
         {
             var amount = await _service.AddBlacklistsAsync(ids);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("bl_added_range", amount));
 
             await context.RespondLocalizedAsync(embed);
@@ -97,7 +97,7 @@ namespace AkkoCore.Commands.Modules.Self
 
             // bl_removed: Successfully removed {0} {1} {2} from the blacklist.
             // bl_not_exist: '{0} {1} {2} is not blacklisted.'
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         (entry is not null) ? "bl_removed" : "bl_not_exist",  // <- Key | Args ↓
@@ -116,7 +116,7 @@ namespace AkkoCore.Commands.Modules.Self
         {
             var amount = await _service.RemoveBlacklistsAsync(ids);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("bl_removed_range", amount));
 
             await context.RespondLocalizedAsync(embed);
@@ -136,7 +136,7 @@ namespace AkkoCore.Commands.Modules.Self
             var fields = new List<SerializableEmbedField>();
 
             // Send response
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("bl_title");
 
             if (blacklist.Count == 0)
@@ -161,7 +161,7 @@ namespace AkkoCore.Commands.Modules.Self
             // If blacklist is empty, return error
             if (!_service.HasBlacklists)
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription("bl_empty");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -169,7 +169,7 @@ namespace AkkoCore.Commands.Modules.Self
             }
 
             // Build the confirmation message
-            var question = new SerializableDiscordMessage()
+            var question = new SerializableDiscordEmbed()
                 .WithDescription(
                     context.FormatLocalized(
                         "q_are_you_sure",               // Key
@@ -182,7 +182,7 @@ namespace AkkoCore.Commands.Modules.Self
             {
                 var rows = await _service.ClearBlacklistsAsync();
 
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(context.FormatLocalized("bl_clear", rows));
 
                 await context.RespondLocalizedAsync(embed);
@@ -198,14 +198,14 @@ namespace AkkoCore.Commands.Modules.Self
 
             if (entity is null)
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription("bl_not_found");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
             else
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .AddField("name", entity.Name?.ToString() ?? context.FormatLocalized("unknown"), true)
                     .AddField("type", entity.Type.ToString(), true)
                     .AddField("id", entity.ContextId.ToString(), true)

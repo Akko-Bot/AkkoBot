@@ -52,7 +52,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             if (cmd is null)
             {
-                var embed = new SerializableDiscordMessage().WithDescription("command_not_found");
+                var embed = new SerializableDiscordEmbed().WithDescription("command_not_found");
                 await context.RespondLocalizedAsync(embed, isError: true);
 
                 return;
@@ -62,7 +62,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             if (_commandHandler.CheckAndExecuteAsync(fakeContext) is null)
             {
-                var embed = new SerializableDiscordMessage().WithDescription("command_check_failed");
+                var embed = new SerializableDiscordEmbed().WithDescription("command_check_failed");
                 await context.RespondLocalizedAsync(embed, isError: true);
             }
         }
@@ -83,7 +83,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             await _guildService.SetPropertyAsync(context.Guild, x => x.Prefix = newPrefix);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(newPrefix)));
 
             await context.RespondLocalizedAsync(embed);
@@ -113,7 +113,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             if (!messages.Any())
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription("prune_error");
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -199,7 +199,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 : _guildService.GetGuildSettings(context.Guild).Prefix;
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized(response, Formatter.InlineCode(prefix)));
 
             await context.RespondLocalizedAsync(embed);

@@ -50,7 +50,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 return x.IsActive;
             });
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("autoslowmode_enabled", messages, (int)time.TotalSeconds, (int)interval.TotalSeconds, (int)duration.TotalSeconds));
 
             await context.RespondLocalizedAsync(embed);
@@ -61,7 +61,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var result = await _service.SetPropertyAsync(context.Guild, x => x.IsActive = false);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("autoslowmode_disabled");
 
             await context.RespondLocalizedAsync(embed);
@@ -98,7 +98,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 return amount < x.IgnoredIds.Count; // true = increased
             });
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((result) ? "ignored_ids_add" : "ignored_ids_remove", ids.Length));
 
             await context.RespondLocalizedAsync(embed);
@@ -118,7 +118,7 @@ namespace AkkoCore.Commands.Modules.Administration
                 return count;
             });
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((result is not 0) ? "ignored_ids_remove" : "ignored_ids_empty", result));
 
             await context.RespondLocalizedAsync(embed);
@@ -130,7 +130,7 @@ namespace AkkoCore.Commands.Modules.Administration
         {
             var slowmode = _service.GetAutoSlowmodeSettings(context.Guild) ?? new();
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("autoslowmode_title")
                 .WithDescription((slowmode.IgnoredIds.Count is not 0) ? $"{context.FormatLocalized("ignored_ids")}: {string.Join(", ", slowmode.IgnoredIds)}" : null)
                 .AddField("message", slowmode.MessageAmount.ToString(), true)

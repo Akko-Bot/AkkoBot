@@ -74,7 +74,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         {
             channel ??= context.Channel;
 
-            var embed = _service.GetChannelInfo(new SerializableDiscordMessage(), channel)
+            var embed = _service.GetChannelInfo(new SerializableDiscordEmbed(), channel)
                 .WithFooter(context.FormatLocalized("{0}: {1}", "created_on", channel.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))));
 
             await context.RespondLocalizedAsync(embed, false);
@@ -87,7 +87,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             user ??= context.Member;
             var isMod = user.Hierarchy is int.MaxValue || user.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers));
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
                 .AddField("name", user.GetFullname(), true)
                 .AddField("nickname", user.Nickname ?? "-", true)
@@ -104,7 +104,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Command("userinfo"), HiddenOverload]
         public async Task UserInfoAsync(CommandContext context, DiscordUser user)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
                 .AddField("name", user.GetFullname(), true)
                 .AddField("id", user.Id.ToString(), true)
@@ -208,7 +208,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var allowedPerms = string.Join("\n", allowedPermsCol);
             var deniedPerms = string.Join("\n", deniedPermsCol);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle(context.FormatLocalized("checkperms_title", user.GetFullname(), channel.Name));
 
             if (!string.IsNullOrWhiteSpace(allowedPerms))
@@ -227,7 +227,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var allowedPerms = string.Join("\n", allowedPermsCol);
             var deniedPerms = string.Join("\n", deniedPermsCol);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle(context.FormatLocalized("checkperms_role_title", role.Name));
 
             if (!string.IsNullOrWhiteSpace(allowedPerms))

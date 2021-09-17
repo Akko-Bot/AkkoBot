@@ -71,7 +71,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             if (!CheckHierarchyAsync(context.Member, user))
             {
-                var embed = new SerializableDiscordMessage()
+                var embed = new SerializableDiscordEmbed()
                     .WithDescription(errorMessage);
 
                 await context.RespondLocalizedAsync(embed, isError: true);
@@ -234,9 +234,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="responseKey">The key of the response string to be used in the response.</param>
         /// <param name="reason">The reason for the mute/unmute.</param>
         /// <returns>An embed with the appropriate response key.</returns>
-        public async Task<SerializableDiscordMessage> SetVoiceMuteAsync(DiscordMember user, bool isMuting, string responseKey, string reason)
+        public async Task<SerializableDiscordEmbed> SetVoiceMuteAsync(DiscordMember user, bool isMuting, string responseKey, string reason)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (user.VoiceState is null)
                 embed.WithDescription("voice_failure");
@@ -257,9 +257,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="responseKey">The key of the response string to be used in the response.</param>
         /// <param name="reason">The reason for the deaf/undeaf.</param>
         /// <returns>An embed with the appropriate response key.</returns>
-        public async Task<SerializableDiscordMessage> SetDeafAsync(DiscordMember user, bool isDeafening, string responseKey, string reason)
+        public async Task<SerializableDiscordEmbed> SetDeafAsync(DiscordMember user, bool isDeafening, string responseKey, string reason)
         {
-            var embed = new SerializableDiscordMessage();
+            var embed = new SerializableDiscordEmbed();
 
             if (user.VoiceState is not null)
                 embed.WithDescription("voice_failure");

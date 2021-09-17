@@ -32,7 +32,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task CheckGuildEmojiAsync(CommandContext context)
         {
             var fields = new List<SerializableEmbedField>();
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("emoji_list_title");
 
             var emojis = context.Guild.Emojis.Values

@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Basic
         [Description("Gets the websocket latency for this bot.")]
         public async Task PingAsync(CommandContext context)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription($"{context.Client.Ping} ms");
 
             await context.RespondLocalizedAsync(embed);
@@ -31,7 +31,7 @@ namespace AkkoCore.Commands.Modules.Basic
         [Description("Shuts the bot down.")]
         public async Task DieAsync(CommandContext context)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("shutdown");
 
             await context.RespondLocalizedAsync(embed);
@@ -48,7 +48,7 @@ namespace AkkoCore.Commands.Modules.Basic
         [Description("Restarts the bot.")]
         public async Task RestartAsync(CommandContext context)
         {
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithDescription("restart");
 
             await context.RespondLocalizedAsync(embed);
@@ -66,7 +66,7 @@ namespace AkkoCore.Commands.Modules.Basic
         {
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 
-            var embed = new SerializableDiscordMessage()
+            var embed = new SerializableDiscordEmbed()
                 .WithTitle("online_since")
                 .WithDescription(Formatter.InlineCode($"[{_startup.LocalDateTime}]"))
                 .AddField("Shards", $"#{context.Client.ShardId}/{context.Client.ShardCount}", inline: true)
@@ -80,6 +80,32 @@ namespace AkkoCore.Commands.Modules.Basic
                 );
 
             await context.RespondLocalizedAsync(embed, false);
+        }
+
+        [Command("test")]
+        public async Task GenerateBigMsgAsync(CommandContext context)
+        {
+            var google = "https://www.google.com/";
+            var resultingMessage = new SerializableDiscordMessage() { Content = "This is the content." };
+            var bigEmbed = new SerializableDiscordEmbed()
+                .WithAuthor(context.User.GetFullname(), google, context.User.AvatarUrl)
+                .WithThumbnail(context.User.AvatarUrl)
+                .WithColor("FFF000")
+                .WithTitle("This is the title")
+                .WithDescription("This is the description")
+                .WithImageUrl(context.User.DefaultAvatarUrl)
+                .WithFooter("Footer text", context.User.AvatarUrl)
+                .AddField("Field 1", "Body", true)
+                .AddField("Field 2", "Body", true)
+                .AddField("Field 3", "Body", false); 
+
+
+            var justImageEmbed = new SerializableDiscordEmbed()
+                .WithImageUrl("https://cdn.discordapp.com/attachments/881721906535997450/888200882884317234/result.png");
+
+            resultingMessage.AddEmbeds(new[] { bigEmbed, justImageEmbed });
+
+            await context.RespondAsync(Formatter.BlockCode(resultingMessage.ToYaml(), "yaml"));
         }
     }
 }

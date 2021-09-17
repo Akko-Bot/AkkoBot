@@ -21,7 +21,7 @@ namespace AkkoCore.Extensions
         /// <param name="isMarked"><see langword="true"/> if the message should be marked with the full name of the user who ran the command, <see langword="false"/> otherwise.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <returns>The newly edited Discord message.</returns>
-        public static async Task<DiscordMessage> ModifyLocalizedAsync(this DiscordMessage msg, CommandContext context, SerializableDiscordMessage embed, bool isMarked = true, bool isError = false)
+        public static async Task<DiscordMessage> ModifyLocalizedAsync(this DiscordMessage msg, CommandContext context, SerializableDiscordEmbed embed, bool isMarked = true, bool isError = false)
         {
             // Reset the embed's current color
             if (isError)
