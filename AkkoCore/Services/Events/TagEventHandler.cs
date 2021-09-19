@@ -59,8 +59,8 @@ namespace AkkoCore.Services.Events
                 || !HasMinimumPermission(dbGuild, eventArgs))
                 return Task.CompletedTask;
 
-                // Get the correct tag
-                var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.BotPrefix);
+            // Get the correct tag
+            var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.BotPrefix);
             var tag = globalTags
                 .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
                 .RandomElement(_rng);

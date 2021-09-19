@@ -1,7 +1,6 @@
 ﻿using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable.EmbedParts;
-using AkkoCore.Services;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;

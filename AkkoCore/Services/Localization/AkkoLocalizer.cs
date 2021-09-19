@@ -116,7 +116,6 @@ namespace AkkoCore.Services.Localization
                 //_localizedStrings.TryAdd(GetFileLocale(filePath), lStrings);
                 //reader.Dispose();
 
-
                 var locale = GetFileLocale(filePath);
                 var reader = new StreamReader(File.OpenRead(filePath));
                 var lStrings = reader.FromYaml<Dictionary<string, string>>();
@@ -128,7 +127,6 @@ namespace AkkoCore.Services.Localization
                     foreach (var stringPair in lStrings)
                         _localizedStrings[locale].Add(stringPair.Key, stringPair.Value);
                 }
-
             }
         }
 

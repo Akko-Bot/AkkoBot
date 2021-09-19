@@ -1,6 +1,5 @@
 ﻿using AkkoCore.Abstractions;
 using AkkoCore.Extensions;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;

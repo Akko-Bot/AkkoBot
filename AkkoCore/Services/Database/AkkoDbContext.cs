@@ -1,11 +1,5 @@
 ﻿using AkkoCore.Services.Database.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AkkoCore.Services.Database

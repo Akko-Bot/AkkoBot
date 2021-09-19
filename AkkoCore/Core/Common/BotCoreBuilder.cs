@@ -351,6 +351,7 @@ namespace AkkoCore.Core.Common
         /// </summary>
         /// <param name="shardedClient">The bot's sharded clients.</param>
         /// <remarks>It won't add services whose interface type has already been registered to <see cref="_cmdServices"/>.</remarks>
+        /// <returns>A collection of cog setups.</returns>
         private ICogSetup[] RegisterFinalServices(DiscordShardedClient shardedClient)
         {
             // Load cog services and response strings

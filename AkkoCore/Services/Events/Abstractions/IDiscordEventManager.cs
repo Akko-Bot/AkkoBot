@@ -15,7 +15,7 @@ namespace AkkoCore.Services.Events.Abstractions
         void RegisterEvents();
 
         /// <summary>
-        /// Subscribes or unsubscribes the specified methods to Discord websocket events defined by <paramref name="setter"/>. 
+        /// Subscribes or unsubscribes the specified methods to Discord websocket events defined by <paramref name="setter"/>.
         /// </summary>
         /// <param name="setter">The method that registers methods to the <see cref="DiscordShardedClient"/>.</param>
         void ManageCallbacks(Action<DiscordShardedClient> setter);
