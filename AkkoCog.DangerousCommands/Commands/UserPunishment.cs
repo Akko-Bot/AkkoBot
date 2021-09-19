@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCog.DangerousCommands.Administration  // Integrate with Administration
 {
+    [RequireGuild]
     public class UserPunishment : AkkoCommandModule
     {
         private readonly UserPunishmentService _service;
