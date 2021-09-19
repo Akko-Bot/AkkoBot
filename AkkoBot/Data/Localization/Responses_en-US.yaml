@@ -90,7 +90,6 @@ arg_repeat_time: How long until the repeater is triggered. Minimum of __1m__.
 arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
-arg_sql: A valid SQL query.
 arg_stream_url: The URL of the stream.
 arg_tag_behavior: The tag behavior.
 arg_tag_clearold_time: Time the tag hasn't been used.
@@ -289,6 +288,7 @@ cmd_guild_errorcolor: Sets the color used on embeds that return an error message
 cmd_guild_ignoreglobaltags: Toggles whether global tags are allowed to be executed in this server.
 cmd_guild_list: Shows the server's current settings.
 cmd_guild_locale: Changes the language the bot should use in this server. Provide no parameter to see the list of available languages.
+cmd_guild_mintagperm: Sets the minimum permissions required for a user to use a tag in this server.
 cmd_guild_okcolor: Sets the color used on embeds for this server.
 cmd_guild_prefix: Sets the prefix for all bot commands on this server. Provide no parameter to see the current server prefix.
 cmd_guild_rolemention: 'Toggles whether users can ping roles through the bot based solely on their position in the role hierarchy. Caution: depending on how the server permissions are set up, enabling this setting may enable role ping abuse.'
@@ -314,8 +314,6 @@ cmd_log_edit: Edits the webhook that sends logs to the specified channel.
 cmd_log_list: Lists the available log events and the channel they are currently active on.
 cmd_log_start: Starts logging on the specified channel. Use `log list` to see the list of events available for logging. Provide no channel to output the logs in the current channel.
 cmd_log_stop: Stops logging of the specified log event.
-cmd_massban: Bans multiple users from the server.
-cmd_massunban: Unbans multiple users from the server.
 cmd_modlog: Shows notices and infractions of a user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
@@ -385,7 +383,6 @@ cmd_setrole: Adds a role to the specified user.
 cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
 cmd_settopic: Sets the topic for the current text channel.
 cmd_slowmode: Sets how frequently users are allowed to send messages in this text channel. Provide no parameter to disable.
-cmd_sql: Runs a SQL query on the database.
 cmd_sudo: Executes a command as the specified user.
 cmd_tag: Groups commands for managing tags. Tags are customized responses sent by the bot when a user types its trigger. Tags are specific to the servers they are created in, except when they are created in direct message with the bot. Creating global tags requires bot ownership.
 cmd_tag_add: Creates a tag with the specified trigger and response.
@@ -605,13 +602,6 @@ log_voicestate_connected: '{0} has connected to the {1} voice channel.'
 log_voicestate_disconnected: '{0} has disconnected from the {1} voice channel.'
 log_voicestate_moved: '{0} has moved from the {1} to the {2} voice channel.'
 low: Low
-massban: Massban
-massban_description: Banning {0} users.
-massban_failure: No user was banned either because none of the IDs were valid or the users are already banned.
-massban_success: '{0} users were banned from the server.'
-massunban: Massunban
-massunban_failed: There was no user to unban.
-massunban_succeded: '{0} users were unbanned from the server.'
 medium: Medium
 members: Members
 message: Message
@@ -713,7 +703,6 @@ q_deleteallroles: delete {0} roles
 q_no: 'no'
 q_operation_length_seconds: This operation will take at least {0} seconds.
 q_override_clearall: remove all permission overrides
-q_sql_query: run this query
 q_yes: 'yes'
 reaction: Reaction
 reason: Reason
@@ -750,8 +739,6 @@ shutdown: Shutting down.
 slowmode: Slowmode
 softban: Soft-ban
 softban_enum: soft-banned
-sqlexec_success: Query successfully run in {0} ms. {1} rows affected.
-sqlselect_title: Query successfully run in {0} ms. {1} rows returned.
 stayed_for: Stayed for
 sticker: Sticker
 store: Store
@@ -831,5 +818,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-
-cmd_guild_mintagperm: Sets the minimum permissions required for a user to use a tag in this server.

@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Formatters;
 using AkkoCore.Common;
@@ -8,6 +9,7 @@ using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
 using AkkoCore.Core.Services;
 using AkkoCore.Extensions;
+using AkkoCore.Services;
 using AkkoCore.Services.Caching;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -323,7 +325,7 @@ namespace AkkoCore.Core.Common
         {
             var shardedClient = await GetBotClientAsync(timeout);   // Initialize the sharded clients
 
-            RegisterFinalServices(shardedClient);                   // Add the last services needed
+            var cogSetups = RegisterFinalServices(shardedClient);   // Add the last services needed
             var services = _cmdServices.BuildServiceProvider();     // Initialize the IoC container
 
             // Initialize the command handlers
@@ -334,6 +336,12 @@ namespace AkkoCore.Core.Common
             events.RegisterStartupEvents();
             events.RegisterEvents();
 
+            // Get cog response strings
+            var localizer = services.GetRequiredService<ILocalizer>();
+
+            foreach (var cogSetup in cogSetups)
+                localizer.LoadLocalizedStrings(cogSetup.LocalizationDirectory);
+
             // Build the bot
             return new BotCore(shardedClient, cmdHandlers);
         }
@@ -343,8 +351,14 @@ namespace AkkoCore.Core.Common
         /// </summary>
         /// <param name="shardedClient">The bot's sharded clients.</param>
         /// <remarks>It won't add services whose interface type has already been registered to <see cref="_cmdServices"/>.</remarks>
-        private void RegisterFinalServices(DiscordShardedClient shardedClient)
+        private ICogSetup[] RegisterFinalServices(DiscordShardedClient shardedClient)
         {
+            // Load cog services and response strings
+            var cogSetups = AkkoUtilities.GetCogSetups().ToArray();
+
+            foreach (var cogSetup in cogSetups)
+                cogSetup.RegisterServices(_cmdServices);
+
             // Add the clients to the IoC container
             _cmdServices.AddSingleton(shardedClient);
             _cmdServices.AddHttpClient();   // Adds the default IHttpClientFactory
@@ -376,9 +390,9 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton(_ => new Random()),
 
                 // > Commands
+                ServiceDescriptor.Transient<IHelpFormatter, HelpFormatter>(),
                 ServiceDescriptor.Singleton<ICommandHandler, AkkoCommandHandler>(),
                 ServiceDescriptor.Singleton<IPlaceholderFormatter, CommandPlaceholders>(),
-                ServiceDescriptor.Transient<IHelpFormatter, HelpFormatter>(),
                 ServiceDescriptor.Singleton<IPrefixResolver, PrefixResolver>(),
                 ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>(),
 
@@ -402,6 +416,8 @@ namespace AkkoCore.Core.Common
                 if (!_cmdServices.Any(x => x.ServiceType == service.ServiceType))
                     _cmdServices.Add(service);
             }
+
+            return cogSetups;
         }
 
         /// <summary>

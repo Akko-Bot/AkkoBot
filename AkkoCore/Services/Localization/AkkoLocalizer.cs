@@ -19,18 +19,18 @@ namespace AkkoCore.Services.Localization
         /// The cache of response strings. First key is the locale. Second key is the response
         /// string's key. The value is the response string itself.
         /// </summary>
-        private readonly Dictionary<string, IReadOnlyDictionary<string, string>> _localizedStrings = new();
+        private readonly Dictionary<string, Dictionary<string, string>> _localizedStrings = new();
 
         /// <summary>
-        /// Regex to get the locale of the response files. Matches anything enclosed between "_" and "."
+        /// Regex to get the locale of the response files. Locale must be between "_" and ".yaml"
         /// </summary>
-        private static readonly Regex _localeRegex = new(@"_(.*?)\.", RegexOptions.Compiled);
+        private static readonly Regex _localeRegex = new(@"_([\w-]+?(?=\.(?:yaml|yml)$))", RegexOptions.Compiled);
 
         public IReadOnlyCollection<string> Locales
             => _localizedStrings.Keys;
 
         public AkkoLocalizer()
-            => LoadLocalizedStrings();
+            => LoadLocalizedStrings(AkkoEnvironment.LocalesDirectory);
 
         public IEnumerable<KeyValuePair<string, string>> GetResponsePairsByPartialKey(string locale, string keyPart)
             => _localizedStrings[locale].Where(x => x.Key.Contains(keyPart, StringComparison.Ordinal));
@@ -53,8 +53,16 @@ namespace AkkoCore.Services.Localization
 
         public void ReloadLocalizedStrings()
         {
+            foreach (var localizedGroup in _localizedStrings.Values)
+            {
+                localizedGroup.Clear();
+                localizedGroup.TrimExcess();
+            }
+
             _localizedStrings.Clear();
-            LoadLocalizedStrings();
+            _localizedStrings.TrimExcess();
+
+            LoadLocalizedStrings(AkkoEnvironment.LocalesDirectory);
         }
 
         public string[] GetResponseStrings(string locale, params string[] responses)
@@ -86,41 +94,41 @@ namespace AkkoCore.Services.Localization
             return response;
         }
 
-        /// <summary>
-        /// Gets the locale of the response string file, assuming it follows the "*_{locale}.yaml" format.
-        /// </summary>
-        /// <param name="filePath">Path to the file with the response strings.</param>
-        /// <returns>The locale of the response string's file, <see langword="null"/> if no match occured.</returns>
-        private string GetFileLocale(string filePath)
+        public void LoadLocalizedStrings(string localesDirectory)
         {
-            var group = _localeRegex.Match(filePath).Groups.Values.LastOrDefault();
-            return group?.Value;
-        }
+            if (string.IsNullOrWhiteSpace(localesDirectory))
+                return;
 
-        /// <summary>
-        /// Loads all response strings into the cache.
-        /// </summary>
-        /// <exception cref="DirectoryNotFoundException"/>
-        /// <exception cref="FileNotFoundException"/>
-        /// <exception cref="IOException"/>
-        private void LoadLocalizedStrings()
-        {
-            var fileNames = Directory
-                .GetFiles(AkkoEnvironment.LocalesDirectory)
-                .Where(x => x.Contains(".yaml") && x.Contains('_'));
+            var filePaths = Directory
+                .GetFiles(localesDirectory)
+                .Where(x => _localeRegex.IsMatch(x));
 
             // If directory doesn't contain response strings, stop program execution
-            if (!fileNames.Any())
-                throw new FileNotFoundException("No localization file has been found.");
+            if (!filePaths.Any())
+                throw new FileNotFoundException($"No localization file has been found at \"{localesDirectory}.\"");
 
             // Start deserialization
-            foreach (var file in fileNames)
+            foreach (var filePath in filePaths)
             {
-                var reader = new StreamReader(File.OpenRead(file));
+                //var reader = new StreamReader(File.OpenRead(filePath));
+                //var lStrings = reader.FromYaml<Dictionary<string, string>>();
+
+                //_localizedStrings.TryAdd(GetFileLocale(filePath), lStrings);
+                //reader.Dispose();
+
+
+                var locale = GetFileLocale(filePath);
+                var reader = new StreamReader(File.OpenRead(filePath));
                 var lStrings = reader.FromYaml<Dictionary<string, string>>();
 
-                _localizedStrings.TryAdd(GetFileLocale(file), lStrings);
-                reader.Dispose();
+                if (!_localizedStrings.ContainsKey(locale))
+                    _localizedStrings.Add(locale, lStrings);
+                else
+                {
+                    foreach (var stringPair in lStrings)
+                        _localizedStrings[locale].Add(stringPair.Key, stringPair.Value);
+                }
+
             }
         }
 
@@ -141,7 +149,7 @@ namespace AkkoCore.Services.Localization
 
         public void Dispose()
         {
-            foreach (var stringGroup in _localizedStrings.Values.Cast<Dictionary<string, string>>())
+            foreach (var stringGroup in _localizedStrings.Values)
             {
                 stringGroup.Clear();
                 stringGroup.TrimExcess();
@@ -151,6 +159,21 @@ namespace AkkoCore.Services.Localization
             _localizedStrings.TrimExcess();
 
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Gets the locale of the response string file, assuming it follows the "*_{locale}.yaml" format.
+        /// </summary>
+        /// <param name="filePath">Path to the file with the response strings.</param>
+        /// <returns>The locale of the response string's file, <see langword="null"/> if no match occured.</returns>
+        private string GetFileLocale(string filePath)
+        {
+            var match = _localeRegex.Match(filePath).Groups.Values.LastOrDefault()?.Value;
+
+            if (match is not null && match.Contains('_'))
+                match = match[(match.LastOccurrenceOf('_', 0) + 1)..];
+
+            return match;
         }
     }
 }

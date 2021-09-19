@@ -1,6 +1,5 @@
 ﻿using AkkoCore.Models.Serializable;
 using AkkoCore.Models.Serializable.EmbedParts;
-using AkkoCore.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using System.Collections.Generic;
@@ -26,7 +25,7 @@ namespace AkkoCore.Extensions
             );
 
             if (embed.Fields.Count is not 0)
-                dEmbed.Append(Formatter.BlockCode(GeneralService.DeconstructEmbedFields(embed.Fields.Select(x => new SerializableEmbedField(x)), 3))); // Discord limits embeds to 3 inline fields per line
+                dEmbed.Append(Formatter.BlockCode(SerializableDiscordEmbed.DeconstructEmbedFields(embed.Fields.Select(x => new SerializableEmbedField(x)), 3))); // Discord limits embeds to 3 inline fields per line
 
             dEmbed.Append(
                 ((embed.Image?.Url is null) ? string.Empty : $"{embed.Image.Url}\n\n") +

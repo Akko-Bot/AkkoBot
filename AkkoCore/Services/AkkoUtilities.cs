@@ -1,9 +1,7 @@
 ﻿using AkkoCore.Abstractions;
 using AkkoCore.Common;
 using AkkoCore.Config.Models;
-using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
-using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Localization;
 using AkkoCore.Services.Localization.Abstractions;
@@ -16,17 +14,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace AkkoCore.Services
 {
     /// <summary>
     /// Groups utility methods for various purposes.
     /// </summary>
-    public static class GeneralService
+    public static class AkkoUtilities
     {
-        private static readonly string[] _newlines = new string[] { "\n", Environment.NewLine };
-
         /// <summary>
         /// Gets the most optimal amount of messages to request from Discord from the specified amount of messages to get.
         /// </summary>
@@ -136,9 +131,21 @@ namespace AkkoCore.Services
                 Directory.CreateDirectory(AkkoEnvironment.CogsDirectory);
 
             // Get all cogs from the cogs directory
-            return Directory.EnumerateFiles(AkkoEnvironment.CogsDirectory)
-                .Where(filePath => filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+            return Directory.EnumerateFiles(AkkoEnvironment.CogsDirectory, "*.dll", SearchOption.AllDirectories)
+                //.Where(filePath => filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                 .Select(filePath => Assembly.LoadFrom(filePath));
+        }
+
+        /// <summary>
+        /// Gets all cog setups from the loaded cogs.
+        /// </summary>
+        /// <returns>A collection of cog setups.</returns>
+        internal static IEnumerable<ICogSetup> GetCogSetups()
+        {
+            return GetCogs()
+                .SelectMany(x => x.ExportedTypes)
+                .Where(x => x.IsAssignableTo(typeof(ICogSetup)))
+                .Select(x => Activator.CreateInstance(x) as ICogSetup);
         }
 
         /// <summary>
@@ -187,119 +194,6 @@ namespace AkkoCore.Services
             embed.WithLocalization(localizer, settings.Locale);
 
             return (embed, settings);
-        }
-
-        /// <summary>
-        /// Extracts the contents of embed fields into a formatted code block.
-        /// </summary>
-        /// <param name="originalFields">The collection of embed fields.</param>
-        /// <param name="inlineLimit">Defines how many inline fields should be allowed on a single line. Set to 0 to disable.</param>
-        /// <returns>The formatted content of the fields.</returns>
-        internal static string DeconstructEmbedFields(IEnumerable<SerializableEmbedField> originalFields, int inlineLimit = 0)
-        {
-            // Redistribute the fields into groups based on their inline property
-            var sisterFields = new List<List<SerializableEmbedField>> { new List<SerializableEmbedField>() };
-            int sisterGroup = 0, inlinedEmbeds = 0;
-
-            // Build the groups
-            foreach (var field in originalFields)
-            {
-                if (!field.Inline || (inlineLimit > 0 && ++inlinedEmbeds > inlineLimit))
-                {
-                    sisterFields.Add(new List<SerializableEmbedField>());
-                    sisterGroup++;
-                    inlinedEmbeds = 1; // Reset limit for the new line
-                }
-
-                sisterFields[sisterGroup].Add(field);
-            }
-
-            // Extract the contents
-            var result = new StringBuilder();
-
-            foreach (var fieldGroup in sisterFields)
-            {
-                if (fieldGroup.Count > 1)
-                    result.AppendLine(ExtractInLineFields(fieldGroup));
-                else
-                {
-                    foreach (var field in fieldGroup)
-                    {
-                        result.AppendLine(
-                            $"|{field.Title.HardPad(field.Title.Length + 2)}|\n" +
-                            new string('-', field.Title.Length + 4) + '\n' +
-                            field.Text
-                        );
-                    }
-                }
-            }
-
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Gets the content of a group of embed fields.
-        /// </summary>
-        /// <param name="fields">A collection of embed fields.</param>
-        /// <returns>The formatted content of all fields.</returns>
-        private static string ExtractInLineFields(IEnumerable<SerializableEmbedField> fields)
-        {
-            // Extract the content of the fields
-            var result = new StringBuilder();
-
-            // Get the names and values of the grouped fields
-            var names = fields.Select(x => x.Title).ToArray();
-            var namesLengthCounter = 0;
-
-            var values = fields
-                .Select(x => x.Text.Split(_newlines, StringSplitOptions.None))
-                .Fill(string.Empty)
-                .Select(x =>
-                {
-                    var maxLength = Math.Max(x.MaxElementLength(), names[namesLengthCounter++].Length);
-                    return x.Select(x => x.HardPad(maxLength + 2)).ToArray();
-                }).ToArray();
-
-            var valueLines = new List<string>(values.Length);
-            var counter = 0;
-
-            // Format the values
-            for (int index = 0, totalIterations = 0; totalIterations < values.Length * values[0].Length; totalIterations++)
-            {
-                if (counter < names.Length - 1)
-                {
-                    // If value is not the last in the line
-                    valueLines.Add(values[counter++][index]);
-                }
-                else
-                {
-                    // If value is the last in the line
-                    valueLines.Add(values[counter][index++] + "|\n");
-                    counter = 0;
-                }
-            }
-
-            // Format the header
-            for (var index = 0; index < names.Length; index++)
-            {
-                var toPad = values[index].MaxElementLength();
-                if (names[index].Length < toPad)
-                    names[index] = names[index].HardPad(toPad);
-            }
-
-            // Get the total length of the table
-            var totalLength = 1;
-            foreach (var column in values)
-                totalLength += column.MaxElementLength();
-
-            // Assemble the field string
-            result.Append('|');                   // Add the first |
-            result.AppendJoin("|", names);        // Add the table's header
-            result.AppendLine("|\n" + new string('-', totalLength + values.Length)); // Add header separator
-            result.Append('|');                   // Add the first | for the values
-            result.AppendJoin("|", valueLines);   // Add the values
-
-            return result.ToString();
         }
     }
 }

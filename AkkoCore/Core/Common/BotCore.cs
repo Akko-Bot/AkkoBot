@@ -41,8 +41,8 @@ namespace AkkoCore.Core.Common
         private void RegisterCommandModules()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var converters = GeneralService.GetConcreteTypesOf(typeof(IArgumentConverter));
-            var cogs = GeneralService.GetCogs();
+            var converters = AkkoUtilities.GetConcreteTypesOf(typeof(IArgumentConverter));
+            var cogs = AkkoUtilities.GetCogs();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.

@@ -102,7 +102,7 @@ namespace AkkoCore.Commands.Modules.Administration
             [Description("arg_prune_options")] string options = "")
         {
             amount = Math.Abs(amount);
-            var requestLimit = GeneralService.GetMaxMessageRequest(amount, 4);  // Limit it to 4 requests at most
+            var requestLimit = AkkoUtilities.GetMaxMessageRequest(amount, 4);  // Limit it to 4 requests at most
 
             Predicate<DiscordMessage> userCheck = (user is null) ? (msg) => true : (msg) => msg.Author.Equals(user);
             Predicate<DiscordMessage> optionsCheck = (!options.Equals(StringComparison.InvariantCultureIgnoreCase, "-s", "--safe")) ? (msg) => true : (msg) => !msg.Pinned;

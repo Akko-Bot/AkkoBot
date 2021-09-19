@@ -49,15 +49,10 @@ namespace AkkoCore.Commands.Modules.Help
         public async Task ModulesAsync(CommandContext context)
         {
             var namespaces = context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))   // Remove library modules
-                .Select(cmd =>                                                          // Section the namespaces
-                {
-                    var nspaces = cmd.Module.ModuleType.FullName.Split('.');
-                    return nspaces[^Math.Min(2, nspaces.Length - 1)];
-                })
-                .Distinct()                                                             // Remove the repeated sections
-                .OrderBy(x => x)
-                .ToArray();
+                .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))                              // Remove library modules
+                .Select(cmd => cmd.Module.ModuleType.Namespace[(cmd.Module.ModuleType.Namespace.LastOccurrenceOf('.', 0) + 1)..])   // Get the module name
+                .Distinct()                                                                                                         // Remove the repeated modules
+                .OrderBy(x => x);
 
             var embed = new SerializableDiscordEmbed()
                 .WithTitle("modules_title")
@@ -77,7 +72,7 @@ namespace AkkoCore.Commands.Modules.Help
         public async Task ModulesAsync(CommandContext context, [Description("arg_module")] string moduleName)
         {
             var cmdGroup = await context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.FullName.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.Namespace.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
                 .Distinct()
                 .OrderBy(x => x.Name)
                 .Select(async cmd =>
@@ -122,7 +117,7 @@ namespace AkkoCore.Commands.Modules.Help
                 keyword = keyword[context.Prefix.Length..];
 
             var embed = new SerializableDiscordEmbed();
-            var cmds = context.CommandsNext.GetAllCommands(keyword)
+            var cmds = context.CommandsNext.GetAllCommands()
                 .DistinctBy(x => x.QualifiedName)
                 .OrderBy(x => x.QualifiedName);
 

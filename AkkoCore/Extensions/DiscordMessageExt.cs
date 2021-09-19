@@ -26,7 +26,7 @@ namespace AkkoCore.Extensions
             // Reset the embed's current color
             if (isError)
                 embed.Color = default;
-            var (localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, embed, isError);    // Localize the embed message
+            var (localizedEmbed, settings) = AkkoUtilities.GetLocalizedMessage(context, embed, isError);    // Localize the embed message
 
             if (isMarked && !string.IsNullOrWhiteSpace(embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedEmbed.Body.Description = localizedEmbed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));

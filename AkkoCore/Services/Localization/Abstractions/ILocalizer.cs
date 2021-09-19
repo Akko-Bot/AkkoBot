@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace AkkoCore.Services.Localization.Abstractions
 {
@@ -78,6 +79,16 @@ namespace AkkoCore.Services.Localization.Abstractions
         /// Clears the cache and loads all response strings again.
         /// </summary>
         void ReloadLocalizedStrings();
+
+        /// <summary>
+        /// Loads all response strings files from a given directory into the cache.
+        /// </summary>
+        /// <param name="localesDirectory">The directory path of the localization files.</param>
+        /// <remarks>File names must follow the pattern "name_locale.yaml"</remarks>
+        /// <exception cref="DirectoryNotFoundException"/>
+        /// <exception cref="FileNotFoundException"/>
+        /// <exception cref="IOException"/>
+        void LoadLocalizedStrings(string localesDirectory);
 
         /// <summary>
         /// Localizes a response string that contains string formatters.

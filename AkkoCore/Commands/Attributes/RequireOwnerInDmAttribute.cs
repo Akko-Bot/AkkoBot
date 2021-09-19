@@ -17,6 +17,6 @@ namespace AkkoCore.Commands.Attributes
     public sealed class RequireOwnerInDmAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
-            => Task.FromResult(ctx.Guild is not null || GeneralService.IsOwner(ctx, ctx.User.Id));
+            => Task.FromResult(ctx.Guild is not null || AkkoUtilities.IsOwner(ctx, ctx.User.Id));
     }
 }

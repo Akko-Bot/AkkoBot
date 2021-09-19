@@ -14,7 +14,7 @@ namespace AkkoCore.Extensions
         /// <returns>This <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddSingletonServices(this IServiceCollection dependencies, Type abstraction)
         {
-            var modules = GeneralService.GetConcreteTypesOf(abstraction);
+            var modules = AkkoUtilities.GetConcreteTypesOf(abstraction);
 
             foreach (var module in modules)
                 dependencies.AddSingleton(module);
@@ -44,7 +44,7 @@ namespace AkkoCore.Extensions
         /// <returns>This <see cref="IServiceCollection"/></returns>
         public static IServiceCollection AddScopedServices(this IServiceCollection dependencies, Type abstraction)
         {
-            var modules = GeneralService.GetConcreteTypesOf(abstraction);
+            var modules = AkkoUtilities.GetConcreteTypesOf(abstraction);
 
             foreach (var module in modules)
                 dependencies.AddScoped(abstraction, module.GetType());
@@ -60,7 +60,7 @@ namespace AkkoCore.Extensions
         /// <returns>This <see cref="IServiceCollection"/></returns>
         public static IServiceCollection AddTransientServices(this IServiceCollection dependencies, Type abstraction)
         {
-            var modules = GeneralService.GetConcreteTypesOf(abstraction);
+            var modules = AkkoUtilities.GetConcreteTypesOf(abstraction);
 
             foreach (var module in modules)
                 dependencies.AddTransient(abstraction, module.GetType());

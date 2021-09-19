@@ -41,6 +41,9 @@ namespace AkkoCore.Services.Events
             _shardedClient = shardedClient;
         }
 
+        public void ManageCallbacks(Action<DiscordShardedClient> setter)
+            => setter(_shardedClient);
+
         public void RegisterStartupEvents()
         {
             // Create bot configs on ready, if there isn't one already
@@ -65,10 +68,6 @@ namespace AkkoCore.Services.Events
             _shardedClient.GuildDownloadCompleted += _startup.ExecuteStartupCommandsAsync;
         }
 
-        /// <summary>
-        /// Registers events the bot should listen to in order to react to specific user actions.
-        /// </summary>
-        /// <exception cref="InvalidOperationException"/>
         public void RegisterEvents()
         {
             #region Log Events

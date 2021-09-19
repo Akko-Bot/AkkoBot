@@ -42,7 +42,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         public async Task<bool> AddTagAsync(CommandContext context, string trigger, string response, bool isEmoji)
         {
             if (string.IsNullOrWhiteSpace(trigger) || string.IsNullOrWhiteSpace(response)
-                || (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id)))
+                || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id)))
                 return false;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
@@ -85,7 +85,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
 
             // Require bot ownership for global tags
             // Require user to be the tag's author or a higher admin for guild tags
-            if (dbTag is null || (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
+            if (dbTag is null || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id))
                 || !(dbTag.AuthorId == context.User.Id || context.Member?.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageGuild)) is true))
                 return false;
 

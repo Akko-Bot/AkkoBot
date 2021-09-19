@@ -100,7 +100,7 @@ namespace AkkoCore.Extensions
         {
             // Get the localized message and its settings (guild or dm)
 
-            var (localizedMsg, settings) = GeneralService.GetLocalizedMessage(context, message, isError);
+            var (localizedMsg, settings) = AkkoUtilities.GetLocalizedMessage(context, message, isError);
 
             if (isMarked && !string.IsNullOrWhiteSpace(localizedMsg?.Embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedMsg.Embed.Body.Description = localizedMsg.Embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
@@ -144,7 +144,7 @@ namespace AkkoCore.Extensions
         public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, SerializableDiscordMessage message, bool isError = false)
         {
             // Get the localized message
-            var (localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, message, isError);
+            var (localizedEmbed, settings) = AkkoUtilities.GetLocalizedMessage(context, message, isError);
 
             return (settings.UseEmbed)
                 ? await user.SendMessageSafelyAsync(localizedEmbed.Build())
@@ -310,7 +310,7 @@ namespace AkkoCore.Extensions
             var result = new List<Page>();
             var serializableFields = fields.ToArray();
 
-            var (localizedMessage, settings) = GeneralService.GetLocalizedMessage(context, embed, false);
+            var (localizedMessage, settings) = AkkoUtilities.GetLocalizedMessage(context, embed, false);
             var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
 
             for (int counter = 1, index = 0, footerCounter = 0; index < serializableFields.Length; counter++)
@@ -354,7 +354,7 @@ namespace AkkoCore.Extensions
                 return TimeZoneInfo.Local;
 
             var dbCache = context.Services.GetRequiredService<IDbCache>();
-            return GeneralService.GetTimeZone(dbCache.Guilds[context.Guild.Id].Timezone, true);
+            return AkkoUtilities.GetTimeZone(dbCache.Guilds[context.Guild.Id].Timezone, true);
         }
 
         /// <summary>
@@ -377,7 +377,7 @@ namespace AkkoCore.Extensions
             var inputLength = input.Length;
 
             var result = new List<Page>();
-            var (localizedEmbed, settings) = GeneralService.GetLocalizedMessage(context, embed, false);
+            var (localizedEmbed, settings) = AkkoUtilities.GetLocalizedMessage(context, embed, false);
             var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
 
             for (var counter = 0; inputLength > 0;)
@@ -415,7 +415,7 @@ namespace AkkoCore.Extensions
             var result = new List<Page>();
             var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
 
-            var (localizedMessage, settings) = GeneralService.GetLocalizedMessage(context, embed, false);
+            var (localizedMessage, settings) = AkkoUtilities.GetLocalizedMessage(context, embed, false);
             var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
             var counter = 0;
 

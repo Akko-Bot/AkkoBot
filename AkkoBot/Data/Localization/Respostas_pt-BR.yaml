@@ -90,7 +90,6 @@ arg_repeat_time: Tempo até a execução do repetidor. Mínimo de __1m__.
 arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
 arg_say: A mensagem a ser enviada.
-arg_sql: Uma instrução SQL válida.
 arg_stream_url: A URL do stream.
 arg_tag_behavior: O comportamento da tag.
 arg_tag_clearold_time: Tempo em que a tag não foi utilizada.
@@ -289,6 +288,7 @@ cmd_guild_errorcolor: Define a cor padrão a ser utilizada em embeds que retorna
 cmd_guild_ignoreglobaltags: Ativa ou desativa a execução de tags globais nesse servidor.
 cmd_guild_list: Exibe as configurações atuais do servidor.
 cmd_guild_locale: Define o idioma a ser utilizado pelo bot nesse servidor. Forneça nenhum parâmetro para visualizar a lista de idiomas disponíveis.
+cmd_guild_mintagperm: Define as permissões mínimad necessárias para um usuário usar uma tag nesse servidor.
 cmd_guild_okcolor: Define a cor padrão a ser utilizada em embeds nesse servidor.
 cmd_guild_prefix: Define o prefixo para todos os comandos do bot nesse servidor. Forneça nenhum parâmetro para visualizar o prefixo atual.
 cmd_guild_rolemention: 'Define se usuários podem mencionar cargos através do bot meramente pela sua posição na hierarquia de cargos. Atenção: dependendo de como as permissões do servidor foram definidas, ativar essa configuração pode levar a comportamento abusivo por parte dos usuários.'
@@ -314,8 +314,6 @@ cmd_log_edit: Modifica o webhook que envia registros no canal especificado.
 cmd_log_list: Exibe a lista de eventos disponíveis para registro e o canal onde estão atualmente ativos.
 cmd_log_start: Inicia registros de servidor no canal especificado. Use `log list` para visualizar a lista de eventos disponíveis para registrar. Forneça nenhum canal para gravar os registros no canal atual.
 cmd_log_stop: Encerra o registro do evento especificado.
-cmd_massban: Bane múltiplos usuários do servidor.
-cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_modlog: Exibe anotações e infrações de um usuário.
 cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
@@ -385,7 +383,6 @@ cmd_setrole: Adiciona um cargo ao usuário especificado.
 cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
 cmd_settopic: Define o tópico do canal de texto atual.
 cmd_slowmode: Define com que frequência usuários podem enviar mensagens nesse canal de texto. Forneça nenhum parâmetro para desabilitar.
-cmd_sql: Executa uma instrução SQL no banco de dados.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_tag: Agrupa comands para gerenciar tags. Tags são respostas personalizadas enviadas pelo bot quando um usuário digita seu gatilho. Tags são específicas aos servidores onde são criadas, exceto quando criadas em mensagem direta com o bot. Criar tags globais requer autoria do bot.
 cmd_tag_add: Cria uma tag com o gatilho e resposta especificados.
@@ -605,13 +602,6 @@ log_voicestate_connected: '{0} conectou ao canal de voz {1}.'
 log_voicestate_disconnected: '{0} desconectou do canal de voz {1}.'
 log_voicestate_moved: '{0} moveu-se do canal de voz {1} para o canal {2}.'
 low: Baixo
-massban: Banimento em Massa
-massban_description: Banindo {0} usuários.
-massban_failure: Ninguém foi banido porque nenhum dos IDs são válidos ou os usuários já foram banidos.
-massban_success: '{0} usuários foram banidos do servidor.'
-massunban: Desbanimento em Massa
-massunban_failed: Não há usuário a desbanir.
-massunban_succeded: '{0} usuários foram desbanidos do servidor.'
 medium: Médio
 members: Membros
 message: Mensagem
@@ -713,7 +703,6 @@ q_deleteallroles: excluir {0} cargos
 q_no: 'não'
 q_operation_length_seconds: Essa operação levará pelo menos {0} segundos.
 q_override_clearall: remover todas as permissões personalizadas
-q_sql_query: executar essa instrução
 q_yes: 'sim'
 reaction: Reação
 reason: Motivo
@@ -750,8 +739,6 @@ shutdown: Desligando.
 slowmode: Modo Lento
 softban: Expulsar e Excluir
 softban_enum: expulso
-sqlexec_success: Instrução executada com sucesso em {0} ms. {1} linhas alteradas.
-sqlselect_title: Instrução executada com sucesso em {0} ms. {1} linhas retornadas.
 stayed_for: Permaneceu por
 sticker: Figurinha
 store: Loja
@@ -831,5 +818,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-
-cmd_guild_mintagperm: Define as permissões mínimad necessárias para um usuário usar uma tag nesse servidor.

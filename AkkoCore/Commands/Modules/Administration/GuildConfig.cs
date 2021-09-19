@@ -47,7 +47,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_guild_okcolor")]
         public async Task ChangeOkColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var color = GeneralService.GetColor(newColor);
+            var color = AkkoUtilities.GetColor(newColor);
 
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(
@@ -66,7 +66,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_guild_errorcolor")]
         public async Task ChangeErrorColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
-            var color = GeneralService.GetColor(newColor);
+            var color = AkkoUtilities.GetColor(newColor);
 
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(
@@ -125,7 +125,7 @@ namespace AkkoCore.Commands.Modules.Administration
             var embed = new SerializableDiscordEmbed()
                 .WithTitle("locales_title")
                 .AddField("code", string.Join('\n', locales), true)
-                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x)), true);
+                .AddField("language", string.Join('\n', locales.Select(x => AkkoUtilities.GetCultureInfo(x)?.NativeName ?? x)), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -154,7 +154,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_guild_timezone")]
         public async Task TimezoneAsync(CommandContext context, [RemainingText, Description("arg_timezone")] string timezone)
         {
-            var zone = GeneralService.GetTimeZone(timezone);
+            var zone = AkkoUtilities.GetTimeZone(timezone);
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(
                     (zone is null)

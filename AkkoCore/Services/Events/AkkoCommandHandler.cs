@@ -132,8 +132,8 @@ namespace AkkoCore.Services.Events
         {
             // Enforce certain permission attributes, no matter what
             static bool IsContextValid(CheckBaseAttribute att, CommandContext context)
-                => ((att.TypeId as Type) != typeof(BotOwnerAttribute) || GeneralService.IsOwner(context, context.User.Id))
-                    && ((att.TypeId as Type) != typeof(RequireOwnerInDmAttribute) || (context.Guild is null && GeneralService.IsOwner(context, context.User.Id)))
+                => ((att.TypeId as Type) != typeof(BotOwnerAttribute) || AkkoUtilities.IsOwner(context, context.User.Id))
+                    && ((att.TypeId as Type) != typeof(RequireOwnerInDmAttribute) || (context.Guild is null && AkkoUtilities.IsOwner(context, context.User.Id)))
                     && ((att.TypeId as Type) != typeof(RequireDirectMessageAttribute) || context.Guild is null)
                     && ((att.TypeId as Type) != typeof(RequireGuildAttribute) || context.Guild is not null);
 

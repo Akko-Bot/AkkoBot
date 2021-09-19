@@ -39,7 +39,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the alias got successfully saved, <see langword="false"/> otherwise.</returns>
         public async Task<bool> SaveAliasAsync(CommandContext context, string alias, string command)
         {
-            if (string.IsNullOrWhiteSpace(command) || (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id)))
+            if (string.IsNullOrWhiteSpace(command) || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id)))
                 return false;
 
             // Sanitize the command input
@@ -88,7 +88,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the alias was successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveAliasAsync(CommandContext context, string alias)
         {
-            if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
+            if (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id))
                 return false;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
@@ -114,7 +114,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the aliases were successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> ClearAliasesAsync(CommandContext context)
         {
-            if (context.Guild is null && !GeneralService.IsOwner(context, context.User.Id))
+            if (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id))
                 return false;
 
             using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);

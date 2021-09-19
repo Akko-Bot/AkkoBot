@@ -95,7 +95,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_override_user")]
         public async Task ToggleUserOverrideAsync(CommandContext context, [Description("arg_command")] string command, [Description("arg_discord_user")] DiscordUser user)
         {
-            if (!GeneralService.IsOwner(context, context.User.Id))
+            if (!AkkoUtilities.IsOwner(context, context.User.Id))
                 return;
 
             var cmd = GetCommandFromInput(context, command);

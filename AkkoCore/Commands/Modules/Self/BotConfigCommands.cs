@@ -7,6 +7,7 @@ using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services;
+using AkkoCore.Services.Localization.Abstractions;
 using AkkoCore.Services.Logging;
 using AkkoCore.Services.Logging.Abstractions;
 using DSharpPlus.CommandsNext;
@@ -25,11 +26,13 @@ namespace AkkoCore.Commands.Modules.Self
     [Description("cmd_config")]
     public class BotConfigCommands : AkkoCommandModule
     {
+        private readonly ILocalizer _localizer;
         private readonly BotConfigService _botService;
         private readonly GuildConfigService _guildService;
 
-        public BotConfigCommands(BotConfigService botService, GuildConfigService guildService)
+        public BotConfigCommands(ILocalizer localizer, BotConfigService botService, GuildConfigService guildService)
         {
+            _localizer = localizer;
             _botService = botService;
             _guildService = guildService;
         }
@@ -42,7 +45,14 @@ namespace AkkoCore.Commands.Modules.Self
         [Command("reloadlocales"), Aliases("reloadresponses")]
         [Description("cmd_config_reloadlocales")]
         public async Task ReloadResponseStringsAsync(CommandContext context)
-                => await context.Message.CreateReactionAsync((_botService.ReloadLocales() is not 0) ? AkkoStatics.SuccessEmoji : AkkoStatics.WarningEmoji);
+        {
+            var defaultLocales = _botService.ReloadLocales() is not 0;
+
+            foreach (var cogSetup in AkkoUtilities.GetCogSetups())
+                _localizer.LoadLocalizedStrings(cogSetup.LocalizationDirectory);
+
+            await context.Message.CreateReactionAsync((defaultLocales) ? AkkoStatics.SuccessEmoji : AkkoStatics.WarningEmoji);
+        }
 
         [Command("locale")]
         [Description("cmd_config_locale")]
@@ -54,7 +64,7 @@ namespace AkkoCore.Commands.Modules.Self
             var embed = new SerializableDiscordEmbed()
                 .WithTitle("locales_title")
                 .AddField("code", string.Join('\n', locales), true)
-                .AddField("language", string.Join('\n', locales.Select(x => GeneralService.GetCultureInfo(x)?.NativeName ?? x)), true);
+                .AddField("language", string.Join('\n', locales.Select(x => AkkoUtilities.GetCultureInfo(x)?.NativeName ?? x)), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -76,7 +86,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Description("cmd_config_okcolor")]
         public async Task SetBotOkColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
-            if (!GeneralService.GetColor(newColor).HasValue)
+            if (!AkkoUtilities.GetColor(newColor).HasValue)
             {
                 await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                 return;
@@ -89,7 +99,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Description("cmd_config_errorcolor")]
         public async Task SetBotErrorColorAsync(CommandContext context, [Description("arg_color")] string newColor)
         {
-            if (!GeneralService.GetColor(newColor).HasValue)
+            if (!AkkoUtilities.GetColor(newColor).HasValue)
             {
                 await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                 return;
@@ -209,7 +219,7 @@ namespace AkkoCore.Commands.Modules.Self
             [Description("cmd_config_log_timeformat")]
             public async Task SetBotLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string logTimeFormat = null)
             {
-                if (!GeneralService.IsValidTimeFormat(logTimeFormat))
+                if (!AkkoUtilities.IsValidTimeFormat(logTimeFormat))
                 {
                     await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                     return;
@@ -225,7 +235,7 @@ namespace AkkoCore.Commands.Modules.Self
             [Description("cmd_config_log_filetimestamp")]
             public async Task SetFileLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string timestampFormat = null)
             {
-                if (!GeneralService.IsValidTimeFormat(timestampFormat))
+                if (!AkkoUtilities.IsValidTimeFormat(timestampFormat))
                 {
                     await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                     return;

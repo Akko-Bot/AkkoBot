@@ -62,7 +62,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Command("serverinfo"), HiddenOverload]
         public async Task ServerInfoAsync(CommandContext context, DiscordGuild server)
         {
-            if (!GeneralService.IsOwner(context, context.Member.Id) || server.Channels.Count == 0)
+            if (!AkkoUtilities.IsOwner(context, context.Member.Id) || server.Channels.Count == 0)
                 return;
 
             await context.RespondLocalizedAsync(_service.GetServerInfo(context, server), false);
@@ -75,7 +75,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             channel ??= context.Channel;
 
             var embed = _service.GetChannelInfo(new SerializableDiscordEmbed(), channel)
-                .WithFooter(context.FormatLocalized("{0}: {1}", "created_on", channel.CreationTimestamp.ToString("d", GeneralService.GetCultureInfo(context.GetLocaleKey(), true))));
+                .WithFooter(context.FormatLocalized("{0}: {1}", "created_on", channel.CreationTimestamp.ToString("d", AkkoUtilities.GetCultureInfo(context.GetLocaleKey(), true))));
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -95,8 +95,8 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .AddField("is_mod", (isMod) ? AkkoStatics.SuccessEmoji.Name : AkkoStatics.FailureEmoji.Name, true)
                 .AddField("roles", user.Roles.Count().ToString(), true)
                 .AddField("position", user.Hierarchy.ToString(), true)
-                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), true)
-                .AddField("joined_on", user.JoinedAt.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), true);
+                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(AkkoUtilities.GetCultureInfo(context.GetLocaleKey(), true)), true)
+                .AddField("joined_on", user.JoinedAt.DateTime.ToString(AkkoUtilities.GetCultureInfo(context.GetLocaleKey(), true)), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -108,7 +108,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
                 .AddField("name", user.GetFullname(), true)
                 .AddField("id", user.Id.ToString(), true)
-                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(GeneralService.GetCultureInfo(context.GetLocaleKey(), true)), false);
+                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(AkkoUtilities.GetCultureInfo(context.GetLocaleKey(), true)), false);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -264,9 +264,9 @@ namespace AkkoCore.Commands.Modules.Utilities
             }
 
             amount = Math.Abs(amount);
-            var requestLimit = (GeneralService.IsOwner(context, context.User.Id))
+            var requestLimit = (AkkoUtilities.IsOwner(context, context.User.Id))
                 ? amount
-                : GeneralService.GetMaxMessageRequest(amount, 1);
+                : AkkoUtilities.GetMaxMessageRequest(amount, 1);
 
             var messages = (await channel.GetMessagesAsync(requestLimit))
                 .Where(x => !x.Author.IsBot)

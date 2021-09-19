@@ -1,9 +1,8 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCog.Commands.Services;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
-using AkkoCore.Commands.Modules.Diagnostics.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
-using AkkoCore.Services;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.Modules.Diagnostics
+namespace AkkoCog.DangerousCommands.Diagnostics // Integrate with 'Diagnostics'
 {
     [BotOwner]
     public class DatabaseQueries : AkkoCommandModule
@@ -80,7 +79,9 @@ namespace AkkoCore.Commands.Modules.Diagnostics
 
             var (fields, time) = await result;
 
-            var text = GeneralService.DeconstructEmbedFields(fields).Replace("\r", string.Empty);
+            var text = SerializableDiscordEmbed.DeconstructEmbedFields(fields)
+                .Replace("\r", string.Empty);
+
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text[..text.LastOccurrenceOf('\n', 2)]));    // Substring to remove the last row of empty values
 
             var message = new DiscordMessageBuilder()

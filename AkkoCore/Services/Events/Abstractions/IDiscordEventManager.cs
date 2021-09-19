@@ -1,4 +1,7 @@
-﻿namespace AkkoCore.Services.Events.Abstractions
+﻿using DSharpPlus;
+using System;
+
+namespace AkkoCore.Services.Events.Abstractions
 {
     /// <summary>
     /// Represents an object responsible for registering methods that
@@ -10,6 +13,12 @@
         /// Registers events that trigger after the bot has connected to Discord.
         /// </summary>
         void RegisterEvents();
+
+        /// <summary>
+        /// Subscribes or unsubscribes the specified methods to Discord websocket events defined by <paramref name="setter"/>. 
+        /// </summary>
+        /// <param name="setter">The method that registers methods to the <see cref="DiscordShardedClient"/>.</param>
+        void ManageCallbacks(Action<DiscordShardedClient> setter);
 
         /// <summary>
         /// Registers events that trigger before the bot has connected to Discord.

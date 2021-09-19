@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoTests", "AkkoTests\Akko
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoCore", "AkkoCore\AkkoCore.csproj", "{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoCog.DangerousCommands", "AkkoCog.DangerousCommands\AkkoCog.DangerousCommands.csproj", "{6097907C-6DD1-467A-8090-F89E80C2A71D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

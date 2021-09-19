@@ -19,6 +19,8 @@ namespace AkkoCore.Models.Serializable
     /// <remarks>For serialization purposes, all unused properties are set to <see langword="null"/>.</remarks>
     public class SerializableDiscordEmbed
     {
+        private static readonly string[] _newlines = new string[] { "\n", Environment.NewLine };
+
         /// <summary>
         /// Represents the embed color, in hexadecimal.
         /// </summary>
@@ -179,6 +181,20 @@ namespace AkkoCore.Models.Serializable
         }
 
         /// <summary>
+        /// Adds multiple fields to this embed.
+        /// </summary>
+        /// <param name="fields">The fields to be added.</param>
+        /// <returns>This embed builder.</returns>
+        /// <exception cref="ArgumentException">Occurs when the <paramref name="title"/> or <paramref name="body"/> from one of the fields is <see langword="null"/> or empty.</exception>
+        public SerializableDiscordEmbed AddFields(IEnumerable<SerializableEmbedField> fields)
+        {
+            foreach (var field in fields)
+                AddField(field.Title, field.Text, field.Inline);
+
+            return this;
+        }
+
+        /// <summary>
         /// Localizes the content of this embed.
         /// </summary>
         /// <param name="localizer">The cache of response strings.</param>
@@ -240,7 +256,7 @@ namespace AkkoCore.Models.Serializable
             );
 
             if (this.Fields?.Count is not null and not 0)
-                stringBuilder.Append(Formatter.BlockCode(GeneralService.DeconstructEmbedFields(this.Fields, 3))); // Discord limits embeds to 3 inline fields per line
+                stringBuilder.Append(Formatter.BlockCode(DeconstructEmbedFields(this.Fields, 3))); // Discord limits embeds to 3 inline fields per line
 
             stringBuilder.Append(
                 ((this.Body?.ImageUrl is null) ? string.Empty : $"{this.Body.ImageUrl}\n\n") +
@@ -263,7 +279,7 @@ namespace AkkoCore.Models.Serializable
         public DiscordEmbedBuilder Build(IEnumerable<SerializableEmbedField> fields = null)
         {
             var localFields = (fields is not null)
-                ? fields.ToList()
+                ? fields.Where(x => !string.IsNullOrWhiteSpace(x.Title) && !string.IsNullOrWhiteSpace(x.Title)).ToList()
                 : Fields;
 
             if (!HasValidEmbed())
@@ -346,5 +362,120 @@ namespace AkkoCore.Models.Serializable
         public static implicit operator DiscordMessageBuilder(SerializableDiscordEmbed x) => x?.BuildMessage();
 
         public static implicit operator SerializableDiscordEmbed(DiscordEmbedBuilder x) => x?.ToSerializableEmbed();
+
+        /* Static Methods */
+
+        /// <summary>
+        /// Extracts the contents of embed fields into a formatted code block.
+        /// </summary>
+        /// <param name="originalFields">The collection of embed fields.</param>
+        /// <param name="inlineLimit">Defines how many inline fields should be allowed on a single line. Set to 0 to disable.</param>
+        /// <returns>The formatted content of the fields.</returns>
+        public static string DeconstructEmbedFields(IEnumerable<SerializableEmbedField> originalFields, int inlineLimit = 0)
+        {
+            // Redistribute the fields into groups based on their inline property
+            var sisterFields = new List<List<SerializableEmbedField>> { new List<SerializableEmbedField>() };
+            int sisterGroup = 0, inlinedEmbeds = 0;
+
+            // Build the groups
+            foreach (var field in originalFields)
+            {
+                if (!field.Inline || (inlineLimit > 0 && ++inlinedEmbeds > inlineLimit))
+                {
+                    sisterFields.Add(new List<SerializableEmbedField>());
+                    sisterGroup++;
+                    inlinedEmbeds = 1; // Reset limit for the new line
+                }
+
+                sisterFields[sisterGroup].Add(field);
+            }
+
+            // Extract the contents
+            var result = new StringBuilder();
+
+            foreach (var fieldGroup in sisterFields)
+            {
+                if (fieldGroup.Count > 1)
+                    result.AppendLine(ExtractInLineFields(fieldGroup));
+                else
+                {
+                    foreach (var field in fieldGroup)
+                    {
+                        result.AppendLine(
+                            $"|{field.Title.HardPad(field.Title.Length + 2)}|\n" +
+                            new string('-', field.Title.Length + 4) + '\n' +
+                            field.Text
+                        );
+                    }
+                }
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Gets the content of a group of embed fields.
+        /// </summary>
+        /// <param name="fields">A collection of embed fields.</param>
+        /// <returns>The formatted content of all fields.</returns>
+        private static string ExtractInLineFields(IEnumerable<SerializableEmbedField> fields)
+        {
+            // Extract the content of the fields
+            var result = new StringBuilder();
+
+            // Get the names and values of the grouped fields
+            var names = fields.Select(x => x.Title).ToArray();
+            var namesLengthCounter = 0;
+
+            var values = fields
+                .Select(x => x.Text.Split(_newlines, StringSplitOptions.None))
+                .Fill(string.Empty)
+                .Select(x =>
+                {
+                    var maxLength = Math.Max(x.MaxElementLength(), names[namesLengthCounter++].Length);
+                    return x.Select(x => x.HardPad(maxLength + 2)).ToArray();
+                }).ToArray();
+
+            var valueLines = new List<string>(values.Length);
+            var counter = 0;
+
+            // Format the values
+            for (int index = 0, totalIterations = 0; totalIterations < values.Length * values[0].Length; totalIterations++)
+            {
+                if (counter < names.Length - 1)
+                {
+                    // If value is not the last in the line
+                    valueLines.Add(values[counter++][index]);
+                }
+                else
+                {
+                    // If value is the last in the line
+                    valueLines.Add(values[counter][index++] + "|\n");
+                    counter = 0;
+                }
+            }
+
+            // Format the header
+            for (var index = 0; index < names.Length; index++)
+            {
+                var toPad = values[index].MaxElementLength();
+                if (names[index].Length < toPad)
+                    names[index] = names[index].HardPad(toPad);
+            }
+
+            // Get the total length of the table
+            var totalLength = 1;
+            foreach (var column in values)
+                totalLength += column.MaxElementLength();
+
+            // Assemble the field string
+            result.Append('|');                   // Add the first |
+            result.AppendJoin("|", names);        // Add the table's header
+            result.AppendLine("|\n" + new string('-', totalLength + values.Length)); // Add header separator
+            result.Append('|');                   // Add the first | for the values
+            result.AppendJoin("|", valueLines);   // Add the values
+
+            return result.ToString();
+        }
     }
 }
