@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace AkkoCog.DangerousCommands
+namespace AkkoCog.DangerousCommandsSetup
 {
     /// <summary>
     /// Initializes this cog's dependencies.
@@ -33,7 +33,7 @@ namespace AkkoCog.DangerousCommands
             // This cog doesn't need events.
         }
 
-        public void RegisterComponentResponses(IInteractionResponseManager responseGenerator)
+        public void RegisterComponentResponses(IInteractionResponseManager responseManager)
         {
             // This cog doesn't have interactive messages.
         }
