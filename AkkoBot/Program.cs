@@ -1,7 +1,5 @@
 ﻿using AkkoCore.Core;
-using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
-using LinqToDB.Mapping;
 using System;
 using System.Threading;
 
@@ -15,11 +13,11 @@ namespace AkkoBot
         // Entry point.
         private static void Main()
         {
-            LinqToDBForEFTools.Initialize();
-            MappingSchema.Default.SetConvertExpression<ulong, DataParameter>(x => new DataParameter(null, (decimal)x));
-            MappingSchema.Default.SetConvertExpression<ulong?, DataParameter>(x => new DataParameter(null, (decimal?)x));
-
+            // Print the process ID
             Console.WriteLine($"Pid: {Environment.ProcessId}");
+
+            // LinqToDB initialization
+            LinqToDBForEFTools.Initialize();
 
             // Start the bot.
             while (_restartBot)

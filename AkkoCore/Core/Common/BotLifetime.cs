@@ -5,7 +5,7 @@ using System.Threading;
 namespace AkkoCore.Core.Common
 {
     /// <summary>
-    /// Manages shutdown of a <see cref="Bot"/>.
+    /// Manages the shutdown of a <see cref="Bot"/>.
     /// </summary>
     internal record BotLifetime : IBotLifetime
     {

@@ -36,6 +36,7 @@ namespace AkkoCore.Core
         /// <summary>
         /// Initializes the bot and connects it to Discord.
         /// </summary>
+        /// <returns><see langword="true"/> if the bot should be restarted, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RunAsync()
         {
             // Load up credentials

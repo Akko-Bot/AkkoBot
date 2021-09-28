@@ -30,13 +30,13 @@ namespace AkkoBot.Migrations
 
                     b.Property<string>("Alias")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("alias");
 
                     b.Property<string>("Arguments")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("arguments");
 
                     b.Property<string>("Command")
@@ -87,8 +87,8 @@ namespace AkkoBot.Migrations
 
                     b.Property<string>("CommandString")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("command_string");
 
                     b.Property<DateTimeOffset>("DateAdded")
@@ -358,8 +358,8 @@ namespace AkkoBot.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("NotificationMessage")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("notification_message");
 
                     b.Property<List<string>>("Words")
@@ -421,8 +421,8 @@ namespace AkkoBot.Migrations
                         .HasColumnName("farewell_delete_time");
 
                     b.Property<string>("FarewellMessage")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("farewell_message");
 
                     b.Property<decimal?>("GreetChannelId")
@@ -438,8 +438,8 @@ namespace AkkoBot.Migrations
                         .HasColumnName("greet_dm");
 
                     b.Property<string>("GreetMessage")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("greet_message");
 
                     b.Property<decimal>("GuildIdFK")
@@ -472,8 +472,8 @@ namespace AkkoBot.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("BanTemplate")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("ban_template");
 
                     b.Property<int>("Behavior")
@@ -817,8 +817,8 @@ namespace AkkoBot.Migrations
 
                     b.Property<string>("Question")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("question");
 
                     b.Property<int>("Type")
@@ -863,8 +863,8 @@ namespace AkkoBot.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("content");
 
                     b.Property<DateTimeOffset>("DateAdded")
@@ -918,8 +918,8 @@ namespace AkkoBot.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("content");
 
                     b.Property<DateTimeOffset>("DateAdded")
@@ -996,14 +996,14 @@ namespace AkkoBot.Migrations
 
                     b.Property<string>("Response")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("response");
 
                     b.Property<string>("Trigger")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("trigger");
 
                     b.HasKey("Id")
@@ -1154,8 +1154,8 @@ namespace AkkoBot.Migrations
                         .HasColumnName("user_id_fk");
 
                     b.Property<string>("WarningText")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
                         .HasColumnName("warning_text");
 
                     b.HasKey("Id")
