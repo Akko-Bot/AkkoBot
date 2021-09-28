@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace AkkoCore.Core.Common
@@ -48,7 +49,7 @@ namespace AkkoCore.Core.Common
         {
             var assembly = Assembly.GetExecutingAssembly();
             var converters = AkkoUtilities.GetConcreteTypesOf(assembly, typeof(IArgumentConverter));
-            var cogs = AkkoUtilities.GetCogAssemblies();
+            var cogs = AkkoUtilities.GetCogAssemblies().ToArray();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.

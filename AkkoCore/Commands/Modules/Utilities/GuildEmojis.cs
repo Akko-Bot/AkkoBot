@@ -31,7 +31,6 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Description("cmd_emoji_list")]
         public async Task CheckGuildEmojiAsync(CommandContext context)
         {
-            var fields = new List<SerializableEmbedField>();
             var embed = new SerializableDiscordEmbed()
                 .WithTitle("emoji_list_title");
 
@@ -42,12 +41,9 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .SplitInto(15);
 
             foreach (var emojiGroup in emojis)
-            {
-                fields.Add(new("emojis", string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}").ToArray()), true));
-                fields.Add(new("exclusive", string.Join('\n', emojiGroup.Select(x => (x.Roles.Count != 0) ? AkkoStatics.SuccessEmoji.Name : AkkoStatics.FailureEmoji.Name).ToArray()), true));
-            }
+                embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}").ToArray()), true);
 
-            await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
+            await context.RespondPaginatedByFieldsAsync(embed, 2);
         }
 
         [Command("show"), Aliases("showemoji", "se")]

@@ -17,14 +17,14 @@ namespace AkkoCore.Extensions
         /// <remarks>If the cog has an <see cref="ICogSetup"/> defined, it will take precedence over the types present in the assembly.</remarks>
         public static void RegisterCommands(this SlashCommandsExtension slashHandler, Assembly assembly, ulong? guildId = default)
         {
-            static bool IsValidSetup(ICogSetup cogSetup)
+            static bool HasValidSetup(ICogSetup cogSetup)
                 => cogSetup.SlashCommandsScope is not null && cogSetup.SlashCommandsScope.Count is not 0;
 
             var cogSetups = AkkoUtilities.GetCogSetups(assembly).ToArray();
 
-            if (cogSetups.Any(IsValidSetup))
+            if (cogSetups.Any(HasValidSetup))
             {
-                foreach (var typeContext in cogSetups.Where(IsValidSetup).SelectMany(x => x.SlashCommandsScope))
+                foreach (var typeContext in cogSetups.Where(HasValidSetup).SelectMany(x => x.SlashCommandsScope))
                     slashHandler.RegisterCommands(typeContext.Key, typeContext.Value);
             }
             else
