@@ -179,7 +179,7 @@ namespace AkkoCore.Services.Timers
         /// <param name="client">The Discord client that fetched the database entry</param>
         private async Task UpdateDailyTimerAsync(IAkkoTimer oldTimer, DiscordClient client)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             var dbTimer = await db.Timers.FirstOrDefaultAsyncEF(x => x.Id == oldTimer.Id);
 
             // Update database
@@ -206,7 +206,7 @@ namespace AkkoCore.Services.Timers
         /// </summary>
         private async Task LoadDbEntriesCacheAsync()
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             _timerEntries = _timerEntries.AddRange(
                 await db.Timers
@@ -220,7 +220,7 @@ namespace AkkoCore.Services.Timers
         /// </summary>
         private void UpdateFromDb(object obj, ElapsedEventArgs args)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var nextEntries = db.Timers
                 .ToLinqToDB()

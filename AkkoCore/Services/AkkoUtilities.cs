@@ -1,12 +1,16 @@
-﻿using AkkoCore.Abstractions;
-using AkkoCore.Common;
+﻿using AkkoCore.Common;
+using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
+using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
+using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Localization;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -14,6 +18,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace AkkoCore.Services
 {
@@ -39,6 +44,44 @@ namespace AkkoCore.Services
         /// <returns><see langword="true"/> if the user is a bot owner, <see langword="false"/> otherwise.</returns>
         public static bool IsOwner(CommandContext context, ulong id)
             => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetRequiredService<Credentials>().OwnerIds.Contains(id);
+
+        /// <summary>
+        /// Checks if the specified <paramref name="id"/> is registered as a bot owner.
+        /// </summary>
+        /// <param name="context">The interaction context.</param>
+        /// <param name="id">The user ID to be checked.</param>
+        /// <returns><see langword="true"/> if the user is a bot owner, <see langword="false"/> otherwise.</returns>
+        public static bool IsOwner(InteractionContext context, ulong id)
+            => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetRequiredService<Credentials>().OwnerIds.Contains(id);
+
+        /// <summary>
+        /// Gets a collection of all concrete classes of the specified type in the currently calling assembly.
+        /// </summary>
+        /// <param name="abstraction">The type implemented by all classes.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="abstraction"/> is not an abstraction.</exception>
+        public static IEnumerable<Type> GetConcreteTypesOf(Type abstraction)
+            => GetConcreteTypesOf(Assembly.GetCallingAssembly(), abstraction);
+
+        /// <summary>
+        /// Gets a collection of all concrete classes of the specified type in the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to get the types from.</param>
+        /// <param name="abstraction">The type implemented by all classes.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="abstraction"/> is not an abstraction.</exception>
+        public static IEnumerable<Type> GetConcreteTypesOf(Assembly assembly, Type abstraction)
+        {
+            return (!abstraction.IsAbstract && !abstraction.IsInterface)
+                ? throw new ArgumentException("Type must be an interface or an abstract class.", nameof(abstraction))
+                : assembly.GetTypes()                       // Get all types in the calling assembly.
+                    .Where(type =>
+                        abstraction.IsAssignableFrom(type)  // Filter to find any concrete type that can be assigned to the specified abstraction
+                        && !type.IsInterface
+                        && !type.IsAbstract
+                        && !type.IsNested
+                );
+        }
 
         /// <summary>
         /// Checks if the specified time format is valid.
@@ -97,26 +140,6 @@ namespace AkkoCore.Services
         }
 
         /// <summary>
-        /// Gets a collection of all concrete classes of the specified type in the current calling assembly.
-        /// </summary>
-        /// <param name="abstraction">The type implemented by all classes.</param>
-        /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentException">Occurs when <paramref name="abstraction"/> is not an abstraction.</exception>
-        public static IEnumerable<Type> GetConcreteTypesOf(Type abstraction)
-        {
-            return (!abstraction.IsAbstract || !abstraction.IsInterface)
-                ? throw new ArgumentException("Type must be an interface or an abstract class.", nameof(abstraction))
-                : Assembly.GetCallingAssembly()
-                    .GetTypes()                             // Get all types in the calling assembly.
-                    .Where(type =>
-                        abstraction.IsAssignableFrom(type)  // Filter to find any concrete type that can be assigned to the specified abstraction
-                        && !type.IsInterface
-                        && !type.IsAbstract
-                        && !type.IsNested
-                );
-        }
-
-        /// <summary>
         /// Gets a collection of assemblies from the cogs directory
         /// </summary>
         /// <remarks>
@@ -124,7 +147,7 @@ namespace AkkoCore.Services
         /// contain commands that can be registered on CommandsNext.
         /// </remarks>
         /// <returns>A collection of assemblies.</returns>
-        internal static IEnumerable<Assembly> GetCogs()
+        internal static IEnumerable<Assembly> GetCogAssemblies()
         {
             // Create directory if it doesn't exist already.
             if (!Directory.Exists(AkkoEnvironment.CogsDirectory))
@@ -142,58 +165,212 @@ namespace AkkoCore.Services
         /// <returns>A collection of cog setups.</returns>
         internal static IEnumerable<ICogSetup> GetCogSetups()
         {
-            return GetCogs()
-                .SelectMany(x => x.ExportedTypes)
-                .Where(x => x.IsAssignableTo(typeof(ICogSetup)))
+            return GetCogAssemblies()
+                .SelectMany(x => GetConcreteTypesOf(x, typeof(ICogSetup)))
+                .Select(x => Activator.CreateInstance(x) as ICogSetup);
+        }
+
+        /// <summary>
+        /// Gets all cog setups from the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to get the cog setups from.</param>
+        /// <returns>A collection of cog setups.</returns>
+        internal static IEnumerable<ICogSetup> GetCogSetups(Assembly assembly)
+        {
+            return GetConcreteTypesOf(assembly, typeof(ICogSetup))
                 .Select(x => Activator.CreateInstance(x) as ICogSetup);
         }
 
         /// <summary>
         /// Gets the localized Discord message.
         /// </summary>
-        /// <param name="context">The command context.</param>
+        /// <param name="ioc">The IoC container.</param>
         /// <param name="message">The message.</param>
-        /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
-        /// <returns>The localized message content, embed, and the message settings.</returns>
-        internal static (SerializableDiscordMessage, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordMessage message, bool isError)
+        /// <param name="sid">The ID of the Discord guild or <see langword="null"/> if it's a direct message.</param>
+        /// <param name="isError"><see langword="true"/> if the embed should contain the context ErrorColor, <see langword="false"/> for OkColor.</param>
+        /// <returns>The localized message.</returns>
+        internal static SerializableDiscordMessage GetLocalizedMessage(IServiceProvider ioc, SerializableDiscordMessage message, ulong? sid, bool isError)
         {
-            var dbCache = context.Services.GetRequiredService<IDbCache>();
-            var localizer = context.Services.GetRequiredService<ILocalizer>();
-
             // Get the message settings (guild or dm)
-            IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
-                ? dbGuild
-                : context.Services.GetRequiredService<BotConfig>();
+            var settings = GetMessageSettings(ioc, sid);
+            var localizer = ioc.GetRequiredService<ILocalizer>();
 
-            foreach (var embed in message.Embeds ?? Enumerable.Empty<SerializableDiscordEmbed>())
-                embed.Color ??= (isError) ? settings.ErrorColor : settings.OkColor;
+            message.WithLocalization(localizer, settings.Locale, (isError) ? settings.ErrorColor : settings.OkColor);
 
-            message.WithLocalization(localizer, settings.Locale);
-
-            return (message, settings);
+            return (settings.UseEmbed)
+                ? message
+                : new SerializableDiscordMessage() { Content = message.Deconstruct() };
         }
 
         /// <summary>
-        /// Gets the localized Discord embed.
+        /// Gets the localized Discord interaction response.
         /// </summary>
-        /// <param name="context">The command context.</param>
-        /// <param name="embed">The embed.</param>
-        /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
-        /// <returns>The localized embed and the message settings.</returns>
-        internal static (SerializableDiscordEmbed, IMessageSettings) GetLocalizedMessage(CommandContext context, SerializableDiscordEmbed embed, bool isError)
+        /// <param name="ioc">The IoC container.</param>
+        /// <param name="response">The response.</param>
+        /// <param name="sid">The ID of the Discord guild or <see langword="null"/> if it's a direct message.</param>
+        /// <param name="isError"><see langword="true"/> if the embeds should contain the context ErrorColor, <see langword="false"/> for OkColor.</param>
+        /// <returns>The localized response.</returns>
+        internal static DiscordInteractionResponseBuilder GetLocalizedMessage(IServiceProvider ioc, DiscordInteractionResponseBuilder response, ulong? sid, bool isError)
         {
-            var dbCache = context.Services.GetRequiredService<IDbCache>();
-            var localizer = context.Services.GetRequiredService<ILocalizer>();
+            // Get the message settings (guild or dm)
+            var settings = GetMessageSettings(ioc, sid);
+            var localizer = ioc.GetRequiredService<ILocalizer>();
+
+            response.WithLocalization(localizer, settings.Locale, (isError) ? settings.ErrorColor : settings.OkColor);
+
+            return (settings.UseEmbed)
+                ? response
+                : new DiscordInteractionResponseBuilder() { Content = response.Deconstruct() };
+        }
+
+        /// <summary>
+        /// Localizes a message and generates pages of it.
+        /// </summary>
+        /// <param name="settings">This message settings.</param>
+        /// <param name="localizer">The localizer.</param>
+        /// <param name="input">The string to be split across the description of multiple embeds.</param>
+        /// <param name="embed">The embed to be used as a template.</param>
+        /// <param name="maxLength">Maximum amount of characters in each embed description.</param>
+        /// <param name="content">The content outside the embed.</param>
+        /// <remarks>The only thing that changes across the pages is the description.</remarks>
+        /// <returns>A collection of paginable embeds.</returns>
+        internal static IEnumerable<Page> GenerateLocalizedPages(IMessageSettings settings, ILocalizer localizer, string input, SerializableDiscordEmbed embed, int maxLength, string content)
+        {
+            if (content is not null)
+                content = localizer.GetResponseString(settings.Locale, content);
+
+            var amount = input.Length / maxLength;
+            var inputLength = input.Length;
+
+            var result = new List<Page>();
+            embed.WithLocalization(localizer, settings.Locale, settings.OkColor);
+            var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
+
+            for (var counter = 0; inputLength > 0;)
+            {
+                var embedCopy = embed.Build();
+                embedCopy.Description = input.Substring(counter++ * maxLength, Math.Min(inputLength, maxLength));
+
+                if (embedCopy?.Footer is null)
+                    embedCopy?.WithFooter(string.Format(footerPrepend, counter, amount));
+                else
+                    embedCopy.WithFooter(string.Format(footerPrepend + " | ", counter, amount) + embedCopy.Footer.Text);
+
+                result.Add(new Page(content, embedCopy));
+                inputLength -= maxLength;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Localizes a message and generates pages of it.
+        /// </summary>
+        /// <param name="settings">This message settings.</param>
+        /// <param name="localizer">The localizer.</param>
+        /// <param name="embed">The embed to create pages from.</param>
+        /// <param name="maxFields">The maximum amount of fields each page is allowed to have.</param>
+        /// <remarks>The only thing that changes across the pages are its embed fields.</remarks>
+        /// <returns>A collection of paginable embeds.</returns>
+        internal static IEnumerable<Page> GenerateLocalizedPagesByFields(IMessageSettings settings, ILocalizer localizer, SerializableDiscordEmbed embed, int maxFields, string content)
+        {
+            if (content is not null)
+                content = localizer.GetResponseString(settings.Locale, content);
+
+            var result = new List<Page>();
+            var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
+
+            embed.WithLocalization(localizer, settings.Locale, settings.OkColor);
+            var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
+            var counter = 0;
+
+            foreach (var fields in splitFields)
+            {
+                var embedCopy = embed.Build(fields);
+
+                if (embedCopy?.Footer is null)
+                    embedCopy?.WithFooter(string.Format(footerPrepend, ++counter, splitFields.Length));
+                else
+                    embedCopy.WithFooter(string.Format(footerPrepend + " | ", ++counter, splitFields.Length) + embedCopy.Footer.Text);
+
+                result.Add(new Page(content, embedCopy));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Localizes a message and generates pages of it.
+        /// </summary>
+        /// <param name="settings">This message settings.</param>
+        /// <param name="localizer">The localizer.</param>
+        /// <param name="embed">The embed to create pages from.</param>
+        /// <param name="fields">The fields to be added to a page message.</param>
+        /// <param name="maxFields">The maximum amount of fields each page is allowed to have.</param>
+        /// <param name="content">The content outside the embed.</param>
+        /// <remarks>The only thing that changes across the pages are its embed fields.</remarks>
+        /// <returns>A collection of paginable embeds.</returns>
+        internal static IEnumerable<Page> GenerateLocalizedPagesByFields(IMessageSettings settings, ILocalizer localizer, SerializableDiscordEmbed embed, IEnumerable<SerializableEmbedField> fields, int maxFields, string content)
+        {
+            if (content is not null)
+                content = localizer.GetResponseString(settings.Locale, content);
+
+            var result = new List<Page>();
+            var serializableFields = fields.ToArray();
+            embed.ClearFields();
+            embed.WithLocalization(localizer, settings.Locale, settings.OkColor);
+            var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
+
+            for (int counter = 1, index = 0, footerCounter = 0; index < serializableFields.Length; counter++)
+            {
+                var embedCopy = embed.Build();
+
+                while (index < maxFields * counter && index != serializableFields.Length)
+                    embedCopy?.AddLocalizedField(localizer, settings.Locale, serializableFields[index].Title, serializableFields[index].Text, serializableFields[index++].Inline);
+
+                if (embedCopy?.Footer is null)
+                    embedCopy?.WithFooter(string.Format(footerPrepend, ++footerCounter, Math.Ceiling((double)serializableFields.Length / maxFields)));
+                else
+                    embedCopy.WithFooter(string.Format(footerPrepend + " | ", ++footerCounter, Math.Ceiling((double)serializableFields.Length / maxFields)) + embedCopy.Footer.Text);
+
+                result.Add(new Page(content, embedCopy));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts a collection of embed pages to a collection of page content.
+        /// </summary>
+        /// <param name="pages">The pages to be converted.</param>
+        /// <returns>A collection of pages whose embed is <see langword="null"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static IEnumerable<Page> ConvertToContentPages(IEnumerable<Page> pages)
+        {
+            foreach (var page in pages)
+            {
+                page.Content += ("\n\n" + page.Embed.Deconstruct()).MaxLength(AkkoConstants.MaxMessageLength - page.Content?.Length ?? 0);
+                page.Embed = null;
+            }
+
+            return pages;
+        }
+
+        /// <summary>
+        /// Gets the message settings of the current context.
+        /// </summary>
+        /// <param name="ioc">The IoC container.</param>
+        /// <param name="sid">The ID of the Discord guild or <see langword="null"/> if it's a direct message.</param>
+        /// <returns>The message settings for the given context.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static IMessageSettings GetMessageSettings(IServiceProvider ioc, ulong? sid)
+        {
+            var dbCache = ioc.GetRequiredService<IDbCache>();
 
             // Get the message settings (guild or dm)
-            IMessageSettings settings = (dbCache.Guilds.TryGetValue(context.Guild?.Id ?? default, out var dbGuild))
+            return (dbCache.Guilds.TryGetValue(sid ?? default, out var dbGuild))
                 ? dbGuild
-                : context.Services.GetRequiredService<BotConfig>();
-
-            embed.Color ??= (isError) ? settings.ErrorColor : settings.OkColor;
-            embed.WithLocalization(localizer, settings.Locale);
-
-            return (embed, settings);
+                : ioc.GetRequiredService<BotConfig>();
         }
     }
 }

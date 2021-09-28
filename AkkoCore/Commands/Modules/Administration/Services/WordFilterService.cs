@@ -34,7 +34,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The setting returned by <paramref name="setter"/>.</returns>
         public async Task<T> SetWordFilterAsync<T>(ulong sid, Func<FilteredWordsEntity, T> setter)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.FilteredWords.TryGetValue(sid, out var filteredWords))
                 filteredWords = await db.FilteredWords.FirstOrDefaultAsync(x => x.GuildIdFK == sid) ?? new() { GuildIdFK = sid };

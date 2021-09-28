@@ -40,7 +40,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the poll was successfully created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddPollAsync(DiscordMessage message, string question, PollType type, params string[] answers)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var newEntry = new PollEntity()
             {
@@ -78,7 +78,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (poll is null)
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             db.Remove(poll);
             polls.TryRemove(poll);
@@ -96,7 +96,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (poll is null)
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             _dbCache.Polls.TryGetValue(poll.GuildIdFK, out var polls);
 
             db.Remove(poll);
@@ -117,7 +117,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (poll is null || poll.Type is not PollType.Anonymous || vote > poll.Votes.Length || poll.Voters.Contains((long)user.Id))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             db.Polls.Attach(poll);
             poll.Votes[vote - 1]++;

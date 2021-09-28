@@ -391,7 +391,7 @@ namespace AkkoCore.Services.Events
                 client.Logger.LogWarning(_guildLogEvent, $"The channel for a \"{guildLog.Type}\" guild log was deleted. Removing the guild log from the database.");
 
                 _dbCache.GuildLogs.TryGetValue(server.Id, out var guildLogs);
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
                 // Remove guild log from the database
                 await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == server.Id && x.ChannelId == guildLog.ChannelId).ConfigureAwait(false); ;
@@ -422,7 +422,7 @@ namespace AkkoCore.Services.Events
                 _webhookClient.AddWebhook(webhook);
 
                 // Update the guild log
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
                 // Update the database entry
                 await db.GuildLogs.UpdateAsync(

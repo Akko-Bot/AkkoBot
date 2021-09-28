@@ -75,13 +75,13 @@ namespace AkkoCore.Services.Logging
         /// </summary>
         private static string Default(LogData logData, Exception exception)
         {
-            var message = (logData.Context is null)
+            var message = (!logData.HasContext)
                 ? logData.OptionalMessage
-                : $"[Shard {logData.Context.Client.ShardId}] {logData.OptionalMessage}\n\t" +
-                    $"User: {logData.Context.User.Username}#{logData.Context.User.Discriminator} [{logData.Context.User.Id}]\n\t" +
-                    $"Server: {logData.Context.Guild?.Name ?? "Private"} {((logData.Context.Guild is null) ? string.Empty : "[" + logData.Context.Guild.Id + "]")}\n\t" +
-                    $"Channel: #{logData.Context.Channel.Name ?? "Private"} [{logData.Context.Channel.Id}]\n\t" +
-                    $"Message: {logData.Context.Message.Content}";
+                : $"[Shard {logData.Client.ShardId}] {logData.OptionalMessage}\n\t" +
+                    $"User: {logData.User.Username}#{logData.User.Discriminator} [{logData.User.Id}]\n\t" +
+                    $"Server: {logData.Guild?.Name ?? "Private"} {((logData.Guild is null) ? string.Empty : "[" + logData.Guild.Id + "]")}\n\t" +
+                    $"Channel: #{logData.Channel.Name ?? "Private"} [{logData.Channel.Id}]\n\t" +
+                    $"Message: {logData.Message}";
 
             // Add the exception
             return (exception is not null)
@@ -94,13 +94,13 @@ namespace AkkoCore.Services.Logging
         /// </summary>
         private static string Simple(LogData logData, Exception exception)
         {
-            var message = (logData.Context is null)
+            var message = (!logData.HasContext)
                 ? logData.OptionalMessage
-                : $"[{logData.Context.Client.ShardId}] {logData.OptionalMessage} | " +
-                    $"g:{((logData.Context.Guild is null) ? "Private" : logData.Context.Guild.Id)} " +
-                    $"| c:{logData.Context.Channel.Id} " +
-                    $"| u:{logData.Context.User.Id} " +
-                    $"| msg: {logData.Context.Message.Content} ";
+                : $"[{logData.Client.ShardId}] {logData.OptionalMessage} | " +
+                    $"g:{((logData.Guild is null) ? "Private" : logData.Guild.Id)} " +
+                    $"| c:{logData.Channel.Id} " +
+                    $"| u:{logData.User.Id} " +
+                    $"| msg: {logData.Message} ";
 
             // Add the exception
             return (exception is not null)
@@ -113,11 +113,11 @@ namespace AkkoCore.Services.Logging
         /// </summary>
         private static string Minimalist(LogData logData, Exception exception)
         {
-            var message = (logData.Context is null)
+            var message = (!logData.HasContext)
                 ? logData.OptionalMessage
-                : $"[{logData.Context.Client.ShardId}] {logData.OptionalMessage} | " +
-                    $"{logData.Context.User.Username}#{logData.Context.User.Discriminator}: {logData.Context.Message.Content} " +
-                    $"| {logData.Context.Guild?.Name ?? "Private"} | #{logData.Context.Channel.Name ?? "Private"}";
+                : $"[{logData.Client.ShardId}] {logData.OptionalMessage} | " +
+                    $"{logData.User.Username}#{logData.User.Discriminator}: {logData.Message} " +
+                    $"| {logData.Guild?.Name ?? "Private"} | #{logData.Channel.Name ?? "Private"}";
 
             // Add exception
             return (exception is not null)

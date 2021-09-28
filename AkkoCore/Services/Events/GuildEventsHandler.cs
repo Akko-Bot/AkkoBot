@@ -65,7 +65,7 @@ namespace AkkoCore.Services.Events
 
         public async Task RemuteAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             var botHasManageRoles = eventArgs.Guild.CurrentMember.Roles.Any(role => role.Permissions.HasPermission(Permissions.ManageRoles));
 
             // Check if user is in the database
@@ -116,7 +116,7 @@ namespace AkkoCore.Services.Events
 
                 if (toRemove.Count is not 0)
                 {
-                    using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                    using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
                     dbGuild.JoinRoles.RemoveAll(x => toRemove.Contains((ulong)x));
 
@@ -326,7 +326,7 @@ namespace AkkoCore.Services.Events
             if (poll is null || vote > poll.Answers.Length || poll.Voters.Contains((long)eventArgs.Author.Id))
                 return;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Update the poll
             poll.Votes[vote - 1]++;

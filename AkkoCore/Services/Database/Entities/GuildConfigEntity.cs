@@ -1,5 +1,5 @@
-﻿using AkkoCore.Abstractions;
-using AkkoCore.Common;
+﻿using AkkoCore.Common;
+using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Abstractions;
@@ -248,7 +248,7 @@ namespace AkkoCore.Services.Database.Entities
             if (config is null)
                 return;
 
-            Prefix = config.BotPrefix;
+            Prefix = config.Prefix;
             Locale = config.Locale;
             Behavior = (config.UseEmbed) ? GuildConfigBehavior.UseEmbed : GuildConfigBehavior.None;
             OkColor = config.OkColor;

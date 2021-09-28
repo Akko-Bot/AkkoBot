@@ -1,6 +1,7 @@
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.SlashCommands;
 using LinqToDB;
 using System;
 using System.Linq;
@@ -22,11 +23,12 @@ namespace AkkoCore.Services.Events
         private readonly IGuildLogEventHandler _guildLogger;
         private readonly ITagEventHandler _tagEventHandler;
         private readonly ICommandHandler _commandHandler;
+        private readonly IInteractionEventHandler _interactionEventHandler;
         private readonly DiscordShardedClient _shardedClient;
 
         public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
             IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, IGuildLogEventHandler guildLogger, ITagEventHandler tagEventsHandler,
-            ICommandHandler commandHandler, DiscordShardedClient shardedClient)
+            ICommandHandler commandHandler, IInteractionEventHandler interactionEventsHandler, DiscordShardedClient shardedClient)
         {
             _startup = startup;
             _voiceRoleHandler = vcRoleHandler;
@@ -38,6 +40,7 @@ namespace AkkoCore.Services.Events
             _guildLogger = guildLogger;
             _tagEventHandler = tagEventsHandler;
             _commandHandler = commandHandler;
+            _interactionEventHandler = interactionEventsHandler;
             _shardedClient = shardedClient;
         }
 
@@ -68,7 +71,7 @@ namespace AkkoCore.Services.Events
             _shardedClient.GuildDownloadCompleted += _startup.ExecuteStartupCommandsAsync;
         }
 
-        public void RegisterEvents()
+        public void RegisterDefaultEvents()
         {
             #region Log Events
 
@@ -189,6 +192,16 @@ namespace AkkoCore.Services.Events
 
             #endregion Bot Events
 
+            #region Interaction Events
+
+            _shardedClient.InteractionCreated += _interactionEventHandler.RegisterNewInteractionAsync;
+
+            _shardedClient.ComponentInteractionCreated += _interactionEventHandler.UpdateInteractionAsync;
+
+            _shardedClient.ComponentInteractionCreated += _interactionEventHandler.EndInteractionAsync;
+
+            #endregion Interaction Events
+
             #region Command Handler Events
 
             foreach (var cmdHandler in _shardedClient.ShardClients.Values.Select(x => x.GetCommandsNext()))
@@ -199,11 +212,18 @@ namespace AkkoCore.Services.Events
                 cmdHandler.CommandErrored += _cmdLogHandler.LogCmdErrorAsync;
             }
 
+            foreach (var slashHandler in _shardedClient.ShardClients.Values.Select(x => x.GetSlashCommands()))
+            {
+                // Slash command handler events
+                slashHandler.SlashCommandExecuted += _cmdLogHandler.LogSlashCmdExecutionAsync;
+                slashHandler.SlashCommandErrored += _cmdLogHandler.LogSlashCmdErrorAsync;
+            }
+
             #endregion Command Handler Events
         }
 
         public void UnregisterStartupEvents() => throw new NotImplementedException();
 
-        public void UnregisterEvents() => throw new NotImplementedException();
+        public void UnregisterDefaultEvents() => throw new NotImplementedException();
     }
 }

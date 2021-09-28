@@ -50,7 +50,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// </returns>
         public async Task<(BlacklistEntity, bool)> AddBlacklistAsync(CommandContext context, BlacklistType type, ulong id, string reason)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Generate the database entry
             var entry = new BlacklistEntity()
@@ -94,7 +94,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been added to the database.</returns>
         public async Task<int> AddBlacklistsAsync(ulong[] ids)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var newEntries = ids
                 .Distinct()
@@ -115,7 +115,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>The amount of entries that have been removed from the database.</returns>
         public async Task<int> RemoveBlacklistsAsync(ulong[] ids)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             foreach (var id in ids)
                 _dbCache.Blacklist.TryRemove(id);
@@ -135,7 +135,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
             if (!_dbCache.Blacklist.Contains(contextId))
                 return null;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Refactor this when DeleteWithOutPutAsync() is available for PostgreSQL
 
@@ -155,7 +155,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>The amount of entries removed.</returns>
         public async Task<int> ClearBlacklistsAsync()
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             _dbCache.Blacklist.Clear();
             return await db.Blacklist.DeleteAsync();
@@ -181,7 +181,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
         public async Task<IReadOnlyCollection<T>> GetBlacklistAsync<T>(Expression<Func<BlacklistEntity, bool>> predicate, Expression<Func<BlacklistEntity, T>> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.Blacklist
                 .Where(predicate)

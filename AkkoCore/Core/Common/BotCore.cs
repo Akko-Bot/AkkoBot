@@ -10,6 +10,7 @@ using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -25,11 +26,16 @@ namespace AkkoCore.Core.Common
     {
         public DiscordShardedClient BotShardedClient { get; }
         public IReadOnlyDictionary<int, CommandsNextExtension> CommandExt { get; }
+        public IReadOnlyDictionary<int, SlashCommandsExtension> SlashExt { get; }
 
-        internal BotCore(DiscordShardedClient client, IReadOnlyDictionary<int, CommandsNextExtension> cmdHandler)
+        internal BotCore(
+            DiscordShardedClient client,
+            IReadOnlyDictionary<int, CommandsNextExtension> cmdHandler,
+            IReadOnlyDictionary<int, SlashCommandsExtension> slashHandler)
         {
             BotShardedClient = client;
             CommandExt = cmdHandler;
+            SlashExt = slashHandler;
 
             // Register command modules
             RegisterCommandModules();
@@ -41,8 +47,8 @@ namespace AkkoCore.Core.Common
         private void RegisterCommandModules()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var converters = AkkoUtilities.GetConcreteTypesOf(typeof(IArgumentConverter));
-            var cogs = AkkoUtilities.GetCogs();
+            var converters = AkkoUtilities.GetConcreteTypesOf(assembly, typeof(IArgumentConverter));
+            var cogs = AkkoUtilities.GetCogAssemblies();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.
@@ -62,6 +68,16 @@ namespace AkkoCore.Core.Common
                 foreach (var cog in cogs)
                     cmdHandler.RegisterCommands(cog);
             }
+
+            foreach (var slashHandler in SlashExt.Values)
+            {
+                // Register all slash commands, globally
+                slashHandler.RegisterCommands(assembly);
+
+                // Register slash commands from cogs
+                foreach (var cog in cogs)
+                    slashHandler.RegisterCommands(cog);
+            }
         }
 
         public void Dispose()
@@ -75,6 +91,7 @@ namespace AkkoCore.Core.Common
             CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
             CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();
             CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
+            CommandExt[0].Services.GetService<IInteractionEventHandler>()?.Dispose();
 
             // Dispose scoped
             foreach (var cmdHandler in CommandExt.Values)

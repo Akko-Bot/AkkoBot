@@ -1,9 +1,10 @@
 using AkkoCore.Common;
 using AkkoCore.Models.Serializable;
-using AkkoCore.Services;
+using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,14 +27,18 @@ namespace AkkoCore.Extensions
             // Reset the embed's current color
             if (isError)
                 embed.Color = default;
-            var (localizedEmbed, settings) = AkkoUtilities.GetLocalizedMessage(context, embed, isError);    // Localize the embed message
+
+            var settings = context.GetMessageSettings();
+            var localizer = context.Services.GetRequiredService<ILocalizer>();
+
+            embed.WithLocalization(localizer, settings.Locale, (isError) ? settings.ErrorColor : settings.OkColor);
 
             if (isMarked && !string.IsNullOrWhiteSpace(embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
-                localizedEmbed.Body.Description = localizedEmbed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
+                embed.Body.Description = embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return (settings.UseEmbed)
-                ? await msg.ModifyAsync(localizedEmbed.BuildMessage())
-                : await msg.ModifyAsync(localizedEmbed.Deconstruct());
+                ? await msg.ModifyAsync(embed.BuildMessage())
+                : await msg.ModifyAsync(embed.Deconstruct());
         }
 
         /// <summary>

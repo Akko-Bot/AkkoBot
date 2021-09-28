@@ -130,7 +130,7 @@ namespace AkkoCore.Services.Events
             // Remove the voice role if it has been deleted.
             if (toRemove.Count is not 0)
             {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
                 await db.VoiceRoles.DeleteAsync(toRemove, CancellationToken.None);
             }
             foreach (var role in toRemove)

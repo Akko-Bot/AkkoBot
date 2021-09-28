@@ -85,7 +85,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Description("cmd_exportcommands")]
         public async Task ExportCommandsAsync(CommandContext context, [Description("arg_exportcommand_format")] string format = "yaml")
         {
-            var locale = context.GetLocaleKey();
+            var locale = context.GetMessageSettings().Locale;
             var result = context.CommandsNext.RegisteredCommands.Values
                 .Distinct()
                 .Where(x => !x.CustomAttributes.Any(y => y.GetType() == typeof(HiddenOverloadAttribute)))

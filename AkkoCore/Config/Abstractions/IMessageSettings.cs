@@ -1,12 +1,17 @@
 using System;
 
-namespace AkkoCore.Abstractions
+namespace AkkoCore.Config.Abstractions
 {
     /// <summary>
     /// Contains information about how a message should be sent.
     /// </summary>
     public interface IMessageSettings
     {
+        /// <summary>
+        /// The prefix in use.
+        /// </summary>
+        string Prefix { get; }
+
         /// <summary>
         /// The locale to be used.
         /// </summary>

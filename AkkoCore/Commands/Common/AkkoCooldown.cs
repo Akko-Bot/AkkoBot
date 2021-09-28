@@ -26,7 +26,7 @@ namespace AkkoCore.Commands.Common
 
         public AkkoCooldown(IServiceScopeFactory scopeFactory)
         {
-            using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             LoadFromEntities(db.CommandCooldown.Where(x => !x.GuildIdFK.HasValue));
         }
 

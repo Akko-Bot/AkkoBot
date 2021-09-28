@@ -1,4 +1,6 @@
 ﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.EventArgs;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events.Abstractions
@@ -17,5 +19,15 @@ namespace AkkoCore.Services.Events.Abstractions
         /// Logs basic information about command execution.
         /// </summary>
         Task LogCmdExecutionAsync(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs exceptions thrown before or during the execution of a slash command.
+        /// </summary>
+        Task LogSlashCmdErrorAsync(SlashCommandsExtension slashHandler, SlashCommandErrorEventArgs eventArgs);
+
+        /// <summary>
+        /// Logs basic information about the execution of a slash command.
+        /// </summary>
+        Task LogSlashCmdExecutionAsync(SlashCommandsExtension slashHandler, SlashCommandExecutedEventArgs eventArgs);
     }
 }

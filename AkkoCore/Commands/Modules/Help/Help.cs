@@ -1,15 +1,12 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Help.Services;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
-using AkkoCore.Models.Serializable;
-using AkkoCore.Models.Serializable.EmbedParts;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Help
@@ -17,6 +14,11 @@ namespace AkkoCore.Commands.Modules.Help
     [HelpCommand, IsNotBlacklisted, GlobalCooldown]
     public class Help : BaseCommandModule
     {
+        private readonly HelpService _service;
+
+        public Help(HelpService service)
+            => _service = service;
+
         [Command("help"), HiddenOverload]
         public async Task HelpCommandAsync(CommandContext context)
             => await HelpCommandAsync(context, Array.Empty<string>());
@@ -25,7 +27,7 @@ namespace AkkoCore.Commands.Modules.Help
         [Description("cmd_help")]
         public async Task HelpCommandAsync(CommandContext context, [Description("arg_command")] params string[] command)
         {
-            using var scope = context.Services.GetScopedService<IHelpFormatter>(out var helpBuilder);
+            using var scope = context.Services.GetRequiredScopedService<IHelpFormatter>(out var helpBuilder);
             var message = helpBuilder.GenerateHelpMessage(context, command);
             var botPerms = context.Guild?.CurrentMember.PermissionsIn(context.Channel) ?? Permissions.SendMessages;
 
@@ -48,64 +50,15 @@ namespace AkkoCore.Commands.Modules.Help
         [RequireBotPermissions(Permissions.SendMessages)]
         public async Task ModulesAsync(CommandContext context)
         {
-            var namespaces = context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))                              // Remove library modules
-                .Select(cmd => cmd.Module.ModuleType.Namespace[(cmd.Module.ModuleType.Namespace.LastOccurrenceOf('.', 0) + 1)..])   // Get the module name
-                .Distinct()                                                                                                         // Remove the repeated modules
-                .OrderBy(x => x);
-
-            var embed = new SerializableDiscordEmbed()
-                .WithTitle("modules_title")
-                .WithDescription(string.Join("\n", namespaces))
-                .WithFooter(
-                    context.FormatLocalized(
-                        "modules_footer",
-                        context.Prefix + context.Command.QualifiedName +
-                        " <" + context.FormatLocalized("name").ToLowerInvariant() + ">"
-                    )
-                );
-
+            var embed = _service.GetAllModules(context.GetMessageSettings(), context.CommandsNext, context.Command.QualifiedName);
             await context.RespondLocalizedAsync(embed, false);
         }
 
         [Command("module")]
         public async Task ModulesAsync(CommandContext context, [Description("arg_module")] string moduleName)
         {
-            var cmdGroup = await context.CommandsNext.RegisteredCommands.Values
-                .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.Namespace.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
-                .Distinct()
-                .OrderBy(x => x.Name)
-                .Select(async cmd =>
-                {
-                    var emote = ((await cmd.RunChecksAsync(context, false)).Any())
-                        ? AkkoStatics.FailureEmoji.Name
-                        : AkkoStatics.SuccessEmoji.Name;
-
-                    return emote + context.Prefix + cmd.QualifiedName;
-                })
-                .ToListAsync();
-
-            var embed = new SerializableDiscordEmbed();
-
-            if (cmdGroup.Count == 0)
-            {
-                embed.WithDescription(context.FormatLocalized("module_not_exist", Formatter.InlineCode(context.Prefix + "modules")));
-                await context.RespondLocalizedAsync(embed, isError: true);
-            }
-            else
-            {
-                embed.WithTitle(moduleName.Capitalize())
-                    .WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroup)))
-                    .WithFooter(
-                        context.FormatLocalized(
-                            "command_modules_footer",
-                            context.Prefix + "help" +
-                            " <" + context.FormatLocalized("command").ToLowerInvariant() + ">"
-                        )
-                    );
-
-                await context.RespondLocalizedAsync(embed, false);
-            }
+            var embed = await _service.GetAllModuleCommandsAsync(context.GetMessageSettings(), context.CommandsNext, context.User, context.Channel, moduleName);
+            await context.RespondLocalizedAsync(embed, embed.Color is not null);
         }
 
         [Command("search")]
@@ -113,32 +66,8 @@ namespace AkkoCore.Commands.Modules.Help
         [RequireBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
         public async Task SearchAsync(CommandContext context, [RemainingText, Description("arg_keyword")] string keyword)
         {
-            if (keyword.StartsWith(context.Prefix))
-                keyword = keyword[context.Prefix.Length..];
-
-            var embed = new SerializableDiscordEmbed();
-            var cmds = context.CommandsNext.GetAllCommands()
-                .DistinctBy(x => x.QualifiedName)
-                .OrderBy(x => x.QualifiedName);
-
-            if (!cmds.Any())
-            {
-                embed.WithDescription(context.FormatLocalized("search_result_empty", Formatter.InlineCode(keyword)));
-                await context.RespondLocalizedAsync(embed, isError: true);
-
-                return;
-            }
-
-            var fields = new List<SerializableEmbedField>();
-            embed.WithTitle(context.FormatLocalized("search_result_description", Formatter.InlineCode(keyword)));
-
-            foreach (var cmd in cmds.SplitInto(AkkoConstants.LinesPerPage))
-            {
-                fields.Add(new("command", string.Join("\n", cmd.Select(x => context.Prefix + x.QualifiedName)), true));
-                fields.Add(new("description", string.Join("\n", cmd.Select(x => context.FormatLocalized(x.Description).MaxLength(50, "[...]"))), true));
-            }
-
-            await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
+            var embed = _service.SearchCommandByKeyword(context.GetMessageSettings(), context.CommandsNext, keyword);
+            await context.RespondPaginatedByFieldsAsync(embed, 2);
         }
     }
 }

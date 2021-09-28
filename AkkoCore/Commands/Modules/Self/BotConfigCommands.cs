@@ -40,7 +40,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Command("prefix")]
         [Description("cmd_config_prefix")]
         public async Task SetBotPrefixAsync(CommandContext context, [Description("arg_prefix")] string prefix)
-            => await ChangePropertyAsync(context, x => x.BotPrefix = prefix);
+            => await ChangePropertyAsync(context, x => x.Prefix = prefix);
 
         [Command("reloadlocales"), Aliases("reloadresponses")]
         [Description("cmd_config_reloadlocales")]

@@ -198,9 +198,16 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <param name="localizer">The cache of response strings.</param>
         /// <param name="locale">The locale to be used.</param>
+        /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
         /// <returns>This embed builder.</returns>
-        public SerializableDiscordEmbed WithLocalization(ILocalizer localizer, string locale)
+        public SerializableDiscordEmbed WithLocalization(ILocalizer localizer, string locale, string color = default)
         {
+            static bool IsValidColor(string color)
+                => color is not null && color.Length is 6 or 7;
+
+            if (!IsValidColor(Color) && IsValidColor(color))
+                Color = color;
+
             if (Header?.Author?.Text is not null)
                 Header.Author.Text = localizer.GetResponseString(locale, Header.Author.Text);
 
@@ -327,7 +334,7 @@ namespace AkkoCore.Models.Serializable
         /// <summary>
         /// Constructs the Discord embed represented by this model.
         /// </summary>
-        /// <returns>A <see cref="DiscordMessageBuilder"/> with the embed content and the embed.</returns>
+        /// <returns>A <see cref="DiscordMessageBuilder"/> with the embed content.</returns>
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordMessageBuilder BuildMessage()
             => new DiscordMessageBuilder().AddEmbed(Build());
@@ -335,10 +342,27 @@ namespace AkkoCore.Models.Serializable
         /// <summary>
         /// Constructs the Discord webhook embed represented by this model.
         /// </summary>
-        /// <returns>A <see cref="DiscordWebhookBuilder"/> with the embed content and the embed.</returns>
+        /// <returns>A <see cref="DiscordWebhookBuilder"/> with the embed content.</returns>
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
         public DiscordWebhookBuilder BuildWebhookMessage()
             => new DiscordWebhookBuilder().AddEmbed(Build());
+
+        /// <summary>
+        /// Constructs the Discord interactive response represented by this model.
+        /// </summary>
+        /// <returns>A <see cref="DiscordInteractionResponseBuilder"/> with the embed content.</returns>
+        /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
+        public DiscordInteractionResponseBuilder BuildInteractiveResponse()
+            => (HasValidEmbed()) ? new DiscordInteractionResponseBuilder().AddEmbed(Build()) : default;
+
+        /// <summary>
+        /// Clears all fields stored in this embed.
+        /// </summary>
+        public void ClearFields()
+        {
+            Fields?.Clear();
+            Fields = null;
+        }
 
         /// <summary>
         /// Clears all data in this embed.

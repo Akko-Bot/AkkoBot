@@ -109,13 +109,14 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <param name="localizer">The cache of response strings.</param>
         /// <param name="locale">The locale to be used.</param>
+        /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
         /// <returns>This message builder.</returns>
-        public SerializableDiscordMessage WithLocalization(ILocalizer localizer, string locale)
+        public SerializableDiscordMessage WithLocalization(ILocalizer localizer, string locale, string color = default)
         {
             Content = localizer.GetResponseString(locale, Content);
 
             foreach (var embed in Embeds ?? Enumerable.Empty<SerializableDiscordEmbed>())
-                embed.WithLocalization(localizer, locale);
+                embed.WithLocalization(localizer, locale, color);
 
             return this;
         }
@@ -163,7 +164,7 @@ namespace AkkoCore.Models.Serializable
         }
 
         /// <summary>
-        /// Constructs the Discord message represented by model.
+        /// Constructs the Discord message represented by this model.
         /// </summary>
         /// <returns>A <see cref="DiscordMessageBuilder"/> with the message content and the embed.</returns>
         /// <exception cref="ArgumentException">Occurs when one of the embeds' <see cref="SerializableDiscordEmbed.Color"/> is not a valid color.</exception>
@@ -178,7 +179,7 @@ namespace AkkoCore.Models.Serializable
         }
 
         /// <summary>
-        /// Constructs the Discord webhook message represented by model.
+        /// Constructs the Discord webhook message represented by this model.
         /// </summary>
         /// <returns>A <see cref="DiscordWebhookBuilder"/> with the message content and the embed.</returns>
         /// <exception cref="ArgumentException">Occurs when one of the embeds' <see cref="SerializableDiscordEmbed.Color"/> is not a valid color.</exception>
@@ -191,6 +192,22 @@ namespace AkkoCore.Models.Serializable
                 webhookMsg.AddEmbeds(Embeds.Select(x => x.Build()).Select(x => x.Build()).Take(AkkoConstants.MaxEmbedAmount));
 
             return webhookMsg;
+        }
+
+        /// <summary>
+        /// Constructs the Discord interactive response represented by this model.
+        /// </summary>
+        /// <returns>A <see cref="DiscordInteractionResponseBuilder"/> with the content and the embed.</returns>
+        /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
+        public DiscordInteractionResponseBuilder BuildInteractiveResponse()
+        {
+            var response = new DiscordInteractionResponseBuilder()
+                .WithContent(Content);
+
+            if (Embeds?.Count is not null and not 0)
+                response.AddEmbeds(Embeds.Select(x => x.Build().Build()));
+
+            return response;
         }
 
         /// <summary>

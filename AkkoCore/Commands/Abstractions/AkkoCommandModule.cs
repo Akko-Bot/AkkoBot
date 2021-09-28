@@ -1,13 +1,11 @@
 ﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
-using AkkoCore.Services.Database;
-using AkkoCore.Services.Database.Entities;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using LinqToDB;
-using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -16,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Abstractions
 {
+    /// <summary>
+    /// Defines the base behavior and actions for all command modules.
+    /// </summary>
     [IsNotBlacklisted, GlobalCooldown, BaseBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
     public abstract class AkkoCommandModule : BaseCommandModule
     {
@@ -29,54 +30,16 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="context">The command context.</param>
         private async Task UpsertUsersInMessageAsync(CommandContext context)
         {
-            var dbCache = context.Services.GetService<IDbCache>();
-
+            var dbCache = context.Services.GetRequiredService<IDbCache>();
+            var userService = context.Services.GetRequiredService<DiscordUserService>();
             var mentionedUsers = context.Message.MentionedUsers
                 .Concat(await GetUnmentionedUsersAsync(context, dbCache))
                 .Append(context.User)
                 .Distinct()
                 .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))
-                .ToList();
+                .ToArray();
 
-            if (mentionedUsers.Count is 0)
-                return;
-
-            using var scope = context.Services.GetScopedService<AkkoDbContext>(out var db);
-
-            for (var counter = 0; counter < mentionedUsers.Count; counter++)
-            {
-                // Skip users that are meant to be inserted
-                if (!dbCache.Users.TryGetValue(mentionedUsers[counter].Id, out var dbUser))
-                    continue;
-
-                // Update the cache
-                dbUser.Username = mentionedUsers[counter].Username;
-                dbUser.Discriminator = mentionedUsers[counter].Discriminator;
-
-                // Remove this element so it doesn't get inserted into the database later
-                mentionedUsers.Remove(mentionedUsers[counter--]);
-
-                // Update the database
-                await db.DiscordUsers.UpdateAsync(
-                    x => x.Id == dbUser.Id,
-                    _ => new DiscordUserEntity() { Username = dbUser.Username, Discriminator = dbUser.Discriminator }
-                );
-            }
-
-            // If there are no new users to be inserted, quit
-            if (mentionedUsers.Count is 0)
-                return;
-
-            // Add new users to the database
-            await db.BulkCopyAsync(mentionedUsers.Select(x => new DiscordUserEntity(x)));
-
-            // Add these users to the cache
-            var insertedEntries = await db.DiscordUsers
-                .Where(x => mentionedUsers.Select(y => y.Id).Contains(x.UserId))
-                .ToArrayAsyncEF();
-
-            foreach (var dbUser in insertedEntries)
-                dbCache.Users.TryAdd(dbUser.UserId, dbUser);
+            await userService.SaveUsersAsync(mentionedUsers);
         }
 
         /// <summary>

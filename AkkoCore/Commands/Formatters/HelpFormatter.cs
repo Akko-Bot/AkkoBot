@@ -230,7 +230,7 @@ namespace AkkoCore.Commands.Formatters
             if (useEmbed)
                 return new(_helpMessage);
 
-            _helpMessage.WithLocalization(_localizer, context.GetLocaleKey());
+            _helpMessage.WithLocalization(_localizer, context.GetMessageSettings().Locale);
 
             return new SerializableDiscordMessage(
                 ((_helpMessage.Body?.Title?.Text is not null) ? Formatter.Bold(_helpMessage.Body.Title.Text) + "\n" : string.Empty) +

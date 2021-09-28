@@ -21,6 +21,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Add DSharpPlus Nightly source
+      run: dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusNightly
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -42,6 +44,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Add DSharpPlus Nightly source
+      run: dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusNightly
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -63,6 +67,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Add DSharpPlus Nightly source
+      run: dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusNightly
     - name: Restore dependencies
       run: dotnet restore
     - name: Build

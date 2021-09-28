@@ -100,6 +100,9 @@ namespace AkkoTests.Core.Extensions.EnumExt
             => Assert.Equal(enumGroup, flags.ToFlags());
 
         [Theory]
+        [InlineData(TestEnum.None, TestEnum.A, TestEnum.A)]
+        [InlineData(TestEnum.A, TestEnum.A, TestEnum.None)]
+        [InlineData(TestEnum.A, TestEnum.None, TestEnum.A)]
         [InlineData(TestEnum.A | TestEnum.B, TestEnum.A, TestEnum.B)]
         [InlineData(TestEnum.A, TestEnum.B, TestEnum.A | TestEnum.B)]
         [InlineData(TestEnum.A | TestEnum.B, TestEnum.A | TestEnum.B, TestEnum.None)]

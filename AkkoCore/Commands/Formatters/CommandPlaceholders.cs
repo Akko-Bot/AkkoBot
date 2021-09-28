@@ -31,7 +31,7 @@ namespace AkkoCore.Commands.Formatters
             ["bot.creationdate"] = (context) => context.Client.CurrentUser.CreationTimestamp,
             ["bot.avatar"] = (context) => context.Client.CurrentUser.AvatarUrl,
             ["bot.status"] = (context) => context.Client.CurrentUser.Presence.Status,
-            ["bot.prefix"] = (context) => context.Services.GetRequiredService<BotConfig>().BotPrefix,
+            ["bot.prefix"] = (context) => context.Services.GetRequiredService<BotConfig>().Prefix,
             ["bot.latency"] = (context) => context.Client.Ping,
             ["bot.shard"] = (context) => context.Client.ShardId,
             ["bot.shardcount"] = (context) => context.Client.ShardCount,

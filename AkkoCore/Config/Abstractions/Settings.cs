@@ -1,7 +1,7 @@
 ﻿using AkkoCore.Extensions;
 using System.Collections.Generic;
 
-namespace AkkoCore.Abstractions
+namespace AkkoCore.Config.Abstractions
 {
     /// <summary>
     /// Represents any data type that holds settings of some sort.

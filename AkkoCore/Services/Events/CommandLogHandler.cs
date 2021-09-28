@@ -4,6 +4,8 @@ using AkkoCore.Extensions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
+using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.EventArgs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -48,6 +50,20 @@ namespace AkkoCore.Services.Events
 
                 return eventArgs.Context.Message.CreateReactionAsync(AkkoStatics.CooldownEmoji);
             }
+
+            return Task.CompletedTask;
+        }
+
+        public Task LogSlashCmdExecutionAsync(SlashCommandsExtension slashHandler, SlashCommandExecutedEventArgs eventArgs)
+        {
+            slashHandler.Client.Logger.LogCommand(LogLevel.Information, eventArgs.Context);
+            return Task.CompletedTask;
+        }
+
+        public Task LogSlashCmdErrorAsync(SlashCommandsExtension slashHandler, SlashCommandErrorEventArgs eventArgs)
+        {
+            if (eventArgs.Exception is not SlashExecutionChecksFailedException)
+                slashHandler.Client.Logger.LogCommand(LogLevel.Error, eventArgs.Context, string.Empty, eventArgs.Exception);
 
             return Task.CompletedTask;
         }

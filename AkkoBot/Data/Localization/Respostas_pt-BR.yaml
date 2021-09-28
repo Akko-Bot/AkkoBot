@@ -146,6 +146,7 @@ bl_not_found: Esse ID não se encontra na lista negra.
 bl_removed: '{0} {1} {2} foi removido da lista negra.'
 bl_removed_range: '{0} IDs foram removidos da lista negra.'
 bl_title: Lista Negra
+bot_owner_error: Esse comando requer autoria do bot.
 bot_prefix_check: O prefixo global é {0}
 bot_settings_title: Configurações Globais
 category: Categoria
@@ -315,7 +316,6 @@ cmd_log_list: Exibe a lista de eventos disponíveis para registro e o canal onde
 cmd_log_start: Inicia registros de servidor no canal especificado. Use `log list` para visualizar a lista de eventos disponíveis para registrar. Forneça nenhum canal para gravar os registros no canal atual.
 cmd_log_stop: Encerra o registro do evento especificado.
 cmd_modlog: Exibe anotações e infrações de um usuário.
-cmd_modules: Exibe os comandos sob um determinado módulo ou os módulos atualmente disponíveis se nenhum for especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
 cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal para forçá-lo a se desconectar.
 cmd_mute: Silencia um usuário nos canais de voz e texto.
@@ -437,7 +437,6 @@ days: Dias
 days_hours_minutes: '{0} dias, {1} horas, {2} minutos'
 db_cache: Cache do Banco de Dados
 deafen_success: Usuário {0} não pode mais ouvir outros usuários nos canais de voz.
-deafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 deleteallroles: '{0} cargos foram excluídos com sucesso.'
 deleteallroles_error: Não há cargos a serem excluídos.
 deleted_on: Excluído em
@@ -457,7 +456,6 @@ error_not_found: 'Erro: a resposta requisitada não foi encontrada.'
 error_user_not_found: Usuário não encontrado.
 exclusive: Exclusivo
 expires: Expira
-expires_on: Expira em
 expires_on: Expira em
 exportcommands_description: '{0} comandos exportados com sucesso.'
 farewell_channel_removed: O canal de despedida foi removido com sucesso.
@@ -502,8 +500,8 @@ greet_message: mensagem de boas-vindas
 greet_message_set: Mensagem de boas-vindas definida com sucesso.
 greetdel_disable: Exclusão automática de mensagens de boas-vindas foi desativada.
 greetdel_enable: Mensagens de boas-vindas serão automaticamente excluídas em {0} segundos.
+greetdm_disabled: A mensagem de boas-vindas será enviada no servidor.
 greetdm_enabled: A mensagem de boas-vindas será enviada em mensagem direta.
-greetdm_enabled: A mensagem de boas-vindas será enviada no servidor.
 group: Grupo
 guild_embed_change: O uso de embeds nesse servidor foi {0}.
 guild_errorcolor: ErrorColor foi alterada para {0}.
@@ -649,6 +647,8 @@ perm_ban_members: Banir Membros
 perm_bot_owner: Autoria do Bot
 perm_change_nickname: Alterar Apelido
 perm_create_instant_invite: Criar Convite
+perm_create_private_threads: Criar Threads Privadas
+perm_create_public_threads: Criat Threads Públicas
 perm_deafen_members: Ensurdecer Membros
 perm_embed_links: Embed de Links
 perm_kick_members: Expulsar Membros
@@ -668,14 +668,14 @@ perm_priority_speaker: Prioridade de Voz
 perm_read_message_history: Visualizar Histórico de Mensagens
 perm_require_dm: Mensagem Direta
 perm_send_messages: Enviar Mensagens
+perm_send_messages_in_threads: Enviar Mensagems Em Threads
 perm_send_tts_messages: Enviar Mensagens TTS
 perm_speak: Falar
+perm_start_embedded_activities: Iniciar Atividades Incorporadas
 perm_stream: Vídeo
+perm_use_application_commands: Usar Comandos de Aplicação
 perm_use_external_emojis: Usar Emojis Externos
 perm_use_external_stickers: Usar Figurinhas Externas
-perm_use_private_threads: Usar Threads Privadas
-perm_use_public_threads: Usar Threads Públicas
-perm_use_slash_commands: Usar Comandos de Aplicação
 perm_use_voice: Conectar
 perm_use_voice_detection: Detecção de Voz
 perm_view_audit_log: Visualizar o Registro de Auditoria
@@ -689,7 +689,6 @@ poll_list_title: Enquetes do Servidor
 poll_not_found: Enquete não encontrada.
 poll_title: '{0} criou uma enquete'
 position: Posição
-private: Privado
 private: Privado
 prune_error: Não há mensagens a serem excluídas ou você está tentando excluir mensagens criadas há mais de 14 dias.
 pstatus_error: Não há status de rotação definido.
@@ -775,6 +774,7 @@ type: Tipo
 unban_not_found: Esse usuário não está banido.
 unban_success: Usuário {0} foi desbanido.
 unbanned_on: Desbanido em
+undeafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz novamente.
 unknown: Desconhecido
 unlockchannel_reason: Lockdown Suspenso
 unmute_success: Usuário {0} pode falar novamente.

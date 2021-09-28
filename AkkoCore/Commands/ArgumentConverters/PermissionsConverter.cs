@@ -18,12 +18,13 @@ namespace AkkoCore.Commands.ArgumentConverters
         public Task<Optional<Permissions>> ConvertAsync(string input, CommandContext ctx)
         {
             var localizer = ctx.Services.GetRequiredService<ILocalizer>();
+            var settings = ctx.GetMessageSettings();
 
             var result = GetPermission(localizer, input, AkkoConstants.DefaultLanguage);
 
             return (result.HasValue)
                 ? Task.FromResult(result)
-                : Task.FromResult(GetPermission(localizer, input, ctx.GetLocaleKey()));
+                : Task.FromResult(GetPermission(localizer, input, settings.Locale));
         }
 
         /// <summary>
@@ -72,11 +73,13 @@ namespace AkkoCore.Commands.ArgumentConverters
                 "perm_use_voice" => Optional.FromValue(Permissions.UseVoice),
                 "perm_use_voice_detection" => Optional.FromValue(Permissions.UseVoiceDetection),
                 "perm_view_audit_log" => Optional.FromValue(Permissions.ViewAuditLog),
-                "perm_use_slash_commands" => Optional.FromValue(Permissions.UseSlashCommands),
                 "perm_manage_threads" => Optional.FromValue(Permissions.ManageThreads),
-                "perm_use_private_threads" => Optional.FromValue(Permissions.UsePrivateThreads),
-                "perm_use_public_threads" => Optional.FromValue(Permissions.UsePublicThreads),
                 "perm_use_external_stickers" => Optional.FromValue(Permissions.UseExternalStickers),
+                "perm_start_embedded_activities" => Optional.FromValue(Permissions.StartEmbeddedActivities),
+                "perm_send_messages_in_threads" => Optional.FromValue(Permissions.SendMessagesInThreads),
+                "perm_create_private_threads" => Optional.FromValue(Permissions.CreatePrivateThreads),
+                "perm_create_public_threads" => Optional.FromValue(Permissions.CreatePublicThreads),
+                "perm_use_application_commands" => Optional.FromValue(Permissions.UseApplicationCommands),
                 _ => Optional.FromNoValue<Permissions>()
             };
         }

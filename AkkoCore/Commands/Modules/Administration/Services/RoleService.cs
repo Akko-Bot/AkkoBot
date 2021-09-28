@@ -106,7 +106,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             if (!server.Roles.TryGetValue(dbGuild.MuteRoleId ?? default, out var muteRole))
             {
-                using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
                 // Create a new mute role
                 muteRole = await server.CreateRoleAsync("AkkoMute", MutePermsAllow);
@@ -138,7 +138,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if a timer was created, <see langword="false"/> otherwise.</returns>
         public async Task<bool> MuteUserAsync(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string reason)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Mute the user
             await user.GrantRoleAsync(muteRole, reason);
@@ -204,7 +204,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the unmute.</param>
         public async Task UnmuteUserAsync(DiscordGuild server, DiscordRole muteRole, DiscordMember user, string reason)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Unmute the user
             await user.RevokeRoleAsync(muteRole, reason);

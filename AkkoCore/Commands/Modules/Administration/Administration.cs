@@ -1,7 +1,6 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
-using AkkoCore.Commands.Modules.Self.Services;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
@@ -21,7 +20,6 @@ namespace AkkoCore.Commands.Modules.Administration
     {
         private readonly ICommandHandler _commandHandler;
         private readonly GuildConfigService _guildService;
-        private readonly BotConfigService _botService;
 
         /// <summary>
         /// Represents the (allowed) permissions of the roles that should be exempt from channel lockdowns.
@@ -33,11 +31,10 @@ namespace AkkoCore.Commands.Modules.Administration
         /// </summary>
         private const Permissions _lockPerms = Permissions.SendMessages | Permissions.AddReactions;
 
-        public Administration(ICommandHandler commandHandler, GuildConfigService guildService, BotConfigService botService)
+        public Administration(ICommandHandler commandHandler, GuildConfigService guildService)
         {
             _commandHandler = commandHandler;
             _guildService = guildService;
-            _botService = botService;
         }
 
         [Command("sudo")]
@@ -194,9 +191,7 @@ namespace AkkoCore.Commands.Modules.Administration
         /// <param name="context">The command context.</param>
         private async Task CheckPrefixAsync(CommandContext context)
         {
-            var prefix = (context.Guild is null)
-                ? _botService.GetOrSetProperty(x => x.BotPrefix)
-                : _guildService.GetGuildSettings(context.Guild).Prefix;
+            var prefix = context.GetMessageSettings().Prefix;
 
             var response = (context.Guild is null) ? "bot_prefix_check" : "guild_prefix_check";
             var embed = new SerializableDiscordEmbed()

@@ -52,7 +52,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task UnbanAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedban_title");
@@ -76,7 +76,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedmute");
@@ -109,7 +109,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers
@@ -136,7 +136,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var timerEntry = await db.Timers
@@ -163,7 +163,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
             var warnings = await db.Warnings
@@ -180,7 +180,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbReminder = await db.Reminders.FirstOrDefaultAsyncEF(x => x.TimerIdFK == entryId);
             var cmdHandler = client.GetCommandsNext();
@@ -205,7 +205,7 @@ namespace AkkoCore.Services.Timers
                     user,
                     channel,
                     dbReminder.Content,
-                    (dbReminder.IsPrivate) ? _botConfig.BotPrefix : dbGuild.Prefix,
+                    (dbReminder.IsPrivate) ? _botConfig.Prefix : dbGuild.Prefix,
                     null
                 );
 
@@ -238,7 +238,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var cmdHandler = client.GetCommandsNext();
             var dbCmd = await db.AutoCommands
@@ -277,7 +277,7 @@ namespace AkkoCore.Services.Timers
 
         public async Task SendRepeaterAsync(int entryId, DiscordClient client, DiscordGuild server)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // If repeater tries to run on a server the bot is not in, abort
             // without removing the repeater from the database.

@@ -75,7 +75,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleNotificationAsync(CommandContext context)
         {
-            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior.ToggleFlag(WordFilterBehavior.NotifyOnDelete));
+            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior = x.Behavior.ToggleFlag(WordFilterBehavior.NotifyOnDelete));
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fw_notify", (isEnabled.HasFlag(WordFilterBehavior.NotifyOnDelete)) ? "enabled" : "disabled"));
 
@@ -87,7 +87,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task ToggleWarnOnDeleteAsync(CommandContext context)
         {
-            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior.ToggleFlag(WordFilterBehavior.WarnOnDelete));
+            var isEnabled = await _service.SetWordFilterAsync(context.Guild.Id, x => x.Behavior = x.Behavior.ToggleFlag(WordFilterBehavior.WarnOnDelete));
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("fw_warn", (isEnabled.HasFlag(WordFilterBehavior.WarnOnDelete)) ? "enabled" : "disabled"));
 

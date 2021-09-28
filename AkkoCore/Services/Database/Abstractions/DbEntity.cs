@@ -1,4 +1,4 @@
-﻿using AkkoCore.Abstractions;
+﻿using AkkoCore.Config.Abstractions;
 using AkkoCore.Extensions;
 using System;
 using System.Collections;

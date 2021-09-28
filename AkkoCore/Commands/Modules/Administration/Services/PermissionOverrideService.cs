@@ -37,7 +37,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The updated property.</returns>
         public async Task<T> SetPermissionOverrideAsync<T>(ulong? sid, Command cmd, Func<PermissionOverrideEntity, T> setter)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             var guildId = sid ?? default;
 
             if (!_dbCache.PermissionOverrides.TryGetValue(guildId, out var permOverrides))
@@ -83,7 +83,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 _dbCache.PermissionOverrides.TryRemove(sid ?? default, out _);
 
             // Remove from the database
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.PermissionOverride.DeleteAsync(permOverride) is not 0;
         }
@@ -98,7 +98,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             if (!_dbCache.PermissionOverrides.TryRemove(sid ?? default, out var permOverrides))
                 return 0;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var result = await db.PermissionOverride.DeleteAsync(permOverrides);
             permOverrides.Clear();

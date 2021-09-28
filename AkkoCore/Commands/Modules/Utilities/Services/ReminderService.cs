@@ -46,7 +46,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var userReminders = await db.Reminders
                 .Where(x => x.AuthorId == context.User.Id)
@@ -99,7 +99,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the reminder got successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveReminderAsync(DiscordUser user, int id)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             var dbReminder = await db.Reminders
                 .Select(x => new ReminderEntity() { Id = x.Id, AuthorId = x.AuthorId, TimerIdFK = x.TimerIdFK, TimerRel = new() { Id = x.TimerIdFK } })
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -134,7 +134,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
         public async Task<IReadOnlyCollection<T>> GetRemindersAsync<T>(DiscordUser user, Expression<Func<ReminderEntity, T>> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.Reminders
                 .Where(x => x.AuthorId == user.Id)

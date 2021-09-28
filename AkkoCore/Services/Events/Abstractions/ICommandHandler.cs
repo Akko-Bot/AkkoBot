@@ -28,6 +28,14 @@ namespace AkkoCore.Services.Events.Abstractions
         bool GetActiveOverride(ulong? sid, Command cmd, out PermissionOverrideEntity permOverride);
 
         /// <summary>
+        /// Checks if the current context is allowed to run the command for the overriden permissions.
+        /// </summary>
+        /// <param name="context">The command context.</param>
+        /// <param name="permOverride">The command permission overrides.</param>
+        /// <returns><see langword="true"/> if the command can run in the current context, <see langword="false"/> otherwise.</returns>
+        bool IsAllowedOverridenContext(CommandContext context, PermissionOverrideEntity permOverride);
+
+        /// <summary>
         /// Executes commands that are mapped to aliases.
         /// </summary>
         Task HandleCommandAliasAsync(DiscordClient client, MessageCreateEventArgs eventArgs);

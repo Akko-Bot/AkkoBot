@@ -1,5 +1,5 @@
-﻿using AkkoCore.Abstractions;
-using AkkoCore.Common;
+﻿using AkkoCore.Common;
+using AkkoCore.Config.Abstractions;
 using AkkoCore.Extensions;
 using ConcurrentCollections;
 using System;
@@ -68,7 +68,7 @@ namespace AkkoCore.Config.Models
         /// The default bot prefix.
         /// </summary>
         [YamlMember(Description = @"The default bot prefix. Defaults to ""!"".")]
-        public string BotPrefix { get; set; } = "!";
+        public string Prefix { get; set; } = "!";
 
         /// <summary>
         /// The default name to be used on webhooks for guild logging.

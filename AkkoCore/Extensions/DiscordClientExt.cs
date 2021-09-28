@@ -11,6 +11,14 @@ namespace AkkoCore.Extensions
             .GetProperty("MessageCache", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /// <summary>
+        /// Gets the URL to invite this bot to a Discord server.
+        /// </summary>
+        /// <param name="client">This Discord client.</param>
+        /// <returns>The URL for inviting the bot.</returns>
+        public static string GetBotInvite(this DiscordClient client)
+            => $"https://discord.com/api/oauth2/authorize?client_id={client.CurrentUser.Id}&permissions=0&scope=applications.commands%20bot";
+
+        /// <summary>
         /// Gets the message cache of this client.
         /// </summary>
         /// <param name="client">This Discord client.</param>

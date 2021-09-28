@@ -33,7 +33,7 @@ namespace AkkoCog.Commands.Services
         /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
         public async Task<(int, double)> RunExecQueryAsync(string query)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var clock = Stopwatch.StartNew();
             var rows = await db.Database.ExecuteSqlRawAsync(query);
@@ -54,7 +54,7 @@ namespace AkkoCog.Commands.Services
             var fieldBuilders = new List<StringBuilder>();
 
             // Open database connection for manual read
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             using var connection = db.Database.GetDbConnection();
             await connection.OpenAsync();

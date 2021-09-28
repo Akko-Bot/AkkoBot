@@ -45,7 +45,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                 || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id)))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbTag = new TagEntity()
             {
@@ -89,7 +89,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                 || !(dbTag.AuthorId == context.User.Id || context.Member?.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageGuild)) is true))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             await db.Tags.DeleteAsync(x => x.Id == id);
 
@@ -114,7 +114,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
 
             predicate ??= x => true;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var result = await db.Tags.Where(x => x.GuildIdFK == ((context.Guild == null) ? null : context.Guild.Id))
                 .DeleteAsync(predicate);
@@ -153,7 +153,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (!tags.Any())
                 return 0;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.Tags.DeleteAsync(x => DateTimeOffset.Now - x.LastDayUsed > time);
         }
@@ -171,7 +171,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (!GetCachedTag(server?.Id, id, out var dbTag))
                 return default;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             db.Tags.Attach(dbTag);
             var result = setter(dbTag);

@@ -83,11 +83,11 @@ namespace AkkoCore.Common
         /// </summary>
         public static PaginationButtons PaginationButtons { get; } = new()
         {
-            Stop = new DiscordButtonComponent(ButtonStyle.Danger, "stop", null, false, new DiscordComponentEmoji(862259725785497620)),
-            Left = new DiscordButtonComponent(ButtonStyle.Secondary, "left", null, false, new DiscordComponentEmoji(862259522478800916)),
-            Right = new DiscordButtonComponent(ButtonStyle.Secondary, "right", null, false, new DiscordComponentEmoji(862259691212242974)),
-            SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "skip_left", null, false, new DiscordComponentEmoji(862259605464023060)),
-            SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "skip_right", null, false, new DiscordComponentEmoji(862259654403031050))
+            Stop = new DiscordButtonComponent(ButtonStyle.Danger, "pagination_stop", null, false, new DiscordComponentEmoji(862259725785497620)),
+            Left = new DiscordButtonComponent(ButtonStyle.Secondary, "pagination_left", null, false, new DiscordComponentEmoji(862259522478800916)),
+            Right = new DiscordButtonComponent(ButtonStyle.Secondary, "pagination_right", null, false, new DiscordComponentEmoji(862259691212242974)),
+            SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "pagination_skip_left", null, false, new DiscordComponentEmoji(862259605464023060)),
+            SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pagination_skip_right", null, false, new DiscordComponentEmoji(862259654403031050))
         };
     }
 }

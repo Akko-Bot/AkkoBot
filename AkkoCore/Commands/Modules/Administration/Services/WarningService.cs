@@ -46,7 +46,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The saved guild settings.</returns>
         public async Task<GuildConfigEntity> SaveInfractionAsync(CommandContext context, DiscordUser user, string note, WarnType type = WarnType.Notice)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuild = await _dbCache.GetDbGuildAsync(context.Guild.Id);
             var dbOccurrence = await db.Occurrences
@@ -112,7 +112,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             var guildSettings = await SaveInfractionAsync(context, user, warn, WarnType.Warning);
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var punishment = await db.WarnPunishments
                 .Where(x => x.WarnAmount == db.Warnings.Count(y => y.GuildIdFK == context.Guild.Id && y.UserIdFK == user.Id && y.Type == WarnType.Warning))
@@ -144,7 +144,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>A collection of server punishments.</returns>
         public async Task<IReadOnlyCollection<WarnPunishEntity>> GetServerPunishmentsAsync(DiscordGuild server)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             var punishments = await db.WarnPunishments
                 .Where(x => x.GuildIdFK == server.Id)
                 .ToArrayAsyncEF();
@@ -162,7 +162,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the punishment was saved, <see langword="false"/> if it was updated.</returns>
         public async Task<bool> SaveWarnPunishmentAsync(DiscordGuild server, int amount, PunishmentType type, DiscordRole role, TimeSpan? interval)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var punishment = await db.WarnPunishments.FirstOrDefaultAsyncEF(x => x.GuildIdFK == server.Id && x.WarnAmount == amount);
 
@@ -196,7 +196,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the expire time has been updates, <see langword="false"/> otherwise.</returns>
         public async Task<bool> SaveWarnExpireAsync(CommandContext context, TimeSpan time)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             if (time < TimeSpan.Zero)
                 time = TimeSpan.Zero;
@@ -222,7 +222,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the punishment was removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveWarnPunishmentAsync(DiscordGuild server, int amount)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             return await db.WarnPunishments.DeleteAsync(x => x.GuildIdFK == server.Id && x.WarnAmount == amount) is not 0;
         }
 
@@ -235,7 +235,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The amount of infractions removed, 0 if no infraction was removed.</returns>
         public async Task<int> RemoveInfractionAsync(DiscordGuild server, DiscordUser user, int? id)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             int result;
 
             if (id.HasValue)
@@ -267,7 +267,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>A collection of infractions and the name of its authors.</returns>
         public async Task<IReadOnlyCollection<(string, WarnEntity)>> GetInfractionsAsync(DiscordGuild server, DiscordUser user)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Join warnings with user who issued them
             var infractions = await db.Warnings
@@ -298,7 +298,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>A collection of infractions and the name of its authors.</returns>
         public async Task<IReadOnlyCollection<(string, WarnEntity)>> GetInfractionsAsync(DiscordGuild server, DiscordUser user, WarnType type)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Join warnings with user who issued them
             var infractions = await db.Warnings
@@ -328,7 +328,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The occurrences of the user.</returns>
         public async Task<OccurrenceEntity> GetUserOccurrencesAsync(DiscordGuild server, DiscordUser user)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.Occurrences
                 .FirstOrDefaultAsyncEF(x => x.GuildIdFK == server.Id && x.UserId == user.Id) ?? new();
@@ -342,7 +342,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The created database timer.</returns>
         private async Task<TimerEntity> CreateWarnTimerAsync(CommandContext context, WarnEntity entry)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             _dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild);
 
@@ -362,7 +362,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The amount of updated timers.</returns>
         private async Task<int> UpdateWarnTimersAsync(DiscordClient client, GuildConfigEntity dbGuild)
         {
-            var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             //Remove the timers
             var updates = 0;

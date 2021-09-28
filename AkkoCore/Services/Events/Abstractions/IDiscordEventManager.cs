@@ -12,7 +12,7 @@ namespace AkkoCore.Services.Events.Abstractions
         /// <summary>
         /// Registers events that trigger after the bot has connected to Discord.
         /// </summary>
-        void RegisterEvents();
+        void RegisterDefaultEvents();
 
         /// <summary>
         /// Subscribes or unsubscribes the specified methods to Discord websocket events defined by <paramref name="setter"/>.
@@ -28,7 +28,7 @@ namespace AkkoCore.Services.Events.Abstractions
         /// <summary>
         /// Unregisters events that trigger after the bot has connected to Discord.
         /// </summary>
-        void UnregisterEvents();
+        void UnregisterDefaultEvents();
 
         /// <summary>
         /// Unregisters events that trigger before the bot has connected to Discord.

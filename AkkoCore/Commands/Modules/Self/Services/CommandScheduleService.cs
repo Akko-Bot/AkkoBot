@@ -46,7 +46,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is AutoCommandType.Startup)
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var newTimer = new TimerEntity()
             {
@@ -91,7 +91,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
             if (cmd is null || context.Guild is null)
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var newCmd = new AutoCommandEntity()
             {
@@ -116,7 +116,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if the autocommand was successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveAutoCommandAsync(DiscordUser user, int id)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbCmd = await db.AutoCommands
                 .Include(x => x.TimerRel)
@@ -162,7 +162,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
         public async Task<IReadOnlyCollection<T>> GetAutoCommandsAsync<T>(DiscordUser user, Expression<Func<AutoCommandEntity, T>> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.AutoCommands
                 .Where(x => x.AuthorId == user.Id)

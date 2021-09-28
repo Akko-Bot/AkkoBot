@@ -49,7 +49,7 @@ namespace AkkoCore.Services.Events
 
         public async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
@@ -68,7 +68,7 @@ namespace AkkoCore.Services.Events
         // have custom rules that users may want to read
         public async Task CacheActiveGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbGuilds = await db.GuildConfig
                 .IncludeCacheable()
@@ -85,7 +85,7 @@ namespace AkkoCore.Services.Events
 
         public async Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var cmdHandler = client.GetCommandsNext();
             var startupCmds = await db.AutoCommands
@@ -111,7 +111,7 @@ namespace AkkoCore.Services.Events
 
         public async Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs _)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var pStatus = await db.PlayingStatuses
                 .Where(x => x.RotationTime == TimeSpan.Zero)

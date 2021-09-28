@@ -50,7 +50,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (timeOfDay is null && (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365)))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Limit of 5 repeaters per guild
             if (await db.Repeaters.CountAsyncEF(x => x.GuildIdFK == context.Guild.Id) >= 5)
@@ -104,7 +104,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the repeater was successfully removed from the database, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveRepeaterAsync(DiscordGuild server, int id)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             if (!_dbCache.Repeaters.TryGetValue(server.Id, out var repeaterCache))
                 return false;
 
@@ -133,7 +133,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if at least one repeater was successfully removed from the database, <see langword="false"/> otherwise.</returns>
         public async Task<bool> ClearRepeatersAsync(DiscordGuild server)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             if (!_dbCache.Repeaters.TryRemove(server.Id, out var repeaterCache))
                 return false;
 
@@ -170,7 +170,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (dbRepeater is null)
                 return (default, default);
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var dbTimer = (timer?.Id is null) ? await db.Timers.Where(x => x.Id == dbRepeater.TimerIdFK).FirstOrDefaultAsyncEF() : null;
             var dbUser = (user is null) ? await db.DiscordUsers.Where(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsyncEF() : null;

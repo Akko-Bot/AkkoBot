@@ -40,7 +40,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             => _localizer.Locales.Equals(locale, StringComparison.InvariantCultureIgnoreCase, out match);
 
         /// <summary>
-        /// Gets all registered localed.
+        /// Gets all registered locales.
         /// </summary>
         /// <returns>A collection of registered locales.</returns>
         public IReadOnlyCollection<string> GetLocales()
@@ -53,9 +53,13 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="server">The target guild.</param>
         /// <param name="selector">A method to set the property.</param>
         /// <returns>The modified setting.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when one of the arguments is <see langword="null"/>.</exception>
         public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<GuildConfigEntity, T> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            if (server is null || selector is null)
+                throw new ArgumentNullException(server is null ? nameof(server) : nameof(selector), "Argument cannot be null.");
+
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.Guilds.TryGetValue(server.Id, out var dbGuild))
                 dbGuild = await db.GuildConfig.IncludeCacheable().FirstOrDefaultAsync(x => x.GuildId == server.Id) ?? new GuildConfigEntity() { GuildId = server.Id };
@@ -75,8 +79,12 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord guild.</param>
         /// <returns>The guild settings.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="server"/> is <see langword="null"/>.</exception>
         public GuildConfigEntity GetGuildSettings(DiscordGuild server)
         {
+            if (server is null)
+                throw new ArgumentNullException(nameof(server), "Discord guild cannot be null.");
+
             _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
             return dbGuild;
         }

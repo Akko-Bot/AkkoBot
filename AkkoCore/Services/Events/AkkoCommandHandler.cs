@@ -61,7 +61,7 @@ namespace AkkoCore.Services.Events
 
             // Get the context prefix
             var prefix = (eventArgs.Guild is null)
-                ? _botConfig.BotPrefix
+                ? _botConfig.Prefix
                 : _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
 
             var cmdHandler = client.GetCommandsNext();
@@ -101,7 +101,7 @@ namespace AkkoCore.Services.Events
 
         public Task CheckAndExecuteAsync(CommandContext context)
         {
-            return (GetActiveOverride(context.Guild?.Id, context.Command, out var permOverride) && IsAllowedContext(context, permOverride))
+            return (GetActiveOverride(context.Guild?.Id, context.Command, out var permOverride) && IsAllowedOverridenContext(context, permOverride))
                 ? Task.Run(async () => await context.Command.ExecuteAndLogAsync(context))           // Execute command with overriden permissions.
                 : (permOverride is null || !permOverride.IsActive)
                     ? Task.Run(async () => await context.CommandsNext.ExecuteCommandAsync(context)) // Execute command with default permissions. This method automatically performs the command checks.
@@ -119,16 +119,10 @@ namespace AkkoCore.Services.Events
             permOverride = permOverrides?.FirstOrDefault(x => x.Command.Equals(cmd.QualifiedName, StringComparison.OrdinalIgnoreCase))
                 ?? globalOverrides?.FirstOrDefault(x => x.Command.Equals(cmd.QualifiedName, StringComparison.OrdinalIgnoreCase));
 
-            return permOverride is not null;
+            return permOverride is not null && permOverride.IsActive;
         }
 
-        /// <summary>
-        /// Checks if the current context is allowed to run the command for the overriden permissions.
-        /// </summary>
-        /// <param name="context">The command context.</param>
-        /// <param name="permOverride">The command permission overrides.</param>
-        /// <returns><see langword="true"/> if the command can run in the current context, <see langword="false"/> otherwise.</returns>
-        private bool IsAllowedContext(CommandContext context, PermissionOverrideEntity permOverride)
+        public bool IsAllowedOverridenContext(CommandContext context, PermissionOverrideEntity permOverride)
         {
             // Enforce certain permission attributes, no matter what
             static bool IsContextValid(CheckBaseAttribute att, CommandContext context)

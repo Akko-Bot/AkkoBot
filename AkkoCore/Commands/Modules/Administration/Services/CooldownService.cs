@@ -37,7 +37,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the cooldown was successfully added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddCommandCooldownAsync(Command cmd, TimeSpan time, DiscordGuild server = null)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var newEntry = new CommandCooldownEntity()
             {
@@ -63,7 +63,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns><see langword="true"/> if the cooldown was successfully removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveCommandCooldownAsync(string qualifiedCommand, ulong? id = default)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return _cmdCooldown.RemoveCommand(qualifiedCommand, id)
                 && await db.CommandCooldown.DeleteAsync(x => x.Command == qualifiedCommand && x.GuildIdFK == id) is not 0;

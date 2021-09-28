@@ -8,7 +8,7 @@ namespace AkkoCore.Common
         /// <summary>
         /// Represents the maximum message length allowed by Discord.
         /// </summary>
-        public const int MaxMessageLength = 4000;
+        public const int MaxMessageLength = 2000;
 
         /// <summary>
         /// Represents the maximum string length allowed in a Discord embed description.

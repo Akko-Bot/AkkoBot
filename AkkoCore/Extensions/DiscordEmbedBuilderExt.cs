@@ -1,6 +1,6 @@
 using AkkoCore.Models.Serializable;
 using AkkoCore.Models.Serializable.EmbedParts;
-using DSharpPlus.CommandsNext;
+using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
 using System.Collections.Generic;
 
@@ -72,14 +72,49 @@ namespace AkkoCore.Extensions
         /// Adds a localized field to this embed.
         /// </summary>
         /// <param name="embed">This embed.</param>
-        /// <param name="context">The command context.</param>
+        /// <param name="localizer">The localizer.</param>
+        /// <param name="locale">The locale to translate to.</param>
         /// <param name="name">The title of this field.</param>
         /// <param name="value">The content of this field.</param>
         /// <param name="inline">Whether the field should be inlined or not.</param>
         /// <returns>This embed with a localized field added to it.</returns>
-        public static DiscordEmbedBuilder AddLocalizedField(this DiscordEmbedBuilder embed, CommandContext context, string name, string value, bool inline = false)
+        public static DiscordEmbedBuilder AddLocalizedField(this DiscordEmbedBuilder embed, ILocalizer localizer, string locale, string name, string value, bool inline = false)
         {
-            embed.AddField(context.FormatLocalized(name), context.FormatLocalized(value), inline);
+            embed.AddField(localizer.GetResponseString(locale, name), localizer.GetResponseString(locale, value), inline);
+            return embed;
+        }
+
+        /// <summary>
+        /// Localizes the content of this embed.
+        /// </summary>
+        /// <param name="embed">This embed.</param>
+        /// <param name="localizer">The cache of response strings.</param>
+        /// <param name="locale">The locale to be used.</param>
+        /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
+        /// <returns>This embed builder.</returns>
+        public static DiscordEmbedBuilder WithLocalization(this DiscordEmbedBuilder embed, ILocalizer localizer, string locale, string color = default)
+        {
+            if (!embed.Color.HasValue)
+                embed.WithColor(new DiscordColor(color));
+
+            if (!string.IsNullOrWhiteSpace(embed.Author?.Name))
+                embed.Author.Name = localizer.GetResponseString(locale, embed.Author.Name);
+
+            if (!string.IsNullOrWhiteSpace(embed.Title))
+                embed.Title = localizer.GetResponseString(locale, embed.Title);
+
+            if (!string.IsNullOrWhiteSpace(embed.Description))
+                embed.Description = localizer.GetResponseString(locale, embed.Description);
+
+            if (!string.IsNullOrWhiteSpace(embed.Footer?.Text))
+                embed.Footer.Text = localizer.GetResponseString(locale, embed.Footer.Text);
+
+            foreach (var field in embed.Fields)
+            {
+                field.Name = localizer.GetResponseString(locale, field.Name);
+                field.Value = localizer.GetResponseString(locale, field.Value);
+            }
+
             return embed;
         }
     }

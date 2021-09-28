@@ -45,7 +45,7 @@ namespace AkkoCore.Services.Database
             _scopeFactory = scopeFactory;
             CommandCooldown = commandCooldown;
 
-            using var scope = scopeFactory.GetScopedService<AkkoDbContext>(out var dbContext);
+            using var scope = scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var dbContext);
 
             // The properties below are global
             Users = dbContext.DiscordUsers.ToConcurrentDictionary(x => x.UserId);
@@ -94,7 +94,7 @@ namespace AkkoCore.Services.Database
             if (Guilds.TryGetValue(sid, out var dbGuild))
                 return dbGuild;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             dbGuild = await db.GuildConfig
                 .IncludeCacheable()

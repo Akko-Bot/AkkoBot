@@ -50,7 +50,7 @@ namespace AkkoCore.Services.Events
                 return;
 
             var cmdHandler = client.GetCommandsNext();
-            var context = cmdHandler.CreateFakeContext(eventArgs.Member, eventArgs.Guild.GetDefaultChannel(), string.Empty, _botConfig.BotPrefix, null);
+            var context = cmdHandler.CreateFakeContext(eventArgs.Member, eventArgs.Guild.GetDefaultChannel(), string.Empty, _botConfig.Prefix, null);
             var action = gatekeeper.AntiAltPunishType switch
             {
                 PunishmentType.Mute => _antiAltActions.MuteAltAsync(context, eventArgs.Member, (await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id, _botConfig)).MuteRoleId ?? default),

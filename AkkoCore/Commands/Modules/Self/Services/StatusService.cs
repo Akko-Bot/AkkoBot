@@ -57,7 +57,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
             if (string.IsNullOrWhiteSpace(activity.Name))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             var newEntry = new PlayingStatusEntity()
             {
@@ -87,7 +87,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if at least one status has been removed, <see langword="false"/> otherwise.</returns>
         public async Task<bool> RemoveStatusesAsync(Expression<Func<PlayingStatusEntity, bool>> predicate)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             var entries = await db.PlayingStatuses
                 .Where(predicate)
                 .Select(x => x.Id)
@@ -111,7 +111,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>The amount of removed entries.</returns>
         public async Task<int> ClearStatusesAsync()
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db); ;
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db); ;
             _dbCache.PlayingStatuses.Clear();
 
             return await db.PlayingStatuses.DeleteAsync();
@@ -123,7 +123,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns><see langword="true"/> if rotation has been toggled, <see langword="false"/> if there was no status to rotate.</returns>
         public async Task<bool> RotateStatusesAsync()
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Update the botconfig
             _botConfig.RotateStatus = !_botConfig.RotateStatus;

@@ -58,7 +58,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
                 throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
                 guildLogs ??= new();
@@ -131,7 +131,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 guildLog.IsActive = false;
 
             // Update the database entry
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return (deleteEntry)
                 ? await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId) is not 0

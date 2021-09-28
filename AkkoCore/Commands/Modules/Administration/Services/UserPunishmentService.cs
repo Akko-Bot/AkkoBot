@@ -113,7 +113,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task KickUserAsync(CommandContext context, DiscordMember user, string reason)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             await user.RemoveAsync(reason);
 
@@ -159,7 +159,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task SoftbanUserAsync(CommandContext context, ulong userId, int days, string reason)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
             await context.Guild.BanMemberAsync(userId, days, reason);
@@ -209,7 +209,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the punishment.</param>
         public async Task BanUserAsync(CommandContext context, ulong userId, int days, string reason)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Ban the user
             await context.Guild.BanMemberAsync(userId, days, reason);
@@ -246,7 +246,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="reason">The reason for the ban.</param>
         public async Task TimedBanAsync(CommandContext context, TimeSpan time, ulong userId, string reason = null)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // If time is less than a minute, set it to a minute.
             if (time < TimeSpan.FromMinutes(1))
@@ -305,7 +305,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
         public async Task TimedRolePunishAsync(CommandContext context, PunishmentType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // If time is less than a minute, set it to a minute.
             if (time < TimeSpan.FromMinutes(1))

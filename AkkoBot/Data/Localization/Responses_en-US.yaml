@@ -146,6 +146,7 @@ bl_not_found: This ID is not blacklisted.
 bl_removed: Successfully removed {0} {1} {2} from the blacklist.
 bl_removed_range: '{0} IDs were removed from the blacklist.'
 bl_title: Blacklist
+bot_owner_error: This command requires bot ownership.
 bot_prefix_check: The global prefix is {0}
 bot_settings_title: Global Settings
 category: Category
@@ -316,7 +317,6 @@ cmd_log_start: Starts logging on the specified channel. Use `log list` to see th
 cmd_log_stop: Stops logging of the specified log event.
 cmd_modlog: Shows notices and infractions of a user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
-cmd_modules: Shows the commands under the specified module or the currently available modules if none is specified.
 cmd_moveuser: Moves a user to another voice channel. Provide no channel to force them to disconnect.
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
@@ -437,7 +437,6 @@ days: Days
 days_hours_minutes: '{0} days, {1} hours, {2} minutes'
 db_cache: Database Cache
 deafen_success: User {0} can no longer hear other users speaking in voice channels.
-deafen_success: User {0} can now hear other users speaking in voice channels.
 deleteallroles: '{0} roles were successfully deleted.'
 deleteallroles_error: There are no eligible roles to be deleted.
 deleted_on: Deleted on
@@ -457,7 +456,6 @@ error_not_found: 'Error: the requested response string was not found.'
 error_user_not_found: User not found.
 exclusive: Exclusive
 expires: Expires
-expires_on: Expires on
 expires_on: Expires on
 exportcommands_description: Successfully exported {0} commands.
 farewell_channel_removed: The farewell channel has been successfully removed.
@@ -649,6 +647,8 @@ perm_ban_members: Ban Members
 perm_bot_owner: Bot Ownership
 perm_change_nickname: Change Nickname
 perm_create_instant_invite: Create Invite
+perm_create_private_threads: Create Private Threads
+perm_create_public_threads: Create Public Threads
 perm_deafen_members: Deafen Members
 perm_embed_links: Embed Links
 perm_kick_members: Kick Members
@@ -668,14 +668,14 @@ perm_priority_speaker: Priority Speaker
 perm_read_message_history: Read Message History
 perm_require_dm: Direct Message
 perm_send_messages: Send Messages
+perm_send_messages_in_threads: Send Messages In Threads
 perm_send_tts_messages: Send TTS Messages
 perm_speak: Speak
+perm_start_embedded_activities: Start Embedded Activities
 perm_stream: Stream
+perm_use_application_commands: Use Application Commands
 perm_use_external_emojis: Use External Emojis
 perm_use_external_stickers: Use External Stickers
-perm_use_private_threads: Use Private Threads
-perm_use_public_threads: Use Public Threads
-perm_use_slash_commands: Use Slash Commands (Comandos de Aplicações)
 perm_use_voice: Connect
 perm_use_voice_detection: Voice Detection
 perm_view_audit_log: View Audit Log
@@ -689,7 +689,6 @@ poll_list_title: Server Polls
 poll_not_found: Poll not found.
 poll_title: '{0} created a poll'
 position: Position
-private: Private
 private: Private
 prune_error: There are no messages to be deleted or you're trying to delete messages older than 14 days.
 pstatus_error: There are no rotating statuses set up.
@@ -775,6 +774,7 @@ type: Type
 unban_not_found: This user is not banned.
 unban_success: User {0} has been unbanned.
 unbanned_on: Unbanned on
+undeafen_success: User {0} can now hear other users speaking in voice channels.
 unknown: Unknown
 unlockchannel_reason: Lockdown Lifted
 unmute_success: User {0} has been unmuted.

@@ -35,7 +35,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The modified setting.</returns>
         public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<AutoSlowmodeEntity, T> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             if (!_dbCache.AutoSlowmode.TryGetValue(server.Id, out var slowmode))
                 slowmode = await db.AutoSlowmode.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id) ?? new() { GuildIdFK = server.Id };
 

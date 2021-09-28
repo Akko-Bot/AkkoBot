@@ -46,7 +46,7 @@ namespace AkkoCore.Services.Events
 
             var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
                     ? dbGuild.Prefix
-                    : _botConfig.BotPrefix;
+                    : _botConfig.Prefix;
 
             if (eventArgs.Guild is not null && prefix.Equals("!", StringComparison.Ordinal))
                 return;

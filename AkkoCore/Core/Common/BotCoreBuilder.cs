@@ -1,5 +1,4 @@
-﻿using AkkoCore.Abstractions;
-using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Formatters;
 using AkkoCore.Common;
@@ -27,6 +26,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
+using DSharpPlus.SlashCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -330,20 +330,24 @@ namespace AkkoCore.Core.Common
 
             // Initialize the command handlers
             var cmdHandlers = await GetCommandHandlersAsync(shardedClient, services, isCaseSensitive, withDms, withMentionPrefix);
+            var slashHandlers = await GetSlashHandlersAsync(shardedClient, services);
 
             // Register the events
+            var responseGenerator = services.GetRequiredService<IInteractionResponseManager>();
+            var localizer = services.GetRequiredService<ILocalizer>();
             var events = services.GetRequiredService<IDiscordEventManager>();
             events.RegisterStartupEvents();
-            events.RegisterEvents();
-
-            // Get cog response strings
-            var localizer = services.GetRequiredService<ILocalizer>();
+            events.RegisterDefaultEvents();
 
             foreach (var cogSetup in cogSetups)
-                localizer.LoadLocalizedStrings(cogSetup.LocalizationDirectory);
+            {
+                cogSetup.RegisterComponentResponses(responseGenerator);         // Register interactive responses
+                cogSetup.RegisterCallbacks(shardedClient);                      // Register cog callbacks
+                localizer.LoadLocalizedStrings(cogSetup.LocalizationDirectory); // Load response strings from cogs
+            }
 
             // Build the bot
-            return new BotCore(shardedClient, cmdHandlers);
+            return new BotCore(shardedClient, cmdHandlers, slashHandlers);
         }
 
         /// <summary>
@@ -383,6 +387,9 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton<ITimerActions, TimerActions>(),
                 ServiceDescriptor.Singleton<ITimerManager, TimerManager>(),
 
+                // > Discord Interactivity
+                ServiceDescriptor.Singleton<IInteractionResponseManager, InteractionResponseManager>(),
+
                 // > Utilities
                 ServiceDescriptor.Transient<IMemberAggregator, MemberAggregator>(),
                 ServiceDescriptor.Singleton<IAntiAltActions, AntiAltActions>(),
@@ -408,7 +415,8 @@ namespace AkkoCore.Core.Common
                 ServiceDescriptor.Singleton<IGatekeepEventHandler, GatekeepEventHandler>(),
                 ServiceDescriptor.Singleton<IGuildLogEventHandler, GuildLogEventHandler>(),
                 ServiceDescriptor.Singleton<IGuildLogGenerator, GuildLogGenerator>(),
-                ServiceDescriptor.Singleton<ITagEventHandler, TagEventHandler>()
+                ServiceDescriptor.Singleton<ITagEventHandler, TagEventHandler>(),
+                ServiceDescriptor.Singleton<IInteractionEventHandler, InteractionEventHandler>()
             };
 
             foreach (var service in servicesList)
@@ -424,13 +432,13 @@ namespace AkkoCore.Core.Common
         /// <summary>
         /// Gets the command handlers for this bot.
         /// </summary>
-        /// <param name="botClients">The bot's sharded clients.</param>
+        /// <param name="shardedClient">The bot's sharded clients.</param>
         /// <param name="services">The services to be accessible through the command handlers.</param>
         /// <param name="isCaseSensitive">Sets whether the bot ignores case sensitivity on commands or not.</param>
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A collection of command handlers.</returns>
-        private async Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlersAsync(DiscordShardedClient botClients, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
+        private Task<IReadOnlyDictionary<int, CommandsNextExtension>> GetCommandHandlersAsync(DiscordShardedClient shardedClient, IServiceProvider services, bool isCaseSensitive, bool withDms, bool withMentionPrefix)
         {
             // Setup command handler configuration
             var cmdExtConfig = new CommandsNextConfiguration()
@@ -446,7 +454,20 @@ namespace AkkoCore.Core.Common
             };
 
             // Initialize the command handlers
-            return await botClients.UseCommandsNextAsync(cmdExtConfig);
+            return shardedClient.UseCommandsNextAsync(cmdExtConfig);
+        }
+
+        /// <summary>
+        /// Gets the command handlers for slash commands for this bot.
+        /// </summary>
+        /// <param name="shardedClient">The bot's sharded clients.</param>
+        /// <param name="services">The services to be accessible through the command handlers.</param>
+        /// <returns>A collection of slash command handlers.</returns>
+        private Task<IReadOnlyDictionary<int, SlashCommandsExtension>> GetSlashHandlersAsync(DiscordShardedClient shardedClient, IServiceProvider services)
+        {
+            // Setup slash commands
+            var slashOptions = new SlashCommandsConfiguration() { Services = services };
+            return shardedClient.UseSlashCommandsAsync(slashOptions);
         }
 
         /// <summary>
@@ -477,8 +498,8 @@ namespace AkkoCore.Core.Common
                 PaginationBehaviour = PaginationBehaviour.WrapAround,       // Sets whether paginated responses should wrap from first page to last page and vice-versa
                 PaginationDeletion = PaginationDeletion.DeleteEmojis,       // Sets whether emojis or the paginated message should be deleted after timeout
                 PollBehaviour = PollBehaviour.KeepEmojis,                   // Sets whether emojis should be deleted after a poll ends
-                Timeout = TimeSpan.FromSeconds(timeout ?? 30.0),            // Sets how long it takes for an interactive response to timeout
-                PaginationButtons = AkkoStatics.PaginationButtons
+                Timeout = TimeSpan.FromSeconds(timeout ?? 60.0),            // Sets how long it takes for an interactive response to timeout
+                PaginationButtons = AkkoStatics.PaginationButtons           // Sets the default pagination buttons
             };
 
             var shardedClients = new DiscordShardedClient(botConfig);   // Initialize the sharded clients

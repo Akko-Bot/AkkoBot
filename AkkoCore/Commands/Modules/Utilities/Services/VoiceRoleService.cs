@@ -45,7 +45,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                 && voiceRoles.Select(x => x.RoleId).Contains(role.Id)))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Add to the database
             var newEntry = new VoiceRoleEntity()
@@ -78,7 +78,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             if (!_dbCache.VoiceRoles.TryGetValue(server.Id, out var voiceRoles))
                 return false;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             // Remove from the cache
             var matches = voiceRoles

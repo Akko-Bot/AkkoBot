@@ -60,7 +60,7 @@ namespace AkkoCore.Services.Events
                 return Task.CompletedTask;
 
             // Get the correct tag
-            var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.BotPrefix);
+            var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.Prefix);
             var tag = globalTags
                 .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
                 .RandomElement(_rng);
@@ -100,7 +100,7 @@ namespace AkkoCore.Services.Events
                 return Task.CompletedTask;
 
             // Get the correct tag
-            var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.BotPrefix);
+            var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.Prefix);
             var tag = globalTags
                 .Where(x => FilterEmojiTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
                 .RandomElement(_rng);
@@ -293,7 +293,7 @@ namespace AkkoCore.Services.Events
             if (DateTimeOffset.Now.Subtract(dbTag.LastDayUsed) < updateTime)
                 return Task.CompletedTask;
 
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             dbTag.LastDayUsed = DateTimeOffset.Now.StartOfDay();
 
@@ -310,7 +310,7 @@ namespace AkkoCore.Services.Events
         private Task DeleteTagAsync(TagEntity dbTag)
         {
             _dbCache.Tags.TryGetValue(dbTag.GuildIdFK ?? default, out var tags);
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             tags.TryRemove(dbTag);
 

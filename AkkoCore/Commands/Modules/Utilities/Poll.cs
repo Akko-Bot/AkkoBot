@@ -230,7 +230,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .WithDescription(Formatter.Bold(qAnswers[0]) + "\n\n" + string.Join("\n", answers));
 
             if (pollType is PollType.Anonymous)
-                embed.WithFooter(context.FormatLocalized("poll_anonymous_footer", $@"""{_botConfig.BotPrefix}poll vote"""));
+                embed.WithFooter(context.FormatLocalized("poll_anonymous_footer", $@"""{_botConfig.Prefix}poll vote"""));
 
             var pollMsg = await context.RespondLocalizedAsync(embed, false);
             await _service.AddPollAsync(pollMsg, qAnswers[0], pollType, answers);

@@ -34,7 +34,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The modified setting.</returns>
         public async Task<T> SetPropertyAsync<T>(DiscordGuild server, Func<GatekeepEntity, T> selector)
         {
-            using var scope = _scopeFactory.GetScopedService<AkkoDbContext>(out var db);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             _dbCache.Gatekeeping.TryGetValue(server.Id, out var gatekeeper);
 
             gatekeeper ??= await db.Gatekeeping.FirstOrDefaultAsyncEF(x => x.GuildIdFK == server.Id)
