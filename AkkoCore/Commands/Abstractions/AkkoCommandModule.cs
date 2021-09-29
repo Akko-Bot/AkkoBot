@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Abstractions
     /// <summary>
     /// Defines the base behavior and actions for all command modules.
     /// </summary>
-    [IsNotBlacklisted, GlobalCooldown, BaseBotPermissions(Permissions.SendMessages | Permissions.AddReactions)]
+    [IsNotBlacklisted, GlobalCooldown, BaseBotPermissions(Permissions.SendMessages | Permissions.AddReactions | Permissions.SendMessagesInThreads)]
     public abstract class AkkoCommandModule : BaseCommandModule
     {
         // Executes before command execution

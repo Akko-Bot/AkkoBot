@@ -818,3 +818,6 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
+
+cmd_createpublicthread: Cria uma thread pública no canal atual com o nome especificado.
+cmd_createprivatethread: Cria uma thread privada no canal atual com o nome especificado. Funciona apenas em servidores com boost nível 2 ou maior.

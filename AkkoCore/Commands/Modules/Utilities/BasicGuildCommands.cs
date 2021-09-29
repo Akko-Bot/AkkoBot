@@ -147,9 +147,40 @@ namespace AkkoCore.Commands.Modules.Utilities
         }
 
         [RequireGuild]
-        [RequirePermissions(Permissions.ManageChannels)]
+        [RequirePermissions(Permissions.ManageChannels | Permissions.ManageThreads)]
         public class BasicChannelCommands : AkkoCommandModule
         {
+            [Command("createpublicthread"), Aliases("cpth")]
+            [Description("cmd_createpublicthread")]
+            [RequirePermissions(Permissions.CreatePublicThreads)]
+            public async Task CreatePublicThreadAsync(
+                CommandContext context,
+                [Description("arg_channel_name")] string name,
+                [Description("arg_discord_message")] DiscordMessage message = default)
+            {
+                message ??= context.Message;
+
+                if (!message.Channel.IsThread)
+                    await context.Channel.CreateThreadAsync(message, name, AutoArchiveDuration.Day);
+
+                await context.Message.CreateReactionAsync((!message.Channel.IsThread) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
+            }
+
+            [Command("createpublicthread"), HiddenOverload]
+            public async Task CreatePublicThreadAsync(CommandContext context, [RemainingText] string name)
+                => await CreatePublicThreadAsync(context, name, context.Message);
+
+            [Command("createprivatethread"), Aliases("cpvth")]
+            [Description("cmd_createprivatethread")]
+            [RequirePermissions(Permissions.CreatePrivateThreads)]
+            public async Task CreatePrivateThreadAsync(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)
+            {
+                if (context.Guild.PremiumTier >= PremiumTier.Tier_2)
+                    await context.Channel.CreateThreadAsync(name, AutoArchiveDuration.Day, ChannelType.PrivateThread);
+
+                await context.Message.CreateReactionAsync((context.Guild.PremiumTier >= PremiumTier.Tier_2) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
+            }
+
             [Command("createtextchannel"), Aliases("ctch")]
             [Description("cmd_createtextchannel")]
             public async Task CreateTextChannelAsync(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)

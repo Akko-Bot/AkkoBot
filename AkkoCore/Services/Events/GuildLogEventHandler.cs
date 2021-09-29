@@ -49,7 +49,7 @@ namespace AkkoCore.Services.Events
 
         public Task CacheMessageOnCreationAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || eventArgs.Message.Author.IsBot
+            if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog.IsActive)
                 return Task.CompletedTask;
 
@@ -66,7 +66,7 @@ namespace AkkoCore.Services.Events
 
         public async Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
         {
-            if (eventArgs.Guild is null || eventArgs.Message.Author.IsBot
+            if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
                 || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is true  // This check is needed because pins trigger this event
