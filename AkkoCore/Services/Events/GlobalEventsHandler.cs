@@ -19,11 +19,21 @@ namespace AkkoCore.Services.Events
         private readonly IDbCache _dbCache;
         private readonly BotConfig _botConfig;
 
+        public uint MessageCount { get; private set; } = 0;
+
         public GlobalEventsHandler(IGuildEventsHandler guildEventsHandler, IDbCache dbCache, BotConfig botconfig)
         {
             _guildEventsHandler = guildEventsHandler;
             _dbCache = dbCache;
             _botConfig = botconfig;
+        }
+
+        public Task CountMessageAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
+        {
+            if (eventArgs.Message.Author?.IsBot is false)
+                MessageCount++;
+
+            return Task.CompletedTask;
         }
 
         public async Task BlockBlacklistedAsync(DiscordClient client, MessageCreateEventArgs eventArgs)

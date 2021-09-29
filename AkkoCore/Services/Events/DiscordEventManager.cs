@@ -115,6 +115,9 @@ namespace AkkoCore.Services.Events
 
             #region Bot Events
 
+            // Count messages
+            _shardedClient.MessageCreated += _globalEventsHandler.CountMessageAsync;
+
             // Handle commands
             _shardedClient.MessageCreated += _commandHandler.HandleCommandAsync;
 

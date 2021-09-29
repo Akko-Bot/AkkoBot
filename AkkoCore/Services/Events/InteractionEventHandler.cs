@@ -34,7 +34,7 @@ namespace AkkoCore.Services.Events
             _responseGenerator = responseGenerator;
 
             // Setup cleanup timer
-            // The timer is needed because this handler will register ALL interactions
+            // The timer is needed because this handler registers ALL interactions
             _cleanupTimer = new(_cleanupTime.TotalMilliseconds);
             _cleanupTimer.Elapsed += CleanupUserInteractions;
         }
@@ -42,7 +42,9 @@ namespace AkkoCore.Services.Events
         public async Task RegisterNewInteractionAsync(DiscordClient client, InteractionCreateEventArgs eventArgs)
         {
             var message = await eventArgs.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);   // wtf, Discord?
-            _userButtonPendingAction.TryAdd(message.Id, (eventArgs.Interaction.User.Id, DateTimeOffset.Now));
+
+            if (message.Author.Id == client.CurrentUser.Id) // Check if interaction is not from another bot
+                _userButtonPendingAction.TryAdd(message.Id, (eventArgs.Interaction.User.Id, DateTimeOffset.Now));
         }
 
         public async Task UpdateInteractionAsync(DiscordClient client, ComponentInteractionCreateEventArgs eventArgs)

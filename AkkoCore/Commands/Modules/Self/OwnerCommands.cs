@@ -3,6 +3,7 @@ using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
+using AkkoCore.Core.Abstractions;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Models.Serializable.EmbedParts;
@@ -35,6 +36,38 @@ namespace AkkoCore.Commands.Modules.Self
             _shardedClient = shardedClient;
             _utilitiesService = utilities;
             _localizer = localizer;
+        }
+
+        [Command("shutdown"), Aliases("die")]
+        [Description("cmd_shutdown")]
+        public async Task DieAsync(CommandContext context)
+        {
+            var embed = new SerializableDiscordEmbed()
+                .WithDescription("shutdown");
+
+            await context.RespondLocalizedAsync(embed);
+
+            // Clean-up
+            foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
+                await client.DisconnectAsync();
+
+            context.Services.GetRequiredService<IBotLifetime>().Shutdown();
+        }
+
+        [Command("restart")]
+        [Description("cmd_restart")]
+        public async Task RestartAsync(CommandContext context)
+        {
+            var embed = new SerializableDiscordEmbed()
+                .WithDescription("restart");
+
+            await context.RespondLocalizedAsync(embed);
+
+            // Clean-up
+            foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
+                await client.DisconnectAsync();
+
+            context.Services.GetRequiredService<IBotLifetime>().Restart();
         }
 
         [Command("senddirectmessage"), Aliases("senddm")]

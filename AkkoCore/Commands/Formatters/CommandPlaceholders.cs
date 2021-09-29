@@ -61,7 +61,7 @@ namespace AkkoCore.Commands.Formatters
             ["channel.category"] = (context) => context.Channel.Parent?.Name,
             ["channel.position"] = (context) => context.Channel.Position,
             ["channel.slowmode"] = (context) => context.Channel.PerUserRateLimit ?? default,
-            ["channel.visibleto"] = (context) => context.Channel.Users.Count(),
+            ["channel.visibleto"] = (context) => context.Channel.Users.Count,
 
             /* User Placeholders */
 

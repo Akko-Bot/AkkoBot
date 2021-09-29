@@ -226,6 +226,8 @@ cmd_cooldown_add: Sets the cooldown for a command. Use it in direct message with
 cmd_cooldown_list: Lists all active cooldowns on this server. Use it in direct message with the bot to list global cooldowns.
 cmd_cooldown_remove: Removes the cooldown from a command. Use it in direct message with the bot to remove a global cooldown.
 cmd_createcategorychannel: Creates a category.
+cmd_createprivatethread: Creates a private thread on the current channel with the specified name. Only works for servers with boost level 2 or higher.
+cmd_createpublicthread: Creates a public thread on the current channel with the specified name.
 cmd_createrole: Creates a Discord role.
 cmd_createtextchannel: Creates a text channel.
 cmd_createvoicechannel: Creates a voice channel.
@@ -329,6 +331,7 @@ cmd_override_list: Lists the permission overrides in this server or the global o
 cmd_override_permission: Sets the permissions required for the specified command.
 cmd_override_role: Toggles command usage for the specified role.
 cmd_override_user: Toggles command usage for the specified user.
+cmd_ping: Shows the websocket latency of this bot.
 cmd_playingstatus: Groups commands to manage the bot's playing status.
 cmd_poll: Groups commands for managing polls.
 cmd_poll_forcestop: Forces a poll to stop. Use this if you have accidentally deleted a poll and can't close it anymore.
@@ -363,6 +366,7 @@ cmd_repeat_here: Creates a repeater in the current channel. Specifying a time in
 cmd_repeat_info: Shows detailed information about the repeater with the specified ID.
 cmd_repeat_list: Lists all repeaters in this server.
 cmd_repeat_remove: Removes the repeater with the specified ID.
+cmd_restart: Restarts the bot.
 cmd_rolecolor: Sets the color of a role. Provide no color to see the current color of the specified role.
 cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_roleid: Shows the ID of the specified role.
@@ -382,7 +386,10 @@ cmd_setnickname: Sets the nickname of a user. Provide no user to set the bot's n
 cmd_setrole: Adds a role to the specified user.
 cmd_setstatus: Sets a static status for the bot. Available types are __Playing__, __Watching__, __Listening__ and __Competing__. Provide a URL to set up a __Streaming__ status. Provide no parameter to remove it.
 cmd_settopic: Sets the topic for the current text channel.
+cmd_shardstats: Shows the amount of servers being serviced by each shard.
+cmd_shutdown: Shuts the bot down.
 cmd_slowmode: Sets how frequently users are allowed to send messages in this text channel. Provide no parameter to disable.
+cmd_stats: Shows some statistics about the bot.
 cmd_sudo: Executes a command as the specified user.
 cmd_tag: Groups commands for managing tags. Tags are customized responses sent by the bot when a user types its trigger. Tags are specific to the servers they are created in, except when they are created in direct message with the bot. Creating global tags requires bot ownership.
 cmd_tag_add: Creates a tag with the specified trigger and response.
@@ -426,6 +433,7 @@ command_check_failed: The user does not have enough permissions to execute this 
 command_modules_footer: Use {0} to see the usage for a specific command.
 command_not_found: Command not found.
 commands: Commands
+commands_executed: Commands Executed
 connected_users: Connected Users
 contains: Contains
 cooldown: Cooldown
@@ -490,6 +498,7 @@ fw_stickers_notification: Stickers are not allowed in this server.
 fw_toggle: The word filter has been {0} on this server.
 fw_warn: Automatic warnings for filtered messages has been {0}.
 fw_warn_footer: This incident has been counted towards your infraction list.
+gateway: Gateway
 gcmd_error: The command {0} could not be found.
 gcmd_toggle: The command {0} has been successfully {1}.
 gmod_error: The module {0} could not be found.
@@ -602,6 +611,7 @@ log_voicestate_moved: '{0} has moved from the {1} to the {2} voice channel.'
 low: Low
 medium: Medium
 members: Members
+memory: Memory
 message: Message
 messages: Messages
 minutes: Minutes
@@ -636,6 +646,7 @@ override_role_remove: The command {0} is not restricted to the role {1} anymore.
 override_user_add: The command {0} is now restricted to the user {1}.
 override_user_remove: The command {0} is not restricted to the user {1} anymore.
 owner: Owner
+owner_ids: Owner IDs
 owners: Owners
 pages: Page {0}/{1}
 perm_access_channels: View Channels
@@ -689,6 +700,7 @@ poll_list_title: Server Polls
 poll_not_found: Poll not found.
 poll_title: '{0} created a poll'
 position: Position
+presence: Presence
 private: Private
 prune_error: There are no messages to be deleted or you're trying to delete messages older than 14 days.
 pstatus_error: There are no rotating statuses set up.
@@ -733,6 +745,7 @@ search_result_empty: No command with the term {0} was found.
 seconds: Seconds
 server: Server
 server_timezone: Time zone on this server is {0}.
+servers: Servers
 settings: Settings
 shutdown: Shutting down.
 slowmode: Slowmode
@@ -818,6 +831,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-
-cmd_createpublicthread: Creates a public thread on the current channel with the specified name.
-cmd_createprivatethread: Creates a private thread on the current channel with the specified name. Only works for servers with boost level 2 or higher.

@@ -226,6 +226,8 @@ cmd_cooldown_add: Define o cooldown para um comando. Use em mensagem direta com 
 cmd_cooldown_list: Lista todos os cooldowns ativos nesse servidor. Use em mensagem direta com o bot para listar os cooldowns globais.
 cmd_cooldown_remove: Remove o cooldown de um comando. Use em mensagem direta com o bot para remover um cooldown global.
 cmd_createcategorychannel: Cria uma categoria.
+cmd_createprivatethread: Cria uma thread privada no canal atual com o nome especificado. Funciona apenas em servidores com boost nível 2 ou maior.
+cmd_createpublicthread: Cria uma thread pública no canal atual com o nome especificado.
 cmd_createrole: Cria um cargo do Discord.
 cmd_createtextchannel: Cria um canal de texto.
 cmd_createvoicechannel: Cria um canal de voz.
@@ -329,6 +331,7 @@ cmd_override_list: Exibe as permissões personalizadas desse servidor, ou as per
 cmd_override_permission: Define as permissões necessárias para o comando especificado.
 cmd_override_role: Ativa ou desativa exclusividade de uso do comando para o cargo especificado.
 cmd_override_user: Ativa ou desativa exclusividade de uso do comando para o usuário especificado.
+cmd_ping: Exibe a latência de websocket do bot.
 cmd_playingstatus: Agrupa comands para gerenciar o status do bot.
 cmd_poll: Agrupa comandos para gerenciar enquetes.
 cmd_poll_forcestop: Força uma enquete a encerrar. Use esse comando se você acidentalmente excluir uma enquete e não puder encerrá-la.
@@ -363,6 +366,7 @@ cmd_repeat_here: Cria um repetidor no canal atual. Especifique um intervalo de t
 cmd_repeat_info: Exibe informação detalhada sobre o repetidor com o ID especificado.
 cmd_repeat_list: Exibe todos os repetidores desse servidor.
 cmd_repeat_remove: Remove o repetidor com o ID especificado.
+cmd_restart: Reinicia o bot.
 cmd_rolecolor: Define a cor de um cargo. Forneça nenhuma cor para exibir a cor atual do cargo especificado.
 cmd_rolehoist: Alterna a exibição do cargo especificado na barra lateral do servidor.
 cmd_roleid: Exibe od ID do cargo especificado.
@@ -382,7 +386,10 @@ cmd_setnickname: Define o apelido de um usuário. Forneça nenhum usuário para 
 cmd_setrole: Adiciona um cargo ao usuário especificado.
 cmd_setstatus: Define um status estático para o bot. Os tipos disponíveis são __Playing__, __Watching__, __Listening__ e __Competing__. Forneça uma URL para definir um status do tipo __Streaming__. Forneça nenhum parâmetro para remover o status estático atual.
 cmd_settopic: Define o tópico do canal de texto atual.
+cmd_shardstats: Exibe a quantidade de servidores servidos por cada shard.
+cmd_shutdown: Desliga o bot.
 cmd_slowmode: Define com que frequência usuários podem enviar mensagens nesse canal de texto. Forneça nenhum parâmetro para desabilitar.
+cmd_stats: Exibe estatísticas sobre o bot.
 cmd_sudo: Executa um comando como se fosse o usuário especificado.
 cmd_tag: Agrupa comands para gerenciar tags. Tags são respostas personalizadas enviadas pelo bot quando um usuário digita seu gatilho. Tags são específicas aos servidores onde são criadas, exceto quando criadas em mensagem direta com o bot. Criar tags globais requer autoria do bot.
 cmd_tag_add: Cria uma tag com o gatilho e resposta especificados.
@@ -426,6 +433,7 @@ command_check_failed: O usuário não possui permissões suficientes para execut
 command_modules_footer: Utilize {0} para visualizar o uso de um comando específico.
 command_not_found: Comando não encontrado.
 commands: Comandos
+commands_executed: Comandos Executados
 connected_users: Usuários Conectados
 contains: Contém
 cooldown: Cooldown
@@ -490,6 +498,7 @@ fw_stickers_notification: Figurinhas não são permitidas nesse servidor.
 fw_toggle: O filtro de palavras foi {0} nesse servidor.
 fw_warn: A advertência automática para mensagens filtradas foi {0}.
 fw_warn_footer: Esse incidente foi registrado na sua lista de infrações.
+gateway: Gateway
 gcmd_error: O comando {0} não foi encontrado.
 gcmd_toggle: O comando {0} foi {1} com sucesso.
 gmod_error: O módulo {0} não foi encontrado.
@@ -602,6 +611,7 @@ log_voicestate_moved: '{0} moveu-se do canal de voz {1} para o canal {2}.'
 low: Baixo
 medium: Médio
 members: Membros
+memory: Memória
 message: Mensagem
 messages: Mensagens
 minutes: Minutos
@@ -636,6 +646,7 @@ override_role_remove: O comando {0} não está mais restrito ao cargo {1}.
 override_user_add: O comando {0} está agora restrito ao usuário {1}.
 override_user_remove: O comando {0} não está mais restrito ao usuário {1}.
 owner: Dono
+owner_ids: IDs dos Donos
 owners: Donos
 pages: Página {0}/{1}
 perm_access_channels: Visualizar Canais
@@ -689,6 +700,7 @@ poll_list_title: Enquetes do Servidor
 poll_not_found: Enquete não encontrada.
 poll_title: '{0} criou uma enquete'
 position: Posição
+presence: Presença
 private: Privado
 prune_error: Não há mensagens a serem excluídas ou você está tentando excluir mensagens criadas há mais de 14 dias.
 pstatus_error: Não há status de rotação definido.
@@ -733,6 +745,7 @@ search_result_empty: Nenhum comando com o termo {0} foi encontrado.
 seconds: Segundos
 server: Servidor
 server_timezone: O fuso horário desse servidor é {0}.
+servers: Servidores
 settings: Configuração
 shutdown: Desligando.
 slowmode: Modo Lento
@@ -818,6 +831,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-
-cmd_createpublicthread: Cria uma thread pública no canal atual com o nome especificado.
-cmd_createprivatethread: Cria uma thread privada no canal atual com o nome especificado. Funciona apenas em servidores com boost nível 2 ou maior.

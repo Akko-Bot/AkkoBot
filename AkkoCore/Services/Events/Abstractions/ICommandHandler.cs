@@ -12,6 +12,11 @@ namespace AkkoCore.Services.Events.Abstractions
     public interface ICommandHandler
     {
         /// <summary>
+        /// Counts how many commands have been run since startup.
+        /// </summary>
+        uint CommandsRan { get; }
+
+        /// <summary>
         /// Checks the permissions for a given command context and executes it if the permissions allow it.
         /// </summary>
         /// <param name="context">The command context.</param>

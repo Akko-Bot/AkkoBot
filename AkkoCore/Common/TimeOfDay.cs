@@ -46,7 +46,7 @@ namespace AkkoCore.Common
                 result = future.Subtract(DateTimeOffset.Now);
             }
 
-            return result <= TimeSpan.Zero
+            return (result <= TimeSpan.Zero)
                 ? result.Add(TimeSpan.FromDays(1))
                 : result;
         }

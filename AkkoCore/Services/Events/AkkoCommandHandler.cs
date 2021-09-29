@@ -25,6 +25,8 @@ namespace AkkoCore.Services.Events
         private readonly IPrefixResolver _prefixResolver;
         private readonly BotConfig _botConfig;
 
+        public uint CommandsRan { get; private set; } = 0;
+
         public AkkoCommandHandler(IDbCache dbCache, IPrefixResolver prefixResolver, BotConfig botConfig)
         {
             _dbCache = dbCache;
@@ -48,6 +50,9 @@ namespace AkkoCore.Services.Events
             var context = cmdHandler.CreateContext(eventArgs.Message, eventArgs.Message.Content[..prefixPos], command, args);
 
             eventArgs.Handled = CheckAndExecuteAsync(context) is not null;
+
+            if (eventArgs.Handled)
+                CommandsRan++;
         }
 
         public Task HandleCommandAliasAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
@@ -94,6 +99,7 @@ namespace AkkoCore.Services.Events
             {
                 var context = cmdHandler.CreateContext(eventArgs.Message, prefix, cmd, args);
                 _ = CheckAndExecuteAsync(context);
+                CommandsRan++;
             }
 
             return Task.CompletedTask;
