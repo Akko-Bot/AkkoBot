@@ -64,7 +64,7 @@ namespace AkkoCore.Commands.Formatters
                         context.FormatLocalized("help_default_explanation_description4", Formatter.InlineCode($"{context.Prefix}help <{name}>")) + "\n" +
                         context.FormatLocalized("help_default_explanation_description5", Formatter.InlineCode($"{context.Prefix}search <{name}>"))
                     )
-                    .AddField("help_default_commandlist_title", "url")
+                    .AddField("help_default_commandlist_title", AkkoConstants.CommandListUrl)
                     .AddField("help_default_support_title", AkkoConstants.RepositoryUrl);
 
                 return new SerializableDiscordMessage(defaultHelp);

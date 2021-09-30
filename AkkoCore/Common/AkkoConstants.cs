@@ -59,5 +59,10 @@ namespace AkkoCore.Common
         /// Represents the URL to the project's repository.
         /// </summary>
         public const string RepositoryUrl = "https://github.com/Kaoticz/AkkoBot";
+
+        /// <summary>
+        /// Represents the URL to the command list in the project's wiki.
+        /// </summary>
+        public const string CommandListUrl = "https://github.com/Kaoticz/AkkoBot/wiki/Command-List";
     }
 }

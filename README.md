@@ -33,10 +33,10 @@ After you [invite Akko to your server][AkkoInvite], you should [setup the permis
 And that's it. You're set.
 
 ## More
-Want to learn about all the features? Check the full [command list][CommandList].
-Want to host your own Akko instance? Check the [installation guide][InstallationGuide].
-Do you have more questions? Check the project's [wiki][GithubWiki].
-Couldn't find what you're looking for? Ask in our [support server][SupportServer].
+- Want to learn about all the features? Check the full [command list][CommandList].
+- Want to host your own Akko instance? Check the [installation guide][InstallationGuide].
+- Do you have more questions? Check the project's [wiki][GithubWiki].
+- Couldn't find what you're looking for? Ask in our [support server][SupportServer].
 
 ## Buy me a Coffee
 - [Ko-fi]
@@ -59,9 +59,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 [AkkoInvite]: https://discord.com/api/oauth2/authorize?client_id=893158413402505299&permissions=274877909056&scope=applications.commands%20bot
-[CommandList]: https://www.google.com/
-[InstallationGuide]: https://www.google.com/
-[GithubWiki]: https://www.google.com/
-[SupportServer]: https://www.google.com/
+[CommandList]: https://github.com/Kaoticz/AkkoBot/wiki/Command-List
+[InstallationGuide]: https://github.com/Kaoticz/AkkoBot/wiki/Installation-Guide
+[GithubWiki]: https://github.com/Kaoticz/AkkoBot/wiki
+[SupportServer]: https://discord.gg/hsgWVZNARD
 [Role101]: https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101
 [Ko-fi]: https://ko-fi.com/kaoticz

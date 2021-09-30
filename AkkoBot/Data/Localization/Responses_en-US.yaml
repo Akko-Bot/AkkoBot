@@ -71,8 +71,8 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
-arg_permission: A Discord [permission](https://www.google.com/), wrapped around quotation marks.
-arg_permissions: Discord [permissions](https://www.google.com/), wrapped around quotation marks and separated by space.
+arg_permission: A Discord [permission](https://github.com/Kaoticz/AkkoBot/wiki/Permissions), wrapped around quotation marks.
+arg_permissions: Discord [permissions](https://github.com/Kaoticz/AkkoBot/wiki/Permissions), wrapped around quotation marks and separated by space.
 arg_poll_id: ID of the poll.
 arg_poll_qanswer: The question and the answers, separated by a semicolon `;`.
 arg_poll_question: A question.
