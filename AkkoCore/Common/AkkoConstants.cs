@@ -54,5 +54,10 @@ namespace AkkoCore.Common
         /// Represents the first part of a Discord guild invite link.
         /// </summary>
         public const string DiscordInviteLinkBase = "https://discord.gg/";
+
+        /// <summary>
+        /// Represents the URL to the project's repository.
+        /// </summary>
+        public const string RepositoryUrl = "https://github.com/Kaoticz/AkkoBot";
     }
 }

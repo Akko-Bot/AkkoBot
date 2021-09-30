@@ -831,3 +831,13 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
+
+help_default_title: Para me convidar ao seu servidor, use esse link
+help_default_explanation_title: O que é isso?
+help_default_explanation_description1: Olá, meu nome é Atsuko Kagari! Sou um bot de Discord focado em moderação de servidores. Use os comandos abaixo para começar.
+help_default_explanation_description2: '{0} para checar os módulos disponíveis.'
+help_default_explanation_description3: '{0} para checar os comandos sob um módulo específico.'
+help_default_explanation_description4: '{0} para receber ajuda sobre um comando específico.'
+help_default_explanation_description5: '{0} para pesquisar por um comando específico.'
+help_default_commandlist_title: Lista de Comandos
+help_default_support_title: Suporte of Projeto

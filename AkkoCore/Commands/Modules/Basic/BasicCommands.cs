@@ -22,7 +22,6 @@ namespace AkkoCore.Commands.Modules.Basic
     {
         private const string _botAuthor = "Kotz#7922";
         private const string _botVersion = "1.0.0";
-        private const string _repositoryUrl = "https://github.com/Kaoticz/AkkoBot";
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
         private readonly Process _botProcess = Process.GetCurrentProcess();
         private double SecondsSinceStartup => DateTimeOffset.Now.Subtract(_startup).TotalSeconds;
@@ -59,7 +58,7 @@ namespace AkkoCore.Commands.Modules.Basic
             var elapsed = DateTimeOffset.Now.Subtract(_startup);
 
             var embed = new SerializableDiscordEmbed()
-                .WithAuthor("AkkoBot v" + _botVersion, _repositoryUrl, context.Client.CurrentUser.AvatarUrl ?? context.Client.CurrentUser.DefaultAvatarUrl)
+                .WithAuthor("AkkoBot v" + _botVersion, AkkoConstants.RepositoryUrl, context.Client.CurrentUser.AvatarUrl ?? context.Client.CurrentUser.DefaultAvatarUrl)
                 .AddField("author", _botAuthor, true)
                 .AddField("commands_executed", context.FormatLocalized("{0} ({1:0.00}/s)", _commandHandler.CommandsRan, _commandHandler.CommandsRan / this.SecondsSinceStartup), true)
                 .AddField("Shards", $"#{context.Client.ShardId}/{context.Client.ShardCount}", true) // Shards is not localized - this is intentional

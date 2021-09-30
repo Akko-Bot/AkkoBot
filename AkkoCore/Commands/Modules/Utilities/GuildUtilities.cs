@@ -73,10 +73,8 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task ChannelInfoAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
         {
             channel ??= context.Channel;
-
-            var settings = context.GetMessageSettings();
             var embed = _service.GetChannelInfo(new SerializableDiscordEmbed(), channel)
-                .WithFooter(context.FormatLocalized("{0}: {1}", "created_on", channel.CreationTimestamp.ToString("d", AkkoUtilities.GetCultureInfo(settings.Locale, true))));
+                .WithFooter(context.FormatLocalized("{0}: {1}", "created_on", channel.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime)));
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -86,7 +84,6 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task UserInfoAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
         {
             user ??= context.Member;
-            var settings = context.GetMessageSettings();
             var isMod = user.Hierarchy is int.MaxValue || user.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers));
 
             var embed = new SerializableDiscordEmbed()
@@ -97,8 +94,8 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .AddField("is_mod", (isMod) ? AkkoStatics.SuccessEmoji.Name : AkkoStatics.FailureEmoji.Name, true)
                 .AddField("roles", user.Roles.Count().ToString(), true)
                 .AddField("position", user.Hierarchy.ToString(), true)
-                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(AkkoUtilities.GetCultureInfo(settings.Locale, true)), true)
-                .AddField("joined_on", user.JoinedAt.DateTime.ToString(AkkoUtilities.GetCultureInfo(settings.Locale, true)), true);
+                .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime), true)
+                .AddField("joined_on", user.JoinedAt.ToDiscordTimestamp(TimestampFormat.ShortDateTime), true);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -106,12 +103,11 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Command("userinfo"), HiddenOverload]
         public async Task UserInfoAsync(CommandContext context, DiscordUser user)
         {
-            var settings = context.GetMessageSettings();
             var embed = new SerializableDiscordEmbed()
                 .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
                 .AddField("name", user.GetFullname(), true)
                 .AddField("id", user.Id.ToString(), true)
-                .AddField("created_on", user.CreationTimestamp.DateTime.ToString(AkkoUtilities.GetCultureInfo(settings.Locale, true)), false);
+                .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime), false);
 
             await context.RespondLocalizedAsync(embed, false);
         }
@@ -284,7 +280,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 return;
             }
 
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(log));
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(log));
             var message = new DiscordMessageBuilder()
                 .WithFile($"savechat_{channel.Name}_{DateTimeOffset.Now}.txt", stream);
 

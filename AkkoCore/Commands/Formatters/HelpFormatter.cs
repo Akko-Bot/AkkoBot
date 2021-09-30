@@ -1,5 +1,6 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
+using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
@@ -47,30 +48,39 @@ namespace AkkoCore.Commands.Formatters
             inputCommand ??= context.RawArguments as List<string>;
 
             // If no parameter, send the default help message
-            if (inputCommand.Count == 0)
+            if (inputCommand.Count is 0)
             {
                 // Default help message (no command)
-                this.WithSubcommands(
-                    context,
-                    context.CommandsNext.RegisteredCommands.Values
-                        .Where(cmd => !cmd.IsHidden)
-                        .Distinct()
-                );
+                var name = context.FormatLocalized("name").ToLowerInvariant();
+                
+                var defaultHelp = new SerializableDiscordEmbed()
+                    .WithTitle("help_default_title")
+                    .WithDescription($"<{context.Client.GetBotInvite()}>")
+                    .AddField(
+                        "help_default_explanation_title",
+                        context.FormatLocalized("help_default_explanation_description1") + "\n" +
+                        context.FormatLocalized("help_default_explanation_description2", Formatter.InlineCode($"{context.Prefix}modules")) + "\n" +
+                        context.FormatLocalized("help_default_explanation_description3", Formatter.InlineCode($"{context.Prefix}module <{name}>")) + "\n" +
+                        context.FormatLocalized("help_default_explanation_description4", Formatter.InlineCode($"{context.Prefix}help <{name}>")) + "\n" +
+                        context.FormatLocalized("help_default_explanation_description5", Formatter.InlineCode($"{context.Prefix}search <{name}>"))
+                    )
+                    .AddField("help_default_commandlist_title", "url")
+                    .AddField("help_default_support_title", AkkoConstants.RepositoryUrl);
+
+                return new SerializableDiscordMessage(defaultHelp);
             }
+
+            // Remove prefix from the command, if user typed it in
+            inputCommand[0] = inputCommand[0].Replace(context.Prefix, string.Empty);
+
+            var cmd = context.CommandsNext.FindCommand(string.Join(" ", inputCommand), out _);
+
+            if (cmd is null)
+                this.WithCmdNotFound(context);
+            else if (cmd is CommandGroup group)
+                this.WithCommand(context, cmd).WithSubcommands(context, group.Children);
             else
-            {
-                // Remove prefix from the command, if user typed it in
-                inputCommand[0] = inputCommand[0].Replace(context.Prefix, string.Empty);
-
-                var cmd = context.CommandsNext.FindCommand(string.Join(" ", inputCommand), out _);
-
-                if (cmd is null)
-                    this.WithCmdNotFound(context);
-                else if (cmd is CommandGroup group)
-                    this.WithCommand(context, cmd).WithSubcommands(context, group.Children);
-                else
-                    this.WithCommand(context, cmd);
-            }
+                this.WithCommand(context, cmd);
 
             return this.Build(context);
         }
