@@ -53,6 +53,7 @@ namespace AkkoCore.Models.Serializable
             Aliases = command.Aliases.ToList();
             Permissions = GetRequirements(localizer, command, locale);
             Arguments = GetArguments(localizer, command, locale);
+
             Subcommands = (command is CommandGroup group)
                 ? GetSubcommands(localizer, group, locale)
                 : new List<SerializableCommand>(0);
@@ -88,7 +89,7 @@ namespace AkkoCore.Models.Serializable
                     result.Add(localizer.GetResponseString(locale, "perm_require_dm"));
                 else
                 {
-                    foreach (var arg in att.ConstructorArguments.SelectMany(x => ((Permissions)x.Value).ToStrings().Skip(1)))
+                    foreach (var arg in att.ConstructorArguments.Where(x => x.Value is Permissions).SelectMany(x => ((Permissions)x.Value).ToStrings().Skip(1)))
                         result.Add(localizer.GetResponseString(locale, "perm_" + arg.ToSnakeCase()));
                 }
             }

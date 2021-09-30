@@ -3,6 +3,7 @@ using DSharpPlus;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using AkkoCore.Services.Events.Controllers.Abstractions;
 
 namespace AkkoCore.Config.Abstractions
 {
@@ -20,7 +21,7 @@ namespace AkkoCore.Config.Abstractions
         /// <summary>
         /// The type of the slash command module and the context they should run.
         /// </summary>
-        /// <remarks>The value is the ID fo the guild the commands should be available or <see langword="null"/> if they should be global.</remarks>
+        /// <remarks>The value is the ID of the guild the commands should be available to or <see langword="null"/> if the commands should be global.</remarks>
         IDictionary<Type, ulong?> SlashCommandsScope { get; }
 
         /// <summary>
@@ -36,9 +37,14 @@ namespace AkkoCore.Config.Abstractions
         void RegisterServices(IServiceCollection ioc);
 
         /// <summary>
-        /// Registers interactive responses from this cog.
+        /// Registers interactive controllers from this cog.
         /// </summary>
         /// <param name="responseGenerator">The generator to register the responses to.</param>
+        /// <remarks>
+        /// Use <see cref="IInteractionResponseManager.Add(ISlashController)"/> or
+        /// <see cref="IInteractionResponseManager.AddRange(IEnumerable{ISlashController})"/>
+        /// to add the interaction controllers defined in this cog.
+        /// </remarks>
         /// <exception cref="ArgumentException">Occurs when a two responses get registered under the same ID.</exception>
         public void RegisterComponentResponses(IInteractionResponseManager responseGenerator);
     }

@@ -7,6 +7,7 @@ namespace AkkoCore.Extensions
 {
     public static class DiscordClientExt
     {
+        private static readonly Permissions _basePermissions = Permissions.SendMessages | Permissions.AddReactions | Permissions.SendMessagesInThreads;
         private static readonly PropertyInfo _messageCacheProp = typeof(DiscordClient)
             .GetProperty("MessageCache", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -16,7 +17,7 @@ namespace AkkoCore.Extensions
         /// <param name="client">This Discord client.</param>
         /// <returns>The URL for inviting the bot.</returns>
         public static string GetBotInvite(this DiscordClient client)
-            => $"https://discord.com/api/oauth2/authorize?client_id={client.CurrentUser.Id}&permissions=0&scope=applications.commands%20bot";
+            => $"https://discord.com/api/oauth2/authorize?client_id={client.CurrentUser.Id}&permissions={(long)_basePermissions}&scope=applications.commands%20bot";
 
         /// <summary>
         /// Gets the message cache of this client.

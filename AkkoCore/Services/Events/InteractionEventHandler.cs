@@ -43,7 +43,7 @@ namespace AkkoCore.Services.Events
         {
             var message = await eventArgs.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);   // wtf, Discord?
 
-            if (message.Author.Id == client.CurrentUser.Id) // Check if interaction is not from another bot
+            if (message.Components.Count is not 0 && message.Author.Id == client.CurrentUser.Id) // Check if interaction is not from another bot
                 _userButtonPendingAction.TryAdd(message.Id, (eventArgs.Interaction.User.Id, DateTimeOffset.Now));
         }
 

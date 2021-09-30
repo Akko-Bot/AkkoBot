@@ -26,7 +26,7 @@ namespace AkkoCore.SlashCommands.Modules
 
         [SlashCommand("prefix", "Shows the prefix the bot responds to.")]
         [SlashRequireUserPermissions(Permissions.ManageGuild)]
-        public async Task CheckPrefixAsync(InteractionContext context, [RemainingText, Option("newPrefix", "The new prefix the bot should respond to.")] string prefix = null)
+        public async Task SlashPrefixAsync(InteractionContext context, [RemainingText, Option("newPrefix", "The new prefix the bot should respond to.")] string prefix = null)
         {
             if (prefix is null)
                 await CheckPrefixAsync(context);
@@ -40,12 +40,12 @@ namespace AkkoCore.SlashCommands.Modules
             var embed = new SerializableDiscordEmbed()
                 .WithDescription((isAllowed) ? context.FormatLocalized("guild_prefix_change", Formatter.InlineCode(prefix)) : "bot_owner_error");
 
-            if (context.Guild is null)
+            if (isAllowed && context.Guild is null)
                 _botService.GetOrSetProperty(x => x.Prefix = prefix);
-            else
+            else if (isAllowed)
                 await _guildService.SetPropertyAsync(context.Guild, x => x.Prefix = prefix);
 
-            await context.RespondLocalizedAsync(embed);
+            await context.RespondLocalizedAsync(embed, isError: !isAllowed);
         }
 
         private async Task CheckPrefixAsync(InteractionContext context)
