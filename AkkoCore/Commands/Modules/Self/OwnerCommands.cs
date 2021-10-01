@@ -121,7 +121,6 @@ namespace AkkoCore.Commands.Modules.Self
             var locale = context.GetMessageSettings().Locale;
             var result = context.CommandsNext.RegisteredCommands.Values
                 .Distinct()
-                .Where(x => !x.CustomAttributes.Any(y => y.GetType() == typeof(HiddenOverloadAttribute)))
                 .Select(x => new SerializableCommand(_localizer, x, locale))
                 .OrderBy(x => x.Name)
                 .ToArray();
