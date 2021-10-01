@@ -90,7 +90,7 @@ namespace AkkoCore.Commands.Modules.Basic
         {
             var list = _shardedClient.ShardClients.Values
                 .OrderBy(x => x.ShardId)
-                .Select(x => Formatter.InlineCode($" #{x.ShardId, -3}| {x.Guilds.Count, -4}"));
+                .Select(x => Formatter.InlineCode($" #{x.ShardId,-3}| {x.Guilds.Count,-4}"));
 
             var embed = new SerializableDiscordEmbed()
                 .WithAuthor($"Shard | {context.FormatLocalized("servers")}");

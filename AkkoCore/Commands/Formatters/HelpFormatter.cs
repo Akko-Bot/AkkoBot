@@ -52,7 +52,7 @@ namespace AkkoCore.Commands.Formatters
             {
                 // Default help message (no command)
                 var name = context.FormatLocalized("name").ToLowerInvariant();
-                
+
                 var defaultHelp = new SerializableDiscordEmbed()
                     .WithTitle("help_default_title")
                     .WithDescription($"<{context.Client.GetBotInvite()}>")

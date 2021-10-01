@@ -16,12 +16,13 @@ Features include, but are not limited to:
 	- Anti-alt filter (keep alt accounts out of your server)
 - Filtering
 	- Invite filter (automatically deletes any message that contains a server invite)
-	- Word filter (with support for wildcard `*`)
+	- Word filter (automatically deletes any message that contains blacklisted words)
 	- Content filter (create channels that only accept messages with pictures, URLs, attachments, invites, or stickers in any combination you want)
 - Utilities
 	- Create polls for your community to vote on
 	- Create reminders for yourself or your community
 	- Create tags for your community to use (predefined messages that are triggered by specific keywords)
+	- Create voice roles (roles that are automatically assigned to users when they join a voice channel)
 	- Commands to quickly interface with Discord (so you don't have to access Discord's UI to do stuff)
 
 ## Getting Started

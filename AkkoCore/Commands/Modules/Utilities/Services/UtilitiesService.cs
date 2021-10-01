@@ -248,7 +248,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                     embed.AddField("category", channel.Parent?.Name ?? "-", true)
                         .AddField("bitrate", $"{channel.Bitrate / 1000} kbps", true)
                         .AddField("user_limit", channel.UserLimit.ToString(), true)
-                        .AddField("connected_users", channel.Users.Count().ToString(), true);
+                        .AddField("connected_users", channel.Users.Count.ToString(), true);
                     break;
 
                 case ChannelType.Category:
@@ -260,7 +260,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                         .AddField("category", channel.Parent?.Name ?? "-", true)
                         .AddField("nsfw", (channel.IsNSFW) ? AkkoStatics.SuccessEmoji.Name : AkkoStatics.FailureEmoji.Name, true)
                         .AddField("slowmode", channel.PerUserRateLimit?.ToString() ?? "-", true)
-                        .AddField("visible_to", channel.Users.Count().ToString(), true);
+                        .AddField("visible_to", channel.Users.Count.ToString(), true);
                     break;
             }
 

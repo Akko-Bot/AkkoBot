@@ -530,6 +530,15 @@ guild_timezone_error: Esse fuso horário não está disponível. Utilize {0} par
 hackban_title: Usuário Preventivamente Banido
 help_cant_dm: Eu não tenho permissão para Enviar Mensagens e Adicionar Reações no servidor {0}.
 help_cmd_not_found: Comando não encontrado. Utilize {0} e/ou {1} para encontrar o comando que você procura.
+help_default_commandlist_title: Lista de Comandos
+help_default_explanation_description1: Olá, meu nome é Atsuko Kagari! Sou um bot do Discord focado em moderação de servidores. Use os comandos abaixo para começar.
+help_default_explanation_description2: '{0} para checar os módulos disponíveis.'
+help_default_explanation_description3: '{0} para checar os comandos sob um módulo específico.'
+help_default_explanation_description4: '{0} para receber ajuda sobre um comando específico.'
+help_default_explanation_description5: '{0} para pesquisar por um comando específico.'
+help_default_explanation_title: O que é isso?
+help_default_support_title: Suporte o Projeto
+help_default_title: Para me convidar ao seu servidor, use esse link
 help_footer: Utilize {0} para receber ajuda sobre um comando específico.
 help_optional: Opcional
 high: Alto
@@ -831,13 +840,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-
-help_default_title: Para me convidar ao seu servidor, use esse link
-help_default_explanation_title: O que é isso?
-help_default_explanation_description1: Olá, meu nome é Atsuko Kagari! Sou um bot do Discord focado em moderação de servidores. Use os comandos abaixo para começar.
-help_default_explanation_description2: '{0} para checar os módulos disponíveis.'
-help_default_explanation_description3: '{0} para checar os comandos sob um módulo específico.'
-help_default_explanation_description4: '{0} para receber ajuda sobre um comando específico.'
-help_default_explanation_description5: '{0} para pesquisar por um comando específico.'
-help_default_commandlist_title: Lista de Comandos
-help_default_support_title: Suporte o Projeto

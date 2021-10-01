@@ -1,9 +1,9 @@
 ﻿using AkkoCore.Services.Events.Abstractions;
+using AkkoCore.Services.Events.Controllers.Abstractions;
 using DSharpPlus;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using AkkoCore.Services.Events.Controllers.Abstractions;
 
 namespace AkkoCore.Config.Abstractions
 {

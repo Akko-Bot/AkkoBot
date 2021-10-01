@@ -530,6 +530,15 @@ guild_timezone_error: This time zone is not available. Use {0} to see the list o
 hackban_title: User Hackbanned
 help_cant_dm: I don't have permission to Send Messages and Add Reactions in the {0} server.
 help_cmd_not_found: Command not found. Use {0} and/or {1} to find the command you're looking for.
+help_default_commandlist_title: List of Commands
+help_default_explanation_description1: Hello, my name is Atsuko Kagari! I'm a Discord bot focused on server moderation. Use the commands below to get started.
+help_default_explanation_description2: '{0} to check the modules that are available.'
+help_default_explanation_description3: '{0} to check the commands under a specific module.'
+help_default_explanation_description4: '{0} to get help for a specific command.'
+help_default_explanation_description5: '{0} to search for a specific command.'
+help_default_explanation_title: What is this?
+help_default_support_title: Support the Project
+help_default_title: To invite me to your server, use this link
 help_footer: Use {0} to get help for a specific command.
 help_optional: Optional
 high: High
@@ -831,13 +840,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-
-help_default_title: To invite me to your server, use this link
-help_default_explanation_title: What is this?
-help_default_explanation_description1: Hello, my name is Atsuko Kagari! I'm a Discord bot focused on server moderation. Use the commands below to get started.
-help_default_explanation_description2: '{0} to check the modules that are available.'
-help_default_explanation_description3: '{0} to check the commands under a specific module.'
-help_default_explanation_description4: '{0} to get help for a specific command.'
-help_default_explanation_description5: '{0} to search for a specific command.'
-help_default_commandlist_title: List of Commands
-help_default_support_title: Support the Project
