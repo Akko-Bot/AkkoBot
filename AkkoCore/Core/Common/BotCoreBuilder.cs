@@ -23,6 +23,7 @@ using AkkoCore.Services.Timers;
 using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
@@ -33,6 +34,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -304,6 +306,8 @@ namespace AkkoCore.Core.Common
         /// Builds a <see cref="BotCore"/> from the provided settings passed to this builder.
         /// </summary>
         /// <returns>A <see cref="BotCore"/>.</returns>
+        /// <exception cref="FileNotFoundException">Occurs when no localization file is found.</exception>
+        /// <exception cref="UnauthorizedException">Occurs when the bot token is invalid.</exception>
         public async Task<BotCore> BuildDefaultAsync()
         {
             return await BuildAsync(
@@ -321,6 +325,8 @@ namespace AkkoCore.Core.Common
         /// <param name="withDms">Sets whether the bot responds to commands in direct messages.</param>
         /// <param name="withMentionPrefix">Sets whether the bot accepts a mention to itself as a command prefix.</param>
         /// <returns>A <see cref="BotCore"/>.</returns>
+        /// <exception cref="FileNotFoundException">Occurs when no localization file is found.</exception>
+        /// <exception cref="UnauthorizedException">Occurs when the bot token is invalid.</exception>
         public async Task<BotCore> BuildAsync(double? timeout = null, bool isCaseSensitive = false, bool withDms = true, bool withMentionPrefix = true)
         {
             var shardedClient = await GetBotClientAsync(timeout);   // Initialize the sharded clients

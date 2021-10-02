@@ -76,30 +76,26 @@ namespace AkkoCore.Core
             }
             catch (NpgsqlException ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-
-                Console.WriteLine(
+                PrintError(
                     "An error has occurred while attempting to establish a connection with the database. " +
                     "Make sure your credentials are correct and that you don't have " +
                     "a firewall or any external software blocking the connection." + Environment.NewLine +
-                    ex.Message
+                    ex.Message + Environment.NewLine
                 );
 
-                Console.ResetColor();
-                Console.WriteLine(Environment.NewLine + "Press Enter to exit.");
-
+                Console.WriteLine("Press Enter to exit.");
                 Console.ReadLine();
             }
             catch (Exception ex)
             {
-                _botCore.BotShardedClient.Logger.LogError(
-                    new EventId(LoggerEvents.ConnectionFailure.Id, "Startup"),
+                PrintError(
                     @"An error has occurred while attempting to connect to Discord. " +
                     @"Make sure your credentials are correct and that you don't have " +
-                    $"a firewall or any external software blocking the connection. [{ex.Message}]\n\n" +
-                    @"Press Enter to exit."
+                    $"a firewall or any external software blocking the connection. Error message:" + Environment.NewLine +
+                    ex.Message + Environment.NewLine
                 );
 
+                Console.WriteLine("Press Enter to exit.");
                 Console.ReadLine();
             }
 
@@ -114,6 +110,17 @@ namespace AkkoCore.Core
             _botCore = null;
 
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Prints the specified text to the console in red.
+        /// </summary>
+        /// <param name="text">The text to be printed.</param>
+        private void PrintError(string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(text);
+            Console.ResetColor();
         }
     }
 }
