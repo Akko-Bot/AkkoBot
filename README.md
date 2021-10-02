@@ -63,6 +63,6 @@ limitations under the License.
 [CommandList]: https://github.com/Kaoticz/AkkoBot/wiki/Command-List
 [InstallationGuide]: https://github.com/Kaoticz/AkkoBot/wiki/Installation-Guide
 [GithubWiki]: https://github.com/Kaoticz/AkkoBot/wiki
-[SupportServer]: https://discord.gg/hsgWVZNARD
+[SupportServer]: https://discord.gg/dETvNP5Hyh
 [Role101]: https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101
 [Ko-fi]: https://ko-fi.com/kaoticz
