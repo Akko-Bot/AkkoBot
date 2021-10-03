@@ -11,6 +11,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,12 +24,14 @@ namespace AkkoCore.Commands.Modules.Administration
     [RequireUserPermissions(Permissions.ManageGuild)]
     public class GuildLogging : AkkoCommandModule
     {
+        private readonly GuildConfigService _guilldService;
         private readonly GuildLogService _service;
         private readonly UtilitiesService _utilities;
         private readonly DiscordWebhookClient _webhookClient;
 
-        public GuildLogging(GuildLogService service, UtilitiesService utilities, DiscordWebhookClient webhookClient)
+        public GuildLogging(GuildConfigService guilldService, GuildLogService service, UtilitiesService utilities, DiscordWebhookClient webhookClient)
         {
+            _guilldService = guilldService;
             _service = service;
             _utilities = utilities;
             _webhookClient = webhookClient;
@@ -103,6 +106,17 @@ namespace AkkoCore.Commands.Modules.Administration
             await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
         }
 
+        [Command("ignore")]
+        [Description("cmd_log_ignore")]
+        public async Task IgnoreChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+        {
+            var result = await _guilldService.SetPropertyAsync(context.Guild, x => ToggleElement(x.GuildLogBlacklist, (long)channel.Id));
+            var embed = new SerializableDiscordEmbed()
+                .WithDescription(context.FormatLocalized((result) ? "log_ignore_add" : "log_ignore_remove", channel.Mention));
+
+            await context.RespondLocalizedAsync(embed);
+        }
+
         [Command("list"), Aliases("show")]
         [Description("cmd_log_list")]
         public async Task ListGuildLogsAsync(CommandContext context)
@@ -134,6 +148,25 @@ namespace AkkoCore.Commands.Modules.Administration
             return (guildLog is null || !guildLog.IsActive || !server.Channels.TryGetValue(guildLog.ChannelId, out var channel))
                 ? null
                 : channel.Mention;
+        }
+
+        /// <summary>
+        /// Adds or removes an element from the specified collection.
+        /// </summary>
+        /// <typeparam name="T">The type of the data.</typeparam>
+        /// <param name="collection">The collection.</param>
+        /// <param name="element">The element to be added or removed.</param>
+        /// <returns><see langword="true"/> if the element got added, <see langword="false"/> otherwise.</returns>
+        private bool ToggleElement<T>(IList<T> collection, T element)
+        {
+            var result = collection.Contains(element);
+
+            if (result)
+                collection.Remove(element);
+            else
+                collection.Add(element);
+
+            return !result;
         }
     }
 }

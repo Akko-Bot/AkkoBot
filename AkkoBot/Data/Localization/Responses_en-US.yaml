@@ -314,6 +314,7 @@ cmd_liststatus: Lists all rotating statuses and their corresponding ID.
 cmd_lockchannel: Locks the current channel so users can't send messages to it. Users with permission to Kick Members, Ban Members or Manage Channels are immune.
 cmd_log: Groups commands for managing guild logs. Log events are restricted to one channel at a time.
 cmd_log_edit: Edits the webhook that sends logs to the specified channel.
+cmd_log_ignore: Adds or removes the specified channel to the list of ignored channels.
 cmd_log_list: Lists the available log events and the channel they are currently active on.
 cmd_log_start: Starts logging on the specified channel. Use `log list` to see the list of events available for logging. Provide no channel to output the logs in the current channel.
 cmd_log_stop: Stops logging of the specified log event.
@@ -597,6 +598,8 @@ log_emoji_deleted: Emoji {0} has been removed.
 log_emoji_edited: Emoji {0} has been changed to {1}.
 log_emoji_edited_simple: Emoji {0} has been modified.
 log_emoji_title: Emoji updated
+log_ignore_add: Added {0} to the ignored list.
+log_ignore_remove: Removed {0} from the ignored list.
 log_invite_created_title: Invite created
 log_invite_deleted_title: Invite deleted
 log_joiningmember_title: User has joined
