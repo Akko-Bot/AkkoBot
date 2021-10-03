@@ -66,10 +66,10 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             var anyChannelLog = guildLogs.FirstOrDefault(x => x.ChannelId == channel.Id);
 
             var webhook = (anyChannelLog is null)
-                ? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName)
+                ? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar)
                 : _webhookClient.GetRegisteredWebhook(anyChannelLog.WebhookId)
-                    ?? await context.Client.GetWebhookAsync(anyChannelLog.WebhookId)
-                    ?? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName);
+                    ?? await context.Client.GetWebhookSafelyAsync(anyChannelLog.WebhookId)
+                    ?? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar);
 
             var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType)
                 ?? new()

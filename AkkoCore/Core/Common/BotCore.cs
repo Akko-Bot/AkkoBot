@@ -84,6 +84,10 @@ namespace AkkoCore.Core.Common
         public void Dispose()
         {
             // Dispose singletons
+            var discordEvents = CommandExt[0].Services.GetService<IDiscordEventManager>();
+            discordEvents?.UnregisterStartupEvents();
+            discordEvents?.UnregisterDefaultEvents();
+
             CommandExt[0].Services.GetService<ILocalizer>()?.Dispose();
             CommandExt[0].Services.GetService<ILoggerFactory>()?.Dispose();
             CommandExt[0].Services.GetService<IAkkoLoggerProvider>()?.Dispose();

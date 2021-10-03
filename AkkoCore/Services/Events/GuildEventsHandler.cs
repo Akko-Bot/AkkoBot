@@ -346,7 +346,7 @@ namespace AkkoCore.Services.Events
 
         public async Task DeleteCommandOnMessageAsync(CommandsNextExtension _, CommandExecutionEventArgs eventArgs)
         {
-            if (eventArgs.Context.Guild is null)
+            if (eventArgs.Context.Guild is null || _dbCache.IsDisposed)
                 return;
 
             _dbCache.Guilds.TryGetValue(eventArgs.Context.Guild.Id, out var dbGuild);

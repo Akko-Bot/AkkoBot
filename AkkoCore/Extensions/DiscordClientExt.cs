@@ -41,7 +41,19 @@ namespace AkkoCore.Extensions
         public static async Task<DiscordUser> GetUserSafelyAsync(this DiscordClient client, ulong uid)
         {
             try { return await client.GetUserAsync(uid); }
-            catch { return null; }
+            catch { return default; }
+        }
+
+        /// <summary>
+        /// Safely gets the webhook with the specified ID.
+        /// </summary>
+        /// <param name="client">This Discord client.</param>
+        /// <param name="id">The webhook ID.</param>
+        /// <returns>The webhook with the specified ID, <see langword="null"/> if the webhook does not exist.</returns>
+        public static async Task<DiscordWebhook> GetWebhookSafelyAsync(this DiscordClient client, ulong id)
+        {
+            try { return await client.GetWebhookAsync(id); }
+            catch { return default; }
         }
     }
 }

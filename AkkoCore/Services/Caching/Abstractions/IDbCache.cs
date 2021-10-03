@@ -14,6 +14,11 @@ namespace AkkoCore.Services.Caching.Abstractions
     public interface IDbCache : IDisposable
     {
         /// <summary>
+        /// Determines whether this cache has been disposed or not.
+        /// </summary>
+        bool IsDisposed { get; }
+
+        /// <summary>
         /// Contains all users that have interacted with the bot.
         /// </summary>
         ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; }

@@ -21,8 +21,8 @@ namespace AkkoCore.Services.Database
     public class AkkoDbCache : IDbCache
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private bool _isDisposed = false;
 
+        public bool IsDisposed { get; private set; } = false;
         public ConcurrentDictionary<ulong, DiscordUserEntity> Users { get; private set; }
         public ConcurrentHashSet<ulong> Blacklist { get; private set; }
         public List<PlayingStatusEntity> PlayingStatuses { get; private set; }
@@ -199,7 +199,7 @@ namespace AkkoCore.Services.Database
 
         protected virtual void Dispose(bool isDisposing)
         {
-            if (!_isDisposed)
+            if (!IsDisposed)
             {
                 if (isDisposing)
                 {
@@ -287,7 +287,7 @@ namespace AkkoCore.Services.Database
                 CommandCooldown = null;
                 PermissionOverrides = null;
 
-                _isDisposed = true;
+                IsDisposed = true;
             }
         }
     }
