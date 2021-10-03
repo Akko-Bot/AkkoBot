@@ -366,7 +366,7 @@ namespace AkkoCore.Extensions
         /// <param name="collection">This collection.</param>
         /// <param name="random">A <see cref="Random"/> instance to generate the random index.</param>
         /// <returns>A random <typeparamref name="T"/> element from this collection or <see langword="default"/>(<typeparamref name="T"/>) if the collection is empty.</returns>
-        public static T RandomElement<T>(this IEnumerable<T> collection, Random random = null)
+        public static T RandomElement<T>(this IEnumerable<T> collection, Random random = default)
         {
             random ??= new();
             return collection.ElementAtOrDefault(random.Next(collection.Count()));
@@ -380,7 +380,7 @@ namespace AkkoCore.Extensions
         /// <param name="maxIndex">The maximum index to pick from.</param>
         /// <param name="random">A <see cref="Random"/> instance to generate the random index.</param>
         /// <returns>A random <typeparamref name="T"/> element from this collection or <see langword="default"/>(<typeparamref name="T"/>) if the collection is empty.</returns>
-        public static T RandomElement<T>(this IEnumerable<T> collection, int maxIndex, Random random = null)
+        public static T RandomElement<T>(this IEnumerable<T> collection, int maxIndex, Random random = default)
         {
             random ??= new();
             return collection.ElementAtOrDefault(random.Next(Math.Min(collection.Count(), Math.Abs(maxIndex))));

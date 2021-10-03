@@ -7,7 +7,7 @@ namespace AkkoCore.Extensions
 {
     public static class DiscordClientExt
     {
-        private static readonly Permissions _basePermissions = Permissions.SendMessages | Permissions.AddReactions | Permissions.SendMessagesInThreads;
+        private static readonly Permissions _basePermissions = Permissions.AccessChannels | Permissions.SendMessages | Permissions.AddReactions | Permissions.SendMessagesInThreads;
 
         private static readonly PropertyInfo _messageCacheProp = typeof(DiscordClient)
             .GetProperty("MessageCache", BindingFlags.NonPublic | BindingFlags.Instance);
