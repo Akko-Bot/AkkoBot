@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class TimeOfDayConverter : IArgumentConverter<TimeOfDay>
+    internal sealed class TimeOfDayConverter : IArgumentConverter<TimeOfDay>
     {
         public Task<Optional<TimeOfDay>> ConvertAsync(string input, CommandContext ctx)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class GuildLogConverter : IArgumentConverter<GuildLogType>
+    internal sealed class GuildLogConverter : IArgumentConverter<GuildLogType>
     {
         public Task<Optional<GuildLogType>> ConvertAsync(string input, CommandContext ctx)
         {

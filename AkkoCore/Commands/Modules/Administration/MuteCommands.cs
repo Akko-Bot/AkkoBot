@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Administration
 {
     [RequireGuild]
-    public class MuteCommands : AkkoCommandModule
+    public sealed class MuteCommands : AkkoCommandModule
     {
         private readonly RoleService _roleService;
         private readonly ChannelService _channelServices;

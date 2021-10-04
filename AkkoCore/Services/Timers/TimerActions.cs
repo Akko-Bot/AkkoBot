@@ -28,7 +28,7 @@ namespace AkkoCore.Services.Timers
     /// <summary>
     /// Defines the actions to be performed when a timer triggers.
     /// </summary>
-    public class TimerActions : ITimerActions
+    internal sealed class TimerActions : ITimerActions
     {
         private readonly EventId _timerLogEvent = new(99, nameof(TimerActions));
         private readonly IServiceScopeFactory _scopeFactory;

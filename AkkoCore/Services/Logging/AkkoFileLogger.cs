@@ -10,7 +10,7 @@ namespace AkkoCore.Services.Logging
     /// <summary>
     /// Writes logs to a file once a certain threshold is reached.
     /// </summary>
-    public class AkkoFileLogger : IFileLogger
+    public sealed class AkkoFileLogger : IFileLogger
     {
         private const double _mb = 1000000.0;    // Byte to Megabyte ratio
         private DateTimeOffset _time = DateTimeOffset.Now;
@@ -60,7 +60,7 @@ namespace AkkoCore.Services.Logging
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool isDisposing)
+        private void Dispose(bool isDisposing)
         {
             if (!IsDisposed)
             {

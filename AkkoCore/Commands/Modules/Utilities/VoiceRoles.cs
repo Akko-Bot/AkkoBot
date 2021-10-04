@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Utilities
     [Group("voicerole"), Aliases("vcrole")]
     [Description("cmd_voicerole")]
     [RequireGuild, RequirePermissions(Permissions.ManageRoles | Permissions.ManageChannels)]
-    public class VoiceRoles : AkkoCommandModule
+    public sealed class VoiceRoles : AkkoCommandModule
     {
         private readonly VoiceRoleService _service;
 

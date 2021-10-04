@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordUserEntity"/> objects.
     /// </summary>
-    public class DiscordUserService : ICommandService
+    public sealed class DiscordUserService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

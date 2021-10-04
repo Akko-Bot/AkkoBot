@@ -16,7 +16,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 {
     [Group("remind"), Aliases("reminder", "reminders")]
     [Description("cmd_remind")]
-    public class Reminders : AkkoCommandModule
+    public sealed class Reminders : AkkoCommandModule
     {
         private readonly ReminderService _service;
 

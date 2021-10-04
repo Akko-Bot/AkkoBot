@@ -10,7 +10,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles caching of guild settings.
     /// </summary>
-    internal class GuildLoadHandler : IGuildLoadHandler
+    internal sealed class GuildLoadHandler : IGuildLoadHandler
     {
         private readonly IDbCache _dbCache;
         private readonly BotConfig _botConfig;

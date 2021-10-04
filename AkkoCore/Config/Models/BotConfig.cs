@@ -11,7 +11,7 @@ namespace AkkoCore.Config.Models
     /// <summary>
     /// Stores settings related to the bot.
     /// </summary>
-    public class BotConfig : Settings, IMessageSettings
+    public sealed class BotConfig : Settings, IMessageSettings
     {
         private string _locale = AkkoConstants.DefaultLanguage;
         private string _okColor = "007FFF";

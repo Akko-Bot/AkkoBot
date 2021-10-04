@@ -15,7 +15,7 @@ namespace AkkoCore.Commands.Modules.Administration
     [RequireGuild]
     [Group("filterword"), Aliases("fw")]
     [Description("cmd_fw")]
-    public class WordFilter : AkkoCommandModule
+    public sealed class WordFilter : AkkoCommandModule
     {
         private readonly WordFilterService _service;
 

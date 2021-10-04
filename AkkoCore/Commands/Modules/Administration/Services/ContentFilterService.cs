@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="FilteredContentEntity"/> objects.
     /// </summary>
-    public class ContentFilterService : ICommandService
+    public sealed class ContentFilterService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

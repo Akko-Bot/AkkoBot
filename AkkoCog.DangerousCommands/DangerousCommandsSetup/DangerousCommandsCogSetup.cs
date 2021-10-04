@@ -1,7 +1,5 @@
 ﻿using AkkoCog.DangerousCommands.Services;
-using AkkoCore.Commands.Abstractions;
 using AkkoCore.Config.Abstractions;
-using AkkoCore.Services;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class TimeSpanConverter : IArgumentConverter<TimeSpan>
+    internal sealed class TimeSpanConverter : IArgumentConverter<TimeSpan>
     {
         private static readonly Regex _timeSpanRegex = new(
             @"^(\d+y)?(\d+mo)?(\d+w)?(\d+d)?(\d+h)?(\d+m)?(\d+s)?$",

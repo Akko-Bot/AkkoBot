@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Utilities
     [RequireGuild]
     [Group("emoji"), Aliases("emote", "emojis", "emotes")]
     [Description("cmd_emoji")]
-    public class GuildEmojis : AkkoCommandModule
+    public sealed class GuildEmojis : AkkoCommandModule
     {
         private const double _additionalDelay = 1.4;
         private readonly UtilitiesService _service;

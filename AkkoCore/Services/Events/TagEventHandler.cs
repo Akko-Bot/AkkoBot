@@ -24,7 +24,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles execution of global and guild tags.
     /// </summary>
-    internal class TagEventHandler : ITagEventHandler
+    internal sealed class TagEventHandler : ITagEventHandler
     {
         private const string _remainingTextPlaceholder = "{remaining.text}";
         private readonly TimeSpan _updateTime = TimeSpan.FromDays(1);

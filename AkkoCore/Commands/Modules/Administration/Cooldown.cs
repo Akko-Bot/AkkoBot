@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Administration
 {
     [Group("cooldown"), Aliases("cd")]
     [Description("cmd_cooldown")]
-    public class Cooldown : AkkoCommandModule
+    public sealed class Cooldown : AkkoCommandModule
     {
         private readonly CooldownService _service;
 

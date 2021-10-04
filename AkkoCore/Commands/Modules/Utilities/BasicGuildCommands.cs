@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Utilities
 {
     [RequireGuild]
-    public class BasicGuildCommands : AkkoCommandModule
+    public sealed class BasicGuildCommands : AkkoCommandModule
     {
         [Command("userid"), Aliases("uid")]
         [Description("cmd_userid")]
@@ -310,7 +310,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [RequireGuild]
         [RequirePermissions(Permissions.ManageRoles)]
-        public class BasicRoleCommands : AkkoCommandModule
+        public sealed class BasicRoleCommands : AkkoCommandModule
         {
             #region Role Management
 

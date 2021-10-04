@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Administration.Services
 {
-    public class WarningService : ICommandService
+    public sealed class WarningService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

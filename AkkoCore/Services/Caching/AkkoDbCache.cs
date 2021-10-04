@@ -18,7 +18,7 @@ namespace AkkoCore.Services.Database
     /// <summary>
     /// This class caches entries retrieved from the database.
     /// </summary>
-    public class AkkoDbCache : IDbCache
+    public sealed class AkkoDbCache : IDbCache
     {
         private readonly IServiceScopeFactory _scopeFactory;
 
@@ -197,7 +197,7 @@ namespace AkkoCore.Services.Database
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool isDisposing)
+        private void Dispose(bool isDisposing)
         {
             if (!IsDisposed)
             {

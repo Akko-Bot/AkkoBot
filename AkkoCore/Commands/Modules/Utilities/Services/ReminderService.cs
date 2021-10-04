@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="ReminderEntity"/> objects.
     /// </summary>
-    public class ReminderService : ICommandService
+    public sealed class ReminderService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

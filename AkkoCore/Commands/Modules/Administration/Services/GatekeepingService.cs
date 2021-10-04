@@ -14,7 +14,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="GatekeepEntity"/> objects.
     /// </summary>
-    public class GatekeepingService : ICommandService
+    public sealed class GatekeepingService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

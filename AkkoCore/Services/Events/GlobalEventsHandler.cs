@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles global events.
     /// </summary>
-    internal class GlobalEventsHandler : IGlobalEventsHandler
+    internal sealed class GlobalEventsHandler : IGlobalEventsHandler
     {
         private readonly IGuildEventsHandler _guildEventsHandler;
         private readonly IDbCache _dbCache;

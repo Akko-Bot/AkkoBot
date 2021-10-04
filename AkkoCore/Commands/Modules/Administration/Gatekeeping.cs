@@ -19,7 +19,7 @@ namespace AkkoCore.Commands.Modules.Administration
 {
     [RequireGuild]
     [RequireUserPermissions(Permissions.ManageGuild)]
-    public class Gatekeeping : AkkoCommandModule
+    public sealed class Gatekeeping : AkkoCommandModule
     {
         private readonly GatekeepingService _service;
         private readonly UtilitiesService _utilitiesService;

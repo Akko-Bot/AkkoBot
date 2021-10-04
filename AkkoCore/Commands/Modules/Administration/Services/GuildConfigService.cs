@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="GuildConfigEntity"/> objects.
     /// </summary>
-    public class GuildConfigService : ICommandService
+    public sealed class GuildConfigService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

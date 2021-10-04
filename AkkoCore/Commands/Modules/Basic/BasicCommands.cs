@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Basic
 {
-    public class BasicCommands : AkkoCommandModule
+    public sealed class BasicCommands : AkkoCommandModule
     {
         private const string _botAuthor = "Kotz#7922";
         private const string _versionString = "AkkoBot v0.1.0-beta";

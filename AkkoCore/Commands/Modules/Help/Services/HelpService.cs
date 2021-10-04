@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Help.Services
     /// <summary>
     /// Contains helper methods for the Help module.
     /// </summary>
-    public class HelpService : ICommandService
+    public sealed class HelpService : ICommandService
     {
         private readonly ILocalizer _localizer;
         private readonly IDbCache _dbCache;

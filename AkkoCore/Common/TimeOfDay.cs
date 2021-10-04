@@ -6,7 +6,7 @@ namespace AkkoCore.Common
     /// <summary>
     /// Calculates the time interval from <see cref="DateTimeOffset.Now"/> to the next time of day specified.
     /// </summary>
-    public class TimeOfDay
+    public sealed class TimeOfDay
     {
         private readonly DateTimeOffset _dateTime;
 

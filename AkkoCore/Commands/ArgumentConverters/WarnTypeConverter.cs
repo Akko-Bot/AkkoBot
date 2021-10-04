@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class WarnTypeConverter : IArgumentConverter<PunishmentType>
+    internal sealed class WarnTypeConverter : IArgumentConverter<PunishmentType>
     {
         public Task<Optional<PunishmentType>> ConvertAsync(string input, CommandContext ctx)
         {

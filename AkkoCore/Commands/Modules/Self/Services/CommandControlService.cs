@@ -18,7 +18,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods to register disabled commands to the database and the command handler.
     /// </summary>
-    public class CommandControlService : ICommandService
+    public sealed class CommandControlService : ICommandService
     {
         private readonly MethodInfo _registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
 

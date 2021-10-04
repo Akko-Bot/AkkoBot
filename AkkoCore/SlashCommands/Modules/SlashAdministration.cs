@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.SlashCommands.Modules
 {
     [SlashModuleLifespan(SlashModuleLifespan.Singleton)]
-    public class SlashAdministration : AkkoSlashCommandModule
+    public sealed class SlashAdministration : AkkoSlashCommandModule
     {
         private readonly BotConfigService _botService;
         private readonly GuildConfigService _guildService;

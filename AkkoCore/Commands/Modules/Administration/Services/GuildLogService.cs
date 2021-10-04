@@ -25,7 +25,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="GuildLogEntity"/> objects.
     /// </summary>
-    public class GuildLogService : ICommandService
+    public sealed class GuildLogService : ICommandService
     {
         private readonly string _headerSeparator = new('=', 30);
         private readonly IServiceScopeFactory _scopeFactory;

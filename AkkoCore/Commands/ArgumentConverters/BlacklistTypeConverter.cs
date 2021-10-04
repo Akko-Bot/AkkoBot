@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class BlacklistTypeConverter : IArgumentConverter<BlacklistType>
+    internal sealed class BlacklistTypeConverter : IArgumentConverter<BlacklistType>
     {
         public Task<Optional<BlacklistType>> ConvertAsync(string input, CommandContext ctx)
         {

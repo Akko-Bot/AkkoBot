@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 {
     [Group("tag"), Aliases("tags")]
     [Description("cmd_tag")]
-    public class Tags : AkkoCommandModule
+    public sealed class Tags : AkkoCommandModule
     {
         private readonly TagsService _service;
 

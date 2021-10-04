@@ -7,7 +7,7 @@ namespace AkkoCore.Core.Common
     /// <summary>
     /// Manages the shutdown of a <see cref="Bot"/>.
     /// </summary>
-    internal record BotLifetime : IBotLifetime
+    internal sealed record BotLifetime : IBotLifetime
     {
         private readonly CancellationTokenSource _cTokenSource;
         private bool _restartBot;

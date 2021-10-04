@@ -7,7 +7,7 @@ namespace AkkoCore.Services.Database.Config
     /// <summary>
     /// Configures relationships for <see cref="DiscordUserEntity"/>.
     /// </summary>
-    public class DiscordUserEntityTypeConfiguration : IEntityTypeConfiguration<DiscordUserEntity>
+    public sealed class DiscordUserEntityTypeConfiguration : IEntityTypeConfiguration<DiscordUserEntity>
     {
         public void Configure(EntityTypeBuilder<DiscordUserEntity> builder)
         {

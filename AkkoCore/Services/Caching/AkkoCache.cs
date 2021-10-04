@@ -11,7 +11,7 @@ namespace AkkoCore.Services.Caching
     /// <summary>
     /// Defines an object that caches Discord-related elements.
     /// </summary>
-    public class AkkoCache : IAkkoCache
+    public sealed class AkkoCache : IAkkoCache
     {
         public ConcurrentDictionary<ulong, RingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();
         public ConcurrentDictionary<string, Command> DisabledCommandCache { get; internal set; }

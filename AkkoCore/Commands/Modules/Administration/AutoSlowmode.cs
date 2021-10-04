@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Administration
     [Description("cmd_autoslowmode")]
     [RequireUserPermissions(Permissions.ManageMessages)]
     [RequirePermissions(Permissions.ManageChannels)]
-    public class AutoSlowmode : AkkoCommandModule
+    public sealed class AutoSlowmode : AkkoCommandModule
     {
         private readonly AutoSlowmodeService _service;
 

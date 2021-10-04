@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Administration
 {
     [RequireGuild]
-    public class WordFilterExtras : AkkoCommandModule
+    public sealed class WordFilterExtras : AkkoCommandModule
     {
         private readonly WordFilterService _service;
 

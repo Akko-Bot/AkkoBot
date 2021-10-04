@@ -14,7 +14,7 @@ namespace AkkoCore.SlashCommands.Attributes
     AttributeTargets.Method,
     AllowMultiple = false,
     Inherited = true)]
-    public class SlashIsNotBlacklistedAttribute : SlashCheckBaseAttribute
+    public sealed class SlashIsNotBlacklistedAttribute : SlashCheckBaseAttribute
     {
         public override Task<bool> ExecuteChecksAsync(InteractionContext context)
         {

@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="CommandCooldownEntity"/> objects.
     /// </summary>
-    public class CooldownService : ICommandService
+    public sealed class CooldownService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommandCooldown _cmdCooldown;

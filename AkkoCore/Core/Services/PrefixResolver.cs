@@ -10,7 +10,7 @@ namespace AkkoCore.Core.Services
     /// <summary>
     /// Processes Discord messages for the presence of a command prefix.
     /// </summary>
-    internal class PrefixResolver : IPrefixResolver
+    internal sealed class PrefixResolver : IPrefixResolver
     {
         private readonly IDbCache _dbCache;
         private readonly BotConfig _botConfig;

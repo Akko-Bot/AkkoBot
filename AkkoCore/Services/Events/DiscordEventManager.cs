@@ -11,7 +11,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Defines the behavior the bot should have for specific user actions.
     /// </summary>
-    internal class DiscordEventManager : IDiscordEventManager
+    internal sealed class DiscordEventManager : IDiscordEventManager
     {
         private readonly IStartupEventHandler _startup;
         private readonly IVoiceRoleConnectionHandler _voiceRoleHandler;

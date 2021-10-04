@@ -12,7 +12,7 @@ namespace AkkoCore.Services.Logging
     /// <summary>
     /// Creates and updates logger objects.
     /// </summary>
-    public class AkkoLoggerProvider : IAkkoLoggerProvider
+    public sealed class AkkoLoggerProvider : IAkkoLoggerProvider
     {
         private bool _isDisposed = false;
         private IFileLogger _fileLogger;
@@ -74,7 +74,7 @@ namespace AkkoCore.Services.Logging
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {

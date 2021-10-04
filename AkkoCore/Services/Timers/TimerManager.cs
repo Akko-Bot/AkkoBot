@@ -20,7 +20,7 @@ namespace AkkoCore.Services.Timers
     /// <summary>
     /// This class initializes timers from the database and manages their execution and lifetime.
     /// </summary>
-    public class TimerManager : ITimerManager
+    internal sealed class TimerManager : ITimerManager
     {
         private const int _updateTimerDayAge = 1;
         private readonly Timer _updateTimer = new(TimeSpan.FromDays(_updateTimerDayAge).TotalMilliseconds);

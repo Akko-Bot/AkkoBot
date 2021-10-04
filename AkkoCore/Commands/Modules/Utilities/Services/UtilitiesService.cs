@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for the Utilities command module.
     /// </summary>
-    public class UtilitiesService : ICommandService
+    public sealed class UtilitiesService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpClientFactory _httpClientFactory;

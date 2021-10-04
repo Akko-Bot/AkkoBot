@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class DiscordGuildConverter : IArgumentConverter<DiscordGuild>
+    internal sealed class DiscordGuildConverter : IArgumentConverter<DiscordGuild>
     {
         public Task<Optional<DiscordGuild>> ConvertAsync(string input, CommandContext ctx)
         {

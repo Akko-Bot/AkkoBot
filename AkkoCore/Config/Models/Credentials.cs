@@ -7,7 +7,7 @@ namespace AkkoCore.Config.Models
     /// <summary>
     /// A class that represents a credentials file.
     /// </summary>
-    public class Credentials
+    public sealed class Credentials
     {
         /// <summary>
         /// Contains the IDs of the bot owners.

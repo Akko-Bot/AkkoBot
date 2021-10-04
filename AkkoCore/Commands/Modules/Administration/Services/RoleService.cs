@@ -21,7 +21,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordRole"/> objects.
     /// </summary>
-    public class RoleService : ICommandService
+    public sealed class RoleService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

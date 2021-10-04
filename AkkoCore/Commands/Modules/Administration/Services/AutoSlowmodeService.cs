@@ -15,7 +15,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="AutoSlowmodeEntity"/> objects.
     /// </summary>
-    public class AutoSlowmodeService : ICommandService
+    public sealed class AutoSlowmodeService : ICommandService
     {
         private readonly IDbCache _dbCache;
         private readonly IServiceScopeFactory _scopeFactory;

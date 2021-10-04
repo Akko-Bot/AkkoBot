@@ -24,7 +24,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles the behavior the bot should have for specific Discord events on startup.
     /// </summary>
-    internal class StartupEventHandler : IStartupEventHandler
+    internal sealed class StartupEventHandler : IStartupEventHandler
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

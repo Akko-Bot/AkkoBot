@@ -16,7 +16,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="PermissionOverrideEntity"/> objects.
     /// </summary>
-    public class PermissionOverrideService : ICommandService
+    public sealed class PermissionOverrideService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Administration
 {
     [RequireGuild]
-    public class UserPunishment : AkkoCommandModule
+    public sealed class UserPunishment : AkkoCommandModule
     {
         private readonly RoleService _roleService;
         private readonly UserPunishmentService _punishService;

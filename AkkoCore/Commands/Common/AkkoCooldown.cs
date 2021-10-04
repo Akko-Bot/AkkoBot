@@ -15,7 +15,7 @@ namespace AkkoCore.Commands.Common
     /// <summary>
     /// Keeps track of commands and users on a global and/or guild cooldown.
     /// </summary>
-    internal class AkkoCooldown : ICommandCooldown
+    internal sealed class AkkoCooldown : ICommandCooldown
     {
         private ConcurrentDictionary<string, TimeSpan> _globalCooldown = new();
         private ConcurrentDictionary<(string, ulong), TimeSpan> _serverCooldown = new();

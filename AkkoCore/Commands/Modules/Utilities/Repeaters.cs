@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Utilities
     [Group("repeat")]
     [Description("cmd_repeat")]
     [RequireUserPermissions(Permissions.ManageMessages)]
-    public class Repeaters : AkkoCommandModule
+    public sealed class Repeaters : AkkoCommandModule
     {
         private readonly IAkkoCache _akkoCache;
         private readonly RepeaterService _service;

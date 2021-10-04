@@ -16,7 +16,7 @@ namespace AkkoCore.Commands.Modules.Self
     [BotOwner]
     [Group("playingstatus"), Aliases("pl")]
     [Description("cmd_playingstatus")]
-    public class RotatingStatus : AkkoCommandModule
+    public sealed class RotatingStatus : AkkoCommandModule
     {
         private readonly StatusService _statusService;
         private readonly BotConfigService _botService;

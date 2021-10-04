@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Self
     [BotOwner, RequireGuild]
     [Group("autocommand"), Aliases("autocmd")]
     [Description("cmd_autocommand")]
-    public class CommandScheduling : AkkoCommandModule
+    public sealed class CommandScheduling : AkkoCommandModule
     {
         private readonly CommandScheduleService _service;
 

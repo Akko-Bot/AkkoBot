@@ -22,7 +22,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="RepeaterEntity"/> objects.
     /// </summary>
-    public class RepeaterService : ICommandService
+    public sealed class RepeaterService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

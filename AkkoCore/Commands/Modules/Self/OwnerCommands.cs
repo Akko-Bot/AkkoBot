@@ -25,7 +25,7 @@ using YamlDotNet.Serialization;
 namespace AkkoCore.Commands.Modules.Self
 {
     [BotOwner]
-    public class OwnerCommands : AkkoCommandModule
+    public sealed class OwnerCommands : AkkoCommandModule
     {
         private readonly DiscordShardedClient _shardedClient;
         private readonly UtilitiesService _utilitiesService;

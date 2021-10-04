@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class TagBehaviorConverter : IArgumentConverter<TagBehavior>
+    internal sealed class TagBehaviorConverter : IArgumentConverter<TagBehavior>
     {
         public Task<Optional<TagBehavior>> ConvertAsync(string input, CommandContext ctx)
         {

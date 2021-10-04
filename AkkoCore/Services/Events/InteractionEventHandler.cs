@@ -15,7 +15,7 @@ namespace AkkoCore.Services.Events
     /// Handles interactive Discord messages.
     /// </summary>
     /// <remarks>This implementation only processes interactions whose ID are suffixed with either "_update" or "_end".</remarks>
-    internal class InteractionEventHandler : IInteractionEventHandler
+    internal sealed class InteractionEventHandler : IInteractionEventHandler
     {
         private const string _updateInteractionSuffix = "_update";
         private const string _endInteractionSuffix = "_end";

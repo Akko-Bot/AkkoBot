@@ -12,7 +12,7 @@ namespace AkkoCore.Config
     /// <summary>
     /// Saves and loads Yaml configuration files.
     /// </summary>
-    public class ConfigLoader : IConfigLoader
+    public sealed class ConfigLoader : IConfigLoader
     {
         private readonly ISerializer _serializer;
         private readonly IDeserializer _deserializer;

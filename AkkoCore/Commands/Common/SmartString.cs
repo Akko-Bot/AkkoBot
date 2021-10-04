@@ -14,7 +14,7 @@ namespace AkkoCore.Commands.Common
     /// <summary>
     /// Represents a string that automatically replaces placeholders matched by a regex with values from a formatter.
     /// </summary>
-    public class SmartString
+    public sealed class SmartString
     {
         private static readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
         private static readonly Regex _defaultPlaceholderRegex = new(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);

@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Events.Common
     /// <summary>
     /// Handles punishment for alt accounts.
     /// </summary>
-    internal class AntiAltActions : IAntiAltActions
+    internal sealed class AntiAltActions : IAntiAltActions
     {
         private readonly RoleService _roleService;
         private readonly ChannelService _channelService;

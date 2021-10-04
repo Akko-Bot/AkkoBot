@@ -21,7 +21,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="BlacklistEntity"/> objects.
     /// </summary>
-    public class BlacklistService : ICommandService
+    public sealed class BlacklistService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Administration
 {
     [RequireGuild]
-    public class WarningCommands : AkkoCommandModule
+    public sealed class WarningCommands : AkkoCommandModule
     {
         private const string _pencil = ":pencil:";
         private const string _warning = "\u26A0";

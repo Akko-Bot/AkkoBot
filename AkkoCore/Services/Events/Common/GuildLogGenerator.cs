@@ -22,7 +22,7 @@ namespace AkkoCore.Services.Events.Common
     /// <summary>
     /// Generates guild log messages.
     /// </summary>
-    public class GuildLogGenerator : IGuildLogGenerator
+    internal sealed class GuildLogGenerator : IGuildLogGenerator
     {
         private readonly TimeSpan _24hours = TimeSpan.FromDays(1);
 

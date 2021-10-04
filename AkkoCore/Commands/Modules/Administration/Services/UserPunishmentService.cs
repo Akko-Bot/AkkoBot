@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for issuing punishments to Discord users.
     /// </summary>
-    public class UserPunishmentService : ICommandService
+    public sealed class UserPunishmentService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

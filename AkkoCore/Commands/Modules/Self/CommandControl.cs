@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Self
 {
     [BotOwner]
-    public class CommandControl : AkkoCommandModule
+    public sealed class CommandControl : AkkoCommandModule
     {
         private readonly CommandControlService _service;
 

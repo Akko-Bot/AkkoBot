@@ -21,7 +21,7 @@ namespace AkkoCore.Commands.Modules.Administration
     [Group("commandoverride"), Aliases("override")]
     [Description("cmd_override")]
     [RequireOwnerInDm, RequireUserPermissions(Permissions.Administrator)]
-    public class PermissionOverride : AkkoCommandModule
+    public sealed class PermissionOverride : AkkoCommandModule
     {
         private readonly PermissionOverrideService _service;
 

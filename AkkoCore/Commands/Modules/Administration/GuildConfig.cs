@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Administration
     [Group("serverconfig"), Aliases("guildconfig", "server", "guild")]
     [Description("cmd_guild")]
     [RequireGuild, RequireUserPermissions(Permissions.ManageGuild)]
-    public class GuildConfig : AkkoCommandModule
+    public sealed class GuildConfig : AkkoCommandModule
     {
         private readonly GuildConfigService _service;
         private readonly UserPunishmentService _punishService;

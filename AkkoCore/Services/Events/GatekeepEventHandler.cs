@@ -19,7 +19,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles events related to gatekeeping.
     /// </summary>
-    internal class GatekeepEventHandler : IGatekeepEventHandler
+    internal sealed class GatekeepEventHandler : IGatekeepEventHandler
     {
         private readonly ConcurrentHashSet<ulong> _waitingGreets = new();
         private readonly ConcurrentHashSet<ulong> _waitingFarewells = new();

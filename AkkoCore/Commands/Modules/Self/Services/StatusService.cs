@@ -25,7 +25,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="PlayingStatusEntity"/> objects.
     /// </summary>
-    public class StatusService : ICommandService
+    public sealed class StatusService : ICommandService
     {
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;

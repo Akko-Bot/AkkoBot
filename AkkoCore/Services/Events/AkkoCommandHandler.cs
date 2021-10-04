@@ -19,7 +19,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles command execution.
     /// </summary>
-    internal class AkkoCommandHandler : ICommandHandler
+    internal sealed class AkkoCommandHandler : ICommandHandler
     {
         private readonly IDbCache _dbCache;
         private readonly IPrefixResolver _prefixResolver;

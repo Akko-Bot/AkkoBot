@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class LogLevelConverter : IArgumentConverter<LogLevel>
+    internal sealed class LogLevelConverter : IArgumentConverter<LogLevel>
     {
         public Task<Optional<LogLevel>> ConvertAsync(string input, CommandContext ctx)
         {

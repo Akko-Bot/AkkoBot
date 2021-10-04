@@ -16,7 +16,7 @@ namespace AkkoCore.Core
     /// <summary>
     /// Represents a bot that connects to Discord.
     /// </summary>
-    public class Bot : IDisposable
+    public sealed class Bot : IDisposable
     {
         private BotCore _botCore;
 

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Administration
 {
-    public class Administration : AkkoCommandModule
+    public sealed class Administration : AkkoCommandModule
     {
         private readonly ICommandHandler _commandHandler;
         private readonly GuildConfigService _guildService;

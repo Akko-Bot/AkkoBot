@@ -7,7 +7,7 @@ namespace AkkoCore.Services.Database.Config
     /// <summary>
     /// Configures relationships for <see cref="TimerEntity"/>.
     /// </summary>
-    public class TimerEntityTypeConfiguration : IEntityTypeConfiguration<TimerEntity>
+    public sealed class TimerEntityTypeConfiguration : IEntityTypeConfiguration<TimerEntity>
     {
         public void Configure(EntityTypeBuilder<TimerEntity> builder)
         {

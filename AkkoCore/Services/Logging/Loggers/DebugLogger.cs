@@ -9,7 +9,7 @@ namespace AkkoCore.Services.Logging.Loggers
     /// <summary>
     /// Logger class that forces information logs to be logged as debug logs.
     /// </summary>
-    public class DebugLogger : AkkoLogger
+    public sealed class DebugLogger : AkkoLogger
     {
         private LogLevel _minimumLevel;
         private IFileLogger _fileLogger;

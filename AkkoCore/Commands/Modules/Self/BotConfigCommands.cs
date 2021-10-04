@@ -24,7 +24,7 @@ namespace AkkoCore.Commands.Modules.Self
     [BotOwner]
     [Group("botconfig"), Aliases("self", "bot")]
     [Description("cmd_config")]
-    public class BotConfigCommands : AkkoCommandModule
+    public sealed class BotConfigCommands : AkkoCommandModule
     {
         private readonly ILocalizer _localizer;
         private readonly BotConfigService _botService;
@@ -188,7 +188,7 @@ namespace AkkoCore.Commands.Modules.Self
 
         [Group("log"), Aliases("logs", "logging")]
         [Description("cmd_config_log")]
-        public class LogConfigCommands : AkkoCommandModule
+        public sealed class LogConfigCommands : AkkoCommandModule
         {
             private readonly BotConfigService _service;
 
@@ -283,7 +283,7 @@ namespace AkkoCore.Commands.Modules.Self
 
         [Group("owner"), Aliases("owners")]
         [Description("cmd_config_owner")]
-        public class OwnerConfig : AkkoCommandModule
+        public sealed class OwnerConfig : AkkoCommandModule
         {
             private readonly Credentials _creds;
             private readonly BotConfigService _service;

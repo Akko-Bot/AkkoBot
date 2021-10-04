@@ -17,7 +17,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="VoiceRoleEntity"/> objects.
     /// </summary>
-    public class VoiceRoleService : ICommandService
+    public sealed class VoiceRoleService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

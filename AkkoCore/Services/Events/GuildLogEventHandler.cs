@@ -23,7 +23,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles guild log events.
     /// </summary>
-    internal class GuildLogEventHandler : IGuildLogEventHandler
+    internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     {
         private readonly EventId _guildLogEvent = new(98, nameof(GuildLogEventHandler));
 

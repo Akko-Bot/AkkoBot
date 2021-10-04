@@ -22,7 +22,7 @@ namespace AkkoCore.Commands.Formatters
     /// <summary>
     /// Generates help messages for a specific command.
     /// </summary>
-    public class HelpFormatter : IHelpFormatter
+    internal sealed class HelpFormatter : IHelpFormatter
     {
         private readonly SerializableDiscordEmbed _helpMessage = new();
         private readonly IDbCache _dbCache;

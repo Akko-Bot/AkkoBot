@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class PermissionsConverter : IArgumentConverter<Permissions>
+    internal sealed class PermissionsConverter : IArgumentConverter<Permissions>
     {
         // Try fetching the value for DefaultLanguage first. If it fails, try the context language.
         public Task<Optional<Permissions>> ConvertAsync(string input, CommandContext ctx)

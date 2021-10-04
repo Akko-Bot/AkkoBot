@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    public class ActivityTypeConverter : IArgumentConverter<ActivityType>
+    internal sealed class ActivityTypeConverter : IArgumentConverter<ActivityType>
     {
         public Task<Optional<ActivityType>> ConvertAsync(string input, CommandContext ctx)
         {

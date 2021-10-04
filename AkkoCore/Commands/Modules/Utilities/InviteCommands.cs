@@ -18,7 +18,7 @@ namespace AkkoCore.Commands.Modules.Utilities
     [Group("invite"), Aliases("invites")]
     [Description("cmd_invite")]
     [RequireGuild]
-    public class InviteCommands : AkkoCommandModule
+    public sealed class InviteCommands : AkkoCommandModule
     {
         [Command("add"), HiddenOverload]
         public async Task CreateInviteAsync(CommandContext context, TimeSpan expiresIn)

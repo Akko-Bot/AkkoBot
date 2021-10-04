@@ -45,7 +45,7 @@ namespace AkkoCore.Core.Common
     /// <summary>
     /// Wrapper class for building a <see cref="BotCore"/>.
     /// </summary>
-    public class BotCoreBuilder
+    public sealed class BotCoreBuilder
     {
         private ILoggerFactory _loggerFactory;
         private readonly Credentials _creds;

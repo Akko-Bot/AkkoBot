@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace AkkoCore.Commands.Modules.Utilities
 {
     [RequireGuild]
-    public class GuildUtilities : AkkoCommandModule
+    public sealed class GuildUtilities : AkkoCommandModule
     {
         private readonly Permissions _voicePerms = Permissions.UseVoice | Permissions.UseVoiceDetection | Permissions.Speak | Permissions.MuteMembers
             | Permissions.PrioritySpeaker | Permissions.Stream | Permissions.DeafenMembers | Permissions.MoveMembers;

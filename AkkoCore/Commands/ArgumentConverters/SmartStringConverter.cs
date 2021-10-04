@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters
 {
-    internal class SmartStringConverter : IArgumentConverter<SmartString>
+    internal sealed class SmartStringConverter : IArgumentConverter<SmartString>
     {
         public Task<Optional<SmartString>> ConvertAsync(string input, CommandContext ctx)
             => Task.FromResult(Optional.FromValue(new SmartString(ctx, input)));

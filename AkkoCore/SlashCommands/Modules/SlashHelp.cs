@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.SlashCommands.Modules
 {
-    public class SlashHelp : AkkoSlashCommandModule
+    [SlashModuleLifespan(SlashModuleLifespan.Singleton)]
+    public sealed class SlashHelp : AkkoSlashCommandModule
     {
         private readonly HelpService _service;
 

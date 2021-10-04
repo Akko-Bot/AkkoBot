@@ -13,6 +13,7 @@
 
 //namespace AkkoCore.SlashCommands.Modules
 //{
+//    [SlashModuleLifespan(SlashModuleLifespan.Singleton)]
 //    public class SlashGuildConfig : AkkoSlashCommandModule
 //    {
 //        private readonly IGuildConfigController _controller;

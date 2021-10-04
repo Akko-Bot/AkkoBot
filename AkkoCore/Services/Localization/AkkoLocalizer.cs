@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Localization
     /// <summary>
     /// Manages the cache for the response strings loaded into memory.
     /// </summary>
-    public class AkkoLocalizer : ILocalizer
+    public sealed class AkkoLocalizer : ILocalizer
     {
         /// <summary>
         /// The cache of response strings. First key is the locale. Second key is the response

@@ -15,7 +15,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles log messages when a command is executed.
     /// </summary>
-    internal class CommandLogHandler : ICommandLogHandler
+    internal sealed class CommandLogHandler : ICommandLogHandler
     {
         public Task LogCmdExecutionAsync(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)
         {

@@ -18,7 +18,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 {
     [Group("poll")]
     [Description("cmd_poll")]
-    public class Poll : AkkoCommandModule
+    public sealed class Poll : AkkoCommandModule
     {
         private readonly BotConfig _botConfig;
         private readonly PollService _service;

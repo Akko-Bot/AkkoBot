@@ -9,7 +9,7 @@ namespace AkkoCore.Services.Logging.Loggers
     /// <summary>
     /// Default logger for logging events.
     /// </summary>
-    public class DefaultLogger : AkkoLogger
+    public sealed class DefaultLogger : AkkoLogger
     {
         private LogLevel _minimumLevel;
         private IFileLogger _fileLogger;

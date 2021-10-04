@@ -29,7 +29,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles guild-related events.
     /// </summary>
-    internal class GuildEventsHandler : IGuildEventsHandler
+    internal sealed class GuildEventsHandler : IGuildEventsHandler
     {
         private static readonly Regex _imageUrlRegex = new(
             @"http\S*?\.(png|jpg|jpeg|gif)",

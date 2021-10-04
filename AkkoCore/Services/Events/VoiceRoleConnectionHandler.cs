@@ -22,7 +22,7 @@ namespace AkkoCore.Services.Events
     /// <summary>
     /// Handles role assignment and removal on voice channel connections and disconnections.
     /// </summary>
-    internal class VoiceRoleConnectionHandler : IVoiceRoleConnectionHandler
+    internal sealed class VoiceRoleConnectionHandler : IVoiceRoleConnectionHandler
     {
         /// <summary>
         /// Caches the cancellation tokens for the most recent voice connections.

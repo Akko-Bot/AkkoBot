@@ -13,7 +13,7 @@ namespace AkkoCore.Commands.Modules.Administration
 {
     [Group("alias"), Aliases("aliases")]
     [Description("cmd_alias")]
-    public class Aliases : AkkoCommandModule
+    public sealed class Aliases : AkkoCommandModule
     {
         private readonly AliasService _service;
 

@@ -20,7 +20,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="AutoCommandEntity"/> objects.
     /// </summary>
-    public class CommandScheduleService : ICommandService
+    public sealed class CommandScheduleService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

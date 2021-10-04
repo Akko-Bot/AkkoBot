@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Utilities
 {
-    public class Timezones : AkkoCommandModule
+    public sealed class Timezones : AkkoCommandModule
     {
         [Command("timezone")]
         [Description("cmd_timezone")]

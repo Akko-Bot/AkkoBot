@@ -19,7 +19,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="AliasEntity"/> objects.
     /// </summary>
-    public class AliasService : ICommandService
+    public sealed class AliasService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

@@ -14,7 +14,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="BotConfigEntity"/> objects.
     /// </summary>
-    public class BotConfigService : ICommandService
+    public sealed class BotConfigService : ICommandService
     {
         private readonly ILocalizer _localizer;
         private readonly IConfigLoader _configLoader;

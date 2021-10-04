@@ -7,7 +7,7 @@ namespace AkkoCore.Services.Database.Config
     /// <summary>
     /// Configures relationships for <see cref="GuildConfigEntity"/>.
     /// </summary>
-    public class GuildConfigEntityTypeConfiguration : IEntityTypeConfiguration<GuildConfigEntity>
+    public sealed class GuildConfigEntityTypeConfiguration : IEntityTypeConfiguration<GuildConfigEntity>
     {
         public void Configure(EntityTypeBuilder<GuildConfigEntity> builder)
         {

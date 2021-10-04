@@ -10,7 +10,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordChannel"/> objects.
     /// </summary>
-    public class ChannelService : ICommandService
+    public sealed class ChannelService : ICommandService
     {
         /// <summary>
         /// Sets the channel overrides for the mute role on all text channels visible to the bot.

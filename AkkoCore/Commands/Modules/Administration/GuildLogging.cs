@@ -22,7 +22,7 @@ namespace AkkoCore.Commands.Modules.Administration
     [RequireGuild]
     [RequirePermissions(Permissions.ManageWebhooks)]
     [RequireUserPermissions(Permissions.ManageGuild)]
-    public class GuildLogging : AkkoCommandModule
+    public sealed class GuildLogging : AkkoCommandModule
     {
         private readonly GuildConfigService _guilldService;
         private readonly GuildLogService _service;

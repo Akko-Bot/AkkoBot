@@ -18,7 +18,7 @@ namespace AkkoCore.Commands.Modules.Administration
     [Group("filtercontent"), Aliases("fc")]
     [Description("cmd_fc")]
     [RequireGuild, RequirePermissions(Permissions.ManageGuild)]
-    public class ContentFilterCommands : AkkoCommandModule
+    public sealed class ContentFilterCommands : AkkoCommandModule
     {
         private readonly ContentFilterService _service;
 

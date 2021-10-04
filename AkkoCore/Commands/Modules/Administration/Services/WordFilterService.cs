@@ -14,7 +14,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="FilteredWordsEntity"/> objects.
     /// </summary>
-    public class WordFilterService : ICommandService
+    public sealed class WordFilterService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

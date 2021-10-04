@@ -19,7 +19,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="PollEntity"/> objects.
     /// </summary>
-    public class PollService : ICommandService
+    public sealed class PollService : ICommandService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
