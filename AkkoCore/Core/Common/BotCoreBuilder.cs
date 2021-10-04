@@ -23,6 +23,7 @@ using AkkoCore.Services.Timers;
 using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Executors;
 using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
@@ -456,6 +457,7 @@ namespace AkkoCore.Core.Common
                 Services = services,                            // Sets the dependencies used by the command modules
                 EnableDefaultHelp = false,                      // Sets whether the bot should use the default help command from the library
                 UseDefaultCommandHandler = false,               // Sets whether the bot uses the D#+ built-in command handler or not
+                CommandExecutor = new ParallelQueuedCommandExecutor(),  // Sets how commands should be executed
                 PrefixResolver = services.GetRequiredService<IPrefixResolver>().ResolvePrefixAsync   // Sets the prefix, defined by the users
             };
 

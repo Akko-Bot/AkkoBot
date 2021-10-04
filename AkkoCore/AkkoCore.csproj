@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.2.0-nightly-01013" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.2.0-nightly-01013" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.2.0-nightly-01013" />
-    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0-nightly-01013" />
+    <PackageReference Include="DSharpPlus" Version="4.2.0-nightly-01022" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.2.0-nightly-01022" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.2.0-nightly-01022" />
+    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0-nightly-01022" />
     <PackageReference Include="EFCore.NamingConventions" Version="5.0.2" />
     <PackageReference Include="linq2db.EntityFrameworkCore" Version="5.6.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
