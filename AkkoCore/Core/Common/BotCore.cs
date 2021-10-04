@@ -31,12 +31,12 @@ namespace AkkoCore.Core.Common
 
         internal BotCore(
             DiscordShardedClient client,
-            IReadOnlyDictionary<int, CommandsNextExtension> cmdHandler,
-            IReadOnlyDictionary<int, SlashCommandsExtension> slashHandler)
+            IReadOnlyDictionary<int, CommandsNextExtension> cmdHandlers,
+            IReadOnlyDictionary<int, SlashCommandsExtension> slashHandlers)
         {
             BotShardedClient = client;
-            CommandExt = cmdHandler;
-            SlashExt = slashHandler;
+            CommandExt = cmdHandlers;
+            SlashExt = slashHandlers;
 
             // Register command modules
             RegisterCommandModules();
@@ -50,6 +50,7 @@ namespace AkkoCore.Core.Common
             var assembly = Assembly.GetExecutingAssembly();
             var converters = AkkoUtilities.GetConcreteTypesOf(assembly, typeof(IArgumentConverter));
             var cogs = AkkoUtilities.GetCogAssemblies().ToArray();
+            var cogSetups = AkkoUtilities.GetCogSetups().ToArray();
 
             // Loop through the list of selected assemblies and register
             // each one of them to the command handler of each shard.
@@ -64,6 +65,10 @@ namespace AkkoCore.Core.Common
                 // Register all argument converters
                 foreach (var converter in converters)
                     cmdHandler.RegisterConverter(converter);
+
+                // Register cog argument converters
+                foreach (var cogSetup in cogSetups)
+                    cogSetup.RegisterArgumentConverters(cmdHandler);
 
                 // Register cog commands
                 foreach (var cog in cogs)

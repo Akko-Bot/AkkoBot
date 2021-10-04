@@ -1,6 +1,7 @@
 ﻿using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Events.Controllers.Abstractions;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,16 @@ namespace AkkoCore.Config.Abstractions
         /// </summary>
         /// <param name="shardedClient">The bot's sharded client.</param>
         void RegisterCallbacks(DiscordShardedClient shardedClient);
+
+        /// <summary>
+        /// Registers or unregisters argument converters into the command handler.
+        /// </summary>
+        /// <param name="cmdHandler">The command handler.</param>
+        /// <remarks>
+        /// Use <see cref="CommandsNextExtension.RegisterConverter{T}(DSharpPlus.CommandsNext.Converters.IArgumentConverter{T})"/>
+        /// to register converters and <see cref="CommandsNextExtension.UnregisterConverter{T}"/> to unregister them.
+        /// </remarks>
+        void RegisterArgumentConverters(CommandsNextExtension cmdHandler);
 
         /// <summary>
         /// Registers services from this cog to the bot's IoC container.

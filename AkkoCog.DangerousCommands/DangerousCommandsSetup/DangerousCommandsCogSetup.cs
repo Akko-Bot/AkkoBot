@@ -1,8 +1,10 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCog.DangerousCommands.Services;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Services;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -23,9 +25,11 @@ namespace AkkoCog.DangerousCommandsSetup
             => new Dictionary<Type, ulong?>(0);
 
         public void RegisterServices(IServiceCollection ioc)
+            => ioc.AddSingleton<QueryService>();
+
+        public void RegisterArgumentConverters(CommandsNextExtension cmdHandler)
         {
-            foreach (var type in AkkoUtilities.GetConcreteTypesOf(typeof(ICommandService)))
-                ioc.AddSingleton(type);
+            // This cog doesn't need argument converters
         }
 
         public void RegisterCallbacks(DiscordShardedClient shardedClient)

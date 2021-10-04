@@ -155,7 +155,6 @@ namespace AkkoCore.Services
 
             // Get all cogs from the cogs directory
             return Directory.EnumerateFiles(AkkoEnvironment.CogsDirectory, "*.dll", SearchOption.AllDirectories)
-                //.Where(filePath => filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                 .Select(filePath => Assembly.LoadFrom(filePath));
         }
 
