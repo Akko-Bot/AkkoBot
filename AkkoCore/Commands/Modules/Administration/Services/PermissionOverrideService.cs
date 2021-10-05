@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -16,7 +16,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="PermissionOverrideEntity"/> objects.
     /// </summary>
-    public sealed class PermissionOverrideService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class PermissionOverrideService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

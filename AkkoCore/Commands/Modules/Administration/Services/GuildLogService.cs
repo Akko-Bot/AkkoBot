@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -25,7 +25,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="GuildLogEntity"/> objects.
     /// </summary>
-    public sealed class GuildLogService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class GuildLogService
     {
         private readonly string _headerSeparator = new('=', 30);
         private readonly IServiceScopeFactory _scopeFactory;

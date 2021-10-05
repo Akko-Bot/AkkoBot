@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Formatters;
 using AkkoCore.Common;
@@ -117,12 +118,43 @@ namespace AkkoCore.Core.Common
         }
 
         /// <summary>
-        /// Adds all objects that implement <see cref="ICommandService"/> as a singleton service to this <see cref="BotCore"/>.
+        /// Adds all concrete types of this assembly that have an attribute of type
+        /// <see cref="CommandServiceAttribute"/> as a service to this <see cref="BotCore"/>.
         /// </summary>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
         public BotCoreBuilder WithDefaultServices()
+            => WithDefaultServices(Assembly.GetCallingAssembly());
+
+        /// <summary>
+        /// Adds all concrete types of the specified assembly that have an attribute of type
+        /// <see cref="CommandServiceAttribute"/> as a service to this <see cref="BotCore"/>.
+        /// </summary>
+        /// <param name="assembly">The assembly to register the services from.</param>
+        /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        public BotCoreBuilder WithDefaultServices(Assembly assembly)
         {
-            _cmdServices.AddSingletonServices(typeof(ICommandService));
+            var types = AkkoUtilities.GetConcreteTypesWithAttribute<CommandServiceAttribute>(assembly);
+
+            foreach (var type in types)
+            {
+                var attribute = type.GetCustomAttribute<CommandServiceAttribute>();
+
+                switch (attribute.Lifespan)
+                {
+                    case ServiceLifetime.Singleton:
+                        _cmdServices.AddSingleton(type);
+                        break;
+
+                    case ServiceLifetime.Scoped:
+                        _cmdServices.AddScoped(type);
+                        break;
+
+                    case ServiceLifetime.Transient:
+                        _cmdServices.AddTransient(type);
+                        break;
+                };
+            }
+
             return this;
         }
 

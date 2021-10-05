@@ -29,7 +29,7 @@ namespace AkkoCore.Extensions
             }
             else
             {
-                foreach (var type in AkkoUtilities.GetConcreteTypesOf(assembly, typeof(ApplicationCommandModule)))
+                foreach (var type in AkkoUtilities.GetConcreteTypesOf<ApplicationCommandModule>(assembly))
                     slashHandler.RegisterCommands(type, guildId);
             }
         }

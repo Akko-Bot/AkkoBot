@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -21,7 +22,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="BlacklistEntity"/> objects.
     /// </summary>
-    public sealed class BlacklistService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class BlacklistService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

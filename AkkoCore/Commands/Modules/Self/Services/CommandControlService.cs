@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
@@ -6,6 +6,7 @@ using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,7 +19,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods to register disabled commands to the database and the command handler.
     /// </summary>
-    public sealed class CommandControlService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class CommandControlService
     {
         private readonly MethodInfo _registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
 

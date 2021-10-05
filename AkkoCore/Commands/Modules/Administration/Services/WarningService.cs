@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -19,7 +20,11 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Administration.Services
 {
-    public sealed class WarningService : ICommandService
+    /// <summary>
+    /// Groups methods for issuing notices and infractions to a Discord user.
+    /// </summary>
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class WarningService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

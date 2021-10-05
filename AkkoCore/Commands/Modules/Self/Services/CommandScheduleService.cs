@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -20,7 +21,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="AutoCommandEntity"/> objects.
     /// </summary>
-    public sealed class CommandScheduleService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class CommandScheduleService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

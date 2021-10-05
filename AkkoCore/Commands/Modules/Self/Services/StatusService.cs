@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
@@ -25,7 +26,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="PlayingStatusEntity"/> objects.
     /// </summary>
-    public sealed class StatusService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class StatusService
     {
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;

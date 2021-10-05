@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services;
 using AkkoCore.Services.Caching.Abstractions;
@@ -19,7 +20,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="AliasEntity"/> objects.
     /// </summary>
-    public sealed class AliasService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class AliasService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

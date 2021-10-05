@@ -48,7 +48,7 @@ namespace AkkoCore.Core.Common
         private void RegisterCommandModules()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var converters = AkkoUtilities.GetConcreteTypesOf(assembly, typeof(IArgumentConverter));
+            var converters = AkkoUtilities.GetConcreteTypesOf<IArgumentConverter>(assembly);
             var cogs = AkkoUtilities.GetCogAssemblies().ToArray();
             var cogSetups = AkkoUtilities.GetCogSetups().ToArray();
 

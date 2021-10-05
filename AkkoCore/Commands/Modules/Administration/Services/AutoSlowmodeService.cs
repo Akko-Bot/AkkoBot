@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -15,7 +16,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="AutoSlowmodeEntity"/> objects.
     /// </summary>
-    public sealed class AutoSlowmodeService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class AutoSlowmodeService
     {
         private readonly IDbCache _dbCache;
         private readonly IServiceScopeFactory _scopeFactory;

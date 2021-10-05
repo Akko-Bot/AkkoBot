@@ -55,6 +55,25 @@ namespace AkkoCore.Services
             => context.Client.CurrentApplication.Owners.Any(x => x.Id == id) || context.Services.GetRequiredService<Credentials>().OwnerIds.Contains(id);
 
         /// <summary>
+        /// Gets a collection of all concrete classes of type <typeparamref name="T"/> in the current assembly.
+        /// </summary>
+        /// <typeparam name="T">The type of the abstraction.</typeparam>
+        /// <returns>A collection of types that inherit or implement <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="T"/> is not an abstraction.</exception>
+        public static IEnumerable<Type> GetConcreteTypesOf<T>()
+             => GetConcreteTypesOf(Assembly.GetCallingAssembly(), typeof(T));
+
+        /// <summary>
+        /// Gets a collection of all concrete classes of type <typeparamref name="T"/> in the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to get the types from.</param>
+        /// <typeparam name="T">The type of the abstraction.</typeparam>
+        /// <returns>A collection of types that inherit or implement <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="T"/> is not an abstraction.</exception>
+        public static IEnumerable<Type> GetConcreteTypesOf<T>(Assembly assembly)
+             => GetConcreteTypesOf(assembly, typeof(T));
+
+        /// <summary>
         /// Gets a collection of all concrete classes of the specified type in the currently calling assembly.
         /// </summary>
         /// <param name="abstraction">The type implemented by all classes.</param>
@@ -80,6 +99,54 @@ namespace AkkoCore.Services
                         && !type.IsInterface
                         && !type.IsAbstract
                         && !type.IsNested
+                );
+        }
+
+        /// <summary>
+        /// Gets a collection of all concrete classes that contain an attribute of type <typeparamref name="T"/> in the current assembly.
+        /// </summary>
+        /// <typeparam name="T">The type of the attribute.</typeparam>
+        /// <returns>A collection of all concrete types with an attribute of type <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="T"/> is not an attribute.</exception>
+        public static IEnumerable<Type> GetConcreteTypesWithAttribute<T>()
+            => GetConcreteTypesWithAttribute(Assembly.GetCallingAssembly(), typeof(T));
+
+        /// <summary>
+        /// Gets a collection of all concrete classes that contain an attribute of type <typeparamref name="T"/> in the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to search from.</param>
+        /// <typeparam name="T">The type of the attribute.</typeparam>
+        /// <returns>A collection of all concrete types with an attribute of type <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="T"/> is not an attribute.</exception>
+        public static IEnumerable<Type> GetConcreteTypesWithAttribute<T>(Assembly assembly)
+            => GetConcreteTypesWithAttribute(assembly, typeof(T));
+
+        /// <summary>
+        /// Gets a collection of all concrete classes that contain an attribute of the specified type in the current assembly.
+        /// </summary>
+        /// <param name="attributeType">The type of the attribute to search for.</param>
+        /// <returns>A collection of all concrete types with an attribute of <paramref name="attributeType"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="attributeType"/> is not an attribute.</exception>
+        public static IEnumerable<Type> GetConcreteTypesWithAttribute(Type attributeType)
+            => GetConcreteTypesWithAttribute(Assembly.GetCallingAssembly(), attributeType);
+
+        /// <summary>
+        /// Gets a collection of all concrete classes that contain an attribute of the specified type in the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to search from.</param>
+        /// <param name="attributeType">The type of the attribute to search for.</param>
+        /// <returns>A collection of all concrete types with an attribute of <paramref name="attributeType"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="attributeType"/> is not an attribute.</exception>
+        public static IEnumerable<Type> GetConcreteTypesWithAttribute(Assembly assembly, Type attributeType)
+        {
+            return (!attributeType.IsAssignableTo(typeof(Attribute)))
+                ? throw new ArgumentException("Type must be an attribute.", nameof(attributeType))
+                : assembly.GetTypes()
+                    .Where(type =>
+                        !type.IsInterface
+                        && !type.IsAbstract
+                        && !type.IsNested
+                        && type.CustomAttributes.Any(x => x.AttributeType == attributeType)
                 );
         }
 
@@ -165,7 +232,7 @@ namespace AkkoCore.Services
         internal static IEnumerable<ICogSetup> GetCogSetups()
         {
             return GetCogAssemblies()
-                .SelectMany(x => GetConcreteTypesOf(x, typeof(ICogSetup)))
+                .SelectMany(x => GetConcreteTypesOf<ICogSetup>(x))
                 .Select(x => Activator.CreateInstance(x) as ICogSetup);
         }
 
@@ -176,7 +243,7 @@ namespace AkkoCore.Services
         /// <returns>A collection of cog setups.</returns>
         internal static IEnumerable<ICogSetup> GetCogSetups(Assembly assembly)
         {
-            return GetConcreteTypesOf(assembly, typeof(ICogSetup))
+            return GetConcreteTypesOf<ICogSetup>(assembly)
                 .Select(x => Activator.CreateInstance(x) as ICogSetup);
         }
 

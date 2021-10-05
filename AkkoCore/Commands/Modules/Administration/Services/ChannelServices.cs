@@ -1,6 +1,8 @@
 using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +12,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordChannel"/> objects.
     /// </summary>
-    public sealed class ChannelService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class ChannelService
     {
         /// <summary>
         /// Sets the channel overrides for the mute role on all text channels visible to the bot.

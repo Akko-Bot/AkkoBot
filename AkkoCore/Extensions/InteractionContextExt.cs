@@ -68,7 +68,7 @@ namespace AkkoCore.Extensions
         {
             if (embed.Fields is null || embed.Fields.Count <= maxFields)
             {
-                await context.RespondLocalizedAsync(embed, false);
+                await context.RespondLocalizedAsync(embed, isEphemeral);
                 return;
             }
 

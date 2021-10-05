@@ -1,9 +1,10 @@
-using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Localization.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +15,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="BotConfigEntity"/> objects.
     /// </summary>
-    public sealed class BotConfigService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class BotConfigService
     {
         private readonly ILocalizer _localizer;
         private readonly IConfigLoader _configLoader;

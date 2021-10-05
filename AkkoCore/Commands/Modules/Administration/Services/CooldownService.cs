@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
@@ -17,7 +18,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="CommandCooldownEntity"/> objects.
     /// </summary>
-    public sealed class CooldownService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class CooldownService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ICommandCooldown _cmdCooldown;

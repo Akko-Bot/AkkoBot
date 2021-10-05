@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
@@ -20,7 +21,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for the Utilities command module.
     /// </summary>
-    public sealed class UtilitiesService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class UtilitiesService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpClientFactory _httpClientFactory;

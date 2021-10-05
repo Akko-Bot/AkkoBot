@@ -1,6 +1,7 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,8 @@ namespace AkkoCore.Commands.Formatters
     /// <summary>
     /// Defines the formatter for command placeholders in bulk greetings.
     /// </summary>
-    public sealed class BulkGreetPlaceholders : CommandPlaceholders, ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class BulkGreetPlaceholders : CommandPlaceholders
     {
         private IEnumerable<DiscordMember> _users = Enumerable.Empty<DiscordMember>();
 

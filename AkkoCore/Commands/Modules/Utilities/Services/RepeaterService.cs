@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -22,7 +23,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="RepeaterEntity"/> objects.
     /// </summary>
-    public sealed class RepeaterService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class RepeaterService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

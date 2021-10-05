@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services;
 using AkkoCore.Services.Caching.Abstractions;
@@ -20,7 +21,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="TagEntity"/> objects.
     /// </summary>
-    public sealed class TagsService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class TagsService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

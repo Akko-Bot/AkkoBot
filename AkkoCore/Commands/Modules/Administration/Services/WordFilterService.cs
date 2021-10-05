@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -14,7 +14,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="FilteredWordsEntity"/> objects.
     /// </summary>
-    public sealed class WordFilterService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class WordFilterService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

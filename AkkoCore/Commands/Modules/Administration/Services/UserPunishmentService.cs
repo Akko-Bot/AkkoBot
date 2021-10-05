@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Extensions;
@@ -20,7 +21,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for issuing punishments to Discord users.
     /// </summary>
-    public sealed class UserPunishmentService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class UserPunishmentService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;

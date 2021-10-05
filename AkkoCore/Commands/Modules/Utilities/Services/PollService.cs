@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -19,7 +20,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="PollEntity"/> objects.
     /// </summary>
-    public sealed class PollService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class PollService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

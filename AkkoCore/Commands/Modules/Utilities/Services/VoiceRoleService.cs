@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -17,7 +18,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
     /// <summary>
     /// Groups utility methods for retrieving and manipulating <see cref="VoiceRoleEntity"/> objects.
     /// </summary>
-    public sealed class VoiceRoleService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class VoiceRoleService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;

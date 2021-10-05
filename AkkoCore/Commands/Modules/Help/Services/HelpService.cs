@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
@@ -10,6 +10,7 @@ using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,8 @@ namespace AkkoCore.Commands.Modules.Help.Services
     /// <summary>
     /// Contains helper methods for the Help module.
     /// </summary>
-    public sealed class HelpService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class HelpService
     {
         private readonly ILocalizer _localizer;
         private readonly IDbCache _dbCache;

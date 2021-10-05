@@ -1,4 +1,4 @@
-using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;
@@ -21,7 +21,8 @@ namespace AkkoCore.Commands.Modules.Administration.Services
     /// <summary>
     /// Groups utility methods for manipulating <see cref="DiscordRole"/> objects.
     /// </summary>
-    public sealed class RoleService : ICommandService
+    [CommandService(ServiceLifetime.Singleton)]
+    public sealed class RoleService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IAkkoCache _akkoCache;
