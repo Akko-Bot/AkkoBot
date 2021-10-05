@@ -315,6 +315,7 @@ cmd_lockchannel: Tranca o canal atual para impedir que usuários enviem mensagen
 cmd_log: Agrupa comandos para gerenciar registros de servidor. Eventos são limitados a um canal por vez.
 cmd_log_edit: Modifica o webhook que envia registros no canal especificado.
 cmd_log_ignore: Adiciona out remove o canal especificado à lista de canais ignorados.
+cmd_log_ignoreclear: Remove todas as entradas da lista de canais ignorados.
 cmd_log_list: Exibe a lista de eventos disponíveis para registro e o canal onde estão atualmente ativos.
 cmd_log_start: Inicia registros de servidor no canal especificado. Use `log list` para visualizar a lista de eventos disponíveis para registrar. Forneça nenhum canal para gravar os registros no canal atual.
 cmd_log_stop: Encerra o registro do evento especificado.

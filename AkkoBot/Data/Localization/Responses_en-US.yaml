@@ -315,6 +315,7 @@ cmd_lockchannel: Locks the current channel so users can't send messages to it. U
 cmd_log: Groups commands for managing guild logs. Log events are restricted to one channel at a time.
 cmd_log_edit: Edits the webhook that sends logs to the specified channel.
 cmd_log_ignore: Adds or removes the specified channel to the list of ignored channels.
+cmd_log_ignoreclear: Removes all entries from the list of ignored channels.
 cmd_log_list: Lists the available log events and the channel they are currently active on.
 cmd_log_start: Starts logging on the specified channel. Use `log list` to see the list of events available for logging. Provide no channel to output the logs in the current channel.
 cmd_log_stop: Stops logging of the specified log event.
