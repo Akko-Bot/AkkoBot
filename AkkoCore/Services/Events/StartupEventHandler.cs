@@ -41,90 +41,116 @@ namespace AkkoCore.Services.Events
             _statusService = statusService;
         }
 
+        // This method exists so to make it easier for modders to apply changes to the bot
+        // that require custom state to be loaded on startup
         public Task LoadInitialStateAsync(DiscordClient client, ReadyEventArgs eventArgs)
             => Task.CompletedTask;
 
         public Task InitializeTimersAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
-            => _akkoCache.Timers.CreateClientTimersAsync(client);
-
-        public async Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+            // This method can be too slow on low-end CPUs
+            Task.Run(async () => await _akkoCache.Timers.CreateClientTimersAsync(client));
+            return Task.CompletedTask;
+        }
 
-            // Filter out the guilds that are already in the database
-            var newGuilds = client.Guilds.Keys
-                .Except(db.GuildConfig.Select(dbGuild => dbGuild.GuildId))
-                .Select(key => new GuildConfigEntity(_botConfig) { GuildId = key })
-                .ToArray();
-
-            if (newGuilds.Length is not 0)
+        public Task SaveNewGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        {
+            Task.Run(async () =>
             {
-                // Save the new guilds to the database
-                await db.BulkCopyAsync(100, newGuilds);
-            }
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+                // Filter out the guilds that are already in the database
+                var newGuilds = client.Guilds.Keys
+                    .Except(db.GuildConfig.Select(dbGuild => dbGuild.GuildId))
+                    .Select(key => new GuildConfigEntity(_botConfig) { GuildId = key })
+                    .ToArray();
+
+                if (newGuilds.Length is not 0)
+                {
+                    // Save the new guilds to the database
+                    await db.BulkCopyAsync(100, newGuilds);
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
         // Filters need to be cached even if the server has no activity, because they could be disabled but
         // have custom rules that users may want to read
-        public async Task CacheActiveGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public Task CacheActiveGuildsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
-
-            var dbGuilds = await db.GuildConfig
-                .IncludeCacheable()
-                .Where(x => (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId) // Replacement for "(sid >> 22) % max", since bitwise operators do not support ulongs
-                .ToArrayAsyncEF();
-
-            foreach (var dbGuild in dbGuilds)
+            Task.Run(async () =>
             {
-                // Do not cache guilds that have no passive activity
-                if (dbGuild.HasPassiveActivity && client.Guilds.ContainsKey(dbGuild.GuildId))
-                    _dbCache.TryAddDbGuild(dbGuild);
-            }
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+                var dbGuilds = await db.GuildConfig
+                    .IncludeCacheable()
+                    .Where(x => (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId) // Replacement for "(sid >> 22) % max", since bitwise operators do not support ulongs
+                    .ToArrayAsyncEF();
+
+                foreach (var dbGuild in dbGuilds)
+                {
+                    // Do not cache guilds that have no passive activity
+                    if (dbGuild.HasPassiveActivity && client.Guilds.ContainsKey(dbGuild.GuildId))
+                        _dbCache.TryAddDbGuild(dbGuild);
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
-        public async Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
+        public Task ExecuteStartupCommandsAsync(DiscordClient client, GuildDownloadCompletedEventArgs eventArgs)
         {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
-
-            var cmdHandler = client.GetCommandsNext();
-            var startupCmds = await db.AutoCommands
-                .Where(x => x.Type == AutoCommandType.Startup && (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId)
-                .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
-                .ToArrayAsyncEF();
-
-            foreach (var dbCmd in startupCmds)
+            Task.Run(async () =>
             {
-                var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-                if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
-                    continue;
+                var cmdHandler = client.GetCommandsNext();
+                var startupCmds = await db.AutoCommands
+                    .Where(x => x.Type == AutoCommandType.Startup && (int)(x.GuildId / (ulong)Math.Pow(2, 22) % (ulong)client.ShardCount) == client.ShardId)
+                    .Select(x => new AutoCommandEntity() { AuthorId = x.AuthorId, GuildId = x.GuildId, ChannelId = x.ChannelId, CommandString = x.CommandString })
+                    .ToArrayAsyncEF();
 
-                var prefix = (await _dbCache.GetDbGuildAsync(server.Id)).Prefix;
+                foreach (var dbCmd in startupCmds)
+                {
+                    var cmd = cmdHandler.FindCommand(dbCmd.CommandString, out var args);
 
-                var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
+                    if (cmd is null || !eventArgs.Guilds.TryGetValue(dbCmd.GuildId, out var server) || !server.Channels.TryGetValue(dbCmd.ChannelId, out var channel))
+                        continue;
 
-                if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
-                    _ = cmd.ExecuteAsync(fakeContext);  // Can't await because it takes too long to run
-            }
+                    var prefix = (await _dbCache.GetDbGuildAsync(server.Id)).Prefix;
+
+                    var fakeContext = cmdHandler.CreateFakeContext(await client.GetUserAsync(dbCmd.AuthorId), channel, cmd.QualifiedName + " " + args, prefix, cmd, args);
+
+                    if (!(await cmd.RunChecksAsync(fakeContext, false)).Any())
+                        _ = cmd.ExecuteAsync(fakeContext);  // Can't await because it takes too long to run
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
-        public async Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs _)
+        public Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs _)
         {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
-
-            var pStatus = await db.PlayingStatuses
-                .Where(x => x.RotationTime == TimeSpan.Zero)
-                .Select(x => new PlayingStatusEntity() { Message = x.Message, Type = x.Type, StreamUrl = x.StreamUrl })
-                .FirstOrDefaultAsyncEF();
-
-            if (pStatus is not null)
-                await client.UpdateStatusAsync(pStatus.Activity);
-            else if (_botConfig.RotateStatus && _dbCache.PlayingStatuses.Count != 0)
+            Task.Run(async () =>
             {
-                _botConfig.RotateStatus = !_botConfig.RotateStatus;
-                await _statusService.RotateStatusesAsync();
-            }
+                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+                var pStatus = await db.PlayingStatuses
+                    .Where(x => x.RotationTime == TimeSpan.Zero)
+                    .Select(x => new PlayingStatusEntity() { Message = x.Message, Type = x.Type, StreamUrl = x.StreamUrl })
+                    .FirstOrDefaultAsyncEF();
+
+                if (pStatus is not null)
+                    await client.UpdateStatusAsync(pStatus.Activity);
+                else if (_botConfig.RotateStatus && _dbCache.PlayingStatuses.Count is not 0)
+                {
+                    _botConfig.RotateStatus = !_botConfig.RotateStatus;
+                    await _statusService.RotateStatusesAsync();
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
         public Task UnregisterCommandsAsync(DiscordClient client, ReadyEventArgs eventArgs)

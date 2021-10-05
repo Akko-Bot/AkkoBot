@@ -105,7 +105,7 @@ namespace AkkoCore.Core.Common
 
             // Dispose scoped
             foreach (var cmdHandler in CommandExt.Values)
-                cmdHandler?.Services.GetService<AkkoDbContext>()?.Dispose();
+                cmdHandler.Services.GetService<AkkoDbContext>()?.Dispose();
 
             // Dispose clients - this also disposes the extensions
             foreach (var client in BotShardedClient.ShardClients.Values)

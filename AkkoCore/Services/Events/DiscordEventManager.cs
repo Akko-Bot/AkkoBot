@@ -55,14 +55,14 @@ namespace AkkoCore.Services.Events
             // Unregisters all disabled commands
             _shardedClient.Ready += _startup.UnregisterCommandsAsync;
 
+            // Load playing statuses
+            _shardedClient.Ready += _startup.InitializePlayingStatuses;
+
             // Initializes all timers
             _shardedClient.GuildDownloadCompleted += _startup.InitializeTimersAsync;
 
             // Save visible guilds on ready
             _shardedClient.GuildDownloadCompleted += _startup.SaveNewGuildsAsync;
-
-            // Initialize the timers stored in the database
-            _shardedClient.GuildDownloadCompleted += _startup.InitializeTimersAsync;
 
             // Caches guild filtered words
             _shardedClient.GuildDownloadCompleted += _startup.CacheActiveGuildsAsync;
@@ -233,14 +233,14 @@ namespace AkkoCore.Services.Events
             // Unregisters all disabled commands
             _shardedClient.Ready -= _startup.UnregisterCommandsAsync;
 
+            // Load playing statuses
+            _shardedClient.Ready -= _startup.InitializePlayingStatuses;
+
             // Initializes all timers
             _shardedClient.GuildDownloadCompleted -= _startup.InitializeTimersAsync;
 
             // Save visible guilds on ready
             _shardedClient.GuildDownloadCompleted -= _startup.SaveNewGuildsAsync;
-
-            // Initialize the timers stored in the database
-            _shardedClient.GuildDownloadCompleted -= _startup.InitializeTimersAsync;
 
             // Caches guild filtered words
             _shardedClient.GuildDownloadCompleted -= _startup.CacheActiveGuildsAsync;

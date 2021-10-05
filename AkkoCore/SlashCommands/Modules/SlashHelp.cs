@@ -31,7 +31,7 @@ namespace AkkoCore.SlashCommands.Modules
             var fakeContext = cmdHandler.CreateFakeContext(context.User, context.Channel, command, settings.Prefix, cmd, args);
             var message = helpBuilder.GenerateHelpMessage(fakeContext, string.IsNullOrWhiteSpace(command) ? Array.Empty<string>() : command.Split(' '));
 
-            await context.RespondLocalizedAsync(message);
+            await context.RespondLocalizedAsync(message, isError: helpBuilder.IsErroed);
         }
 
         [SlashCommand("modules", "Lists all command modules.")]
