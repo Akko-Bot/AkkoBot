@@ -25,7 +25,7 @@
     <Exec Command="xcopy &quot;$(ProjectDir)Data\Localization&quot; &quot;$(TargetDir)Data\Localization&quot; /i /e /R /Y" />
   </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Unix'">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
     <Exec Command="cp &quot;$(ProjectDir)Data/Localization&quot; &quot;$(TargetDir)Data&quot; -r" />
   </Target>
 
