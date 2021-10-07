@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,6 +7,7 @@
     <AssemblyName>AkkoBot</AssemblyName>
     <RootNamespace>AkkoBot</RootNamespace>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,10 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT'">
     <Exec Command="xcopy &quot;$(ProjectDir)Data\Localization&quot; &quot;$(TargetDir)Data\Localization&quot; /i /e /R /Y" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Unix'">
+    <Exec Command="cp &quot;$(ProjectDir)Data/Localization&quot; &quot;$(TargetDir)Data&quot; -r" />
   </Target>
 
 </Project>
