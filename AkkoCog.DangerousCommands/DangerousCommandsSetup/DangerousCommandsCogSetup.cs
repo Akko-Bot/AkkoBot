@@ -16,10 +16,11 @@ namespace AkkoCog.DangerousCommandsSetup
     /// </summary>
     public class DangerousCommandsCogSetup : ICogSetup
     {
+        // Localization files inside the "../Localization" folder
         public string LocalizationDirectory { get; } = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? string.Empty, "Localization");
 
         // This cog doesn't have slash commands
-        public IDictionary<Type, ulong?> SlashCommandsScope
+        public IReadOnlyDictionary<Type, ulong?> SlashCommandsScope
             => new Dictionary<Type, ulong?>(0);
 
         public void RegisterServices(IServiceCollection ioc)

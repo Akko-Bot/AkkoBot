@@ -2,6 +2,7 @@
 using AkkoCore.Services.Events.Controllers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Converters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace AkkoCore.Config.Abstractions
         /// The type of the slash command module and the context they should run.
         /// </summary>
         /// <remarks>The value is the ID of the guild the commands should be available to or <see langword="null"/> if the commands should be global.</remarks>
-        IDictionary<Type, ulong?> SlashCommandsScope { get; }
+        IReadOnlyDictionary<Type, ulong?> SlashCommandsScope { get; }
 
         /// <summary>
         /// Subscribes or unsubscribes methods to certain Discord websocket events.
@@ -36,7 +37,7 @@ namespace AkkoCore.Config.Abstractions
         /// </summary>
         /// <param name="cmdHandler">The command handler.</param>
         /// <remarks>
-        /// Use <see cref="CommandsNextExtension.RegisterConverter{T}(DSharpPlus.CommandsNext.Converters.IArgumentConverter{T})"/>
+        /// Use <see cref="CommandsNextExtension.RegisterConverter{T}(IArgumentConverter{T})"/>
         /// to register converters and <see cref="CommandsNextExtension.UnregisterConverter{T}"/> to unregister them.
         /// </remarks>
         void RegisterArgumentConverters(CommandsNextExtension cmdHandler);

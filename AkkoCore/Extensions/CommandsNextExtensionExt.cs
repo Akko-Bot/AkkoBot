@@ -13,12 +13,15 @@ namespace AkkoCore.Extensions
         /// </summary>
         /// <param name="cmdHandler">This command handler.</param>
         /// <param name="concreteType">The type of the converter to be registered.</param>
-        /// <remarks>
-        /// You must be absolutely sure that <paramref name="concreteType"/> implements
-        /// <see cref="IArgumentConverter{T}"/>, otherwise you're going to get runtime errors.
-        /// </remarks>
+        /// <exception cref="ArgumentException">Occurs when <paramref name="concreteType"/> does not implement <see cref="IArgumentConverter{T}"/>.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="concreteType"/> is <see langword="null"/>.</exception>
         public static void RegisterConverter(this CommandsNextExtension cmdHandler, Type concreteType)
         {
+            if (concreteType is null)
+                throw new ArgumentNullException(nameof(concreteType), "Type of argument converter cannot be null.");
+            else if (!concreteType.IsAssignableTo(typeof(IArgumentConverter)))
+                throw new ArgumentException($"Type \"{concreteType.Name}\" must implement \"IArgumentConverter<T>\"", nameof(concreteType));
+
             // TODO: figure out a way to do this without dynamic
             dynamic instance = Activator.CreateInstance(concreteType);
             cmdHandler.RegisterConverter(instance);

@@ -111,7 +111,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task IgnoreChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
         {
             var result = await _guilldService.SetPropertyAsync(context.Guild, x => ToggleElement(x.GuildLogBlacklist, (long)channel.Id));
-            
+
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((result) ? "log_ignore_add" : "log_ignore_remove", channel.Mention));
 
