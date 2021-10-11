@@ -3,6 +3,7 @@ using AkkoCore.Services.Events.Controllers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -15,19 +16,25 @@ namespace AkkoCore.Config.Abstractions
     public interface ICogSetup
     {
         /// <summary>
+        /// The name of this cog.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// The author of this cog.
+        /// </summary>
+        string Author { get; }
+
+        /// <summary>
         /// The full path to the directory where the localized response strings are stored.
         /// </summary>
         /// <remarks>The files must be in Yaml format.</remarks>
         string LocalizationDirectory { get; }
 
         /// <summary>
-        /// The type of the slash command module and the context they should run.
+        /// Registers slash commands and associated events from this cog.
         /// </summary>
-        /// <remarks>
-        /// The key is the type of the command module.
-        /// The value is the ID of the guild the commands should be available to or <see langword="null"/> if the commands should be global.
-        /// </remarks>
-        IReadOnlyDictionary<Type, ulong?> SlashCommandsScope { get; }
+        void RegisterSlashCommands(SlashCommandsExtension slashHandler);
 
         /// <summary>
         /// Subscribes or unsubscribes methods to certain Discord websocket events.

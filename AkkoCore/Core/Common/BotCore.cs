@@ -81,8 +81,8 @@ namespace AkkoCore.Core.Common
                 slashHandler.RegisterCommands(assembly);
 
                 // Register all slash commands from cogs
-                foreach (var cog in cogs)
-                    slashHandler.RegisterCogCommands(cog);
+                foreach (var cogSetup in cogSetups)
+                    cogSetup.RegisterSlashCommands(slashHandler);
             }
         }
 

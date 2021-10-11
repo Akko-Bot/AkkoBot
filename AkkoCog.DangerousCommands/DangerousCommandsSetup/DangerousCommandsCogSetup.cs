@@ -3,9 +3,8 @@ using AkkoCore.Config.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -14,17 +13,22 @@ namespace AkkoCog.DangerousCommandsSetup
     /// <summary>
     /// Initializes this cog's dependencies.
     /// </summary>
-    public class DangerousCommandsCogSetup : ICogSetup
+    internal class DangerousCommandsCogSetup : ICogSetup
     {
+        public string Name { get; } = "DangerousCommands";
+
+        public string Author { get; } = "Kotz#7922";
+
         // Localization files inside the "../Localization" folder
         public string LocalizationDirectory { get; } = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? string.Empty, "Localization");
 
-        // This cog doesn't have slash commands
-        public IReadOnlyDictionary<Type, ulong?> SlashCommandsScope
-            => new Dictionary<Type, ulong?>(0);
-
         public void RegisterServices(IServiceCollection ioc)
             => ioc.AddSingleton<QueryService>();
+
+        public void RegisterSlashCommands(SlashCommandsExtension slashHandler)
+        {
+            // This cog doesn't have slash commands
+        }
 
         public void RegisterArgumentConverters(CommandsNextExtension cmdHandler)
         {
