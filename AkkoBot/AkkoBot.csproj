@@ -29,4 +29,8 @@
     <Exec Command="cp &quot;$(ProjectDir)Data/Localization&quot; &quot;$(TargetDir)Data&quot; -r" />
   </Target>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <Exec Command="cp -r &quot;$(ProjectDir)Data/Localization&quot; &quot;$(TargetDir)Data&quot;" />
+  </Target>
+
 </Project>
