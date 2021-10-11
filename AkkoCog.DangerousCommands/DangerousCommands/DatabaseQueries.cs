@@ -97,14 +97,16 @@ namespace AkkoCog.DangerousCommands.Diagnostics // Integrate with 'Diagnostics'
         /// <param name="context">The command context.</param>
         /// <param name="task">An awaited <see cref="Task"/>.</param>
         /// <exception cref="AggregateException">Occurs when <see cref="Task.Exception"/> is not of base type <see cref="PostgresException"/>.</exception>
-        /// <exception cref="NullReferenceException">Occurs when <see cref="Task.Exception"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <see cref="Task.Exception"/> is null.</exception>
         private async Task SendPsqlErrorAsync(CommandContext context, Task task)
         {
+            if (task?.Exception is null)
+                throw new ArgumentNullException(nameof(task), "Task cannot be null.");
             if (task.Exception.GetBaseException() is not PostgresException exception)
-                throw task.Exception.GetBaseException();
+                throw task.Exception;
 
             var embed = new SerializableDiscordEmbed()
-                    .WithDescription($"{exception.Severity} ({exception.SqlState}): {exception.MessageText}\n" + exception.Hint);
+                .WithDescription($"{exception.Severity} ({exception.SqlState}): {exception.MessageText}\n" + exception.Hint);
 
             await context.RespondLocalizedAsync(embed, isError: true);
         }

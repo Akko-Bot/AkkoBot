@@ -8,7 +8,7 @@ namespace AkkoBot
     internal class Program
     {
         private static bool _restartBot = true;
-        private static CancellationTokenSource _shutdownToken;
+        private static CancellationTokenSource? _shutdownToken;
 
         // Entry point.
         private static void Main()
