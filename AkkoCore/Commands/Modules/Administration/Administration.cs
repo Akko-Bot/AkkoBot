@@ -94,18 +94,20 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_prune")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
         public async Task PruneAsync(CommandContext context,
-            [Description("arg_discord_user")] DiscordUser user = null,
+            [Description("arg_discord_user")] DiscordUser user = default,
             [Description("arg_int")] int amount = 50,
             [Description("arg_prune_options")] string options = "")
         {
+            bool UserCheck(DiscordMessage msg)
+                => user is null || msg.Author.Equals(user);
+
+            bool OptionsCheck(DiscordMessage msg)
+                => (!options.Equals(StringComparison.InvariantCultureIgnoreCase, "-s", "--safe")) || !msg.Pinned;
+
             amount = Math.Abs(amount);
             var requestLimit = AkkoUtilities.GetMaxMessageRequest(amount, 4);  // Limit it to 4 requests at most
-
-            Predicate<DiscordMessage> userCheck = (user is null) ? (msg) => true : (msg) => msg.Author.Equals(user);
-            Predicate<DiscordMessage> optionsCheck = (!options.Equals(StringComparison.InvariantCultureIgnoreCase, "-s", "--safe")) ? (msg) => true : (msg) => !msg.Pinned;
-
             var messages = (await context.Channel.GetMessagesBeforeAsync(context.Message.Id, requestLimit))
-                .Where(msg => DateTimeOffset.Now.Subtract(msg.CreationTimestamp) < AkkoStatics.MaxMessageDeletionAge && userCheck(msg) && optionsCheck(msg))
+                .Where(msg => DateTimeOffset.Now.Subtract(msg.CreationTimestamp) < AkkoStatics.MaxMessageDeletionAge && UserCheck(msg) && OptionsCheck(msg))
                 .Take(amount);
 
             if (!messages.Any())

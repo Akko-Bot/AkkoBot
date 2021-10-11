@@ -23,7 +23,10 @@ namespace AkkoCore.Config.Abstractions
         /// <summary>
         /// The type of the slash command module and the context they should run.
         /// </summary>
-        /// <remarks>The value is the ID of the guild the commands should be available to or <see langword="null"/> if the commands should be global.</remarks>
+        /// <remarks>
+        /// The key is the type of the command module.
+        /// The value is the ID of the guild the commands should be available to or <see langword="null"/> if the commands should be global.
+        /// </remarks>
         IReadOnlyDictionary<Type, ulong?> SlashCommandsScope { get; }
 
         /// <summary>

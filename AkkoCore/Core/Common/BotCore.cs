@@ -77,12 +77,12 @@ namespace AkkoCore.Core.Common
 
             foreach (var slashHandler in SlashExt.Values)
             {
-                // Register all slash commands, globally
+                // Register all default slash commands, globally
                 slashHandler.RegisterCommands(assembly);
 
-                // Register slash commands from cogs
+                // Register all slash commands from cogs
                 foreach (var cog in cogs)
-                    slashHandler.RegisterCommands(cog);
+                    slashHandler.RegisterCogCommands(cog);
             }
         }
 
