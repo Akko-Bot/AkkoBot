@@ -16,6 +16,7 @@ Features include, but are not limited to:
 - Gatekeeping
 	- Create greet and farewell messages for when users join and leave your server
 	- Anti-alt filter (keep alt accounts out of your server)
+	- Anti-hoisting (prevent users from changing their nickname just to display themselves at the top of the user list)
 - Filtering
 	- Invite filter (automatically deletes any message that contains a server invite)
 	- Word filter (automatically deletes any message that contains blacklisted words)
