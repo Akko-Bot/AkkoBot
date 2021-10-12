@@ -554,7 +554,6 @@ namespace AkkoCore.Core.Common
         /// Gets the default database connection string.
         /// </summary>
         /// <returns>The connection string.</returns>
-        /// <exception cref="NullReferenceException">Occurs when no credentials object is provided to this builder.</exception>
         private string GetDefaultConnectionString()
         {
             return
