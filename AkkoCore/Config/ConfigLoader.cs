@@ -25,7 +25,7 @@ namespace AkkoCore.Config
 
         public Credentials LoadCredentials(string filePath)
         {
-            while (!IsValidCredential(filePath)) ;
+            while (!IsValidCredential(filePath));
 
             return GetCredentials(filePath);
         }

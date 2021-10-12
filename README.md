@@ -1,3 +1,5 @@
+[![CodeFactor][CodeFactor-Badge]][CodeFactor-Url]
+
 # AkkoBot
 #### A moderation Discord bot written in C# with DSharpPlus
 
@@ -66,3 +68,5 @@ limitations under the License.
 [SupportServer]: https://discord.gg/dETvNP5Hyh
 [Role101]: https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101
 [Ko-fi]: https://ko-fi.com/kaoticz
+[CodeFactor-Url]: https://www.codefactor.io/repository/github/kaoticz/akkobot/overview/main
+[CodeFactor-Badge]: https://www.codefactor.io/repository/github/kaoticz/akkobot/badge/main

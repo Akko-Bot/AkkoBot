@@ -6,13 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.2.0-nightly-01025" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.2.0-nightly-01025" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.2.0-nightly-01025" />
-    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0-nightly-01025" />
+    <PackageReference Include="DSharpPlus" Version="4.2.0-nightly-01026" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.2.0-nightly-01026" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.2.0-nightly-01026" />
+    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0-nightly-01026" />
     <PackageReference Include="EFCore.NamingConventions" Version="5.0.2" />
     <PackageReference Include="linq2db.EntityFrameworkCore" Version="5.6.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.11" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />

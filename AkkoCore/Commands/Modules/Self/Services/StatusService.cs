@@ -112,7 +112,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>The amount of removed entries.</returns>
         public async Task<int> ClearStatusesAsync()
         {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db); ;
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
             _dbCache.PlayingStatuses.Clear();
 
             return await db.PlayingStatuses.DeleteAsync();

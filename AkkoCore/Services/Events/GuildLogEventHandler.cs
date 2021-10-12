@@ -394,7 +394,7 @@ namespace AkkoCore.Services.Events
                 using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
                 // Remove guild log from the database
-                await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == server.Id && x.ChannelId == guildLog.ChannelId).ConfigureAwait(false); ;
+                await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == server.Id && x.ChannelId == guildLog.ChannelId).ConfigureAwait(false);
 
                 // Remove guild log from the cache
                 if (guildLogs.TryRemove(guildLog) && guildLogs.Count is 0)
@@ -410,7 +410,7 @@ namespace AkkoCore.Services.Events
             try
             {
                 return _webhookClient.GetRegisteredWebhook(guildLog.WebhookId)
-                    ?? await _webhookClient.AddWebhookAsync(guildLog.WebhookId, client).ConfigureAwait(false); ;
+                    ?? await _webhookClient.AddWebhookAsync(guildLog.WebhookId, client).ConfigureAwait(false);
             }
             catch
             {

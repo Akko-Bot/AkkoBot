@@ -35,7 +35,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_guild_embed")]
         public async Task ChangeEmbedAsync(CommandContext context)
         {
-            var result = await _service.SetPropertyAsync(context.Guild, x => x.Behavior = x.Behavior.ToggleFlag(GuildConfigBehavior.UseEmbed)); ;
+            var result = await _service.SetPropertyAsync(context.Guild, x => x.Behavior = x.Behavior.ToggleFlag(GuildConfigBehavior.UseEmbed));
 
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized("guild_embed_change", (result.HasFlag(GuildConfigBehavior.UseEmbed)) ? "enabled" : "disabled"));

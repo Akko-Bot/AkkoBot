@@ -152,7 +152,7 @@ namespace AkkoCore.Core.Common
                     case ServiceLifetime.Transient:
                         _cmdServices.AddTransient(type);
                         break;
-                };
+                }
             }
 
             return this;
