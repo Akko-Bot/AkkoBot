@@ -91,7 +91,7 @@ namespace AkkoCore.Commands.Modules.Help.Services
                             ? (await cmd.RunChecksAsync(fakeContext, false)).Any() ? AkkoStatics.FailureEmoji : AkkoStatics.SuccessEmoji
                             : AkkoStatics.FailureEmoji;
 
-                    return emote + settings.Prefix + cmd.QualifiedName;
+                    return @"\" + emote + settings.Prefix + cmd.QualifiedName;
                 })
                 .ToListAsync();
 
@@ -104,8 +104,7 @@ namespace AkkoCore.Commands.Modules.Help.Services
             }
             else
             {
-                embed.WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroup)))
-                    .WithFooter(
+                embed.WithFooter(
                         _localizer.FormatLocalized(
                             settings.Locale,
                             "command_modules_footer",
@@ -113,6 +112,10 @@ namespace AkkoCore.Commands.Modules.Help.Services
                             " <" + _localizer.FormatLocalized(settings.Locale, "command").ToLowerInvariant() + ">"
                         )
                     );
+
+                // Split the results into 3 columns
+                foreach (var column in cmdGroup.SplitInto((int)Math.Ceiling(cmdGroup.Count / 3.0)))
+                    embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', column), true);
             }
 
             return embed;
