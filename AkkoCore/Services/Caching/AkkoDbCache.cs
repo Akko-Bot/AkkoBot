@@ -130,31 +130,31 @@ namespace AkkoCore.Services.Database
             if (dbGuild.AutoSlowmodeRel is not null)
                 AutoSlowmode.TryAdd(dbGuild.GuildId, dbGuild.AutoSlowmodeRel);
 
-            if (dbGuild.AliasRel.Count is not 0)
+            if (dbGuild.AliasRel?.Count is not null and not 0)
                 Aliases.TryAdd(dbGuild.GuildId, dbGuild.AliasRel.ToConcurrentHashSet());
 
-            if (dbGuild.FilteredContentRel.Count is not 0)
+            if (dbGuild.FilteredContentRel?.Count is not null and not 0)
                 FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
 
-            if (dbGuild.VoiceRolesRel.Count is not 0)
+            if (dbGuild.VoiceRolesRel?.Count is not null and not 0)
                 VoiceRoles.TryAdd(dbGuild.GuildId, dbGuild.VoiceRolesRel.ToConcurrentHashSet());
 
-            if (dbGuild.RepeaterRel.Count is not 0)
+            if (dbGuild.RepeaterRel?.Count is not null and not 0)
                 Repeaters.TryAdd(dbGuild.GuildId, dbGuild.RepeaterRel.ToConcurrentHashSet());
 
-            if (dbGuild.PollRel.Count is not 0)
+            if (dbGuild.PollRel?.Count is not null and not 0)
                 Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
 
-            if (dbGuild.GuildLogsRel.Count is not 0)
+            if (dbGuild.GuildLogsRel?.Count is not null and not 0)
                 GuildLogs.TryAdd(dbGuild.GuildId, dbGuild.GuildLogsRel.ToConcurrentHashSet());
 
-            if (dbGuild.TagsRel.Count is not 0)
+            if (dbGuild.TagsRel?.Count is not null and not 0)
                 Tags.TryAdd(dbGuild.GuildId, dbGuild.TagsRel.ToConcurrentHashSet());
 
-            if (dbGuild.PermissionOverrideRel.Count is not 0)
+            if (dbGuild.PermissionOverrideRel?.Count is not null and not 0)
                 PermissionOverrides.TryAdd(dbGuild.GuildId, dbGuild.PermissionOverrideRel.ToConcurrentHashSet());
 
-            if (dbGuild.CommandCooldownRel.Count is not 0)
+            if (dbGuild.CommandCooldownRel?.Count is not null and not 0)
                 CommandCooldown.LoadFromEntities(dbGuild.CommandCooldownRel);
 
             return true;
@@ -177,7 +177,7 @@ namespace AkkoCore.Services.Database
             Tags.TryRemove(sid, out var guildTags);
             PermissionOverrides.TryRemove(sid, out var permOverrides);
 
-            if (dbGuild.CommandCooldownRel.Count is not 0)
+            if (dbGuild.CommandCooldownRel?.Count is not null and not 0)
                 CommandCooldown.UnloadFromEntities(dbGuild.CommandCooldownRel);
 
             aliases?.Clear();
