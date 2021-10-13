@@ -284,7 +284,7 @@ namespace AkkoCore.Services.Timers
             if (!_dbCache.Guilds.ContainsKey(server.Id))
             {
                 _dbCache.Repeaters.TryRemove(server.Id, out _);
-                scope.ServiceProvider.GetService<ITimerManager>().TryRemove(entryId);
+                scope.ServiceProvider.GetRequiredService<ITimerManager>().TryRemove(entryId);   // Circular dependency if this is passed in the constructor
 
                 return;
             }

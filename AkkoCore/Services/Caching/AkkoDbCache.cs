@@ -8,9 +8,11 @@ using ConcurrentCollections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Database
@@ -213,62 +215,14 @@ namespace AkkoCore.Services.Database
                     Gatekeeping?.Clear();
                     AutoSlowmode?.Clear();
                     CommandCooldown?.Dispose();
-
-                    if (Aliases is not null)
-                    {
-                        foreach (var group in Aliases.Values)
-                            group.Clear();
-
-                        Aliases.Clear();
-                    }
-
-                    if (Polls is not null)
-                    {
-                        foreach (var group in Polls.Values)
-                            group.Clear();
-
-                        Polls.Clear();
-                    }
-
-                    if (Repeaters is not null)
-                    {
-                        foreach (var group in Repeaters.Values)
-                            group.Clear();
-
-                        Repeaters.Clear();
-                    }
-
-                    if (VoiceRoles is not null)
-                    {
-                        foreach (var group in VoiceRoles.Values)
-                            group.Clear();
-
-                        VoiceRoles.Clear();
-                    }
-
-                    if (GuildLogs is not null)
-                    {
-                        foreach (var group in GuildLogs.Values)
-                            group.Clear();
-
-                        GuildLogs.Clear();
-                    }
-
-                    if (Tags is not null)
-                    {
-                        foreach (var group in Tags.Values)
-                            group.Clear();
-
-                        Tags.Clear();
-                    }
-
-                    if (PermissionOverrides is not null)
-                    {
-                        foreach (var group in PermissionOverrides.Values)
-                            group.Clear();
-
-                        PermissionOverrides.Clear();
-                    }
+                    ClearNestedCache(Aliases);
+                    ClearNestedCache(FilteredContent);
+                    ClearNestedCache(Polls);
+                    ClearNestedCache(Repeaters);
+                    ClearNestedCache(VoiceRoles);
+                    ClearNestedCache(GuildLogs);
+                    ClearNestedCache(Tags);
+                    ClearNestedCache(PermissionOverrides);
                 }
 
                 Blacklist = null;
@@ -289,6 +243,23 @@ namespace AkkoCore.Services.Database
 
                 IsDisposed = true;
             }
+        }
+
+        /// <summary>
+        /// Fully clears a nested cache.
+        /// </summary>
+        /// <typeparam name="T">The nested type.</typeparam>
+        /// <param name="dictionary">The cache to be cleared.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ClearNestedCache<T>(IDictionary<ulong, ConcurrentHashSet<T>> dictionary)
+        {
+            if (dictionary is null)
+                return;
+
+            foreach (var collection in dictionary.Values)
+                collection.Clear();
+
+            dictionary.Clear();
         }
     }
 }

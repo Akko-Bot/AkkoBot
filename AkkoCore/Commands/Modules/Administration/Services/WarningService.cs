@@ -412,20 +412,15 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.CreateScope();
             var warnString = context.FormatLocalized("infraction");
-            var member = user as DiscordMember;
 
             switch (punishment.Type)
             {
-                case PunishmentType.Mute:
-                    if (member is null) break;
-
+                case PunishmentType.Mute when user is DiscordMember member:
                     var muteRole = await _roleService.FetchMuteRoleAsync(context.Guild);
                     await _roleService.MuteUserAsync(context, muteRole, member, punishment.Interval ?? TimeSpan.Zero, warnString + " | " + reason);
                     break;
 
-                case PunishmentType.Kick:
-                    if (member is null) break;
-
+                case PunishmentType.Kick when user is DiscordMember member:
                     await _punishmentService.KickUserAsync(context, member, warnString + " | " + reason);
                     break;
 
@@ -433,29 +428,32 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                     await _punishmentService.SoftbanUserAsync(context, user.Id, 1, warnString + " | " + reason);
                     break;
 
-                case PunishmentType.Ban:
-                    if (punishment.Interval.HasValue)
-                        await _punishmentService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
-                    else
-                        await _punishmentService.BanUserAsync(context, user.Id, 1, warnString + " | " + reason);
-
+                case PunishmentType.Ban when punishment.Interval.HasValue:
+                    await _punishmentService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
                     break;
 
-                case PunishmentType.AddRole:
-                case PunishmentType.RemoveRole:
-                    if (member is null || !context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole))
-                        break;
+                case PunishmentType.Ban when !punishment.Interval.HasValue:
+                    await _punishmentService.BanUserAsync(context, user.Id, 1, warnString + " | " + reason);
+                    break;
 
-                    if (punishment.Interval.HasValue)
-                        await _punishmentService.TimedRolePunishAsync(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
-                    else if (punishment.Type == PunishmentType.AddRole)
-                        await member.GrantRoleAsync(punishRole, warnString + " | " + reason);
-                    else
-                        await member.RevokeRoleAsync(punishRole, warnString + " | " + reason);
+                case PunishmentType.AddRole or PunishmentType.RemoveRole when user is DiscordMember member && punishment.Interval.HasValue
+                    && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
+                    
+                    await _punishmentService.TimedRolePunishAsync(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
+                    break;
 
+                case PunishmentType.AddRole when user is DiscordMember member && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
+                    await member.GrantRoleAsync(punishRole, warnString + " | " + reason);
+                    break;
+
+                case PunishmentType.RemoveRole when user is DiscordMember member && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
+                    await member.RevokeRoleAsync(punishRole, warnString + " | " + reason);
                     break;
 
                 default:
+                    if (user is DiscordMember)
+                        break;
+
                     throw new NotImplementedException($"No punishment of type \"{punishment.Type}\" has been implemented.");
             }
         }

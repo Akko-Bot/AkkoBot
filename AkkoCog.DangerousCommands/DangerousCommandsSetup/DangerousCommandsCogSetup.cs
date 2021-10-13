@@ -15,7 +15,7 @@ namespace AkkoCog.DangerousCommandsSetup
     /// </summary>
     internal class DangerousCommandsCogSetup : ICogSetup
     {
-        public string Name { get; } = "DangerousCommands";
+        public string Name { get; } = "DangerousCommands v1.0.0";
 
         public string Author { get; } = "Kotz#7922";
 

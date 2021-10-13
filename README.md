@@ -69,5 +69,5 @@ limitations under the License.
 [SupportServer]: https://discord.gg/dETvNP5Hyh
 [Role101]: https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101
 [Ko-fi]: https://ko-fi.com/kaoticz
-[CodeFactor-Url]: https://www.codefactor.io/repository/github/kaoticz/akkobot/overview/main
-[CodeFactor-Badge]: https://www.codefactor.io/repository/github/kaoticz/akkobot/badge/main
+[CodeFactor-Url]: https://www.codefactor.io/repository/github/akko-bot/akkobot/overview/main
+[CodeFactor-Badge]: https://www.codefactor.io/repository/github/akko-bot/akkobot/badge/main

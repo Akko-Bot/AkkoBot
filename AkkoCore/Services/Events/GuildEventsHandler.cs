@@ -47,6 +47,7 @@ namespace AkkoCore.Services.Events
         );
 
         private readonly ConcurrentDictionary<(ulong, ulong, ulong), (int, DateTimeOffset)> _slowmodeRegister = new();
+        private readonly TimeSpan _30seconds = TimeSpan.FromSeconds(30);
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
@@ -169,7 +170,7 @@ namespace AkkoCore.Services.Events
             // If message starts with the server prefix or bot has no permission to delete messages or server has no filtered words, quit
             if (eventArgs.Author.IsBot
                 || !_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
-                || filteredWords.Words.Count == 0
+                || filteredWords.Words.Count is 0
                 || !filteredWords.IsActive
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || IsIgnoredContext(filteredWords.IgnoredIds, eventArgs))
@@ -200,38 +201,12 @@ namespace AkkoCore.Services.Events
             }
 
             // Send notification message, if enabled
-            if (!isDeleted || !filteredWords.Behavior.HasOneFlag(WordFilterBehavior.NotifyOnDelete | WordFilterBehavior.WarnOnDelete))
-                return true;
+            if (isDeleted && filteredWords.Behavior.HasOneFlag(WordFilterBehavior.NotifyOnDelete | WordFilterBehavior.WarnOnDelete))
+                await SendFilterWordNotificationAsync(filteredWords, cmdHandler, eventArgs);
 
-            var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
-            var toWarn = filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete) && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
+            eventArgs.Handled = isDeleted;
 
-            var embed = new SerializableDiscordEmbed()
-            {
-                Body = new()
-                {
-                    Description = (string.IsNullOrWhiteSpace(filteredWords.NotificationMessage))
-                        ? "fw_default_notification"
-                        : filteredWords.NotificationMessage
-                },
-
-                Footer = (toWarn)
-                    ? new SerializableEmbedFooter("fw_warn_footer")
-                    : null
-            };
-
-            var notification = await dummyCtx.RespondLocalizedAsync(embed, false, true, eventArgs.Author.Mention);
-
-            // Apply warning, if enabled
-            if (toWarn)
-                await _warningService.SaveWarnAsync(dummyCtx, eventArgs.Guild.CurrentMember, dummyCtx.FormatLocalized("fw_default_warn"));
-
-            // Delete the notification message after some time
-            _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
-
-            eventArgs.Handled = true;
-
-            return true;
+            return isDeleted;
         }
 
         public Task<bool> FilterInviteAsync(DiscordClient _, MessageCreateEventArgs eventArgs)
@@ -459,6 +434,41 @@ namespace AkkoCore.Services.Events
             return ignoredIds.Contains((long)eventArgs.Channel.Id)
                 || ignoredIds.Contains((long)eventArgs.Author.Id)
                 || (eventArgs.Guild is not null && (eventArgs.Author as DiscordMember)?.Roles.Any(role => ignoredIds.Contains((long)role.Id)) is true);
+        }
+
+        /// <summary>
+        /// Sends a notification message for a filtered message and warns the user, if applicable.
+        /// </summary>
+        /// <param name="filteredWords">The filtered words for the current guild.</param>
+        /// <param name="cmdHandler">The command handler.</param>
+        /// <param name="eventArgs">The event arguments.</param>
+        private async Task SendFilterWordNotificationAsync(FilteredWordsEntity filteredWords, CommandsNextExtension cmdHandler, MessageCreateEventArgs eventArgs)
+        {
+            var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
+            var toWarn = filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete) && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
+
+            var embed = new SerializableDiscordEmbed()
+            {
+                Body = new()
+                {
+                    Description = (string.IsNullOrWhiteSpace(filteredWords.NotificationMessage))
+                        ? "fw_default_notification"
+                        : filteredWords.NotificationMessage
+                },
+
+                Footer = (toWarn)
+                    ? new SerializableEmbedFooter("fw_warn_footer")
+                    : null
+            };
+
+            var notification = await dummyCtx.RespondLocalizedAsync(embed, false, true, eventArgs.Author.Mention);
+
+            // Apply warning, if enabled
+            if (toWarn)
+                await _warningService.SaveWarnAsync(dummyCtx, eventArgs.Guild.CurrentMember, dummyCtx.FormatLocalized("fw_default_warn"));
+
+            // Delete the notification message after some time
+            _ = notification.DeleteWithDelayAsync(_30seconds);
         }
     }
 }
