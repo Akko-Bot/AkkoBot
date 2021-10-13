@@ -104,8 +104,7 @@ namespace AkkoCore.Commands.Modules.Help.Services
             }
             else
             {
-                embed.WithTitle(moduleName.Capitalize())
-                    .WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroup)))
+                embed.WithDescription(Formatter.BlockCode(string.Join("\t", cmdGroup)))
                     .WithFooter(
                         _localizer.FormatLocalized(
                             settings.Locale,
