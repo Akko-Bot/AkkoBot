@@ -21,7 +21,7 @@ namespace AkkoCore.Commands.Modules.Basic
     public sealed class BasicCommands : AkkoCommandModule
     {
         private const string _botAuthor = "Kotz#7922";
-        private const string _versionString = "AkkoBot v0.1.1-beta";
+        private const string _versionString = "AkkoBot v0.1.2-beta";
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
         private readonly Process _botProcess = Process.GetCurrentProcess();
         private double SecondsSinceStartup => DateTimeOffset.Now.Subtract(_startup).TotalSeconds;

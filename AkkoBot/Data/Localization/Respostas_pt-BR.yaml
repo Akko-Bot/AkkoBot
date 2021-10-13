@@ -519,7 +519,7 @@ guild_errorcolor: ErrorColor foi alterada para {0}.
 guild_locale_changed: O idioma desse servidor foi alterado para {0}.
 guild_locale_unavailable: Esse idioma não está disponível. Use {0} para ver a lista de idiomas disponíveis.
 guild_okcolor: OkColor foi alterada para {0}.
-guild_prefix_change: O prefixo nesse servidor foi alterado para {0}
+guild_prefix_change: O prefixo foi alterado para {0}
 guild_prefix_check: O prefixo nesse servidor é {0}
 guild_prop_null: Nenhuma {0} foi definina.
 guild_role_mention: Menções permissivas de cargos foram {0}s.

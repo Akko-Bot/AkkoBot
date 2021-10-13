@@ -7,7 +7,6 @@ using AkkoCore.SlashCommands.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.SlashCommands;
-using DSharpPlus.SlashCommands.Attributes;
 using System.Threading.Tasks;
 
 namespace AkkoCore.SlashCommands.Modules
@@ -25,13 +24,14 @@ namespace AkkoCore.SlashCommands.Modules
         }
 
         [SlashCommand("prefix", "Shows the prefix the bot responds to.")]
-        [SlashRequireUserPermissions(Permissions.ManageGuild)]
         public async Task SlashPrefixAsync(InteractionContext context, [RemainingText, Option("newPrefix", "The new prefix the bot should respond to.")] string prefix = null)
         {
-            if (prefix is null)
-                await CheckPrefixAsync(context);
-            else
+            if (prefix is not null
+                && ((AkkoUtilities.IsOwner(context, context.User.Id) && context.Guild is null)
+                || (context.Guild is not null && context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.ManageGuild))))
                 await SetPrefixAsync(context, prefix);
+            else
+                await CheckPrefixAsync(context);
         }
 
         private async Task SetPrefixAsync(InteractionContext context, string prefix)

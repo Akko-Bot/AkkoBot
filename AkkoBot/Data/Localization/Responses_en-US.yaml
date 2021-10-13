@@ -519,7 +519,7 @@ guild_errorcolor: ErrorColor has been changed to {0}.
 guild_locale_changed: The language for this server has been changed to {0}.
 guild_locale_unavailable: This language is not available. Use {0} to see the list of available languages.
 guild_okcolor: OkColor has been changed to {0}.
-guild_prefix_change: The prefix on this server has been changed to {0}
+guild_prefix_change: The prefix has been changed to {0}
 guild_prefix_check: The prefix on this server is {0}
 guild_prop_null: No {0} has been set.
 guild_role_mention: Permissive role mentions have been {0}.
