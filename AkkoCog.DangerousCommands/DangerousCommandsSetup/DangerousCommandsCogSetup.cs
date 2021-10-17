@@ -13,7 +13,7 @@ namespace AkkoCog.DangerousCommandsSetup
     /// <summary>
     /// Initializes this cog's dependencies.
     /// </summary>
-    internal class DangerousCommandsCogSetup : ICogSetup
+    internal sealed class DangerousCommandsCogSetup : ICogSetup
     {
         public string Name { get; } = "DangerousCommands v1.0.0";
 

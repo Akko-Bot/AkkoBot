@@ -7,6 +7,7 @@ using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services;
+using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Localization.Abstractions;
 using AkkoCore.Services.Logging;
 using AkkoCore.Services.Logging.Abstractions;
@@ -26,12 +27,14 @@ namespace AkkoCore.Commands.Modules.Self
     [Description("cmd_config")]
     public sealed class BotConfigCommands : AkkoCommandModule
     {
+        private readonly IAkkoCache _akkoCache;
         private readonly ILocalizer _localizer;
         private readonly BotConfigService _botService;
         private readonly GuildConfigService _guildService;
 
-        public BotConfigCommands(ILocalizer localizer, BotConfigService botService, GuildConfigService guildService)
+        public BotConfigCommands(IAkkoCache akkoCache, ILocalizer localizer, BotConfigService botService, GuildConfigService guildService)
         {
+            _akkoCache = akkoCache;
             _localizer = localizer;
             _botService = botService;
             _guildService = guildService;
@@ -144,12 +147,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Command("casesensitive"), Aliases("case")]
         [Description("cmd_config_case")]
         public async Task SetBotCaseSensitiveAsync(CommandContext context, [Description("arg_bool")] bool caseSensitive)
-            => await ChangePropertyAsync(context, x => x.CaseSensitiveCommands = caseSensitive);
-
-        [Command("cachesize"), Aliases("cache")]
-        [Description("cmd_config_cache")]
-        public async Task SetBotCacheSizeAsync(CommandContext context, [Description("arg_uint")] uint cacheSize)
-            => await ChangePropertyAsync(context, x => x.MessageSizeCache = (int)cacheSize);
+            => await ChangePropertyAsync(context, x => x.CaseSensitiveCommands = caseSensitive);    
 
         [Command("timeout")]
         [Description("cmd_config_timeout")]
@@ -165,6 +163,19 @@ namespace AkkoCore.Commands.Modules.Self
         [Description("cmd_gatekeepbulktime")]
         public async Task SetBulkGatekeepTimeAsync(CommandContext context, [Description("arg_gatekeep_bulktime")] TimeSpan time)
             => await ChangePropertyAsync(context, x => x.BulkGatekeepTime = time);
+
+        [Command("cachesize"), Aliases("cache")]
+        [Description("cmd_config_cache")]
+        public async Task SetBotCacheSizeAsync(CommandContext context, [Description("arg_uint")] uint cacheSize)
+        {
+            if (cacheSize is 0)
+                return;
+
+            foreach (var messageCache in _akkoCache.GuildMessageCache.Values)
+                messageCache.Resize((int)cacheSize);
+
+            await ChangePropertyAsync(context, x => x.MessageSizeCache = (int)cacheSize);
+        }
 
         [GroupCommand, Command("list"), Aliases("show")]
         [Description("cmd_config_list")]

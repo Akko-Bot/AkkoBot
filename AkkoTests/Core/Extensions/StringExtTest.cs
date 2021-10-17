@@ -2,9 +2,9 @@
 using System;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions.StringExt
+namespace AkkoTests.Core.Extensions
 {
-    public class StringExtTest
+    public sealed class StringExtTest
     {
         [Theory]
         [InlineData("hello", "hello", StringComparison.Ordinal, true)]

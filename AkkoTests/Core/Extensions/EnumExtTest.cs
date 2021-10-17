@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions.EnumExt
+namespace AkkoTests.Core.Extensions
 {
     [Flags]
     internal enum TestEnum
@@ -16,7 +16,7 @@ namespace AkkoTests.Core.Extensions.EnumExt
         E = 1 << 4
     }
 
-    public class EnumExtTest
+    public sealed class EnumExtTest
     {
         [Theory]
         /* Individual Tests */

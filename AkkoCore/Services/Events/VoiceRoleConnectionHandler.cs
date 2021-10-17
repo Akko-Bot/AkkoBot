@@ -163,9 +163,7 @@ namespace AkkoCore.Services.Events
 
             foreach (var voiceRole in voiceRoles)
             {
-                eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role);
-
-                if (role is null)
+                if (!eventArgs.Guild.Roles.TryGetValue(voiceRole.RoleId, out var role))
                     toRemove.Add(voiceRole);
                 else if (voiceRole.ChannelId != user.VoiceState.Channel.Id && user.Roles.Contains(role) && eventArgs.Guild.CurrentMember.Hierarchy > role.Position)
                     await user.RevokeRoleAsync(role);

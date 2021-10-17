@@ -55,7 +55,7 @@ namespace AkkoCore.Services.Events
 
             if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
             {
-                messageCache = new(_botConfig.MessageSizeCache);    // TODO: change this size
+                messageCache = new(_botConfig.MessageSizeCache);
                 _akkoCache.GuildMessageCache.TryAdd(eventArgs.Guild.Id, messageCache);
             }
 
@@ -79,7 +79,7 @@ namespace AkkoCore.Services.Events
             {
                 if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
                 {
-                    messageCache = new(_botConfig.MessageSizeCache) { eventArgs.Message }; // TODO: change this size
+                    messageCache = new(_botConfig.MessageSizeCache) { eventArgs.Message };
                     _akkoCache.GuildMessageCache.TryAdd(eventArgs.Guild.Id, messageCache);
                 }
 
@@ -99,7 +99,7 @@ namespace AkkoCore.Services.Events
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
                 || !guildLog.IsActive
                 || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
-                || !messageCache.TryGet(x => x.Id == eventArgs.Message.Id, out var message)
+                || !messageCache.TryGetValue(x => x.Id == eventArgs.Message.Id, out var message)
                 || IsIgnoredContext(eventArgs.Guild.Id, (eventArgs.Message.Author as DiscordMember).Roles.Select(x => x.Id).Append(eventArgs.Message.Author.Id).Append(eventArgs.Channel.Id)))
                 return;
 
@@ -134,7 +134,7 @@ namespace AkkoCore.Services.Events
             // Remove from the cache
             // The loop is needed because Remove() only removes one item from the ring buffer :facepalm:
             foreach (var message in messages)
-                messageCache.Remove(x => x.Id == message.Id);
+                messageCache.Remove(x => x?.Id == message.Id);
 
             if (webhook is not null)
                 await webhook.ExecuteAsync(_logGenerator.GetMessageBulkDeleteLog(messages, stream, eventArgs));

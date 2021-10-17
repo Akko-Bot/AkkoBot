@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions.ObjectExt
+namespace AkkoTests.Core.Extensions
 {
-    public class EqualsAnyTests
+    public sealed class EqualsAnyTests
     {
         private readonly List<MockObject> _dummies;
 

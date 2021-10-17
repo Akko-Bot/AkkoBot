@@ -3,9 +3,9 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions.ArrayExt
+namespace AkkoTests.Core.Extensions
 {
-    public class ArrayExtTest
+    public sealed class ArrayExtTest
     {
         [Theory]
         [InlineData(50)]

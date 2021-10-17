@@ -3,9 +3,9 @@ using DSharpPlus;
 using System;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions.DateTimeOffsetExt
+namespace AkkoTests.Core.Extensions
 {
-    public class DateTimeOffsetExtTest
+    public sealed class DateTimeOffsetExtTest
     {
         private readonly DateTimeOffset _now = DateTimeOffset.Now;
 

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace AkkoCog.DangerousCommands.Diagnostics // Integrate with 'Diagnostics'
 {
     [BotOwner]
-    public class DatabaseQueries : AkkoCommandModule
+    public sealed class DatabaseQueries : AkkoCommandModule
     {
         private readonly QueryService _service;
 

@@ -16,7 +16,7 @@ namespace AkkoCog.DangerousCommands.Services
     /// <summary>
     /// Groups utility methods for querying the database manually.
     /// </summary>
-    public class QueryService
+    public sealed class QueryService
     {
         // TODO: I may need to, in the future, specify which database needs to be queried
         private readonly IServiceScopeFactory _scopeFactory;

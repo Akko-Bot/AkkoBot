@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions.LinqExt
+namespace AkkoTests.Core.Extensions
 {
-    public class LinqExtTest
+    public sealed class LinqExtTest
     {
         private readonly List<MockObject> _nullCollection = null;
         private readonly List<MockObject> _dummiesEmpty = Enumerable.Empty<MockObject>().ToList();

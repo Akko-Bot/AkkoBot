@@ -1,4 +1,5 @@
-﻿using AkkoCore.Services.Caching.Abstractions;
+﻿using AkkoCore.Common;
+using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -13,7 +14,7 @@ namespace AkkoCore.Services.Caching
     /// </summary>
     public sealed class AkkoCache : IAkkoCache
     {
-        public ConcurrentDictionary<ulong, RingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();
+        public ConcurrentDictionary<ulong, DynamicRingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();
         public ConcurrentDictionary<string, Command> DisabledCommandCache { get; internal set; }
         public ITimerManager Timers { get; private set; }
 
