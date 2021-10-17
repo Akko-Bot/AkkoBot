@@ -18,14 +18,13 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Basic
 {
-    public sealed class BasicCommands : AkkoCommandModule
+    public sealed class BasicCommands : AkkoCommandModule, IDisposable
     {
         private const string _botAuthor = "Kotz#7922";
         private const string _versionString = "AkkoBot v0.1.2-beta";
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
-        private readonly Process _botProcess = Process.GetCurrentProcess();
-        private double SecondsSinceStartup => DateTimeOffset.Now.Subtract(_startup).TotalSeconds;
-
+        private readonly Process _currentProcess = Process.GetCurrentProcess();
+        
         private readonly ICommandHandler _commandHandler;
         private readonly IGlobalEventsHandler _globalEvents;
         private readonly IDbCache _dbCache;
@@ -55,29 +54,30 @@ namespace AkkoCore.Commands.Modules.Basic
         [Description("cmd_stats")]
         public async Task UptimeAsync(CommandContext context)
         {
-            var elapsed = DateTimeOffset.Now.Subtract(_startup);
+            _currentProcess.Refresh();
 
+            var elapsed = GetTimeSinceStartup();
             var embed = new SerializableDiscordEmbed()
                 .WithAuthor(_versionString, AkkoConstants.RepositoryUrl, context.Client.CurrentUser.AvatarUrl ?? context.Client.CurrentUser.DefaultAvatarUrl)
                 .AddField("author", _botAuthor, true)
-                .AddField("commands_executed", context.FormatLocalized("{0} ({1:0.00}/s)", _commandHandler.CommandsRan, _commandHandler.CommandsRan / this.SecondsSinceStartup), true)
+                .AddField("commands_executed", $"{_commandHandler.CommandsRan} ({_commandHandler.CommandsRan / elapsed.TotalSeconds:F2}/s)", true)
                 .AddField("Shards", $"#{context.Client.ShardId}/{context.Client.ShardCount}", true) // Shards is not localized - this is intentional
                 .AddField("gateway", $"v{context.Client.GatewayVersion}", true)
-                .AddField("messages", context.FormatLocalized("{0} ({1:0.00}/s)", _globalEvents.MessageCount, _globalEvents.MessageCount / this.SecondsSinceStartup), true)
-                .AddField("memory", $"{_botProcess.PrivateMemorySize64 / 1000000.0:0.0} MB", true)
+                .AddField("messages", $"{_globalEvents.MessageCount} ({_globalEvents.MessageCount / elapsed.TotalSeconds:F2}/s)", true)
+                .AddField("memory", $"{_currentProcess.PrivateMemorySize64 / 1_000_000.0:F1} MB", true)    // Process needs to be fetched every single time for the value to update
                 .AddField("owner_ids", string.Join("\n", GetBotOwnerIds(context.Client, _creds)), true)
                 .AddField(
                     "uptime",
                     context.FormatLocalized("{0}: {1}\n", "days", elapsed.Days) +
                     context.FormatLocalized("{0}: {1}\n", "hours", elapsed.Hours) +
-                    context.FormatLocalized("{0}: {1}\n", "minutes", elapsed.Minutes),
+                    context.FormatLocalized("{0}: {1}", "minutes", elapsed.Minutes),
                     inline: true
                 )
                 .AddField(
                     "presence",
                     context.FormatLocalized("{0}: {1}\n", "servers", _shardedClient.ShardClients.Values.Sum(client => client.Guilds.Count)) +
                     context.FormatLocalized("{0}: {1}\n", "channels", _shardedClient.ShardClients.Values.Sum(client => client.Guilds.Values.Sum(y => y.Channels.Count))) +
-                    context.FormatLocalized("{0}: {1}\n", "users", _dbCache.Users.Count),
+                    context.FormatLocalized("{0}: {1}", "users", _dbCache.Users.Count),
                     inline: true
                 );
 
@@ -101,6 +101,12 @@ namespace AkkoCore.Commands.Modules.Basic
             await context.RespondPaginatedByFieldsAsync(embed, 2);
         }
 
+        public void Dispose()
+        {
+            _currentProcess.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// Gets the user IDs of all bot owners.
         /// </summary>
@@ -114,5 +120,13 @@ namespace AkkoCore.Commands.Modules.Basic
                 .Concat(client.CurrentApplication.Owners.Select(x => x.Id))
                 .Distinct();
         }
+
+        /// <summary>
+        /// Gets the time elapsed since the bot started up.
+        /// </summary>
+        /// <returns>The time elapsed.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private TimeSpan GetTimeSinceStartup()
+            => DateTimeOffset.Now.Subtract(_startup);
     }
 }
