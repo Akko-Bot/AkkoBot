@@ -147,7 +147,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Command("casesensitive"), Aliases("case")]
         [Description("cmd_config_case")]
         public async Task SetBotCaseSensitiveAsync(CommandContext context, [Description("arg_bool")] bool caseSensitive)
-            => await ChangePropertyAsync(context, x => x.CaseSensitiveCommands = caseSensitive);    
+            => await ChangePropertyAsync(context, x => x.CaseSensitiveCommands = caseSensitive);
 
         [Command("timeout")]
         [Description("cmd_config_timeout")]

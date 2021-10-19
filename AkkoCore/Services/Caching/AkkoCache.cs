@@ -1,7 +1,6 @@
 ﻿using AkkoCore.Common;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Timers.Abstractions;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System;

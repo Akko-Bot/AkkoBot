@@ -24,7 +24,7 @@ namespace AkkoTests.Core.DataStructures
 
             if (collection == default)
                 Assert.True(ringBuffer.All(x => x == default), "Buffer was not filled with default values.");
-            
+
             if (capacity != default)
                 Assert.True(capacity == ringBuffer.Capacity);
 

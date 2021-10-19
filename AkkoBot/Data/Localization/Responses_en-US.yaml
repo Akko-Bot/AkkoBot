@@ -761,6 +761,10 @@ server_timezone: Time zone on this server is {0}.
 servers: Servers
 settings: Settings
 shutdown: Shutting down.
+slash_bot_cmd_error: I don't have enough permission to execute this slash command.
+slash_dm_cmd_error: This slash command can only be executed in direct message.
+slash_guild_cmd_error: This slash command can only be executed in a Discord server.
+slash_user_cmd_error: You don't have permission to execute this slash command.
 slowmode: Slowmode
 softban: Soft-ban
 softban_enum: soft-banned

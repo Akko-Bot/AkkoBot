@@ -24,7 +24,7 @@ namespace AkkoCore.Commands.Modules.Basic
         private const string _versionString = "AkkoBot v0.1.2-beta";
         private readonly DateTimeOffset _startup = DateTimeOffset.Now;
         private readonly Process _currentProcess = Process.GetCurrentProcess();
-        
+
         private readonly ICommandHandler _commandHandler;
         private readonly IGlobalEventsHandler _globalEvents;
         private readonly IDbCache _dbCache;

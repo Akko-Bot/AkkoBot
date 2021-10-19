@@ -1,3 +1,5 @@
+[![.NET Unit Tests][.NET-Badge]][.NET-Url]
+[![CodeQL][CodeQL-Badge]][CodeQL-Url]
 [![CodeFactor][CodeFactor-Badge]][CodeFactor-Url]
 
 # AkkoBot
@@ -71,3 +73,7 @@ limitations under the License.
 [Ko-fi]: https://ko-fi.com/kaoticz
 [CodeFactor-Url]: https://www.codefactor.io/repository/github/akko-bot/akkobot/overview/main
 [CodeFactor-Badge]: https://www.codefactor.io/repository/github/akko-bot/akkobot/badge/main
+[.NET-Url]: ../../actions/workflows/dotnet.yml
+[.NET-Badge]: ../../actions/workflows/dotnet.yml/badge.svg
+[CodeQL-Url]: ../../actions/workflows/codeql-analysis.yml
+[CodeQL-Badge]: ../../actions/workflows/codeql-analysis.yml/badge.svg

@@ -761,6 +761,10 @@ server_timezone: O fuso horário desse servidor é {0}.
 servers: Servidores
 settings: Configuração
 shutdown: Desligando.
+slash_bot_cmd_error: Eu não tenho permissão suficiente para executar esse comando.
+slash_dm_cmd_error: Esse comando só pode ser executado em mensagem direta.
+slash_guild_cmd_error: Esse comando só pode ser executado em um servidor de Discord.
+slash_user_cmd_error: Você não tem permissão para executar esse comando.
 slowmode: Modo Lento
 softban: Expulsar e Excluir
 softban_enum: expulso

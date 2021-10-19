@@ -438,7 +438,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
                 case PunishmentType.AddRole or PunishmentType.RemoveRole when user is DiscordMember member && punishment.Interval.HasValue
                     && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
-                    
+
                     await _punishmentService.TimedRolePunishAsync(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
                     break;
 
