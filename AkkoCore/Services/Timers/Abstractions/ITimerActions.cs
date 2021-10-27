@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// Adds a role to a Discord user.
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
         Task AddPunishRoleAsync(int entryId, DiscordGuild server, ulong userId);
 
@@ -22,14 +22,14 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
         /// <param name="client">The Discord client that created the autocommand.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         Task ExecuteCommandAsync(int entryId, DiscordClient client, DiscordGuild server);
 
         /// <summary>
         /// Removes old warnings from the specified user.
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
         Task RemoveOldWarningAsync(int entryId, DiscordGuild server, ulong userId);
 
@@ -37,7 +37,7 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// Removes a role from a Discord user.
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
         Task RemovePunishRoleAsync(int entryId, DiscordGuild server, ulong userId);
 
@@ -46,7 +46,7 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
         /// <param name="client">The Discord client that created the reminder.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         Task SendReminderAsync(int entryId, DiscordClient client, DiscordGuild server);
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
         /// <param name="client">The Discord client that created the autocommand.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         Task SendRepeaterAsync(int entryId, DiscordClient client, DiscordGuild server);
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// Unmutes a user on a Discord server.
         /// </summary>
         /// <param name="entryId">The ID of the timer in the database.</param>
-        /// <param name="server">The Discord server to unmute from.</param>
+        /// <param name="server">The Discord server.</param>
         /// <param name="userId">The ID of the user to be unmuted.</param>
         Task UnmuteAsync(int entryId, DiscordGuild server, ulong userId);
     }

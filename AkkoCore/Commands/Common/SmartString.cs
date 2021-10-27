@@ -92,7 +92,7 @@ namespace AkkoCore.Commands.Common
         /// <param name="sanitizeRoles">Defines whether role mentions should be sanitized or not.</param>
         /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\.]+)\((.+?)\)}|{([\w\.]+)}".</param>
         /// <param name="formatter">The object responsible for converting the placeholders to the values they represent.</param>
-        public SmartString(CommandContext context, string content, bool sanitizeRoles = false, Regex regex = null, IPlaceholderFormatter formatter = null)
+        public SmartString(CommandContext context, string content, bool sanitizeRoles = false, Regex regex = default, IPlaceholderFormatter formatter = default)
         {
             _context = context;
             _contentBuilder = new(content ?? context.RawArgumentString);

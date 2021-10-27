@@ -49,7 +49,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             }
             catch
             {
-                result = null;
+                result = default;
                 return false;
             }
         }

@@ -14,7 +14,7 @@ namespace AkkoCore.SlashCommands.Attributes
     AttributeTargets.Method,
     AllowMultiple = false,
     Inherited = true)]
-    public sealed class AkkoSlashRequireGuild : SlashCheckBaseAttribute
+    public sealed class AkkoSlashRequireGuildAttribute : SlashCheckBaseAttribute
     {
         public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
         {

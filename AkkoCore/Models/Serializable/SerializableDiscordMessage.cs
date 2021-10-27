@@ -153,12 +153,12 @@ namespace AkkoCore.Models.Serializable
         /// Converts all text content from message builder into a string.
         /// </summary>
         /// <returns>A formatted string with the contents of message.</returns>
-        public string Deconstruct()
+        public string Decompose()
         {
             var dEmbed = new StringBuilder(((Content is null) ? string.Empty : Content + "\n\n"));
 
             foreach (var embed in Embeds ?? Enumerable.Empty<SerializableDiscordEmbed>())
-                dEmbed = embed.Deconstruct(dEmbed);
+                dEmbed = embed.Decompose(dEmbed);
 
             return dEmbed.ToString();
         }

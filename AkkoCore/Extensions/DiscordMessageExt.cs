@@ -38,7 +38,7 @@ namespace AkkoCore.Extensions
 
             return (settings.UseEmbed)
                 ? await msg.ModifyAsync(embed.BuildMessage())
-                : await msg.ModifyAsync(embed.Deconstruct());
+                : await msg.ModifyAsync(embed.Decompose());
         }
 
         /// <summary>

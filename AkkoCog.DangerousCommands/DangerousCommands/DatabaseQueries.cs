@@ -79,7 +79,7 @@ namespace AkkoCog.DangerousCommands.Diagnostics // Integrate with 'Diagnostics'
 
             var (fields, time) = await result;
 
-            var text = SerializableDiscordEmbed.DeconstructEmbedFields(fields)
+            var text = SerializableDiscordEmbed.DecomposeEmbedFields(fields)
                 .Replace("\r", string.Empty);
 
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text[..text.LastOccurrenceOf('\n', 2)]));    // Substring to remove the last row of empty values

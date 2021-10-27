@@ -14,7 +14,7 @@ namespace AkkoCore.SlashCommands.Attributes
     AttributeTargets.Method,
     AllowMultiple = false,
     Inherited = true)]
-    public sealed class AkkoSlashRequireDm : SlashCheckBaseAttribute
+    public sealed class AkkoSlashRequireDmAttribute : SlashCheckBaseAttribute
     {
         public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
         {

@@ -25,20 +25,20 @@ namespace AkkoCore.Extensions
         /// <summary>
         /// Converts all text content from this embed into a string.
         /// </summary>
-        /// <param name="embed">Embed to be deconstructed.</param>
+        /// <param name="embed">Embed to be decomposed.</param>
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A formatted string with the contents of the embed.</returns>
-        public static string Deconstruct(this DiscordEmbed embed)
-            => Deconstruct(embed, null).ToString();
+        public static string Decompose(this DiscordEmbed embed)
+            => Decompose(embed, null).ToString();
 
         /// <summary>
         /// Converts all text content from this embed into a string.
         /// </summary>
-        /// <param name="embed">Embed to be deconstructed.</param>
+        /// <param name="embed">Embed to be decomposed.</param>
         /// <param name="stringBuilder">String builder to be used in the deconstruction.</param>
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A string builder with the contents of the embed.</returns>
-        public static StringBuilder Deconstruct(this DiscordEmbed embed, StringBuilder stringBuilder)
+        public static StringBuilder Decompose(this DiscordEmbed embed, StringBuilder stringBuilder)
         {
             stringBuilder ??= new StringBuilder();
 
@@ -49,7 +49,7 @@ namespace AkkoCore.Extensions
             );
 
             if (embed.Fields.Count is not 0)
-                stringBuilder.Append(Formatter.BlockCode(SerializableDiscordEmbed.DeconstructEmbedFields(embed.Fields.Select(x => new SerializableEmbedField(x)), 3))); // Discord limits embeds to 3 inline fields per line
+                stringBuilder.Append(Formatter.BlockCode(SerializableDiscordEmbed.DecomposeEmbedFields(embed.Fields.Select(x => new SerializableEmbedField(x)), 3))); // Discord limits embeds to 3 inline fields per line
 
             stringBuilder.Append(
                 ((embed.Image?.Url is null) ? string.Empty : $"{embed.Image.Url}\n\n") +

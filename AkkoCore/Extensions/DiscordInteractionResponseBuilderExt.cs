@@ -47,12 +47,12 @@ namespace AkkoCore.Extensions
         /// </summary>
         /// <param name="response">This interaction response.</param>
         /// <returns>A formatted string with the contents of this response.</returns>
-        public static string Deconstruct(this DiscordInteractionResponseBuilder response)
+        public static string Decompose(this DiscordInteractionResponseBuilder response)
         {
             var dEmbed = new StringBuilder(((response.Content is null) ? string.Empty : response.Content + "\n\n"));
 
             foreach (var embed in response.Embeds ?? Enumerable.Empty<DiscordEmbed>())
-                dEmbed = embed.Deconstruct(dEmbed);
+                dEmbed = embed.Decompose(dEmbed);
 
             return dEmbed.ToString();
         }

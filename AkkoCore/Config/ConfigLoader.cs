@@ -25,8 +25,7 @@ namespace AkkoCore.Config
 
         public Credentials LoadCredentials(string filePath)
         {
-            while (!IsValidCredential(filePath));
-
+            while (!IsValidCredential(filePath)) { }
             return GetCredentials(filePath);
         }
 
@@ -114,8 +113,8 @@ namespace AkkoCore.Config
                 CreateConfigFile<Credentials>(filePath);
 
                 PauseProgram(
-                    @"A credentials file has been generated for you at " +
-                    AkkoEnvironment.CredsPath + Environment.NewLine +
+                    @"A credentials file has been generated for you at:" +
+                    Environment.NewLine + AkkoEnvironment.CredsPath + Environment.NewLine +
                     @"Please, add your data to it and"
                 );
             }

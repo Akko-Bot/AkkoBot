@@ -8,27 +8,27 @@ using System.Threading.Tasks;
 namespace AkkoCore.SlashCommands.Attributes
 {
     /// <summary>
-    /// Checks if the bot is allowed to execute a slash command and responds with an error message if it isn't.
+    /// Checks if the slash command was executed in direct message and sends an error message if it nas not issued by a bot owner.
     /// </summary>
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
     AllowMultiple = false,
     Inherited = true)]
-    public sealed class AkkoSlashRequireBotPermission : SlashCheckBaseAttribute
+    public sealed class AkkoSlashRequireUserPermissionAttribute : SlashCheckBaseAttribute
     {
         private readonly Permissions _permissions;
 
-        public AkkoSlashRequireBotPermission(Permissions permissions)
+        public AkkoSlashRequireUserPermissionAttribute(Permissions permissions)
             => _permissions = permissions;
 
         public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
         {
-            if (ctx.Guild is null || ctx.Guild.CurrentMember.PermissionsIn(ctx.Channel).HasPermission(_permissions))
+            if (ctx.Member is null || ctx.Member.PermissionsIn(ctx.Channel).HasPermission(_permissions))
                 return Task.FromResult(true);
 
             var embed = new SerializableDiscordEmbed()
-                .WithDescription("slash_bot_cmd_error");
+                .WithDescription("slash_user_cmd_error");
 
             _ = ctx.RespondLocalizedAsync(embed, true, true);
 

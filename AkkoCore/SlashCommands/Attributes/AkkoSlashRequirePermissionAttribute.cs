@@ -15,11 +15,11 @@ namespace AkkoCore.SlashCommands.Attributes
     AttributeTargets.Method,
     AllowMultiple = false,
     Inherited = true)]
-    public sealed class AkkoSlashRequirePermission : SlashCheckBaseAttribute
+    public sealed class AkkoSlashRequirePermissionAttribute : SlashCheckBaseAttribute
     {
         private readonly Permissions _permissions;
 
-        public AkkoSlashRequirePermission(Permissions permissions)
+        public AkkoSlashRequirePermissionAttribute(Permissions permissions)
             => _permissions = permissions;
 
         public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)

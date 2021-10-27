@@ -1,6 +1,6 @@
 ﻿using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
-using DSharpPlus;
+using AkkoCore.Services;
 using DSharpPlus.SlashCommands;
 using System;
 using System.Threading.Tasks;
@@ -8,23 +8,18 @@ using System.Threading.Tasks;
 namespace AkkoCore.SlashCommands.Attributes
 {
     /// <summary>
-    /// Checks if the slash command was executed in direct message and sends an error message if it nas not issued by a bot owner.
+    /// Checks if the user is allowed to execute a slash command and responds with an error message if it isn't.
     /// </summary>
     [AttributeUsage(
     AttributeTargets.Class |
     AttributeTargets.Method,
     AllowMultiple = false,
     Inherited = true)]
-    public sealed class AkkoSlashRequireUserPermission : SlashCheckBaseAttribute
+    public class AkkoSlashRequireOwnerInDmAttribute : SlashCheckBaseAttribute
     {
-        private readonly Permissions _permissions;
-
-        public AkkoSlashRequireUserPermission(Permissions permissions)
-            => _permissions = permissions;
-
         public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
         {
-            if (ctx.Member is null || ctx.Member.PermissionsIn(ctx.Channel).HasPermission(_permissions))
+            if (ctx.Guild is not null || AkkoUtilities.IsOwner(ctx, ctx.User.Id))
                 return Task.FromResult(true);
 
             var embed = new SerializableDiscordEmbed()

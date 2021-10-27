@@ -240,15 +240,15 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A formatted string with the contents of the embed.</returns>
-        public string Deconstruct()
-            => (!this.HasValidEmbed()) ? string.Empty : this.Deconstruct(null).ToString();
+        public string Decompose()
+            => (!this.HasValidEmbed()) ? string.Empty : this.Decompose(null).ToString();
 
         /// <summary>
         /// Converts all text content from this embed into a string.
         /// </summary>
         /// <param name="stringBuilder">The string builder to be used during deconstruction.</param>
         /// <returns>The provided <paramref name="stringBuilder"/> with this embed's formatted content.</returns>
-        public StringBuilder Deconstruct(StringBuilder stringBuilder)
+        public StringBuilder Decompose(StringBuilder stringBuilder)
         {
             stringBuilder ??= new StringBuilder();
 
@@ -262,7 +262,7 @@ namespace AkkoCore.Models.Serializable
             );
 
             if (this.Fields?.Count is not null and not 0)
-                stringBuilder.Append(Formatter.BlockCode(DeconstructEmbedFields(this.Fields, 3))); // Discord limits embeds to 3 inline fields per line
+                stringBuilder.Append(Formatter.BlockCode(DecomposeEmbedFields(this.Fields, 3))); // Discord limits embeds to 3 inline fields per line
 
             stringBuilder.Append(
                 ((this.Body?.ImageUrl is null) ? string.Empty : $"{this.Body.ImageUrl}\n\n") +
@@ -394,7 +394,7 @@ namespace AkkoCore.Models.Serializable
         /// <param name="originalFields">The collection of embed fields.</param>
         /// <param name="inlineLimit">Defines how many inline fields should be allowed on a single line. Set to 0 to disable.</param>
         /// <returns>The formatted content of the fields.</returns>
-        public static string DeconstructEmbedFields(IEnumerable<SerializableEmbedField> originalFields, int inlineLimit = 0)
+        public static string DecomposeEmbedFields(IEnumerable<SerializableEmbedField> originalFields, int inlineLimit = 0)
         {
             // Redistribute the fields into groups based on their inline property
             var sisterFields = new List<List<SerializableEmbedField>> { new List<SerializableEmbedField>() };

@@ -265,7 +265,7 @@ namespace AkkoCore.Services
 
             return (settings.UseEmbed)
                 ? message
-                : new SerializableDiscordMessage() { Content = message.Deconstruct() };
+                : new SerializableDiscordMessage() { Content = message.Decompose() };
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace AkkoCore.Services
 
             return (settings.UseEmbed)
                 ? response
-                : new DiscordInteractionResponseBuilder() { Content = response.Deconstruct() };
+                : new DiscordInteractionResponseBuilder() { Content = response.Decompose() };
         }
 
         /// <summary>
@@ -415,7 +415,7 @@ namespace AkkoCore.Services
         {
             foreach (var page in pages)
             {
-                page.Content += ("\n\n" + page.Embed.Deconstruct()).MaxLength(AkkoConstants.MaxMessageLength - page.Content?.Length ?? 0);
+                page.Content += ("\n\n" + page.Embed.Decompose()).MaxLength(AkkoConstants.MaxMessageLength - page.Content?.Length ?? 0);
                 page.Embed = null;
             }
 

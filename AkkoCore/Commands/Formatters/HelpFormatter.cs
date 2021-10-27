@@ -93,6 +93,53 @@ namespace AkkoCore.Commands.Formatters
         /// <returns>This HelpFormatter.</returns>
         private HelpFormatter WithCommand(CommandContext context, Command cmd)
         {
+            // Local function to add the overload text to the help message
+            void AddCommandOverloadText(CommandContext context, Command cmd, StringBuilder stringBuilder)
+            {
+                // Get the parameters of valid overloads
+                var reflectedParameters = GetOverloads(cmd).ToArray();
+
+                // Format usage
+                foreach (var overload in cmd.Overloads.OrderBy(x => x.Arguments.Count))
+                {
+                    if (!IsValidOverload(overload, reflectedParameters))
+                        continue;
+
+                    // If command takes no argument
+                    if (overload.Arguments.Count == 0)
+                    {
+                        stringBuilder.AppendLine(Formatter.InlineCode(context.Prefix + cmd.QualifiedName) + "\n");
+                        continue;
+                    }
+
+                    // Format full command name + <arguments>
+                    stringBuilder.Append('`' + context.Prefix + cmd.QualifiedName);
+
+                    foreach (var argument in overload.Arguments)
+                        stringBuilder.Append($" <{argument.Name}>");
+
+                    stringBuilder.AppendLine("`");
+
+                    // Format argument descriptions
+                    foreach (var argument in overload.Arguments)
+                    {
+                        var optional = (argument.IsOptional)
+                            ? $"({context.FormatLocalized("help_optional")})"
+                            : string.Empty;
+
+                        stringBuilder.AppendLine(
+                            $"{Formatter.InlineCode(argument.Name)}: {optional} " +
+                            context.FormatLocalized(argument.Description ?? string.Empty)
+                        );
+                    }
+
+                    stringBuilder.AppendLine();
+                }
+
+                _helpMessage.AddField("usage", stringBuilder.ToString());
+                stringBuilder.Clear();
+            }
+
             // Set title and description
             _helpMessage
                 .WithTitle(GetHelpHeader(cmd))
@@ -123,51 +170,8 @@ namespace AkkoCore.Commands.Formatters
             }
 
             // If this is a group, there are no arguments to be shown
-            if (cmd is CommandGroup)
-                return this;
-
-            // Get the parameters of valid overloads
-            var reflectedParameters = GetOverloads(cmd).ToArray();
-
-            // Format usage
-            foreach (var overload in cmd.Overloads.OrderBy(x => x.Arguments.Count))
-            {
-                if (!IsValidOverload(overload, reflectedParameters))
-                    continue;
-
-                // If command takes no argument
-                if (overload.Arguments.Count == 0)
-                {
-                    stringBuilder.AppendLine(Formatter.InlineCode(context.Prefix + cmd.QualifiedName) + "\n");
-                    continue;
-                }
-
-                // Format full command name + <arguments>
-                stringBuilder.Append('`' + context.Prefix + cmd.QualifiedName);
-
-                foreach (var argument in overload.Arguments)
-                    stringBuilder.Append($" <{argument.Name}>");
-
-                stringBuilder.AppendLine("`");
-
-                // Format argument descriptions
-                foreach (var argument in overload.Arguments)
-                {
-                    var optional = (argument.IsOptional)
-                        ? $"({context.FormatLocalized("help_optional")})"
-                        : string.Empty;
-
-                    stringBuilder.AppendLine(
-                        $"{Formatter.InlineCode(argument.Name)}: {optional} " +
-                        context.FormatLocalized(argument.Description ?? string.Empty)
-                    );
-                }
-
-                stringBuilder.AppendLine();
-            }
-
-            _helpMessage.AddField("usage", stringBuilder.ToString());
-            stringBuilder.Clear();
+            if (cmd is not CommandGroup)
+                AddCommandOverloadText(context, cmd, stringBuilder);
 
             return this;
         }

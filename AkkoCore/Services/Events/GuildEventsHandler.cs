@@ -264,6 +264,7 @@ namespace AkkoCore.Services.Events
         public Task FilterContentAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Author.IsBot
+                || !_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild)
                 || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
                 || (_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id))
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
@@ -271,21 +272,15 @@ namespace AkkoCore.Services.Events
 
             var filter = filters.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id);
 
-            if (filter is null || !filter.IsActive)
-                return Task.CompletedTask;
-
-            var prefix = _dbCache.Guilds[eventArgs.Guild.Id].Prefix;
-
             // Check if message contains a valid content. If it does, leave it alone.
-            if ((filter.ContentType.HasFlag(ContentFilter.Attachment) && eventArgs.Message.Attachments.Count is not 0)
+            if (filter is null || !filter.IsActive
+                || (filter.ContentType.HasFlag(ContentFilter.Attachment) && eventArgs.Message.Attachments.Count is not 0)
                 || (filter.ContentType.HasFlag(ContentFilter.Url) && _urlRegex.IsMatch(eventArgs.Message.Content))
                 || (filter.ContentType.HasFlag(ContentFilter.Invite) && HasInvite(eventArgs.Message))
                 || (filter.ContentType.HasFlag(ContentFilter.Image) && HasImage(eventArgs.Message))
                 || (filter.ContentType.HasFlag(ContentFilter.Sticker) && eventArgs.Message.Stickers.Count is not 0)
-                || (filter.ContentType.HasFlag(ContentFilter.Command) && client.GetCommandsNext().FindCommand(eventArgs.Message.Content[prefix.Length..], out _) is not null))
-            {
+                || (filter.ContentType.HasFlag(ContentFilter.Command) && client.GetCommandsNext().FindCommand(eventArgs.Message.Content[dbGuild.Prefix.Length..], out _) is not null))
                 return Task.CompletedTask;
-            }
 
             eventArgs.Handled = true;
             return eventArgs.Message.DeleteAsync();

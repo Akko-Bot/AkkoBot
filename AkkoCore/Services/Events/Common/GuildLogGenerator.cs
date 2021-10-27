@@ -431,7 +431,7 @@ namespace AkkoCore.Services.Events.Common
         /// <returns>The webhook message.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private DiscordWebhookBuilder GetStandardMessage(SerializableDiscordEmbed message, GuildConfigEntity dbGuild)
-            => (dbGuild.UseEmbed) ? message.BuildWebhookMessage() : new DiscordWebhookBuilder() { Content = message.Deconstruct() };
+            => (dbGuild.UseEmbed) ? message.BuildWebhookMessage() : new DiscordWebhookBuilder() { Content = message.Decompose() };
 
         /// <summary>
         /// Returns the smallest time string for the specified time span.
