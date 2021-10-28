@@ -118,6 +118,9 @@ namespace AkkoCore.Services.Timers
 
             try
             {
+                if (timerEntry is null or { RoleId: null })
+                    return;
+
                 var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedrole");
                 server.Roles.TryGetValue(timerEntry.RoleId.Value, out var punishRole);
                 var user = await server.GetMemberAsync(userId);
@@ -145,6 +148,9 @@ namespace AkkoCore.Services.Timers
 
             try
             {
+                if (timerEntry is null or { RoleId: null })
+                    return;
+
                 var localizedReason = _localizer.GetResponseString(dbGuild.Locale, "timedunrole");
                 server.Roles.TryGetValue(timerEntry.RoleId.Value, out var punishRole);
                 var user = await server.GetMemberAsync(userId);
@@ -187,7 +193,7 @@ namespace AkkoCore.Services.Timers
 
             try
             {
-                var user = FindMember(dbReminder.AuthorId, server);
+                var user = FindMember(dbReminder.AuthorId, server) ?? await server.GetMemberAsync(dbReminder.AuthorId);
 
                 _dbCache.Guilds.TryGetValue(dbReminder.GuildId ?? default, out var dbGuild);
 
@@ -205,7 +211,7 @@ namespace AkkoCore.Services.Timers
                     user,
                     channel,
                     dbReminder.Content,
-                    (dbReminder.IsPrivate) ? _botConfig.Prefix : dbGuild.Prefix,
+                    (dbReminder.IsPrivate) ? _botConfig.Prefix : dbGuild!.Prefix,
                     null
                 );
 
@@ -215,7 +221,7 @@ namespace AkkoCore.Services.Timers
 
                 var localizedDate = (server is null)
                     ? dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(_botConfig.Locale))
-                    : dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(dbGuild.Locale));
+                    : dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(dbGuild!.Locale));
 
                 var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
 
@@ -310,7 +316,7 @@ namespace AkkoCore.Services.Timers
                 var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
 
                 // If last message is the same repeated message, do nothing
-                if ((lastMessage is not null && lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg.Content && lastMessage.Embeds[0] == dmsg.Embed)
+                if ((lastMessage is not null && lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg!.Content && lastMessage.Embeds[0] == dmsg.Embed)
                     || (!wasDeserialized && lastMessage?.Content == message && lastMessage.Author == server.CurrentMember))
                     return;
 
@@ -330,7 +336,7 @@ namespace AkkoCore.Services.Timers
 
                 await db.Timers.DeleteAsync(x => x.Id == entryId);
 
-                scope.ServiceProvider.GetService<ITimerManager>().TryRemove(entryId);
+                scope.ServiceProvider.GetRequiredService<ITimerManager>().TryRemove(entryId);   // Circular dependency if this is passed in the constructor
 
                 _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run a repeater. [User: {dbRepeater?.AuthorId}] [Server: {dbRepeater?.GuildIdFK}] [{ex.Message}]");
             }
@@ -358,7 +364,7 @@ namespace AkkoCore.Services.Timers
         /// If the user is not found in it, the search expands to all guilds the bot is in.
         /// </remarks>
         /// <returns>The <see cref="DiscordMember"/>, <see langword="null"/> if the user doesn't share any server with the bot.</returns>
-        private DiscordMember FindMember(ulong uid, DiscordGuild server = null)
+        private DiscordMember? FindMember(ulong uid, DiscordGuild? server = default)
         {
             if (server is not null && server.Members.TryGetValue(uid, out var member))
                 return member;
@@ -371,7 +377,7 @@ namespace AkkoCore.Services.Timers
                     return member;
             }
 
-            return null;
+            return default;
         }
     }
 }

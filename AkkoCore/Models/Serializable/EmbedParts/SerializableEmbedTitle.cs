@@ -8,17 +8,17 @@ namespace AkkoCore.Models.Serializable.EmbedParts
     /// </summary>
     public class SerializableEmbedTitle
     {
-        private string _text;
+        private string? _text;
 
         /// <summary>
         /// The URL associated with the <see cref="Text"/>.
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// The text to be displayed on the embed's title.
         /// </summary>
-        public string Text
+        public string? Text
         {
             get => _text;
             set => _text = value?.MaxLength(AkkoConstants.MaxEmbedTitleLength);
@@ -28,7 +28,7 @@ namespace AkkoCore.Models.Serializable.EmbedParts
         {
         }
 
-        public SerializableEmbedTitle(string text, string url)
+        public SerializableEmbedTitle(string? text, string? url)
         {
             Text = text;
             Url = url;

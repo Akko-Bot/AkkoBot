@@ -35,7 +35,7 @@ namespace AkkoCore.Extensions
         /// <param name="content">The content outside the embed.</param>
         /// <remarks>The question message gets deleted, regardless of user input.</remarks>
         /// <returns>The interaction between the user and the message.</returns>
-        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, SerializableDiscordEmbed embed, string expectedResponseKey, Func<Task> action, bool isMarked = true, bool isError = false, string content = default)
+        public static async Task<InteractivityResult<DiscordMessage>> RespondInteractiveAsync(this CommandContext context, SerializableDiscordEmbed embed, string expectedResponseKey, Func<Task> action, bool isMarked = true, bool isError = false, string? content = default)
             => await RespondInteractiveAsync(context, new SerializableDiscordMessage(content, embed), expectedResponseKey, action, isMarked, isError);
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace AkkoCore.Extensions
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <param name="content">The content outside the embed.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent.</returns>
-        public static Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, SerializableDiscordEmbed embed, bool isMarked = true, bool isError = false, string content = default)
+        public static Task<DiscordMessage> RespondLocalizedAsync(this CommandContext context, SerializableDiscordEmbed embed, bool isMarked = true, bool isError = false, string? content = default)
             => RespondLocalizedAsync(context, new SerializableDiscordMessage(content, embed), isMarked, isError);
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace AkkoCore.Extensions
         {
             var localizedMsg = AkkoUtilities.GetLocalizedMessage(context.Services, message, context.Guild?.Id, isError);
 
-            if (isMarked && !string.IsNullOrWhiteSpace(localizedMsg?.Embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
+            if (isMarked && !string.IsNullOrWhiteSpace(localizedMsg.Embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
                 localizedMsg.Embed.Body.Description = localizedMsg.Embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return context.Channel.SendMessageAsync(localizedMsg.Build());
@@ -112,7 +112,7 @@ namespace AkkoCore.Extensions
         /// <param name="content">The content outside the embed.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
-        public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, ulong userId, SerializableDiscordEmbed embed, bool isError = false, string content = default)
+        public static async Task<DiscordMessage?> SendLocalizedDmAsync(this CommandContext context, ulong userId, SerializableDiscordEmbed embed, bool isError = false, string? content = default)
             => await SendLocalizedDmAsync(context, await context.Guild.GetMemberAsync(userId), new SerializableDiscordMessage(content, embed), isError);
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace AkkoCore.Extensions
         /// <param name="message">The message to be sent.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
-        public static async Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, ulong userId, SerializableDiscordMessage message, bool isError = false)
+        public static async Task<DiscordMessage?> SendLocalizedDmAsync(this CommandContext context, ulong userId, SerializableDiscordMessage message, bool isError = false)
             => await SendLocalizedDmAsync(context, await context.Guild.GetMemberAsync(userId), message, isError);
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace AkkoCore.Extensions
         /// <param name="message">The message to be sent.</param>
         /// <param name="isError"><see langword="true"/> if the embed should contain the guild ErrorColor, <see langword="false"/> for OkColor.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
-        public static Task<DiscordMessage> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, SerializableDiscordMessage message, bool isError = false)
+        public static Task<DiscordMessage?> SendLocalizedDmAsync(this CommandContext context, DiscordMember user, SerializableDiscordMessage message, bool isError = false)
         {
             var localizedEmbed = AkkoUtilities.GetLocalizedMessage(context.Services, message, context.Guild?.Id, isError);
             return user.SendMessageSafelyAsync(localizedEmbed.Build());
@@ -153,7 +153,7 @@ namespace AkkoCore.Extensions
         /// <see cref="RespondPaginatedByFieldsAsync(CommandContext, SerializableDiscordEmbed, IEnumerable{SerializableEmbedField}, int, string)"/>
         /// instead.
         /// </remarks>
-        public static async Task RespondPaginatedAsync(this CommandContext context, string input, SerializableDiscordEmbed embed, int maxLength = 500, string content = null)
+        public static async Task RespondPaginatedAsync(this CommandContext context, string input, SerializableDiscordEmbed embed, int maxLength = 500, string? content = default)
         {
             if (input.Length <= maxLength)
             {
@@ -192,7 +192,7 @@ namespace AkkoCore.Extensions
         /// <see cref="RespondPaginatedAsync(CommandContext, string, SerializableDiscordEmbed, int, string)"/>
         /// instead.
         /// </remarks>
-        public static async Task RespondPaginatedByFieldsAsync(this CommandContext context, SerializableDiscordEmbed embed, int maxFields = 3, string content = null)
+        public static async Task RespondPaginatedByFieldsAsync(this CommandContext context, SerializableDiscordEmbed embed, int maxFields = 3, string? content = default)
         {
             if (embed.Fields is null || embed.Fields.Count <= maxFields)
             {
@@ -230,7 +230,7 @@ namespace AkkoCore.Extensions
         /// <see cref="RespondPaginatedAsync(CommandContext, string, SerializableDiscordEmbed, int, string)"/>
         /// instead.
         /// </remarks>
-        public static async Task RespondPaginatedByFieldsAsync(this CommandContext context, SerializableDiscordEmbed embed, IEnumerable<SerializableEmbedField> fields, int maxFields = 3, string content = null)
+        public static async Task RespondPaginatedByFieldsAsync(this CommandContext context, SerializableDiscordEmbed embed, IEnumerable<SerializableEmbedField> fields, int maxFields = 3, string? content = default)
         {
             if (fields.Count() <= maxFields)
             {
@@ -267,7 +267,7 @@ namespace AkkoCore.Extensions
         /// <param name="key">The key for the response string.</param>
         /// <param name="args">Variables to be included into the formatted response string.</param>
         /// <returns>A formatted and localized response string.</returns>
-        public static string FormatLocalized(this CommandContext context, string key, params object[] args)
+        public static string FormatLocalized(this CommandContext context, string key, params object?[] args)
         {
             var dbCache = context.Services.GetRequiredService<IDbCache>();
             var localizer = context.Services.GetRequiredService<ILocalizer>();
@@ -302,8 +302,11 @@ namespace AkkoCore.Extensions
             if (context.Guild is null)
                 return TimeZoneInfo.Local;
 
-            var dbCache = context.Services.GetRequiredService<IDbCache>();
-            return AkkoUtilities.GetTimeZone(dbCache.Guilds[context.Guild.Id].Timezone, true);
+            var timezone = context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].Timezone;
+
+            return (timezone is null)
+                ? TimeZoneInfo.Local
+                : AkkoUtilities.GetTimeZone(timezone, true)!;
         }
     }
 }

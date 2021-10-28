@@ -49,7 +49,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// A tuple with the database entry and a boolean indicating whether the entry was
         /// added (<see langword="true"/>) or updated (<see langword="false"/>).
         /// </returns>
-        public async Task<(BlacklistEntity, bool)> AddBlacklistAsync(CommandContext context, BlacklistType type, ulong id, string reason)
+        public async Task<(BlacklistEntity, bool)> AddBlacklistAsync(CommandContext context, BlacklistType type, ulong id, string? reason)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -131,10 +131,10 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>
         /// The entry if the removal was successful, <see langword="null"/> otherwise.
         /// </returns>
-        public async Task<BlacklistEntity> RemoveBlacklistAsync(ulong contextId)
+        public async Task<BlacklistEntity?> RemoveBlacklistAsync(ulong contextId)
         {
             if (!_dbCache.Blacklist.Contains(contextId))
-                return null;
+                return default;
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -168,7 +168,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <param name="predicate">Expression tree to filter the result.</param>
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all blacklist entries.</remarks>
         /// <returns>A collection of blacklist entries that match the criteria of <paramref name="predicate"/>.</returns>
-        public async Task<IReadOnlyCollection<BlacklistEntity>> GetBlacklistAsync(Expression<Func<BlacklistEntity, bool>> predicate = null)
+        public async Task<IReadOnlyCollection<BlacklistEntity>> GetBlacklistAsync(Expression<Func<BlacklistEntity, bool>>? predicate = default)
             => await GetBlacklistAsync(predicate, x => x);
 
         /// <summary>
@@ -180,12 +180,12 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it gets all blacklist entries.</remarks>
         /// <returns>A collection of <typeparamref name="T"/> whose entries match the criteria of <paramref name="predicate"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
-        public async Task<IReadOnlyCollection<T>> GetBlacklistAsync<T>(Expression<Func<BlacklistEntity, bool>> predicate, Expression<Func<BlacklistEntity, T>> selector)
+        public async Task<IReadOnlyCollection<T>> GetBlacklistAsync<T>(Expression<Func<BlacklistEntity, bool>>? predicate, Expression<Func<BlacklistEntity, T>> selector)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
             return await db.Blacklist
-                .Where(predicate)
+                .Where(predicate ?? (x => true))
                 .Select(selector)
                 .ToArrayAsync();
         }
@@ -197,14 +197,14 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <param name="blType">The type of the blacklist.</param>
         /// <param name="id">The ID provided by the user.</param>
         /// <returns>The name of the entity if found, <see langword="null"/> otherwise.</returns>
-        private string GetBlacklistedName(CommandContext context, BlacklistType blType, ulong id)
+        private string? GetBlacklistedName(CommandContext context, BlacklistType blType, ulong id)
         {
             return blType switch
             {
                 BlacklistType.User =>
                     context.Client.Guilds.Values
                         .FirstOrDefault(x => x.Members.Values.Any(u => u.Id == id))
-                        .Members.Values.FirstOrDefault(u => u.Id == id)
+                        ?.Members.Values.FirstOrDefault(u => u.Id == id)
                         ?.GetFullname(),
 
                 BlacklistType.Channel =>

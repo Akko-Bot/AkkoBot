@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace AkkoCore.Extensions
@@ -31,8 +32,10 @@ namespace AkkoCore.Extensions
         /// <param name="maxLength">The maximum length the string should have.</param>
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
+#nullable disable
         public static string MaxLength(this string text, int maxLength)
             => text?.Substring(0, Math.Min(text.Length, maxLength));
+#nullable enable
 
         /// <summary>
         /// Truncates the string to the maximum specified length.
@@ -43,10 +46,12 @@ namespace AkkoCore.Extensions
         /// <remarks>The <paramref name="append"/> only gets added to the truncated string if this string exceeds <paramref name="maxLength"/> in length.</remarks>
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
+#nullable disable
         public static string MaxLength(this string text, int maxLength, string append)
-            => (text.Length <= maxLength)
+            => (text is null || text.Length <= maxLength)
                 ? text
                 : (text.MaxLength(Math.Max(0, maxLength - append.Length)) + append)[..maxLength];
+#nullable enable
 
         /// <summary>
         /// Returns a new string that has a space character inserted at its begining and that
@@ -58,7 +63,7 @@ namespace AkkoCore.Extensions
         /// <returns>This string padded to the right.</returns>
         public static string HardPad(this string text, int totalLength)
             => string.IsNullOrWhiteSpace(text)
-                ? text?.PadRight(totalLength)
+                ? text?.PadRight(totalLength) ?? string.Empty
                 : text.Insert(0, " ").PadRight(totalLength);
 
         /// <summary>
@@ -167,7 +172,7 @@ namespace AkkoCore.Extensions
         /// <param name="comparisonType">The comparison rules.</param>
         /// <param name="match">The resulting match in the collection or <see langword="null"/> if none was found.</param>
         /// <returns><see langword="true"/> if there was one matching entry, <see langword="false"/> otherwise.</returns>
-        public static bool Equals(this IEnumerable<string> collection, string target, StringComparison comparisonType, out string match)
+        public static bool Equals(this IEnumerable<string> collection, string target, StringComparison comparisonType, [MaybeNullWhen(false)] out string? match)
         {
             foreach (var word in collection)
             {
@@ -178,7 +183,7 @@ namespace AkkoCore.Extensions
                 }
             }
 
-            match = null;
+            match = default;
             return false;
         }
 

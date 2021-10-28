@@ -73,7 +73,7 @@ namespace AkkoCore.Services.Localization.Abstractions
         /// The localized response string, if it exists.
         /// An empty string, if <paramref name="response"/> is <see langword="null"/>.
         /// </returns>
-        string GetResponseString(string locale, string response);
+        string GetResponseString(string locale, string? response);
 
         /// <summary>
         /// Clears the cache and loads all response strings again.
@@ -97,6 +97,6 @@ namespace AkkoCore.Services.Localization.Abstractions
         /// <param name="key">The response key to be localized.</param>
         /// <param name="args">Variables to be included into the formatted response string.</param>
         /// <returns>A formatted and localized response string.</returns>
-        string FormatLocalized(string locale, string key, params object[] args);
+        string FormatLocalized(string locale, string key, params object?[] args);
     }
 }

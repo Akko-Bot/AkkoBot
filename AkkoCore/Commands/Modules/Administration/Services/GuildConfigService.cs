@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Administration.Services
@@ -37,7 +38,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="locale">The locale to check for.</param>
         /// <param name="match">The locale if found, <see langword="null"/> otherwise.</param>
         /// <returns><see langword="true"/> if a match is found, <see langword="false"/> otherwise.</returns>
-        public bool IsLocaleRegistered(string locale, out string match)
+        public bool IsLocaleRegistered(string locale, [MaybeNullWhen(false)] out string? match)
             => _localizer.Locales.Equals(locale, StringComparison.InvariantCultureIgnoreCase, out match);
 
         /// <summary>
@@ -80,14 +81,12 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord guild.</param>
         /// <returns>The guild settings.</returns>
-        /// <exception cref="ArgumentNullException">Occurs when <paramref name="server"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the guild settings are not found.</exception>
         public GuildConfigEntity GetGuildSettings(DiscordGuild server)
         {
-            if (server is null)
-                throw new ArgumentNullException(nameof(server), "Discord guild cannot be null.");
-
-            _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
-            return dbGuild;
+            return (_dbCache.Guilds.TryGetValue(server.Id, out var dbGuild))
+                ? dbGuild
+                : throw new InvalidOperationException("Guild settings were not found - potential cache invalidation issue");
         }
     }
 }

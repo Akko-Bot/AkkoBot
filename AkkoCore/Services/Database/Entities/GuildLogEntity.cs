@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Database.Entities
         /// <summary>
         /// The settings of the Discord guild this poll is associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord guild this poll is associated with.

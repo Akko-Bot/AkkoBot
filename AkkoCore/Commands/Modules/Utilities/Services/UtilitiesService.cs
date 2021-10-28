@@ -40,7 +40,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="input">The user's input.</param>
         /// <param name="result">The deserialized input.</param>
         /// <returns><see langword="true"/> if deserialization was successful, <see langword="false"/> otherwise.</returns>
-        public bool DeserializeEmbed(string input, out DiscordMessageBuilder result)
+        public bool DeserializeEmbed(string input, out DiscordMessageBuilder? result)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="url">The URL to make the GET request.</param>
         /// <param name="cToken">The cancellation token.</param>
         /// <returns>A <see cref="Stream"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
-        public async Task<Stream> GetOnlineStreamAsync(string url, CancellationToken cToken = default)
+        public async Task<Stream?> GetOnlineStreamAsync(string url, CancellationToken cToken = default)
         {
             var httpClient = _httpClientFactory.CreateClient();
 
@@ -107,12 +107,12 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="name">The name of the emoji.</param>
         /// <remarks>If an emoji with the same <paramref name="name"/> is found, it will be replaced with the new emoji.</remarks>
         /// <returns><see langword="true"/> if the emoji got added, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddGuildEmojiAsync(CommandContext context, DiscordEmoji emoji, string name = null)
+        public async Task<bool> AddGuildEmojiAsync(CommandContext context, DiscordEmoji emoji, string? name = default)
         {
             name = name?.Trim(':') ?? emoji.Name.SanitizeEmojiName();
             var imageStream = await GetOnlineStreamAsync(emoji.Url);
 
-            return await AddEmojiAsync(context, imageStream, name);
+            return imageStream is not null && await AddEmojiAsync(context, imageStream, name);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="name">The name of the emoji. Defaults to the file name in the URL.</param>
         /// <remarks>If an emoji with the same <paramref name="name"/> is found, it will be replaced with the new emoji.</remarks>
         /// <returns><see langword="true"/> if the emoji got added, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddGuildEmojiAsync(CommandContext context, Uri url, string name = null)
+        public async Task<bool> AddGuildEmojiAsync(CommandContext context, Uri url, string? name = default)
         {
             // Check if file extension is supported
             if (!url.AbsoluteUri.Contains('.') || !url.AbsoluteUri[(url.AbsoluteUri.LastIndexOf('.') + 1)..].StartsWith(AkkoStatics.SupportedEmojiFormats, StringComparison.InvariantCultureIgnoreCase))
@@ -143,7 +143,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="attachments">The attachments in a <see cref="DiscordMessage"/>.</param>
         /// <param name="additionalDelay">Time, in seconds, to add to the delay between processing each attachment.</param>
         /// <returns><see langword="true"/> if at least one emoji got added, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddGuildEmojisAsync(CommandContext context, IEnumerable<DiscordAttachment> attachments, double additionalDelay = 0)
+        public async Task<bool> AddGuildEmojisAsync(CommandContext context, IEnumerable<DiscordAttachment> attachments, double additionalDelay = 0.0)
         {
             var success = false;
             await context.TriggerTypingAsync();
@@ -156,7 +156,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
 
                 var name = attachment.FileName.RemoveExtension();
                 var imageStream = await GetOnlineStreamAsync(attachment.Url);
-                var added = await AddEmojiAsync(context, imageStream, name);
+                var added = imageStream is not null && await AddEmojiAsync(context, imageStream, name);
 
                 success = success || added;
 
@@ -248,7 +248,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
                 case ChannelType.Voice:
                     embed.AddField("category", channel.Parent?.Name ?? "-", true)
                         .AddField("bitrate", $"{channel.Bitrate / 1000} kbps", true)
-                        .AddField("user_limit", channel.UserLimit.ToString(), true)
+                        .AddField("user_limit", channel.UserLimit.ToString() ?? "-", true)
                         .AddField("connected_users", channel.Users.Count.ToString(), true);
                     break;
 

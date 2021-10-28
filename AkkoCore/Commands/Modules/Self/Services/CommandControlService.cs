@@ -22,7 +22,8 @@ namespace AkkoCore.Commands.Modules.Self.Services
     [CommandService(ServiceLifetime.Singleton)]
     public sealed class CommandControlService
     {
-        private readonly MethodInfo _registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic);
+        private readonly MethodInfo _registrationMethod = typeof(CommandsNextExtension).GetMethod("AddToCommandDictionary", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException("Method \"AddToCommandDictionary\" was not found on the type \"CommandsNextExtension\".");
 
         private readonly IAkkoCache _akkoCache;
         private readonly IConfigLoader _configLoader;
@@ -75,7 +76,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         {
             if (!_akkoCache.DisabledCommandCache.Keys.Equals(cmdString, StringComparison.InvariantCultureIgnoreCase, out var qualifiedName))
                 return false;
-            if (!_akkoCache.DisabledCommandCache.TryRemove(qualifiedName, out var cmd))
+            if (!_akkoCache.DisabledCommandCache.TryRemove(qualifiedName!, out var cmd))
                 return false;
 
             var result = _botConfig.DisabledCommands.TryRemove(cmd.QualifiedName);

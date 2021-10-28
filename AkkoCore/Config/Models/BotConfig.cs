@@ -31,7 +31,7 @@ namespace AkkoCore.Config.Models
         public string Locale
         {
             get => _locale;
-            set => _locale = value?.MaxLength(10);
+            set => _locale = value.MaxLength(10);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace AkkoCore.Config.Models
         public string OkColor
         {
             get => _okColor;
-            set => _okColor = value?.MaxLength(6).ToUpperInvariant();
+            set => _okColor = value.MaxLength(6).ToUpperInvariant();
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace AkkoCore.Config.Models
         public string ErrorColor
         {
             get => _errorColor;
-            set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
+            set => _errorColor = value.MaxLength(6).ToUpperInvariant();
         }
 
         /// <summary>
@@ -132,8 +132,13 @@ namespace AkkoCore.Config.Models
 
         public override IReadOnlyDictionary<string, string> GetSettings()
         {
-            var result = base.GetSettings() as Dictionary<string, string>;
-            result[nameof(DisabledCommands).ToSnakeCase()] = string.Join(", ", DisabledCommands);
+            var result = base.GetSettings();
+
+            if (result is Dictionary<string, string> toRemove)
+            {
+                toRemove[nameof(DisabledCommands).ToSnakeCase()] = string.Join(", ", DisabledCommands);
+                return toRemove;
+            }
 
             return result;
         }

@@ -18,7 +18,7 @@ namespace AkkoCore.Services.Events.Abstractions
         /// <param name="componentId">The ID of the component.</param>
         /// <param name="options">The options of the interaction.</param>
         /// <returns>The response for the given ID or <see langword="null"/> if it was not found.</returns>
-        ValueTask<DiscordInteractionResponseBuilder> RequestAsync(DiscordMessage message, string componentId, string[] options);
+        ValueTask<DiscordInteractionResponseBuilder?> RequestAsync(DiscordMessage message, string componentId, string[] options);
 
         /// <summary>
         /// Adds a controller to this handler.

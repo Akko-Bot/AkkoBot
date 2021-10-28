@@ -132,12 +132,14 @@ namespace AkkoCore.Commands.Modules.Administration
 
             var embed = new SerializableDiscordEmbed()
                 .WithTitle("autoslowmode_title")
-                .WithDescription((slowmode.IgnoredIds.Count is not 0) ? $"{context.FormatLocalized("ignored_ids")}: {string.Join(", ", slowmode.IgnoredIds)}" : null)
                 .AddField("message", slowmode.MessageAmount.ToString(), true)
                 .AddField("trigger_time", slowmode.SlowmodeTriggerTime.ToString(), true)
                 .AddField("interval", slowmode.SlowmodeInterval.ToString(), true)
                 .AddField("duration", slowmode.SlowmodeDuration.ToString(), true)
                 .WithFooter((slowmode.IsActive) ? "is_active" : "is_not_active");
+
+            if (slowmode.IgnoredIds.Count is not 0)
+                embed.WithDescription($"{context.FormatLocalized("ignored_ids")}: {string.Join(", ", slowmode.IgnoredIds)}");
 
             await context.RespondLocalizedAsync(embed, false);
         }

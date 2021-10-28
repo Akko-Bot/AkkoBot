@@ -57,13 +57,13 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord guild.</param>
         /// <returns>The guild's autoslowmode settings or <see langword="null"/> if it doesn't exist.</returns>
-        public AutoSlowmodeEntity GetAutoSlowmodeSettings(DiscordGuild server)
+        public AutoSlowmodeEntity? GetAutoSlowmodeSettings(DiscordGuild server)
         {
             if (_dbCache.AutoSlowmode.TryGetValue(server.Id, out var gatekeeper))
                 return gatekeeper;
 
             _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
-            return dbGuild.AutoSlowmodeRel;
+            return dbGuild?.AutoSlowmodeRel;
         }
     }
 }

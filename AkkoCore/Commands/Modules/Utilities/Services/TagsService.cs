@@ -108,7 +108,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="context">The command context.</param>
         /// <param name="predicate">A method defining what tags in the current context should be removed.</param>
         /// <returns>The amount of removed tags.</returns>
-        public async Task<int> RemoveTagAsync(CommandContext context, Expression<Func<TagEntity, bool>> predicate = null)
+        public async Task<int> RemoveTagAsync(CommandContext context, Expression<Func<TagEntity, bool>>? predicate = default)
         {
             if (!_dbCache.Tags.TryGetValue(context.Guild?.Id ?? default, out var tags))
                 return 0;
@@ -117,7 +117,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            var result = await db.Tags.Where(x => x.GuildIdFK == ((context.Guild == null) ? null : context.Guild.Id))
+            var result = await db.Tags
+                .Where(x => x.GuildIdFK == ((context.Guild == null) ? null : context.Guild.Id))
                 .DeleteAsync(predicate);
 
             // Update the cache
@@ -144,7 +145,9 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             // Update the cache
             foreach (var tag in tags)
             {
-                _dbCache.Tags.TryGetValue(tag.GuildIdFK ?? default, out var cachedTags);
+                if (!_dbCache.Tags.TryGetValue(tag.GuildIdFK ?? default, out var cachedTags))
+                    continue;
+
                 cachedTags.TryRemove(tag);
 
                 if (cachedTags.Count is 0)
@@ -167,15 +170,15 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="id">The database ID of the tag.</param>
         /// <param name="setter">A method to set the property.</param>
         /// <returns>The modified setting.</returns>
-        public async Task<T> SetPropertyAsync<T>(DiscordGuild server, int id, Func<TagEntity, T> setter)
+        public async Task<T?> SetPropertyAsync<T>(DiscordGuild server, int id, Func<TagEntity, T> setter)
         {
             if (!GetCachedTag(server?.Id, id, out var dbTag))
                 return default;
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            db.Tags.Attach(dbTag);
-            var result = setter(dbTag);
+            db.Tags.Attach(dbTag!);
+            var result = setter(dbTag!);
             await db.SaveChangesAsync();
 
             return result;
@@ -199,7 +202,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="id">The database ID of the tag.</param>
         /// <param name="dbTag">The tag if found, <see langword="null"/> if it was not found.</param>
         /// <returns><see langword="true"/> if the tag was found, <see langword="false"/> otherwise.</returns>
-        private bool GetCachedTag(ulong? sid, int id, out TagEntity dbTag)
+        private bool GetCachedTag(ulong? sid, int id, out TagEntity? dbTag)
         {
             _dbCache.Tags.TryGetValue(sid ?? default, out var tags);
             dbTag = tags?.FirstOrDefault(x => x.Id == id);

@@ -18,10 +18,11 @@ namespace AkkoCore.Commands.Common
     {
         private static readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
         private static readonly Regex _defaultPlaceholderRegex = new(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
+
+        private string _parsedContent = string.Empty;
         private readonly StringBuilder _contentBuilder;
         private readonly CommandContext _context;
         private readonly IPlaceholderFormatter _formatter;
-        private string _parsedContent;
 
         /// <summary>
         /// Defines the regex to match the placeholders.
@@ -92,7 +93,7 @@ namespace AkkoCore.Commands.Common
         /// <param name="sanitizeRoles">Defines whether role mentions should be sanitized or not.</param>
         /// <param name="regex">The regex to match the placeholders in <paramref name="content"/>. Default is "{([\w\.]+)\((.+?)\)}|{([\w\.]+)}".</param>
         /// <param name="formatter">The object responsible for converting the placeholders to the values they represent.</param>
-        public SmartString(CommandContext context, string content, bool sanitizeRoles = false, Regex regex = default, IPlaceholderFormatter formatter = default)
+        public SmartString(CommandContext context, string? content, bool sanitizeRoles = false, Regex? regex = default, IPlaceholderFormatter? formatter = default)
         {
             _context = context;
             _contentBuilder = new(content ?? context.RawArgumentString);
@@ -145,7 +146,7 @@ namespace AkkoCore.Commands.Common
         /// to use the formatter set in this <see cref="SmartString"/>.
         /// </param>
         /// <returns>The parsed <paramref name="input"/>.</returns>
-        public string Parse(string input, CommandContext context = default, bool? sanitizeRoles = default, Regex placeholderRegex = default, IPlaceholderFormatter formatter = default)
+        public string Parse(string input, CommandContext? context = default, bool? sanitizeRoles = default, Regex? placeholderRegex = default, IPlaceholderFormatter? formatter = default)
         {
             context ??= _context;
             placeholderRegex ??= ParseRegex;
@@ -170,7 +171,7 @@ namespace AkkoCore.Commands.Common
         /// <param name="placeholderRegex">The regex to match the command placeholders or <see langword="null"/> to use the default regex.</param>
         /// <param name="formatter">The formatter to parse the command placeholders or <see langword="null"/> to use the default formatter.</param>
         /// <returns>The parsed <paramref name="input"/>.</returns>
-        public static string Parse(CommandContext context, string input, bool sanitizeRoles = false, Regex placeholderRegex = default, IPlaceholderFormatter formatter = default)
+        public static string Parse(CommandContext context, string input, bool sanitizeRoles = false, Regex? placeholderRegex = default, IPlaceholderFormatter? formatter = default)
         {
             if (context is null || input is null)
                 throw new ArgumentNullException((context is null) ? nameof(context) : nameof(input), "Command context and input cannot be null.");
@@ -293,7 +294,7 @@ namespace AkkoCore.Commands.Common
 
         public static bool operator !=(SmartString x, SmartString y) => x.Content != y.Content;
 
-        public static implicit operator string(SmartString x) => x?.Content;
+        public static implicit operator string(SmartString x) => x.Content;
 
         public static implicit operator Optional<string>(SmartString x) => x?.Content ?? Optional.FromNoValue<string>();
 
@@ -302,7 +303,7 @@ namespace AkkoCore.Commands.Common
         public override string ToString()
             => Content;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => (ReferenceEquals(this, obj) || obj is not null) && Content == obj.ToString();
 
         public override int GetHashCode()

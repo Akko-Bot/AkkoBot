@@ -46,7 +46,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="reason">The reason of the punishment.</param>
         /// <param name="time">If the punishment is temporary, for how long will it last.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
-        public async Task<DiscordMessage> SendPunishmentDmAsync(CommandContext context, DiscordMember user, string message, string reason, TimeSpan? time = null)
+        public async Task<DiscordMessage?> SendPunishmentDmAsync(CommandContext context, DiscordMember user, string message, string? reason, TimeSpan? time = null)
         {
             // Create the notification dm
             var dm = new SerializableDiscordEmbed()
@@ -67,15 +67,15 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="user">The user that's being punished.</param>
         /// <param name="reason">The reason of the punishment.</param>
         /// <returns>The <see cref="DiscordMessage"/> that has been sent, <see langword="null"/> if it failed to send the message.</returns>
-        public async Task<DiscordMessage> SendBanDmAsync(CommandContext context, DiscordMember user, string reason)
+        public async Task<DiscordMessage?> SendBanDmAsync(CommandContext context, DiscordMember user, string? reason)
         {
             if (!_dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild))
-                return null;
+                return default;
 
             var template = new SmartString(context, dbGuild.BanTemplate);
 
-            return (_utilitiesService.DeserializeEmbed(template, out var message) || message is not null)
-                ? await user.SendMessageSafelyAsync(message)                                    // Send database ban notification
+            return (_utilitiesService.DeserializeEmbed(template, out var message))
+                ? await user.SendMessageSafelyAsync(message!)                                   // Send database ban notification
                 : string.IsNullOrWhiteSpace(template)                                           // If template is not serializable
                     ? await SendPunishmentDmAsync(context, user, "ban_notification", reason)    // Send default ban notification
                     : await user.SendMessageSafelyAsync(template);                              // Send database ban notification (no embed)
@@ -245,7 +245,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="time">When the user should be unbanned.</param>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="reason">The reason for the ban.</param>
-        public async Task TimedBanAsync(CommandContext context, TimeSpan time, ulong userId, string reason = null)
+        public async Task TimedBanAsync(CommandContext context, TimeSpan time, ulong userId, string? reason = default)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -304,7 +304,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="role">The Discord role to be added/removed.</param>
         /// <param name="reason">The reason for the punishment.</param>
         /// <exception cref="ArgumentException">Occurs when <paramref name="type"/> is invalid.</exception>
-        public async Task TimedRolePunishAsync(CommandContext context, PunishmentType type, TimeSpan time, DiscordMember user, DiscordRole role, string reason = null)
+        public async Task TimedRolePunishAsync(CommandContext context, PunishmentType type, TimeSpan time, DiscordMember user, DiscordRole role, string? reason = default)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 

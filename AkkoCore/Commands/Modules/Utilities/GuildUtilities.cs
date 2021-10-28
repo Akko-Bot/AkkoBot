@@ -70,7 +70,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [Command("channelinfo"), Aliases("cinfo")]
         [Description("cmd_channelinfo")]
-        public async Task ChannelInfoAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task ChannelInfoAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             channel ??= context.Channel;
             var embed = _service.GetChannelInfo(new SerializableDiscordEmbed(), channel)
@@ -81,7 +81,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [Command("userinfo"), Aliases("uinfo")]
         [Description("cmd_userinfo")]
-        public async Task UserInfoAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        public async Task UserInfoAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember? user = default)
         {
             user ??= context.Member;
             var isMod = user.Hierarchy is int.MaxValue || user.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers));
@@ -197,8 +197,8 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Description("cmd_checkperms")]
         public async Task CheckUserPermsAsync(
             CommandContext context,
-            [Description("arg_discord_channel")] DiscordChannel channel = null,
-            [Description("arg_discord_user")] DiscordMember user = null)
+            [Description("arg_discord_channel")] DiscordChannel? channel = default,
+            [Description("arg_discord_user")] DiscordMember? user = default)
         {
             channel ??= context.Channel;
             user ??= context.Member;
@@ -239,7 +239,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         }
 
         [Command("checkperms"), HiddenOverload]
-        public async Task CheckUserPermsAsync(CommandContext context, DiscordMember user = null)
+        public async Task CheckUserPermsAsync(CommandContext context, DiscordMember? user = default)
             => await CheckUserPermsAsync(context, null, user);
 
         [Command("savechat"), HiddenOverload]
@@ -251,7 +251,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequireUserPermissions(Permissions.ManageGuild)]
         public async Task SaveChatAsync(
             CommandContext context,
-            [Description("arg_discord_channel")] DiscordChannel channel = null,
+            [Description("arg_discord_channel")] DiscordChannel? channel = default,
             [Description("arg_int")] int amount = 100)
         {
             channel ??= context.Channel;

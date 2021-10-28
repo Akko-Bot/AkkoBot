@@ -20,7 +20,7 @@ namespace AkkoCore.Services.Logging
         public double FileSizeLimitMB { get; set; }
         public bool IsDisposed { get; private set; } = false;
 
-        public AkkoFileLogger(double fileSizeLimit = 1.0, string timeFormat = null)
+        public AkkoFileLogger(double fileSizeLimit = 1.0, string? timeFormat = default)
         {
             FileSizeLimitMB = (fileSizeLimit <= 0.0) ? 1.0 : fileSizeLimit;
             TimeStampFormat = (string.IsNullOrWhiteSpace(timeFormat)) ? "dd-MM-yyyy_HH-mm_fffff" : timeFormat;

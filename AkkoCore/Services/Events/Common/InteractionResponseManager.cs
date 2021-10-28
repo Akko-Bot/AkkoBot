@@ -21,7 +21,7 @@ namespace AkkoCore.Services.Events.Common
         //    };
         //}
 
-        public async ValueTask<DiscordInteractionResponseBuilder> RequestAsync(DiscordMessage message, string componentId, string[] options)
+        public async ValueTask<DiscordInteractionResponseBuilder?> RequestAsync(DiscordMessage message, string componentId, string[] options)
         {
             foreach (var controller in _slashControllers)
             {

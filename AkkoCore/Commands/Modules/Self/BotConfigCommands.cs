@@ -82,7 +82,7 @@ namespace AkkoCore.Commands.Modules.Self
                 return;
             }
 
-            await ChangePropertyAsync(context, x => x.Locale = result);
+            await ChangePropertyAsync(context, x => x.Locale = result!);
         }
 
         [Command("okcolor")]
@@ -213,7 +213,7 @@ namespace AkkoCore.Commands.Modules.Self
                 await ChangePropertyAsync(context, x => x.LogLevel = logLevel);
 
                 var logConfig = _service.GetLogConfig();
-                context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
+                context.Services.GetRequiredService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
             }
 
             [Command("format")]
@@ -223,14 +223,14 @@ namespace AkkoCore.Commands.Modules.Self
                 await ChangePropertyAsync(context, x => x.LogFormat = logFormat);
 
                 var logConfig = _service.GetLogConfig();
-                context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
+                context.Services.GetRequiredService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
             }
 
             [Command("timeformat")]
             [Description("cmd_config_log_timeformat")]
-            public async Task SetBotLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string logTimeFormat = null)
+            public async Task SetBotLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string? logTimeFormat = default)
             {
-                if (!AkkoUtilities.IsValidTimeFormat(logTimeFormat))
+                if (logTimeFormat is null || !AkkoUtilities.IsValidTimeFormat(logTimeFormat))
                 {
                     await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                     return;
@@ -239,14 +239,14 @@ namespace AkkoCore.Commands.Modules.Self
                 await ChangePropertyAsync(context, x => x.LogTimeFormat = logTimeFormat);
 
                 var logConfig = _service.GetLogConfig();
-                context.Services.GetService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
+                context.Services.GetRequiredService<IAkkoLoggerProvider>().UpdateLoggers(logConfig);
             }
 
             [Command("filetimestamp")]
             [Description("cmd_config_log_filetimestamp")]
-            public async Task SetFileLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string timestampFormat = null)
+            public async Task SetFileLogTimeFormatAsync(CommandContext context, [Description("cmd_config_log_timeformat_arg")] string? timestampFormat = default)
             {
-                if (!AkkoUtilities.IsValidTimeFormat(timestampFormat))
+                if (timestampFormat is null || !AkkoUtilities.IsValidTimeFormat(timestampFormat))
                 {
                     await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                     return;
@@ -269,10 +269,10 @@ namespace AkkoCore.Commands.Modules.Self
                 {
                     var logConfig = _service.GetLogConfig();
                     var fileLogger = new AkkoFileLogger(logConfig.LogSizeMb, logConfig.LogTimeStamp);
-                    context.Services.GetService<IAkkoLoggerProvider>().UpdateFileLogger(fileLogger);
+                    context.Services.GetRequiredService<IAkkoLoggerProvider>().UpdateFileLogger(fileLogger);
                 }
                 else if (!isEnabled)
-                    context.Services.GetService<IAkkoLoggerProvider>().UpdateFileLogger(null);
+                    context.Services.GetRequiredService<IAkkoLoggerProvider>().UpdateFileLogger(default);
             }
 
             [Command("size"), Aliases("setsize")]

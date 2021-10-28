@@ -70,7 +70,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("prefix")]
         [Description("cmd_guild_prefix")]
-        public async Task ChangePrefixAsync(CommandContext context, [RemainingText, Description("arg_prefix")] string newPrefix = null)
+        public async Task ChangePrefixAsync(CommandContext context, [RemainingText, Description("arg_prefix")] string? newPrefix = default)
         {
             if (context.Guild is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.ManageGuild))
             {
@@ -94,7 +94,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_prune")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
         public async Task PruneAsync(CommandContext context,
-            [Description("arg_discord_user")] DiscordUser user = default,
+            [Description("arg_discord_user")] DiscordUser? user = default,
             [Description("arg_int")] int amount = 50,
             [Description("arg_prune_options")] string options = "")
         {

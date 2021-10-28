@@ -12,7 +12,7 @@ namespace AkkoCore.Extensions
         /// <param name="member">This Discord member.</param>
         /// <param name="message">The message to be sent.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordMember member, DiscordMessageBuilder message)
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordMember member, DiscordMessageBuilder message)
             => await SendMessageSafelyAsync(member, message.Content, message.Embed);
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace AkkoCore.Extensions
         /// <param name="member">This Discord member.</param>
         /// <param name="embed">The message's embed.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordMember member, DiscordEmbed embed)
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordMember member, DiscordEmbed embed)
             => await SendMessageSafelyAsync(member, null, embed);
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace AkkoCore.Extensions
         /// <param name="member">This Discord member.</param>
         /// <param name="content">The message's content.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordMember member, string content)
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordMember member, string content)
             => await SendMessageSafelyAsync(member, content, null);
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace AkkoCore.Extensions
         /// <param name="content">The message's content.</param>
         /// <param name="embed">The message's embed.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordMember member, string content, DiscordEmbed embed)
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordMember member, string? content, DiscordEmbed? embed)
         {
             if (content is null && embed is null)
-                return null;
+                return default;
 
             try
             {
@@ -61,7 +61,7 @@ namespace AkkoCore.Extensions
             }
             catch
             {
-                return null;
+                return default;
             }
         }
     }

@@ -19,7 +19,7 @@ namespace AkkoCore.Extensions
         /// <param name="locale">The locale to be used.</param>
         /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
         /// <returns>This embed builder.</returns>
-        public static DiscordEmbed WithLocalization(this DiscordEmbed embed, ILocalizer localizer, string locale, string color = null)
+        public static DiscordEmbed WithLocalization(this DiscordEmbed embed, ILocalizer localizer, string locale, string? color = default)
             => new DiscordEmbedBuilder(embed).WithLocalization(localizer, locale, color).Build();
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace AkkoCore.Extensions
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A formatted string with the contents of the embed.</returns>
         public static string Decompose(this DiscordEmbed embed)
-            => Decompose(embed, null).ToString();
+            => Decompose(embed, default).ToString();
 
         /// <summary>
         /// Converts all text content from this embed into a string.
@@ -38,7 +38,7 @@ namespace AkkoCore.Extensions
         /// <param name="stringBuilder">String builder to be used in the deconstruction.</param>
         /// <remarks>It ignores image links, except for the one on the image field.</remarks>
         /// <returns>A string builder with the contents of the embed.</returns>
-        public static StringBuilder Decompose(this DiscordEmbed embed, StringBuilder stringBuilder)
+        public static StringBuilder Decompose(this DiscordEmbed embed, StringBuilder? stringBuilder)
         {
             stringBuilder ??= new StringBuilder();
 
@@ -79,9 +79,13 @@ namespace AkkoCore.Extensions
                 Footer = (embed.Footer is null) ? null : new SerializableEmbedFooter(embed.Footer.Text, embed.Footer.IconUrl?.ToUri().AbsoluteUri),
                 Timestamp = embed.Timestamp
             };
-            foreach (var field in embed.Fields)
-                model.Fields.Add(new SerializableEmbedField(field.Name, field.Value, field.Inline));
 
+            if (embed.Fields is not null)
+            {
+                foreach (var field in embed.Fields)
+                    model.AddField(field.Name, field.Value, field.Inline);
+            }
+            
             return model;
         }
     }

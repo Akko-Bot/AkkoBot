@@ -14,8 +14,8 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores data related to the bot's Discord status.")]
     public class PlayingStatusEntity : DbEntity
     {
-        private string _message;
-        private string _streamUrl;
+        private string _message = null!;
+        private string? _streamUrl;
 
         /// <summary>
         /// The message to be displayed in the status.
@@ -32,10 +32,10 @@ namespace AkkoCore.Services.Database.Entities
         /// The stream URL to be displayed in the status.
         /// </summary>
         [MaxLength(512)]
-        public string StreamUrl
+        public string? StreamUrl
         {
             get => _streamUrl;
-            init => _streamUrl = value.MaxLength(512);
+            init => _streamUrl = value?.MaxLength(512);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace AkkoCore.Services.Database.Entities
         public static bool operator !=(PlayingStatusEntity x, PlayingStatusEntity y)
             => !(x == y);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || (obj is not null && obj is PlayingStatusEntity pStatus && this == pStatus);
 
         public override int GetHashCode()

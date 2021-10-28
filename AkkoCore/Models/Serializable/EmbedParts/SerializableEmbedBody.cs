@@ -8,22 +8,22 @@ namespace AkkoCore.Models.Serializable.EmbedParts
     /// </summary>
     public class SerializableEmbedBody
     {
-        private string _description;
+        private string? _description;
 
         /// <summary>
         /// The title of the embed.
         /// </summary>
-        public SerializableEmbedTitle Title { get; set; }
+        public SerializableEmbedTitle? Title { get; set; }
 
         /// <summary>
         /// The URL for the image on the embed's body.
         /// </summary>
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         /// <summary>
         /// The text on the embed's body.
         /// </summary>
-        public string Description
+        public string? Description
         {
             get => _description;
             set => _description = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength, "[...]");
@@ -33,7 +33,7 @@ namespace AkkoCore.Models.Serializable.EmbedParts
         {
         }
 
-        public SerializableEmbedBody(SerializableEmbedTitle title, string description, string imageUrl)
+        public SerializableEmbedBody(SerializableEmbedTitle? title, string? description, string? imageUrl)
         {
             Title = title;
             Description = description;

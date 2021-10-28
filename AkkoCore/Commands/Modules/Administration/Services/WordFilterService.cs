@@ -60,7 +60,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="sid">The Discord server ID.</param>
         /// <returns>The filtered words, <see langword="null"/> if the Discord server has no entry for filtered words.</returns>
-        public FilteredWordsEntity GetFilteredWords(ulong sid)
+        public FilteredWordsEntity? GetFilteredWords(ulong sid)
         {
             _dbCache.FilteredWords.TryGetValue(sid, out var dbentry);
             return dbentry;

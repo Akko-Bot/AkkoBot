@@ -78,7 +78,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            var filter = filters.FirstOrDefault(x => x.Id == id);
+            var filter = filters.First(x => x.Id == id);
 
             db.Remove(filter);
             var result = await db.SaveChangesAsync() is not 0;

@@ -5,6 +5,7 @@ using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
+using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
@@ -22,10 +23,14 @@ namespace AkkoCore.Commands.Modules.Utilities
     [Description("cmd_tag")]
     public sealed class Tags : AkkoCommandModule
     {
+        private readonly IDbCache _dbCache;
         private readonly TagsService _service;
 
-        public Tags(TagsService service)
-            => _service = service;
+        public Tags(IDbCache dbCache, TagsService service)
+        {
+            _dbCache = dbCache;
+            _service = service;
+        }
 
         [Command("add")]
         [Description("cmd_tag_add")]
@@ -169,13 +174,16 @@ namespace AkkoCore.Commands.Modules.Utilities
                 embed.WithDescription("tag_not_found");
             else
             {
-                var author = await context.Guild.GetMemberSafelyAsync(tag.AuthorId)
-                    ?? await context.Client.GetUserSafelyAsync(tag.AuthorId);
+                var author = (_dbCache.Users.TryGetValue(tag.AuthorId, out var dbUser))
+                    ? default
+                    : (context.Guild is null)
+                        ? await context.Client.GetUserSafelyAsync(tag.AuthorId)
+                        : await context.Guild.GetMemberSafelyAsync(tag.AuthorId) ?? await context.Client.GetUserSafelyAsync(tag.AuthorId);
 
                 embed.WithTitle(context.FormatLocalized("{0} {1}", "tag", $"#{tag.Id}"))
                     .WithDescription((tag.IsEmoji) ? tag.Response : Formatter.BlockCode(tag.Response, "yaml"))
                     .AddField("trigger", tag.Trigger, true)
-                    .AddField("author", author.GetFullname(), true)
+                    .AddField("author", dbUser?.FullName ?? author!.GetFullname(), true)
                     .WithFooter(context.FormatLocalized("{0}: {1}", "reaction", (tag.IsEmoji) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji));
 
                 if (tag.Behavior is not TagBehavior.None)

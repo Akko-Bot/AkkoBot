@@ -18,7 +18,7 @@ namespace AkkoCore.Core
     /// </summary>
     public sealed class Bot : IDisposable
     {
-        private BotCore _botCore;
+        private BotCore? _botCore;
 
         private readonly CancellationTokenSource _cTokenSource;
         private readonly IBotLifetime _lifetime;
@@ -66,7 +66,7 @@ namespace AkkoCore.Core
             {
                 Console.WriteLine();
 
-                if (_lifetime.RestartBot)
+                if (_lifetime.RestartBot && _botCore is not null)
                 {
                     _botCore.BotShardedClient.Logger.LogWarning(
                         new EventId(LoggerEvents.ConnectionClose.Id, "Restart"),

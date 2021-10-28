@@ -2,6 +2,7 @@
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events.Abstractions
@@ -21,7 +22,7 @@ namespace AkkoCore.Services.Events.Abstractions
         /// </summary>
         /// <param name="context">The command context.</param>
         /// <returns>A <see cref="Task"/> object if the command was run, <see langword="null"/> otherwise.</returns>
-        Task CheckAndExecuteAsync(CommandContext context);
+        Task? CheckAndExecuteAsync(CommandContext context);
 
         /// <summary>
         /// Gets the active permission override for the specified command.
@@ -30,7 +31,7 @@ namespace AkkoCore.Services.Events.Abstractions
         /// <param name="cmd">The command to check the permission for.</param>
         /// <param name="permOverride">The resulting permission override or <see langword="null"/> if not found.</param>
         /// <returns><see langword="true"/> if the permission override for <paramref name="cmd"/> has been found, <see langword="false"/> otherwise.</returns>
-        bool GetActiveOverride(ulong? sid, Command cmd, out PermissionOverrideEntity permOverride);
+        bool GetActiveOverride(ulong? sid, Command cmd, [MaybeNullWhen(false)] out PermissionOverrideEntity? permOverride);
 
         /// <summary>
         /// Checks if the current context is allowed to run the command for the overriden permissions.

@@ -12,11 +12,11 @@ namespace AkkoCore.Services.Logging.Loggers
     public sealed class DefaultLogger : AkkoLogger
     {
         private LogLevel _minimumLevel;
-        private IFileLogger _fileLogger;
-        private string _logFormat;
-        private string _timeFormat;
+        private IFileLogger? _fileLogger;
+        private string? _logFormat;
+        private string? _timeFormat;
 
-        public DefaultLogger(LogLevel minimumLevel, IFileLogger fileLogger, string logFormat, string timeFormat)
+        public DefaultLogger(LogLevel minimumLevel, IFileLogger? fileLogger, string? logFormat, string? timeFormat)
         {
             _minimumLevel = minimumLevel;
             _fileLogger = fileLogger;
@@ -53,7 +53,7 @@ namespace AkkoCore.Services.Logging.Loggers
             }
         }
 
-        public override IDisposable BeginScope<TState>(TState state)
+        public override IDisposable? BeginScope<TState>(TState state)
         {
             if (state is not null and LogConfig logConfig)
             {

@@ -60,13 +60,13 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord guild.</param>
         /// <returns>The guild's gatekeeping settings or <see langword="null"/> if it doesn't exist.</returns>
-        public GatekeepEntity GetGatekeepSettings(DiscordGuild server)
+        public GatekeepEntity? GetGatekeepSettings(DiscordGuild server)
         {
             if (_dbCache.Gatekeeping.TryGetValue(server.Id, out var gatekeeper))
                 return gatekeeper;
 
             _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
-            return dbGuild.GatekeepRel;
+            return dbGuild?.GatekeepRel;
         }
     }
 }

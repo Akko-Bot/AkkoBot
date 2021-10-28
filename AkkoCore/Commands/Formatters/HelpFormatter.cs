@@ -43,9 +43,9 @@ namespace AkkoCore.Commands.Formatters
         public SerializableDiscordMessage GenerateHelpMessage(CommandContext context)
             => GenerateHelpMessage(context, context.RawArguments as List<string>);
 
-        public SerializableDiscordMessage GenerateHelpMessage(CommandContext context, IList<string> inputCommand)
+        public SerializableDiscordMessage GenerateHelpMessage(CommandContext context, IList<string>? inputCommand)
         {
-            inputCommand ??= context.RawArguments as List<string>;
+            inputCommand ??= (List<string>)context.RawArguments;
 
             // If no parameter, send the default help message
             if (inputCommand.Count is 0)
@@ -262,7 +262,7 @@ namespace AkkoCore.Commands.Formatters
         /// <returns>A string with all localized attributes separated by a newline.</returns>
         /// <exception cref="InvalidCastException">Occurs when the attribute argument is not of type <see cref="Permissions"/>.</exception>
         private string GetLocalizedAttributePermissions(CommandContext context, IEnumerable<CustomAttributeTypedArgument> permissions)
-            => string.Join("\n", permissions.Where(x => x.ArgumentType == typeof(Permissions)).SelectMany(x => ((Permissions)x.Value).ToLocalizedStrings(context)));
+            => string.Join("\n", permissions.Where(x => x.ArgumentType == typeof(Permissions)).SelectMany(x => ((Permissions)x.Value!).ToLocalizedStrings(context)));
 
         /// <summary>
         /// Adds the localized overriden permissions to the suplied <paramref name="stringBuilder"/>.

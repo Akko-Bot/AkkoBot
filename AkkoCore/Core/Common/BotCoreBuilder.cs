@@ -48,13 +48,13 @@ namespace AkkoCore.Core.Common
     /// </summary>
     public sealed class BotCoreBuilder
     {
-        private ILoggerFactory _loggerFactory;
+        private ILoggerFactory? _loggerFactory;
         private readonly Credentials _creds;
         private readonly BotConfig _botConfig;
         private readonly LogConfig _logConfig;
         private readonly IServiceCollection _cmdServices;
 
-        public BotCoreBuilder(Credentials creds, BotConfig botConfig, LogConfig logConfig, ILoggerFactory loggerFactory = null, IServiceCollection cmdServices = null)
+        public BotCoreBuilder(Credentials creds, BotConfig botConfig, LogConfig logConfig, ILoggerFactory? loggerFactory = default, IServiceCollection? cmdServices = default)
         {
             _creds = creds ?? throw new ArgumentNullException(nameof(creds), "The credentials cannot be null.");
             _botConfig = botConfig ?? throw new ArgumentNullException(nameof(botConfig), "Configuration objects cannot be null.");
@@ -82,10 +82,10 @@ namespace AkkoCore.Core.Common
         /// </summary>
         /// <param name="logLevel">Minimum log severity to be logged.</param>
         /// <param name="fileLogger">An object responsible for writing the logs to a text file. Default is <see langword="null"/> (no file logging).</param>
-        /// <param name="logFormat">The type of logging to be output. Default is "Default".</param>
+        /// <param name="logFormat">The type of logging to be output.</param>
         /// <param name="timeFormat">The format of the time stamp to be used in the logs. Default depends on <paramref name="logFormat"/>.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
-        public BotCoreBuilder WithDefaultLogging(LogLevel logLevel = LogLevel.Information, IFileLogger fileLogger = default, string logFormat = "Default", string timeFormat = default)
+        public BotCoreBuilder WithDefaultLogging(LogLevel logLevel = LogLevel.Information, IFileLogger? fileLogger = default, string? logFormat = default, string? timeFormat = default)
         {
             var logProvider = new AkkoLoggerProvider(
                 (logLevel is LogLevel.Information) ? _logConfig.LogLevel : logLevel,
@@ -139,7 +139,7 @@ namespace AkkoCore.Core.Common
             {
                 var attribute = type.GetCustomAttribute<CommandServiceAttribute>();
 
-                switch (attribute.Lifespan)
+                switch (attribute!.Lifespan)
                 {
                     case ServiceLifetime.Singleton:
                         _cmdServices.AddSingleton(type);
@@ -240,8 +240,12 @@ namespace AkkoCore.Core.Common
         /// <typeparam name="T">The abstraction implemented by <paramref name="implementation"/>.</typeparam>
         /// <param name="implementation">The service implementation.</param>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="implementation"/> is <see langword="null"/>.</exception>
         public BotCoreBuilder WithSingletonService<T>(T implementation)
         {
+            if (implementation is null)
+                throw new ArgumentNullException(nameof(implementation), "Singleton object cannot be null.");
+
             _cmdServices.AddSingleton(typeof(T), implementation);
             return this;
         }
@@ -299,10 +303,14 @@ namespace AkkoCore.Core.Common
         /// </summary>
         /// <remarks>This database context has a direct dependency with EF Core and Npgsql.</remarks>
         /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+        /// <exception cref="InvalidOperationException">Occurs when the entry assembly is unmanaged.</exception>
         /// <exception cref="NpgsqlException">Occurs when it's not possible to establish a connection with the database.</exception>
         public BotCoreBuilder WithDefaultDbContext()
         {
-            var assemblyName = Assembly.GetEntryAssembly().FullName;
+            var assemblyName = Assembly.GetEntryAssembly()?.FullName;
+
+            if (assemblyName is null)
+                throw new InvalidOperationException("Invoking this class from unmanaged code is not supported.");
 
             // Apply pending database migrations
             using var dbContext = new AkkoDbContext(
@@ -344,7 +352,7 @@ namespace AkkoCore.Core.Common
         public async Task<BotCore> BuildDefaultAsync()
         {
             return await BuildAsync(
-                _botConfig.InteractiveTimeout.Value.TotalSeconds,
+                _botConfig.InteractiveTimeout?.TotalSeconds,
                 _botConfig.CaseSensitiveCommands,
                 _botConfig.RespondToDms,
                 _botConfig.MentionPrefix

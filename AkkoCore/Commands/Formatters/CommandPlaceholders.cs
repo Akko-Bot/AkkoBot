@@ -6,6 +6,7 @@ using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -19,7 +20,7 @@ namespace AkkoCore.Commands.Formatters
         /// <summary>
         /// Stores actions for placeholders with no parameters.
         /// </summary>
-        protected readonly Dictionary<string, Func<CommandContext, object>> placeholderActions = new()
+        protected readonly Dictionary<string, Func<CommandContext, object?>> placeholderActions = new()
         {
             /* Bot Placeholders */
 
@@ -83,7 +84,7 @@ namespace AkkoCore.Commands.Formatters
             ["user.color"] = (context) => context.Member?.Color,
             ["user.nitrodate"] = (context) => context.Member?.PremiumSince,
             ["user.nitrotype"] = (context) => context.Member?.PremiumType,
-            ["user.roles"] = (context) => string.Join(", ", context.Member?.Roles.Select(x => x.Name)),
+            ["user.roles"] = (context) => string.Join(", ", context.Member?.Roles.Select(x => x.Name) ?? Enumerable.Empty<string>()),
             ["user.voicechat"] = (context) => context.Member?.VoiceState?.Channel.Name,
 
             /* Discord Timestamps */
@@ -133,7 +134,7 @@ namespace AkkoCore.Commands.Formatters
         /// <summary>
         /// Stores actions for placeholders with parameters.
         /// </summary>
-        protected readonly Dictionary<string, Func<CommandContext, object, object>> parameterizedActions = new()
+        protected readonly Dictionary<string, Func<CommandContext, object, object?>> parameterizedActions = new()
         {
             #region Discord Timestamps
 
@@ -232,7 +233,7 @@ namespace AkkoCore.Commands.Formatters
             #endregion Miscelaneous
         };
 
-        public virtual bool TryParse(CommandContext context, Match match, out object result)
+        public virtual bool TryParse(CommandContext context, Match match, out object? result)
         {
             var groups = match.Groups.Values
                 .Where(x => !string.IsNullOrWhiteSpace(x.Value))    // This is needed because for some reason groups can contain empty values.

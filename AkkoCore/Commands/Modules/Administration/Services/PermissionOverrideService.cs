@@ -78,7 +78,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                 return false;
 
             // Remove from the cache
-            permOverrides.TryRemove(permOverride);
+            permOverrides!.TryRemove(permOverride);
 
             if (permOverrides.Count is 0)
                 _dbCache.PermissionOverrides.TryRemove(sid ?? default, out _);

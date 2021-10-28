@@ -103,7 +103,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns>A collection of voice roles.</returns>
         public async Task<IReadOnlyCollection<VoiceRoleEntity>> GetVoiceRolesAsync(DiscordGuild server)
         {
-            _dbCache.VoiceRoles.TryGetValue(server.Id, out var voiceRoles);
+            if (!_dbCache.VoiceRoles.TryGetValue(server.Id, out var voiceRoles))
+                return Array.Empty<VoiceRoleEntity>();
 
             await RemoveVoiceRoleAsync(
                 server,

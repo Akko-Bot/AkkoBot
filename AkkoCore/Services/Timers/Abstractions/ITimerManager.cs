@@ -1,6 +1,7 @@
 using AkkoCore.Services.Database.Entities;
 using DSharpPlus;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Timers.Abstractions
@@ -43,7 +44,7 @@ namespace AkkoCore.Services.Timers.Abstractions
         /// <param name="id">The ID of the <see cref="IAkkoTimer"/>.</param>
         /// <param name="timer">An <see cref="IAkkoTimer"/> if the timer is found, <see langword="null"/> otherwise.</param>
         /// <returns><see langword="true"/> if the timer is found, <see langword="false"/> otherwise.</returns>
-        bool TryGetValue(int id, out IAkkoTimer timer);
+        bool TryGetValue(int id, [MaybeNullWhen(false)] out IAkkoTimer timer);
 
         /// <summary>
         /// Attempts to remove the specified <see cref="IAkkoTimer"/> from the cache.

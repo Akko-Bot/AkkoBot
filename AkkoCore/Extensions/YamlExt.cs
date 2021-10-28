@@ -24,7 +24,7 @@ namespace AkkoCore.Extensions
         /// <param name="obj">This object.</param>
         /// <param name="serializer">The serializer to be used. By default, it omits fields, null properties, and uses snake_case convention for naming variables.</param>
         /// <returns>This object serialized to Yaml.</returns>
-        public static string ToYaml(this object obj, ISerializer serializer = null)
+        public static string ToYaml(this object obj, ISerializer? serializer = default)
         {
             serializer ??= _defaultSerializer;
             return serializer.Serialize(obj);
@@ -37,7 +37,7 @@ namespace AkkoCore.Extensions
         /// <param name="writer">The stream to write the Yaml to.</param>
         /// <param name="serializer">The serializer to be used. By default, it omits fields, null properties, and uses snake_case convention for naming variables.</param>
         /// <returns>The text stream with the serialized object.</returns>
-        public static TextWriter ToYaml(this object obj, TextWriter writer, ISerializer serializer = null)
+        public static TextWriter ToYaml(this object obj, TextWriter writer, ISerializer? serializer = default)
         {
             serializer ??= _defaultSerializer;
             serializer.Serialize(writer, obj);
@@ -53,7 +53,7 @@ namespace AkkoCore.Extensions
         /// <param name="deserializer">The deserializer to be used. By default, it omits unmatched properties.</param>
         /// <returns>A <typeparamref name="T"/> object.</returns>
         /// <exception cref="YamlException">Occurs when deserialization fails.</exception>
-        public static T FromYaml<T>(this string input, IDeserializer deserializer = null)
+        public static T FromYaml<T>(this string input, IDeserializer? deserializer = default)
         {
             deserializer ??= _defaultDeserializer;
             return deserializer.Deserialize<T>(input);
@@ -67,7 +67,7 @@ namespace AkkoCore.Extensions
         /// <param name="deserializer">The deserializer to be used. By default, it omits unmatched properties.</param>
         /// <returns>A <typeparamref name="T"/> object.</returns>
         /// <exception cref="YamlException">Occurs when deserialization fails.</exception>
-        public static T FromYaml<T>(this TextReader input, IDeserializer deserializer = null)
+        public static T FromYaml<T>(this TextReader input, IDeserializer? deserializer = default)
         {
             deserializer ??= _defaultDeserializer;
             return deserializer.Deserialize<T>(input);

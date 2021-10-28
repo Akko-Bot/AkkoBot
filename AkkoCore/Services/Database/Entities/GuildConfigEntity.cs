@@ -24,92 +24,92 @@ namespace AkkoCore.Services.Database.Entities
         private string _locale = AkkoConstants.DefaultLanguage;
         private string _okColor = "007FFF";
         private string _errorColor = "FB3D28";
-        private string _banTemplate;
+        private string? _banTemplate;
 
         /// <summary>
         /// The settings of the word filter and the words it is keeping track of.
         /// </summary>
-        public FilteredWordsEntity FilteredWordsRel { get; init; }
+        public FilteredWordsEntity? FilteredWordsRel { get; init; }
 
         /// <summary>
         /// The gatekeeping settings of this Discord guild.
         /// </summary>
-        public GatekeepEntity GatekeepRel { get; init; }
+        public GatekeepEntity? GatekeepRel { get; init; }
 
         /// <summary>
         /// The automatic slow mode settings of this Discord guild.
         /// </summary>
-        public AutoSlowmodeEntity AutoSlowmodeRel { get; init; }
+        public AutoSlowmodeEntity? AutoSlowmodeRel { get; init; }
 
         /// <summary>
         /// The aliases associated with this Discord guild.
         /// </summary>
-        public List<AliasEntity> AliasRel { get; init; }
+        public List<AliasEntity>? AliasRel { get; init; }
 
         /// <summary>
         /// The command cooldowns associated with this Discord guild.
         /// </summary>
-        public List<CommandCooldownEntity> CommandCooldownRel { get; init; }
+        public List<CommandCooldownEntity>? CommandCooldownRel { get; init; }
 
         /// <summary>
         /// The timers associated with this Discord guild.
         /// </summary>
-        public List<TimerEntity> TimerRel { get; init; }
+        public List<TimerEntity>? TimerRel { get; init; }
 
         /// <summary>
         /// The list of content filters.
         /// </summary>
-        public List<FilteredContentEntity> FilteredContentRel { get; init; }
+        public List<FilteredContentEntity>? FilteredContentRel { get; init; }
 
         /// <summary>
         /// The list of muted users.
         /// </summary>
-        public List<MutedUserEntity> MutedUserRel { get; init; }
+        public List<MutedUserEntity>? MutedUserRel { get; init; }
 
         /// <summary>
         /// The list of warnings.
         /// </summary>
-        public List<WarnEntity> WarnRel { get; init; }
+        public List<WarnEntity>? WarnRel { get; init; }
 
         /// <summary>
         /// The list of warn punishments.
         /// </summary>
-        public List<WarnPunishEntity> WarnPunishRel { get; init; }
+        public List<WarnPunishEntity>? WarnPunishRel { get; init; }
 
         /// <summary>
         /// The list of user occurrences.
         /// </summary>
-        public List<OccurrenceEntity> OccurrenceRel { get; init; }
+        public List<OccurrenceEntity>? OccurrenceRel { get; init; }
 
         /// <summary>
         /// The list of voice roles.
         /// </summary>
-        public List<VoiceRoleEntity> VoiceRolesRel { get; init; }
+        public List<VoiceRoleEntity>? VoiceRolesRel { get; init; }
 
         /// <summary>
         /// The list of polls.
         /// </summary>
-        public List<PollEntity> PollRel { get; init; }
+        public List<PollEntity>? PollRel { get; init; }
 
         /// <summary>
         /// The list of repeaters.
         /// </summary>
-        public List<RepeaterEntity> RepeaterRel { get; init; }
+        public List<RepeaterEntity>? RepeaterRel { get; init; }
 
         /// <summary>
         /// The list of guild logs.
         /// </summary>
-        public List<GuildLogEntity> GuildLogsRel { get; init; }
+        public List<GuildLogEntity>? GuildLogsRel { get; init; }
 
         /// <summary>
         /// The list of guild tags.
         /// </summary>
-        public List<TagEntity> TagsRel { get; init; }
+        public List<TagEntity>? TagsRel { get; init; }
 
         /// <summary>
         /// The list of permission overrides.
         /// </summary>
-        public List<PermissionOverrideEntity> PermissionOverrideRel { get; init; }
+        public List<PermissionOverrideEntity>? PermissionOverrideRel { get; init; }
 
         /// <summary>
         /// The IDs of the roles that should be assigned to a Discord user when they join the guild.
@@ -139,7 +139,7 @@ namespace AkkoCore.Services.Database.Entities
         public string Prefix
         {
             get => _prefix;
-            set => _prefix = value?.MaxLength(15);
+            set => _prefix = value.MaxLength(15);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace AkkoCore.Services.Database.Entities
         public string Locale
         {
             get => _locale;
-            set => _locale = value?.MaxLength(10);
+            set => _locale = value.MaxLength(10);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace AkkoCore.Services.Database.Entities
         public string OkColor
         {
             get => _okColor;
-            set => _okColor = value?.MaxLength(6).ToUpperInvariant();
+            set => _okColor = value.MaxLength(6).ToUpperInvariant();
         }
 
         /// <summary>
@@ -175,14 +175,14 @@ namespace AkkoCore.Services.Database.Entities
         public string ErrorColor
         {
             get => _errorColor;
-            set => _errorColor = value?.MaxLength(6).ToUpperInvariant();
+            set => _errorColor = value.MaxLength(6).ToUpperInvariant();
         }
 
         /// <summary>
         /// Defines the template to be used on the notification message for permanent bans.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string BanTemplate
+        public string? BanTemplate
         {
             get => _banTemplate;
             set => _banTemplate = value?.MaxLength(AkkoConstants.MaxMessageLength);
@@ -192,7 +192,7 @@ namespace AkkoCore.Services.Database.Entities
         /// The time zone of this guild.
         /// </summary>
         [MaxLength(128)]
-        public string Timezone { get; set; }
+        public string? Timezone { get; set; }
 
         /// <summary>
         /// Defines the behavior of different features in this guild.
@@ -236,14 +236,14 @@ namespace AkkoCore.Services.Database.Entities
         /// </remarks>
         [NotMapped]
         public bool HasPassiveActivity
-            => GatekeepRel?.IsActive is true || FilteredWordsRel?.IsActive is true || PollRel.Any(x => x.Type is PollType.Anonymous)
+            => GatekeepRel?.IsActive is true || FilteredWordsRel?.IsActive is true || PollRel?.Any(x => x.Type is PollType.Anonymous) is true
             || FilteredContentRel?.Count is > 0 || VoiceRolesRel?.Count is > 0 || RepeaterRel?.Count is > 0 || GuildLogsRel?.Any(x => x.IsActive) is true;
 
         public GuildConfigEntity()
         {
         }
 
-        public GuildConfigEntity(BotConfig config)
+        public GuildConfigEntity(BotConfig? config)
         {
             if (config is null)
                 return;
@@ -257,12 +257,15 @@ namespace AkkoCore.Services.Database.Entities
 
         public override IReadOnlyDictionary<string, string> GetSettings()
         {
-            var result = base.GetSettings() as Dictionary<string, string>;
+            var result = base.GetSettings();
 
-            result.Remove(nameof(GuildId).ToSnakeCase());
-            result.Remove(nameof(BanTemplate).ToSnakeCase());
+            if (result is not Dictionary<string, string> toRemove)
+                return result;
 
-            return result;
+            toRemove.Remove(nameof(GuildId).ToSnakeCase());
+            toRemove.Remove(nameof(BanTemplate).ToSnakeCase());
+
+            return toRemove;
         }
     }
 }

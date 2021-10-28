@@ -14,12 +14,12 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores filtered words of a Discord server.")]
     public class FilteredWordsEntity : DbEntity
     {
-        private string _notificationMessage;
+        private string? _notificationMessage;
 
         /// <summary>
         /// The settings of the Discord guild this filter is associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// List of filtered words.
@@ -40,7 +40,7 @@ namespace AkkoCore.Services.Database.Entities
         /// The notification to be sent when a user sends a message with a filtered word.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string NotificationMessage
+        public string? NotificationMessage
         {
             get => _notificationMessage;
             set => _notificationMessage = value?.MaxLength(AkkoConstants.MaxMessageLength);

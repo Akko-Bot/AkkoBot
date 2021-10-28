@@ -14,7 +14,7 @@ namespace AkkoCore.Extensions
         /// <param name="embed">This embed.</param>
         /// <param name="fields">A collection of embed fields that will replace the fields from the original embed. If this is <see langword="null"/>, the copy will contain all fields from the original embed.</param>
         /// <returns>A copy of this <paramref name="embed"/>.</returns>
-        public static DiscordEmbedBuilder DeepCopy(this DiscordEmbedBuilder embed, IEnumerable<DiscordEmbedField> fields = null)
+        public static DiscordEmbedBuilder DeepCopy(this DiscordEmbedBuilder embed, IEnumerable<DiscordEmbedField>? fields = default)
         {
             var copy = new DiscordEmbedBuilder()
             {
@@ -62,8 +62,12 @@ namespace AkkoCore.Extensions
                 Footer = (embed.Footer is null) ? null : new SerializableEmbedFooter(embed.Footer.Text, embed.Footer.IconUrl),
                 Timestamp = embed.Timestamp
             };
-            foreach (var field in embed.Fields)
-                model.Fields.Add(new SerializableEmbedField(field.Name, field.Value, field.Inline));
+
+            if (embed.Fields is not null)
+            {
+                foreach (var field in embed.Fields)
+                    model.AddField(field.Name, field.Value, field.Inline);
+            }
 
             return model;
         }
@@ -92,7 +96,7 @@ namespace AkkoCore.Extensions
         /// <param name="locale">The locale to be used.</param>
         /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
         /// <returns>This embed builder.</returns>
-        public static DiscordEmbedBuilder WithLocalization(this DiscordEmbedBuilder embed, ILocalizer localizer, string locale, string color = default)
+        public static DiscordEmbedBuilder WithLocalization(this DiscordEmbedBuilder embed, ILocalizer localizer, string locale, string? color = default)
         {
             if (!embed.Color.HasValue)
                 embed.WithColor(new DiscordColor(color));

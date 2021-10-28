@@ -17,7 +17,7 @@ namespace AkkoCore.Config
         private readonly ISerializer _serializer;
         private readonly IDeserializer _deserializer;
 
-        public ConfigLoader(ISerializer serializer = default, IDeserializer deserializer = default)
+        public ConfigLoader(ISerializer? serializer = default, IDeserializer? deserializer = default)
         {
             _serializer = serializer ?? new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
             _deserializer = deserializer ?? new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
@@ -42,7 +42,7 @@ namespace AkkoCore.Config
         public void SaveConfig<T>(T config, string filePath)
         {
             using var writer = File.CreateText(filePath);
-            config.ToYaml(writer, _serializer);
+            config?.ToYaml(writer, _serializer);
         }
 
         /// <summary>

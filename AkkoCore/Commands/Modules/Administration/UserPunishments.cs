@@ -32,7 +32,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task KickAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -58,7 +58,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireBotPermissions(Permissions.BanMembers)]
         [RequireUserPermissions(Permissions.KickMembers)]
         [Priority(0)]
-        public async Task SoftBanAsync(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
+        public async Task SoftBanAsync(CommandContext context, DiscordMember user, [RemainingText] string? reason = default)
             => await SoftBanAsync(context, user, null, reason);
 
         [Command("softban")]
@@ -66,8 +66,8 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task SoftBanAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [Description("arg_ban_deletion")] TimeSpan? time = null,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [Description("arg_ban_deletion")] TimeSpan? time = default,
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -92,7 +92,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Description("cmd_ban")]
         [RequirePermissions(Permissions.BanMembers)]
         [Priority(1)]
-        public async Task BanAsync(CommandContext context, DiscordMember user, [RemainingText] string reason = null)
+        public async Task BanAsync(CommandContext context, DiscordMember user, [RemainingText] string? reason = default)
             => await BanAsync(context, user, null, reason);
 
         [Command("ban")]
@@ -100,8 +100,8 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task BanAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [Description("arg_ban_deletion")] TimeSpan? time = null,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [Description("arg_ban_deletion")] TimeSpan? time = default,
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -123,7 +123,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("ban"), HiddenOverload]
         [Priority(0)]
-        public async Task HackBanAsync(CommandContext context, DiscordUser user, [RemainingText] string reason = null)
+        public async Task HackBanAsync(CommandContext context, DiscordUser user, [RemainingText] string? reason = default)
         {
             // Ban the user - Don't register any occurrency
             await context.Guild.BanMemberAsync(user.Id, 1, context.Member.GetFullname() + " | " + reason);
@@ -140,7 +140,7 @@ namespace AkkoCore.Commands.Modules.Administration
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_timed_ban")] TimeSpan time,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (time <= TimeSpan.Zero)
             {
@@ -165,7 +165,7 @@ namespace AkkoCore.Commands.Modules.Administration
         }
 
         [Command("timedban"), HiddenOverload]
-        public async Task TimedHackBanAsync(CommandContext context, DiscordUser user, TimeSpan time, [RemainingText] string reason = null)
+        public async Task TimedHackBanAsync(CommandContext context, DiscordUser user, TimeSpan time, [RemainingText] string? reason = default)
         {
             // Perform the timed ban
             await _punishService.TimedBanAsync(context, time, user.Id, reason);
@@ -186,7 +186,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task UnbanAsync(
             CommandContext context,
             [Description("arg_ulong_id")] ulong userId,
-            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string? reason = default)
         {
             // Get the user
             var user = (await context.Guild.GetBansAsync()).FirstOrDefault(u => u.User.Id == userId);

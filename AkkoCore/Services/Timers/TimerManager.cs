@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -44,7 +45,7 @@ namespace AkkoCore.Services.Timers
             _updateTimer.Start();
         }
 
-        public bool TryGetValue(int id, out IAkkoTimer timer)
+        public bool TryGetValue(int id, [MaybeNullWhen(false)] out IAkkoTimer timer)
             => _timers.TryGetValue(id, out timer);
 
         public bool TryRemove(IAkkoTimer timer)
@@ -146,9 +147,11 @@ namespace AkkoCore.Services.Timers
         /// <param name="client">The Discord client that fetched the database entry.</param>
         /// <param name="entity">The database entry.</param>
         /// <returns>An active <see cref="AkkoTimer"/>.</returns>
+        /// <exception cref="ArgumentException">Occurs when the bot is not present in the entity guild.</exception>
         private IAkkoTimer GetTimer(DiscordClient client, TimerEntity entity)
         {
-            client.Guilds.TryGetValue(entity.GuildIdFK ?? default, out var server);
+            if (!client.Guilds.TryGetValue(entity.GuildIdFK ?? default, out var server))
+                throw new ArgumentException($"Tried to create a timer for an invalid guild. [Id: {entity.GuildIdFK}]", nameof(entity));
 
             var timer = entity.Type switch
             {
@@ -166,9 +169,10 @@ namespace AkkoCore.Services.Timers
             timer.OnDispose += TimerAutoRemoval;
 
             // If it's a daily timer, set it to automatically create the permanent version of itself
+#nullable disable
             if (entity.TimeOfDay.HasValue && entity.Interval != TimeSpan.FromDays(1))
-                timer.OnDispose += async (timer, _) => await UpdateDailyTimerAsync(timer as IAkkoTimer, client);
-
+                timer.OnDispose += async (x, _) => await UpdateDailyTimerAsync((IAkkoTimer)x, client);
+#nullable enable
             return timer;
         }
 
@@ -259,10 +263,10 @@ namespace AkkoCore.Services.Timers
         /// </remarks>
         /// <param name="obj">An object representing an <see cref="IAkkoTimer"/>.</param>
         /// <param name="args">Event arguments.</param>
-        private void TimerAutoRemoval(object obj, EventArgs args)
+        private void TimerAutoRemoval(object? obj, EventArgs args)
         {
-            var timer = obj as IAkkoTimer;
-            _timers.TryRemove(timer.Id, out _);
+            if (obj is IAkkoTimer timer)
+                _timers.TryRemove(timer.Id, out _);
         }
 
         public void Dispose()

@@ -14,7 +14,7 @@ namespace AkkoCore.Services.Caching
     public sealed class AkkoCache : IAkkoCache
     {
         public ConcurrentDictionary<ulong, DynamicRingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();
-        public ConcurrentDictionary<string, Command> DisabledCommandCache { get; internal set; }
+        public ConcurrentDictionary<string, Command> DisabledCommandCache { get; internal set; } = null!;
         public ITimerManager Timers { get; private set; }
 
         public AkkoCache(ITimerManager timerManager)
@@ -29,9 +29,9 @@ namespace AkkoCore.Services.Caching
             DisabledCommandCache?.Clear();
             Timers?.Dispose();
 
-            GuildMessageCache = null;
-            DisabledCommandCache = null;
-            Timers = null;
+            GuildMessageCache = null!;
+            DisabledCommandCache = null!;
+            Timers = null!;
 
             GC.SuppressFinalize(this);
         }

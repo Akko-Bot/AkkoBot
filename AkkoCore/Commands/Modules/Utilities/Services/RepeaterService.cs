@@ -46,9 +46,9 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="timeOfDay">Time of day the repeater should trigger. This overrides <paramref name="time"/>, turning this repeater into a daily repeater.</param>
         /// <remarks>Repeaters are limited to the maximum of 5 per Discord guild.</remarks>
         /// <returns><see langword="true"/> if the repeater was successfully added to the database, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddRepeaterAsync(CommandContext context, DiscordChannel channel, TimeSpan time, string content, TimeOfDay timeOfDay = null)
+        public async Task<bool> AddRepeaterAsync(CommandContext context, DiscordChannel channel, TimeSpan time, string content, TimeOfDay? timeOfDay = default)
         {
-            if (timeOfDay is null && (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365)))
+            if (context.Guild is null || (timeOfDay is null && (time < TimeSpan.FromMinutes(1) || time > TimeSpan.FromDays(365))))
                 return false;
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
@@ -80,7 +80,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             {
                 Content = content,
                 TimerIdFK = newTimer.Id,
-                GuildIdFK = context.Guild.Id,
+                GuildIdFK = context.Guild!.Id,
                 AuthorId = context.User.Id,
                 ChannelId = channel.Id,
                 Interval = (timeOfDay is null) ? time : TimeSpan.FromDays(1)
@@ -164,17 +164,21 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// </summary>
         /// <param name="dbRepeater">The database repeater.</param>
         /// <param name="user">The author of the repeater.</param>
-        /// <param name="timer">The timer responsible for running the repeater..</param>
-        /// <returns>The database timer and user, if <paramref name="timer"/> and/or <paramref name="user"/> are <see langword="null"/>.</returns>
-        public async Task<(TimerEntity, DiscordUserEntity)> GetRepeaterExtraInfoAsync(IAkkoTimer timer, RepeaterEntity dbRepeater, DiscordMember user)
+        /// <param name="timer">The timer responsible for running the repeater.</param>
+        /// <remarks>
+        /// If <paramref name="timer"/> is <see langword="null"/>, <see cref="TimerEntity"/> will be <see langword="null"/>.
+        /// if <paramref name="user"/> is <see langword="null"/>, <see cref="DiscordUserEntity"/> will be <see langword="null"/>.
+        /// </remarks>
+        /// <returns>The database timer and user from the database.</returns>
+        public async Task<(TimerEntity?, DiscordUserEntity?)> GetRepeaterExtraInfoAsync(IAkkoTimer? timer, RepeaterEntity dbRepeater, DiscordMember? user)
         {
             if (dbRepeater is null)
                 return (default, default);
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            var dbTimer = (timer?.Id is null) ? await db.Timers.Where(x => x.Id == dbRepeater.TimerIdFK).FirstOrDefaultAsyncEF() : null;
-            var dbUser = (user is null) ? await db.DiscordUsers.Where(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsyncEF() : null;
+            var dbTimer = (timer?.Id is null) ? await db.Timers.Where(x => x.Id == dbRepeater.TimerIdFK).FirstOrDefaultAsyncEF() : default;
+            var dbUser = (user is null) ? await db.DiscordUsers.Where(x => x.UserId == dbRepeater.AuthorId).FirstOrDefaultAsyncEF() : default;
 
             return (dbTimer, dbUser);
         }
@@ -186,7 +190,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="predicate">Expression tree to filter the result.</param>
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it returns all guild repeaters.</remarks>
         /// <returns>A collection of repeaters.</returns>
-        public IReadOnlyCollection<RepeaterEntity> GetRepeaters(DiscordGuild server, Func<RepeaterEntity, bool> predicate = null)
+        public IReadOnlyList<RepeaterEntity> GetRepeaters(DiscordGuild server, Func<RepeaterEntity, bool>? predicate = default)
             => GetRepeaters(server, predicate, x => x);
 
         /// <summary>
@@ -199,7 +203,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <remarks>If <paramref name="predicate"/> is <see langword="null"/>, it returns all guild repeaters.</remarks>
         /// <returns>A collection of <typeparamref name="T"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
-        public IReadOnlyCollection<T> GetRepeaters<T>(DiscordGuild server, Func<RepeaterEntity, bool> predicate, Func<RepeaterEntity, T> selector)
+        public IReadOnlyList<T> GetRepeaters<T>(DiscordGuild server, Func<RepeaterEntity, bool>? predicate, Func<RepeaterEntity, T> selector)
         {
             _dbCache.Repeaters.TryGetValue(server.Id, out var repeaters);
 

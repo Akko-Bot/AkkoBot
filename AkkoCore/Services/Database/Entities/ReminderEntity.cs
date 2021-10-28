@@ -14,12 +14,12 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores reminder data and the context it should be sent to.")]
     public class ReminderEntity : DbEntity
     {
-        private string _content;
+        private string _content = null!;
 
         /// <summary>
         /// The timer this reminder is associated with.
         /// </summary>
-        public TimerEntity TimerRel { get; init; }
+        public TimerEntity? TimerRel { get; init; }
 
         /// <summary>
         /// The database ID of the timer this reminder is associated with.
@@ -34,7 +34,7 @@ namespace AkkoCore.Services.Database.Entities
         public string Content
         {
             get => _content;
-            init => _content = value?.MaxLength(AkkoConstants.MaxMessageLength) ?? "-";
+            init => _content = value.MaxLength(AkkoConstants.MaxMessageLength) ?? "-";
         }
 
         /// <summary>

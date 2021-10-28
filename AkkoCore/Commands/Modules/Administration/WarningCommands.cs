@@ -70,7 +70,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [RequireUserPermissions(Permissions.KickMembers)]
         public async Task WarnAsync(CommandContext context,
         [Description("arg_discord_user")] DiscordMember user,
-        [RemainingText, Description("arg_infraction")] string reason = null)
+        [RemainingText, Description("arg_infraction")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -94,7 +94,7 @@ namespace AkkoCore.Commands.Modules.Administration
                     context.FormatLocalized(
                         "warn_and_punish",
                         Formatter.Bold(user.GetFullname()),
-                        punishment.ToString().ToLowerInvariant() + "_enum"
+                        punishment.ToString()!.ToLowerInvariant() + "_enum"
                     )
                 );
             }
@@ -143,7 +143,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("infractions"), Aliases("warnlog")]
         [Description("cmd_infractions")]
-        public async Task InfractionsAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
+        public async Task InfractionsAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser? user = default)
         {
             if (!context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.KickMembers) && user is not null)
                 return;
@@ -165,7 +165,7 @@ namespace AkkoCore.Commands.Modules.Administration
                     modName
                 );
 
-                fields.Add(new(fieldName, infraction.WarningText));
+                fields.Add(new(fieldName, infraction.WarningText ?? "-"));
             }
 
             if (infractions.Count is 0)
@@ -177,7 +177,7 @@ namespace AkkoCore.Commands.Modules.Administration
         [Command("modlog")]
         [Description("cmd_modlog")]
         [RequireUserPermissions(Permissions.KickMembers)]
-        public async Task ModLogAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user = null)
+        public async Task ModLogAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser? user = default)
         {
             user ??= context.User;
             var infractions = await _warnService.GetInfractionsAsync(context.Guild, user);
@@ -205,11 +205,11 @@ namespace AkkoCore.Commands.Modules.Administration
                     modName.ToString()
                 );
 
-                fields.Add(new(fieldName, infraction.WarningText));
+                fields.Add(new(fieldName, infraction.WarningText ?? "-"));
             }
 
             if (infractions.Count is 0)
-                embed.Body.Description += "\n\n" + context.FormatLocalized("infractions_empty");
+                embed.Body!.Description += "\n\n" + context.FormatLocalized("infractions_empty");
 
             await context.RespondPaginatedByFieldsAsync(embed, fields);
         }
@@ -219,8 +219,8 @@ namespace AkkoCore.Commands.Modules.Administration
             => await WarnplAsync(context);
 
         [Command("warnpunishment"), HiddenOverload]
-        public async Task WarnpAsync(CommandContext context, int amount, PunishmentType punishmentType, TimeSpan? time = null)
-            => await WarnpAsync(context, amount, punishmentType, null, time);
+        public async Task WarnpAsync(CommandContext context, int amount, PunishmentType punishmentType, TimeSpan? time = default)
+            => await WarnpAsync(context, amount, punishmentType, default, time);
 
         [Command("warnpunishment"), Aliases("warnp")]
         [Description("cmd_warnp")]
@@ -229,8 +229,8 @@ namespace AkkoCore.Commands.Modules.Administration
             CommandContext context,
             [Description("arg_warnp_amount")] int amount,
             [Description("arg_warnp_type")] PunishmentType punishmentType,
-            [Description("arg_warnp_role")] DiscordRole role = null,
-            [Description("arg_warnp_time")] TimeSpan? time = null)
+            [Description("arg_warnp_role")] DiscordRole? role = default,
+            [Description("arg_warnp_time")] TimeSpan? time = default)
         {
             await _warnService.SaveWarnPunishmentAsync(context.Guild, amount, punishmentType, role, time);
 

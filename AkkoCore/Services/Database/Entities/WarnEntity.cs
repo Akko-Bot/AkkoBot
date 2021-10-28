@@ -13,22 +13,22 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores warnings issued to users on servers.")]
     public class WarnEntity : DbEntity
     {
-        private readonly string _note;
+        private readonly string? _note = null!;
 
         /// <summary>
         /// The Discord user associated with this infraction.
         /// </summary>
-        public DiscordUserEntity UserRel { get; init; }
+        public DiscordUserEntity? UserRel { get; init; }
 
         /// <summary>
         /// The settings of the Discord guild this infraction is associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The timer associated with this infraction.
         /// </summary>
-        public TimerEntity TimerRel { get; init; }
+        public TimerEntity? TimerRel { get; init; }
 
         /// <summary>
         /// The database ID of the timer associated with this infraction.
@@ -61,10 +61,10 @@ namespace AkkoCore.Services.Database.Entities
         /// The content of the infraction.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string WarningText
+        public string? WarningText
         {
             get => _note;
-            init => _note = value?.MaxLength(AkkoConstants.MaxMessageLength) ?? "-";
+            init => _note = (string.IsNullOrWhiteSpace(value)) ? null : value.MaxLength(AkkoConstants.MaxMessageLength);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [Command("add")]
         [Description("cmd_voicerole_add")]
-        public async Task AddVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task AddVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             channel ??= context.Member.VoiceState?.Channel;
             var success = channel?.Type is ChannelType.Voice && await _service.AddVoiceRoleAsync(context.Guild, channel, role);
@@ -36,20 +36,20 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_voicerole_remove")]
-        public async Task RemoveVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task RemoveVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             channel ??= context.Member.VoiceState?.Channel;
-            var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel.Id && x.RoleId == role.Id);
+            var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel?.Id && x.RoleId == role.Id);
 
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
         [Command("removeall"), Aliases("rmall")]
         [Description("cmd_voicerole_removeall")]
-        public async Task RemoveAllVoiceRolesAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task RemoveAllVoiceRolesAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             channel ??= context.Member.VoiceState?.Channel;
-            var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel.Id);
+            var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel?.Id);
 
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }

@@ -51,13 +51,6 @@ namespace AkkoCore.Services.Logging
             => Client is not null;
 
         /// <summary>
-        /// Initializes a log data with no context.
-        /// </summary>
-        /// <param name="optionalMessage">The message to be displayed.</param>
-        public LogData(string optionalMessage)
-            => OptionalMessage = optionalMessage;
-
-        /// <summary>
         /// Initializes a log data.
         /// </summary>
         /// <param name="context">The command context.</param>

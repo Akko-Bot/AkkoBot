@@ -64,7 +64,7 @@ namespace AkkoCore.Extensions
         /// <param name="maxFields">The maximum amount of fields each page is allowed to have.</param>
         /// <param name="isEphemeral">Whether the message should be ephemeral or not.</param>
         /// <param name="content">The content outside the embed.</param>
-        public static async Task RespondPaginatedByFieldsAsync(this InteractionContext context, SerializableDiscordEmbed embed, int maxFields = 3, bool isEphemeral = true, string content = null)
+        public static async Task RespondPaginatedByFieldsAsync(this InteractionContext context, SerializableDiscordEmbed embed, int maxFields = 3, bool isEphemeral = true, string? content = default)
         {
             if (embed.Fields is null || embed.Fields.Count <= maxFields)
             {

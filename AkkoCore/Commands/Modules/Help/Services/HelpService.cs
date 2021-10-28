@@ -47,9 +47,9 @@ namespace AkkoCore.Commands.Modules.Help.Services
         public SerializableDiscordEmbed GetAllModules(IMessageSettings settings, CommandsNextExtension cmdHandler, string thisCmdQualifiedName)
         {
             var namespaces = cmdHandler.RegisteredCommands.Values
-                .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName.Contains("DSharpPlus"))                              // Remove library modules
-                .Select(cmd => cmd.Module.ModuleType.Namespace[(cmd.Module.ModuleType.Namespace.LastOccurrenceOf('.', 0) + 1)..])   // Get the module name
-                .Distinct()                                                                                                         // Remove the repeated modules
+                .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName!.Contains("DSharpPlus"))                                             // Remove library modules
+                .Select(cmd => cmd.Module.ModuleType.Namespace?[(cmd.Module.ModuleType.Namespace.LastOccurrenceOf('.', 0) + 1)..] ?? "Undefined")   // Get the module name
+                .Distinct()                                                                                                                         // Remove the repeated modules
                 .OrderBy(x => x);
 
             return new SerializableDiscordEmbed()
@@ -78,14 +78,14 @@ namespace AkkoCore.Commands.Modules.Help.Services
         public async Task<SerializableDiscordEmbed> GetAllModuleCommandsAsync(IMessageSettings settings, CommandsNextExtension cmdHandler, DiscordUser user, DiscordChannel channel, string moduleName)
         {
             var cmdGroup = await cmdHandler.RegisteredCommands.Values
-                .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.Namespace.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.Namespace?.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase) is true)
                 .Distinct()
                 .OrderBy(x => x.Name)
                 .Select(async cmd =>
                 {
                     var fakeContext = cmdHandler.CreateFakeContext(user, channel, string.Empty, string.Empty, cmd);
 
-                    var emote = ((_commandHandler.GetActiveOverride(channel.GuildId, cmd, out var permOverride) && _commandHandler.IsAllowedOverridenContext(fakeContext, permOverride)))
+                    var emote = ((_commandHandler.GetActiveOverride(channel.GuildId, cmd, out var permOverride) && _commandHandler.IsAllowedOverridenContext(fakeContext, permOverride!)))
                         ? AkkoStatics.SuccessEmoji
                         : (permOverride is null || !permOverride.IsActive)
                             ? (await cmd.RunChecksAsync(fakeContext, false)).Any() ? AkkoStatics.FailureEmoji : AkkoStatics.SuccessEmoji

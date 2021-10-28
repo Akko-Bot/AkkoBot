@@ -45,7 +45,7 @@ namespace AkkoCore.Services.Database.Queries
         /// <param name="referenceEntity">The model to look for in the database.</param>
         /// <remarks>The entry is filtered by TimerType, GuildId, UserId and ChannelId.</remarks>
         /// <returns>The tracked database entry, <see langword="null"/> if the entry doesn't exist.</returns>
-        private static TimerEntity GetTimerEntity(DbSet<TimerEntity> table, TimerEntity referenceEntity)
+        private static TimerEntity? GetTimerEntity(DbSet<TimerEntity> table, TimerEntity referenceEntity)
         {
             return table.AsNoTracking().FirstOrDefault(x =>
                     x.Type == referenceEntity.Type

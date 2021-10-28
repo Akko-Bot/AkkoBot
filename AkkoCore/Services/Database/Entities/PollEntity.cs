@@ -3,6 +3,7 @@ using AkkoCore.Services.Database.Abstractions;
 using AkkoCore.Services.Database.Enums;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace AkkoCore.Services.Database.Entities
         /// <summary>
         /// The settings of the Discord guild this poll is associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord guild this poll is associated with.
@@ -45,17 +46,17 @@ namespace AkkoCore.Services.Database.Entities
         /// </summary>
         [Required]
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string Question { get; init; }
+        public string Question { get; init; } = null!;
 
         /// <summary>
         /// The possible answers for this poll.
         /// </summary>
-        public string[] Answers { get; init; }
+        public string[] Answers { get; init; } = Array.Empty<string>();
 
         /// <summary>
         /// The votes that have been cast to this poll.
         /// </summary>
-        public int[] Votes { get; init; }
+        public int[] Votes { get; init; } = Array.Empty<int>();
 
         /// <summary>
         /// The ID of the Discord users that have voted on this poll.
@@ -67,15 +68,13 @@ namespace AkkoCore.Services.Database.Entities
         /// </summary>
         /// <param name="server">The Discord guild the poll is from.</param>
         /// <returns>The message that containst the poll, <see langword="null"/> if it's not found.</returns>
-        public async Task<DiscordMessage> GetPollMessageAsync(DiscordGuild server)
+        public async Task<DiscordMessage?> GetPollMessageAsync(DiscordGuild server)
         {
-            if (server.Id != GuildIdFK)
-                return null;
+            if (server.Id != GuildIdFK || server.Channels.TryGetValue(ChannelId, out var channel))
+                return default;
 
-            server.Channels.TryGetValue(ChannelId, out var channel);
-
-            try { return await channel?.GetMessageAsync(MessageId); }
-            catch { return null; }
+            try { return await channel!.GetMessageAsync(MessageId); }
+            catch { return default; }
         }
     }
 }

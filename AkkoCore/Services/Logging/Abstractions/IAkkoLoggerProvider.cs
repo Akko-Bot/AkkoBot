@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Logging.Abstractions
         /// </summary>
         /// <param name="fileLogger">The new file logger, <see langword="null"/> to disable file logging.</param>
         /// <remarks>Pass in <see langword="null"/> to disable file logging.</remarks>
-        void UpdateFileLogger(IFileLogger fileLogger);
+        void UpdateFileLogger(IFileLogger? fileLogger);
 
         /// <summary>
         /// Updates the loggers registered in this provider with the specified settings.

@@ -102,7 +102,7 @@ namespace AkkoCore.Services.Events
                 || !gatekeeper.GreetDm || eventArgs.Member.IsBot || string.IsNullOrWhiteSpace(gatekeeper.GreetMessage))
                 return;
 
-            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
             eventArgs.Guild.Channels.TryGetValue(gatekeeper.GreetChannelId ?? default, out var channel);
 
             channel ??= eventArgs.Guild.GetDefaultChannel();
@@ -111,22 +111,21 @@ namespace AkkoCore.Services.Events
             var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
             if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
-                await eventArgs.Member.SendMessageSafelyAsync(message);
+                await eventArgs.Member.SendMessageSafelyAsync(message!);
             else
                 await eventArgs.Member.SendMessageSafelyAsync(parsedString);
         }
 
-        public Task SendGreetMessageAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+        public async Task SendGreetMessageAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
                 || !gatekeeper.GreetChannelId.HasValue || gatekeeper.GreetDm || eventArgs.Member.IsBot
                 || string.IsNullOrWhiteSpace(gatekeeper.GreetMessage)
                 || !eventArgs.Guild.Channels.TryGetValue(gatekeeper.GreetChannelId.Value, out var channel)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels | Permissions.SendMessages))
-                return Task.CompletedTask;
+                return;
 
-            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
-
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
             var cmdHandler = client.GetCommandsNext();
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
 
@@ -134,24 +133,22 @@ namespace AkkoCore.Services.Events
                 fakeContext, eventArgs.Member, channel, gatekeeper.GreetDeleteTime,
                 _botConfig.BulkGatekeepTime, _greetAggregator, _waitingGreets, gatekeeper.GreetMessage
             );
-
-            return Task.CompletedTask;
         }
 
-        public Task SendFarewellMessageAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
+        public async Task SendFarewellMessageAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
         {
             if (!_dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper)
                 || !gatekeeper.FarewellChannelId.HasValue || eventArgs.Member.IsBot
                 || string.IsNullOrWhiteSpace(gatekeeper.FarewellMessage)
                 || !eventArgs.Guild.Channels.TryGetValue(gatekeeper.FarewellChannelId.Value, out var channel)
                 || !eventArgs.Guild.CurrentMember.PermissionsIn(channel).HasPermission(Permissions.AccessChannels | Permissions.SendMessages))
-                return Task.CompletedTask;
+                return;
 
             // If antialt is enabled and user was kicked/banned, send no farewell message
             if (gatekeeper.AntiAlt && eventArgs.Member.GetTimeDifference() <= gatekeeper.AntiAltTime)
-                return Task.CompletedTask;
+                return;
 
-            _dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild);
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
 
             var cmdHandler = client.GetCommandsNext();
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.FarewellMessage, dbGuild.Prefix, null);
@@ -160,8 +157,6 @@ namespace AkkoCore.Services.Events
                 fakeContext, eventArgs.Member, channel, gatekeeper.FarewellDeleteTime,
                 _botConfig.BulkGatekeepTime, _farewellAggregator, _waitingFarewells, gatekeeper.FarewellMessage
             );
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -15,10 +15,10 @@ namespace AkkoCore.Services.Logging
     public sealed class AkkoLoggerProvider : IAkkoLoggerProvider
     {
         private bool _isDisposed = false;
-        private IFileLogger _fileLogger;
+        private IFileLogger? _fileLogger;
         private LogLevel _minLogLevel;
-        private string _logFormat;
-        private string _timeFormat;
+        private string? _logFormat;
+        private string? _timeFormat;
         private readonly List<ILogger> _loggers = new();
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace AkkoCore.Services.Logging
         /// <param name="fileLogger">Defines the file logger for logging to a text file. Default is <see langword="null"/> for no logging.</param>
         /// <param name="logFormat">Defines the type of <see cref="ILogger"/> that should be created. Default is "Default".</param>
         /// <param name="timeFormat">The time format to be used on timestamps.</param>
-        public AkkoLoggerProvider(LogLevel minLogLevel, IFileLogger fileLogger = default, string logFormat = default, string timeFormat = default)
+        public AkkoLoggerProvider(LogLevel minLogLevel, IFileLogger? fileLogger = default, string? logFormat = default, string? timeFormat = default)
         {
             _minLogLevel = minLogLevel;
             _logFormat = logFormat;
@@ -56,7 +56,7 @@ namespace AkkoCore.Services.Logging
                 logger.BeginScope(logConfig);
         }
 
-        public void UpdateFileLogger(IFileLogger fileLogger)
+        public void UpdateFileLogger(IFileLogger? fileLogger)
         {
             _fileLogger = fileLogger;
             _loggers[0].BeginScope(null)?.Dispose();

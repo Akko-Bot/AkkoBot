@@ -42,7 +42,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <param name="cmdArgs">The command's arguments, if any.</param>
         /// <remarks>To create startup commands, use <see cref="AddStartupCommandAsync(CommandContext, Command, string)"/> instead.</remarks>
         /// <returns><see langword="true"/> if the autocommand was successfully created, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddAutoCommandAsync(CommandContext context, TimeSpan time, AutoCommandType cmdType, Command cmd, string cmdArgs = null)
+        public async Task<bool> AddAutoCommandAsync(CommandContext context, TimeSpan time, AutoCommandType cmdType, Command cmd, string? cmdArgs = default)
         {
             if (cmd is null || context.Guild is null || time <= TimeSpan.Zero || cmdType is AutoCommandType.Startup)
                 return false;
@@ -67,7 +67,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
             {
                 TimerIdFK = newTimer.Id,
                 CommandString = cmd.QualifiedName + ((string.IsNullOrWhiteSpace(cmdArgs)) ? string.Empty : " " + cmdArgs),
-                GuildId = context.Guild.Id,
+                GuildId = context.Guild!.Id,
                 AuthorId = context.User.Id,
                 ChannelId = context.Channel.Id,
                 Type = cmdType
@@ -124,7 +124,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
                 .Select(x =>
                     new AutoCommandEntity()
                     {
-                        TimerRel = (x.TimerRel == null) ? null : new TimerEntity() { Id = x.TimerRel.Id },
+                        TimerRel = (x.TimerRel! == null!) ? null : new TimerEntity() { Id = x.TimerRel.Id },
                         Id = x.Id,
                         TimerIdFK = x.TimerIdFK,
                         AuthorId = x.AuthorId
@@ -178,19 +178,17 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// <returns>The time remaining.</returns>
         public string GetElapseTime(AutoCommandEntity dbEntry)
         {
-            switch (dbEntry.Type)
+            return dbEntry.Type switch
             {
-                case AutoCommandType.Startup:
-                    return "-";
+                AutoCommandType.Startup => "-",
 
-                case AutoCommandType.Scheduled:
-                case AutoCommandType.Repeated:
-                    _akkoCache.Timers.TryGetValue(dbEntry.TimerIdFK.Value, out var timer);
-                    return DateTimeOffset.Now.Add(timer.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime);
+                AutoCommandType.Scheduled or AutoCommandType.Repeated 
+                    => (_akkoCache.Timers.TryGetValue(dbEntry.TimerIdFK!.Value, out var timer))
+                        ? DateTimeOffset.Now.Add(timer.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime)
+                        : "-",
 
-                default:
-                    throw new NotImplementedException($"Command of type {dbEntry.Type} has not been implemented.");
-            }
+                _ => throw new NotImplementedException($"Command of type {dbEntry.Type} has not been implemented."),
+            };
         }
     }
 }

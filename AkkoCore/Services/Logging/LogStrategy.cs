@@ -33,7 +33,7 @@ namespace AkkoCore.Services.Logging
         /// <param name="timeFormat">The time format to be used on the timestamps.</param>
         /// <remarks>Defaults to "Default".</remarks>
         /// <returns>The log header.</returns>
-        public static string GetHeader(EventId eventId, string strategyName, string timeFormat)
+        public static string GetHeader(EventId eventId, string? strategyName, string? timeFormat)
         {
             return strategyName?.ToLowerInvariant() switch
             {
@@ -46,7 +46,7 @@ namespace AkkoCore.Services.Logging
         /// <summary>
         /// Gets the default log header.
         /// </summary>
-        private static string DefaultHeader(EventId eventId, string timeFormat)
+        private static string DefaultHeader(EventId eventId, string? timeFormat)
         {
             var eName = (eventId.Name?.Length > 12) ? eventId.Name?.Substring(0, 12) : eventId.Name;
             return $"[{DateTimeOffset.Now.ToString(timeFormat ?? "yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture)}] [{eName,-6}] ";
@@ -55,7 +55,7 @@ namespace AkkoCore.Services.Logging
         /// <summary>
         /// Gets the simple log header.
         /// </summary>
-        private static string SimpleHeader(EventId eventId, string timeFormat)
+        private static string SimpleHeader(EventId eventId, string? timeFormat)
         {
             var eName = (eventId.Name?.Length > 12) ? eventId.Name?.Substring(0, 12) : eventId.Name;
             return $"[{DateTimeOffset.Now.ToString(timeFormat ?? "HH:mm", CultureInfo.InvariantCulture)}] [{eventId.Id,-4}/{eName,-12}] ";
@@ -64,7 +64,7 @@ namespace AkkoCore.Services.Logging
         /// <summary>
         /// Gets the minimalist log header.
         /// </summary>
-        private static string MinimalistHeader(EventId eventId, string timeFormat)
+        private static string MinimalistHeader(EventId eventId, string? timeFormat)
         {
             var eName = (eventId.Name?.Length > 7) ? eventId.Name?.Substring(0, 7) : eventId.Name;
             return $"[{DateTimeOffset.Now.ToString(timeFormat ?? "HH:mm", CultureInfo.InvariantCulture)}] [{eName,-7}] ";

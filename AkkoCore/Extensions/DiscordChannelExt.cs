@@ -15,7 +15,7 @@ namespace AkkoCore.Extensions
         /// <param name="channel">This Discord channel.</param>
         /// <param name="message">The message to be sent.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordChannel channel, DiscordMessageBuilder message)
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordChannel channel, DiscordMessageBuilder message)
             => await SendMessageSafelyAsync(channel, message.Content, message.Embed);
 
         /// <summary>
@@ -24,8 +24,8 @@ namespace AkkoCore.Extensions
         /// <param name="channel">This Discord channel.</param>
         /// <param name="embed">The message's embed.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordChannel channel, DiscordEmbed embed)
-            => await SendMessageSafelyAsync(channel, null, embed);
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordChannel channel, DiscordEmbed embed)
+            => await SendMessageSafelyAsync(channel, default, embed);
 
         /// <summary>
         /// Safely sends a message to the specified channel.
@@ -33,8 +33,8 @@ namespace AkkoCore.Extensions
         /// <param name="channel">This Discord channel.</param>
         /// <param name="content">The message's content.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordChannel channel, string content)
-            => await SendMessageSafelyAsync(channel, content, null);
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordChannel channel, string content)
+            => await SendMessageSafelyAsync(channel, content, default);
 
         /// <summary>
         /// Safely sends a message to the specified channel.
@@ -43,13 +43,13 @@ namespace AkkoCore.Extensions
         /// <param name="content">The message's content.</param>
         /// <param name="embed">The message's embed.</param>
         /// <returns>The message that was sent, <see langword="null"/> if the message could not be sent.</returns>
-        public static async Task<DiscordMessage> SendMessageSafelyAsync(this DiscordChannel channel, string content, DiscordEmbed embed)
+        public static async Task<DiscordMessage?> SendMessageSafelyAsync(this DiscordChannel channel, string? content, DiscordEmbed? embed)
         {
             if (content is null && embed is null)
-                return null;
+                return default;
 
             try { return await channel.SendMessageAsync(content, embed); }
-            catch { return null; }
+            catch { return default; }
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace AkkoCore.Extensions
         /// <exception cref="NotFoundException">Occurs when the client has no access to this Discord channel or when the channel has no messages.</exception>
         /// <exception cref="BadRequestException">Occurs when this Discord channel has been deleted or does not exist.</exception>
         /// <exception cref="ServerErrorException">Occurs when Discord is going through internal errors.</exception>
-        public static async Task<DiscordMessage> GetLatestMessageAsync(this DiscordChannel channel, DiscordClient client)
+        public static async Task<DiscordMessage?> GetLatestMessageAsync(this DiscordChannel channel, DiscordClient client)
         {
             var messageCache = client.GetMessageCache();
             var message = messageCache
@@ -72,7 +72,7 @@ namespace AkkoCore.Extensions
             if (message is null)
             {
                 message = (await channel.GetMessagesAsync(1)).FirstOrDefault(); // Channel can be empty
-                messageCache.Add(message);  // It's fine to add null values to the message cache
+                messageCache.Add(message!);  // It's fine to add null values to the message cache
             }
 
             return message;
@@ -109,7 +109,7 @@ namespace AkkoCore.Extensions
             else
             {
                 return messages.Concat(
-                    (await channel.GetMessagesBeforeAsync(messages.LastOrDefault().Id, amount - messagesCount))
+                    (await channel.GetMessagesBeforeAsync(messages.Last().Id, amount - messagesCount))
                         .OrderByDescending(x => x.Id)
                 );
             }

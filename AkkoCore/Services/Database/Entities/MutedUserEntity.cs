@@ -12,7 +12,7 @@ namespace AkkoCore.Services.Database.Entities
         /// <summary>
         /// The settings of the Discord guild this muted user is associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord guild this muted user is associated with.
@@ -23,7 +23,5 @@ namespace AkkoCore.Services.Database.Entities
         /// The ID of the Discord user that got muted.
         /// </summary>
         public ulong UserId { get; init; }
-
-        public string JustATest { get; set; }
     }
 }

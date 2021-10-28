@@ -58,7 +58,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             var newEntry = new AliasEntity()
             {
                 GuildIdFK = context.Guild?.Id,
-                IsDynamic = ((cmd is CommandGroup c) && c.Children.Count > 1)     // This is not perfect but it will do for now
+                IsDynamic = ((cmd is CommandGroup cg) && cg.Children.Count > 1)     // This is not perfect but it will do for now
                     || cmd.Overloads.Any(x => x.Arguments.Count > args.Split(' ').Length - ((string.IsNullOrWhiteSpace(args)) ? 1 : 0)),
 
                 Alias = alias,
@@ -68,13 +68,13 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             var guildId = newEntry.GuildIdFK ?? default;
             var trackedEntity = db.Upsert(newEntry);
-            var dbEntry = trackedEntity.Entity as AliasEntity;
+            var dbEntry = (AliasEntity)trackedEntity.Entity;
 
             // Update the cache
             if (!_dbCache.Aliases.ContainsKey(guildId))
                 _dbCache.Aliases.TryAdd(guildId, new ConcurrentHashSet<AliasEntity>());
-            else if (trackedEntity.State is EntityState.Modified)
-                _dbCache.Aliases[guildId].TryRemove(_dbCache.Aliases[guildId].FirstOrDefault(x => x.Id == dbEntry.Id));
+            else if (trackedEntity.State is EntityState.Modified && _dbCache.Aliases.TryGetValue(guildId, out var aliases))
+                _dbCache.Aliases[guildId].TryRemove(aliases.FirstOrDefault(x => x.Id == dbEntry.Id)!);  // Passing null here is fine
 
             _dbCache.Aliases[guildId].Add(dbEntry);
 

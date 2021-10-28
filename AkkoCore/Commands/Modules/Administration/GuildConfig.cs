@@ -137,7 +137,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             // Change the locale
             if (success)
-                await _service.SetPropertyAsync(context.Guild, x => x.Locale = responseKey);
+                await _service.SetPropertyAsync(context.Guild, x => x.Locale = responseKey!);
 
             // Send the message
             var embed = new SerializableDiscordEmbed()

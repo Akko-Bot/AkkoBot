@@ -19,12 +19,12 @@ namespace AkkoCore.Services.Database.Entities
         /// <summary>
         /// The infractions associated with this user.
         /// </summary>
-        public List<WarnEntity> WarnRel { get; init; }
+        public List<WarnEntity>? WarnRel { get; init; }
 
         /// <summary>
         /// The timers this associated with this user.
         /// </summary>
-        public List<TimerEntity> TimerRel { get; init; }
+        public List<TimerEntity>? TimerRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord user.
@@ -84,7 +84,7 @@ namespace AkkoCore.Services.Database.Entities
         public static bool operator !=(DiscordUserEntity x, DiscordUserEntity y)
             => !(x == y);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || (obj is not null && obj is DiscordUserEntity dbUser && this == dbUser);
 
         public override int GetHashCode()

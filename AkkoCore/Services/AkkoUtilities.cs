@@ -177,10 +177,10 @@ namespace AkkoCore.Services
         /// <see langword="false"/> to get <see langword="null"/> if the locale is invalid.
         /// </param>
         /// <returns>A <see cref="CultureInfo"/> object, <see langword="null"/> if the locale is invalid.</returns>
-        public static CultureInfo GetCultureInfo(string locale, bool getDefault = false)
+        public static CultureInfo? GetCultureInfo(string locale, bool getDefault = false)
         {
             try { return CultureInfo.CreateSpecificCulture(locale); }
-            catch { return (getDefault) ? CultureInfo.CreateSpecificCulture(AkkoConstants.DefaultLanguage) : null; }
+            catch { return (getDefault) ? CultureInfo.CreateSpecificCulture(AkkoConstants.DefaultLanguage) : default; }
         }
 
         /// <summary>
@@ -189,10 +189,10 @@ namespace AkkoCore.Services
         /// <param name="id">The timezone ID.</param>
         /// <param name="getDefault"><see langword="true"/> to return the local timezone if the specified ID is invalid, <see langword="false"/> to return <see langword="null"/>.</param>
         /// <returns>A <see cref="TimeZoneInfo"/> object, <see langword="null"/> if the specified ID is invalid.</returns>
-        public static TimeZoneInfo GetTimeZone(string id, bool getDefault = false)
+        public static TimeZoneInfo? GetTimeZone(string id, bool getDefault = false)
         {
             try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
-            catch { return (getDefault) ? TimeZoneInfo.Local : null; }
+            catch { return (getDefault) ? TimeZoneInfo.Local : default; }
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace AkkoCore.Services
         {
             return GetCogAssemblies()
                 .SelectMany(x => GetConcreteTypesOf<ICogSetup>(x))
-                .Select(x => Activator.CreateInstance(x) as ICogSetup);
+                .Select(x => (ICogSetup)Activator.CreateInstance(x)!);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace AkkoCore.Services
         internal static IEnumerable<ICogSetup> GetCogSetups(Assembly assembly)
         {
             return GetConcreteTypesOf<ICogSetup>(assembly)
-                .Select(x => Activator.CreateInstance(x) as ICogSetup);
+                .Select(x => (ICogSetup)Activator.CreateInstance(x)!);
         }
 
         /// <summary>
@@ -300,9 +300,12 @@ namespace AkkoCore.Services
         /// <param name="content">The content outside the embed.</param>
         /// <remarks>The only thing that changes across the pages is the description.</remarks>
         /// <returns>A collection of paginable embeds.</returns>
-        internal static IEnumerable<Page> GenerateLocalizedPages(IMessageSettings settings, ILocalizer localizer, string input, SerializableDiscordEmbed embed, int maxLength, string content)
+        /// <exception cref="ArgumentException">Occurs when <paramref name="embed"/> is invalid.</exception>
+        internal static IEnumerable<Page> GenerateLocalizedPages(IMessageSettings settings, ILocalizer localizer, string input, SerializableDiscordEmbed embed, int maxLength, string? content)
         {
-            if (content is not null)
+            if (!embed.HasValidEmbed())
+                throw new ArgumentException("Cannot localize an invalid embed.", nameof(embed));
+            else if (content is not null)
                 content = localizer.GetResponseString(settings.Locale, content);
 
             var amount = input.Length / maxLength;
@@ -314,7 +317,7 @@ namespace AkkoCore.Services
 
             for (var counter = 0; inputLength > 0;)
             {
-                var embedCopy = embed.Build();
+                var embedCopy = embed.Build()!;
                 embedCopy.Description = input.Substring(counter++ * maxLength, Math.Min(inputLength, maxLength));
 
                 if (embedCopy?.Footer is null)
@@ -338,8 +341,11 @@ namespace AkkoCore.Services
         /// <param name="maxFields">The maximum amount of fields each page is allowed to have.</param>
         /// <remarks>The only thing that changes across the pages are its embed fields.</remarks>
         /// <returns>A collection of paginable embeds.</returns>
-        internal static IEnumerable<Page> GenerateLocalizedPagesByFields(IMessageSettings settings, ILocalizer localizer, SerializableDiscordEmbed embed, int maxFields, string content)
+        internal static IEnumerable<Page> GenerateLocalizedPagesByFields(IMessageSettings settings, ILocalizer localizer, SerializableDiscordEmbed embed, int maxFields, string? content)
         {
+            if (embed.Fields is null or { Count: 0 })
+                throw new ArgumentException("Embed contains no field.", nameof(embed));
+
             if (content is not null)
                 content = localizer.GetResponseString(settings.Locale, content);
 
@@ -376,7 +382,7 @@ namespace AkkoCore.Services
         /// <param name="content">The content outside the embed.</param>
         /// <remarks>The only thing that changes across the pages are its embed fields.</remarks>
         /// <returns>A collection of paginable embeds.</returns>
-        internal static IEnumerable<Page> GenerateLocalizedPagesByFields(IMessageSettings settings, ILocalizer localizer, SerializableDiscordEmbed embed, IEnumerable<SerializableEmbedField> fields, int maxFields, string content)
+        internal static IEnumerable<Page> GenerateLocalizedPagesByFields(IMessageSettings settings, ILocalizer localizer, SerializableDiscordEmbed embed, IEnumerable<SerializableEmbedField> fields, int maxFields, string? content)
         {
             if (content is not null)
                 content = localizer.GetResponseString(settings.Locale, content);
@@ -415,6 +421,9 @@ namespace AkkoCore.Services
         {
             foreach (var page in pages)
             {
+                if (page.Embed is null)
+                    continue;
+
                 page.Content += ("\n\n" + page.Embed.Decompose()).MaxLength(AkkoConstants.MaxMessageLength - page.Content?.Length ?? 0);
                 page.Embed = null;
             }

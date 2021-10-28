@@ -48,7 +48,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="note">The note to be added.</param>
         /// <param name="type">The type of note to be added.</param>
         /// <returns>The saved guild settings.</returns>
-        public async Task<GuildConfigEntity> SaveInfractionAsync(CommandContext context, DiscordUser user, string note, WarnType type = WarnType.Notice)
+        public async Task<GuildConfigEntity> SaveInfractionAsync(CommandContext context, DiscordUser user, string? note, WarnType type = WarnType.Notice)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -112,7 +112,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="user">The user to be warned.</param>
         /// <param name="warn">The warning to be added.</param>
         /// <returns>The punishment type if a punishment was applied, <see langword="null"/> otherwise.</returns>
-        public async Task<PunishmentType?> SaveWarnAsync(CommandContext context, DiscordUser user, string warn)
+        public async Task<PunishmentType?> SaveWarnAsync(CommandContext context, DiscordUser user, string? warn)
         {
             var guildSettings = await SaveInfractionAsync(context, user, warn, WarnType.Warning);
 
@@ -164,7 +164,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="type">The type of punishment that should be issued.</param>
         /// <param name="interval">If the punishment is temporary, for how long it should be.</param>
         /// <returns><see langword="true"/> if the punishment was saved, <see langword="false"/> if it was updated.</returns>
-        public async Task<bool> SaveWarnPunishmentAsync(DiscordGuild server, int amount, PunishmentType type, DiscordRole role, TimeSpan? interval)
+        public async Task<bool> SaveWarnPunishmentAsync(DiscordGuild server, int amount, PunishmentType type, DiscordRole? role, TimeSpan? interval)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -205,7 +205,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             if (time < TimeSpan.Zero)
                 time = TimeSpan.Zero;
 
-            _dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild);
+            var dbGuild = await _dbCache.GetDbGuildAsync(context.Guild.Id);
             dbGuild.WarnExpire = time;
 
             // Remove Enable or disable the timers
@@ -348,9 +348,9 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            _dbCache.Guilds.TryGetValue(context.Guild.Id, out var dbGuild);
-
+            var dbGuild = await _dbCache.GetDbGuildAsync(context.Guild.Id);
             var newTimer = new TimerEntity(entry, dbGuild.WarnExpire);
+
             db.Timers.Add(newTimer);
             await db.SaveChangesAsync();
 
@@ -385,7 +385,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
                     _akkoCache.Timers.TryRemove(timer.Id);
                 else
                 {
-                    timer.ElapseAt = timer.WarnRel.DateAdded.Add(dbGuild.WarnExpire);
+                    timer.ElapseAt = timer.WarnRel!.DateAdded.Add(dbGuild.WarnExpire);
                     timer.Interval = dbGuild.WarnExpire;
 
                     _akkoCache.Timers.AddOrUpdateByEntity(client, timer);
@@ -408,7 +408,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="punishment">The punishment to be carried out.</param>
         /// <param name="reason">The reason for the punishment.</param>
         /// <exception cref="NotImplementedException">Occurs when the specified punishment has no implementation.</exception>
-        private async Task ApplyPunishmentAsync(CommandContext context, DiscordUser user, WarnPunishEntity punishment, string reason)
+        private async Task ApplyPunishmentAsync(CommandContext context, DiscordUser user, WarnPunishEntity punishment, string? reason)
         {
             using var scope = _scopeFactory.CreateScope();
             var warnString = context.FormatLocalized("infraction");

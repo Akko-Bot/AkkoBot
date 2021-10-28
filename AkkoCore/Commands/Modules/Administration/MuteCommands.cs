@@ -37,8 +37,8 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task TimedMuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [Description("arg_timed_mute")] TimeSpan? time = null,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [Description("arg_timed_mute")] TimeSpan? time = default,
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -67,7 +67,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task UnmuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -94,13 +94,13 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task VoiceMuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetVoiceMuteAsync(user, true, "voicemute_success", reason);
-            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -111,13 +111,13 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task VoiceUnmuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetVoiceMuteAsync(user, false, "voiceunmute_success", reason);
-            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -128,13 +128,13 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task DeafAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetDeafAsync(user, true, "deafen_success", reason);
-            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -145,13 +145,13 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task UndeafAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
 
             var embed = await _roleService.SetDeafAsync(user, false, "undeafen_success", reason);
-            embed.Body.Description = context.FormatLocalized(embed.Body.Description, Formatter.Bold(user.GetFullname()));
+            embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
 
             await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
         }
@@ -163,7 +163,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ChatMuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_punishment_reason")] string reason = null)
+            [RemainingText, Description("arg_punishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;
@@ -184,7 +184,7 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task ChatUnmuteAsync(
             CommandContext context,
             [Description("arg_discord_user")] DiscordMember user,
-            [RemainingText, Description("arg_unpunishment_reason")] string reason = null)
+            [RemainingText, Description("arg_unpunishment_reason")] string? reason = default)
         {
             if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
                 return;

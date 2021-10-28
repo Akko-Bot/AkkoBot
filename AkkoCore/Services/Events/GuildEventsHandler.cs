@@ -172,7 +172,7 @@ namespace AkkoCore.Services.Events
                 || !_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || filteredWords.Words.Count is 0
                 || !filteredWords.IsActive
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
+                || !eventArgs.Guild!.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || IsIgnoredContext(filteredWords.IgnoredIds, eventArgs))
                 return false;
 
@@ -213,7 +213,7 @@ namespace AkkoCore.Services.Events
         {
             if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || !filteredWords.Behavior.HasFlag(WordFilterBehavior.FilterInvite) || !HasInvite(eventArgs.Message)
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
+                || !eventArgs.Guild!.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
                 || eventArgs.Author.Id == eventArgs.Guild.CurrentMember.Id
@@ -230,7 +230,7 @@ namespace AkkoCore.Services.Events
         {
             if (!_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords)
                 || !filteredWords.Behavior.HasFlag(WordFilterBehavior.FilterSticker) || eventArgs.Message.Stickers.Count is 0
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
+                || !eventArgs.Guild!.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages)
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Channel.Id)    // Do not delete from ignored users, channels and roles
                 || filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id)
                 || eventArgs.Author.Id == eventArgs.Guild.CurrentMember.Id
@@ -267,7 +267,7 @@ namespace AkkoCore.Services.Events
                 || !_dbCache.Guilds.TryGetValue(eventArgs.Guild.Id, out var dbGuild)
                 || !_dbCache.FilteredContent.TryGetValue(eventArgs.Guild.Id, out var filters)
                 || (_dbCache.FilteredWords.TryGetValue(eventArgs.Guild?.Id ?? default, out var filteredWords) && filteredWords.IgnoredIds.Contains((long)eventArgs.Author.Id))
-                || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
+                || !eventArgs.Guild!.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
                 return Task.CompletedTask;
 
             var filter = filters.FirstOrDefault(x => x.ChannelId == eventArgs.Channel.Id);
@@ -319,7 +319,7 @@ namespace AkkoCore.Services.Events
             if (eventArgs.Context.Guild is null || _dbCache.IsDisposed)
                 return;
 
-            _dbCache.Guilds.TryGetValue(eventArgs.Context.Guild.Id, out var dbGuild);
+            var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Context.Guild.Id);
             var isIgnoredContext = IsDelOnCmdIgnoredContext(dbGuild, eventArgs.Context);
 
             if ((dbGuild.Behavior.HasFlag(GuildConfigBehavior.DeleteCmdOnMessage) && isIgnoredContext)
@@ -440,7 +440,9 @@ namespace AkkoCore.Services.Events
         private async Task SendFilterWordNotificationAsync(FilteredWordsEntity filteredWords, CommandsNextExtension cmdHandler, MessageCreateEventArgs eventArgs)
         {
             var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
-            var toWarn = filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete) && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, eventArgs.Message.Author as DiscordMember);
+            var toWarn = eventArgs.Message.Author is DiscordMember member
+                && filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete)
+                && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, member);
 
             var embed = new SerializableDiscordEmbed()
             {

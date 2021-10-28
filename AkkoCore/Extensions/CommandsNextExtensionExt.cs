@@ -23,7 +23,7 @@ namespace AkkoCore.Extensions
                 throw new ArgumentException($"Type \"{concreteType.Name}\" must implement \"IArgumentConverter<T>\"", nameof(concreteType));
 
             // TODO: figure out a way to do this without dynamic
-            dynamic instance = Activator.CreateInstance(concreteType);
+            dynamic instance = Activator.CreateInstance(concreteType)!;
             cmdHandler.RegisterConverter(instance);
         }
 
@@ -39,7 +39,7 @@ namespace AkkoCore.Extensions
                 .Concat(
                     cmdHandler.RegisteredCommands.Values
                         .Where(x => x is CommandGroup)
-                        .SelectMany(x => (x as CommandGroup).Children)
+                        .SelectMany(x => (x as CommandGroup)!.Children)
                 );
         }
 

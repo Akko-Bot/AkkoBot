@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace AkkoCore.Services.Events
         public Task CacheMessageOnCreationAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog!.IsActive)
                 return Task.CompletedTask;
 
             if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
@@ -68,10 +69,10 @@ namespace AkkoCore.Services.Events
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
-                || !guildLog.IsActive
+                || !guildLog!.IsActive
                 || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is true  // This check is needed because pins trigger this event
 
-                || IsIgnoredContext(eventArgs.Guild.Id, (eventArgs.Author as DiscordMember).Roles.Select(x => x.Id).Append(eventArgs.Author.Id).Append(eventArgs.Channel.Id)))
+                || (eventArgs.Message.Author is DiscordMember member && IsIgnoredContext(eventArgs.Guild.Id, member.Roles.Select(x => x.Id).Append(eventArgs.Author.Id).Append(eventArgs.Channel.Id))))
                 return;
 
             // Cache uncached edited messages, but don't log them.
@@ -97,26 +98,26 @@ namespace AkkoCore.Services.Events
         {
             if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
-                || !guildLog.IsActive
+                || !guildLog!.IsActive
                 || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
                 || !messageCache.TryGetValue(x => x.Id == eventArgs.Message.Id, out var message)
-                || IsIgnoredContext(eventArgs.Guild.Id, (eventArgs.Message.Author as DiscordMember).Roles.Select(x => x.Id).Append(eventArgs.Message.Author.Id).Append(eventArgs.Channel.Id)))
+                || (eventArgs.Message.Author is DiscordMember member && IsIgnoredContext(eventArgs.Guild.Id, member.Roles.Select(x => x.Id).Append(eventArgs.Message.Author.Id).Append(eventArgs.Channel.Id))))
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
+                        
+            if (webhook is not null)
+                await webhook.ExecuteAsync(_logGenerator.GetMessageDeleteLog(message));
 
             // Remove from the cache
             messageCache.Remove(x => x.Id == eventArgs.Message.Id);
-
-            if (webhook is not null)
-                await webhook.ExecuteAsync(_logGenerator.GetMessageDeleteLog(message));
         }
 
         public async Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || eventArgs.Messages.All(x => x.Author?.IsBot is not false)
                 || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
-                || !guildLog.IsActive
+                || !guildLog!.IsActive
                 || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
                 || IsIgnoredContext(eventArgs.Guild.Id, eventArgs.Channel.Id))
                 return;
@@ -126,24 +127,21 @@ namespace AkkoCore.Services.Events
 
             var messages = messageCache
                 .Where(x => x?.ChannelId == eventArgs.Channel.Id && x.CreationTimestamp >= firstDeletedTime)
-                .OrderBy(x => x.CreationTimestamp)
-                .ToArray();
+                .OrderBy(x => x.CreationTimestamp);
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
 
-            // Remove from the cache
-            // The loop is needed because Remove() only removes one item from the ring buffer :facepalm:
-            foreach (var message in messages)
-                messageCache.Remove(x => x?.Id == message.Id);
-
             if (webhook is not null)
                 await webhook.ExecuteAsync(_logGenerator.GetMessageBulkDeleteLog(messages, stream, eventArgs));
+
+            // Remove from the cache
+            messageCache.Remove(x => x?.Id == eventArgs.Channel.Id && x.CreationTimestamp >= firstDeletedTime);
         }
 
         public async Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var target = (eventArgs.EmojisBefore.Count > eventArgs.EmojisAfter.Count)
@@ -153,7 +151,7 @@ namespace AkkoCore.Services.Events
             var emoji = eventArgs.EmojisAfter.Values
                 .Concat(eventArgs.EmojisBefore.Values)
                 .Except(target)
-                .FirstOrDefault();
+                .First();
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
 
@@ -173,7 +171,7 @@ namespace AkkoCore.Services.Events
         public async Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -185,7 +183,7 @@ namespace AkkoCore.Services.Events
         public async Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -197,7 +195,7 @@ namespace AkkoCore.Services.Events
         public async Task LogBannedUserAsync(DiscordClient client, GuildBanAddEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -210,7 +208,7 @@ namespace AkkoCore.Services.Events
         public async Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -223,7 +221,7 @@ namespace AkkoCore.Services.Events
         public async Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -235,7 +233,7 @@ namespace AkkoCore.Services.Events
         public async Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -247,7 +245,7 @@ namespace AkkoCore.Services.Events
         public async Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -259,7 +257,7 @@ namespace AkkoCore.Services.Events
         public async Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -271,7 +269,7 @@ namespace AkkoCore.Services.Events
         public async Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -283,7 +281,7 @@ namespace AkkoCore.Services.Events
         public async Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -295,7 +293,7 @@ namespace AkkoCore.Services.Events
         public async Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
         {
             if (eventArgs.Before == eventArgs.After || eventArgs.Guild is null
-                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
+                || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -307,7 +305,7 @@ namespace AkkoCore.Services.Events
         public async Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -319,7 +317,7 @@ namespace AkkoCore.Services.Events
         public async Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
         {
             if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog)
-                || !guildLog.IsActive)
+                || !guildLog!.IsActive)
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
@@ -364,7 +362,7 @@ namespace AkkoCore.Services.Events
         /// <param name="logType">The type of guild log to get.</param>
         /// <param name="guildLog">The resulting guild log.</param>
         /// <returns><see langword="true"/> if the guild log was found, <see langword="false"/> otherwise.</returns>
-        private bool TryGetGuildLog(ulong sid, GuildLogType logType, out GuildLogEntity guildLog)
+        private bool TryGetGuildLog(ulong sid, GuildLogType logType, [MaybeNullWhen(false)] out GuildLogEntity guildLog)
         {
             _dbCache.GuildLogs.TryGetValue(sid, out var guildLogs);
             guildLog = guildLogs?.FirstOrDefault(x => logType.HasFlag(x.Type));
@@ -380,7 +378,7 @@ namespace AkkoCore.Services.Events
         /// <param name="guildLog">The guild log to be processed.</param>
         /// <returns>The log's <see cref="DiscordWebhook"/> or <see langword="null"/> if the channel associated with the log got deleted.</returns>
         /// <exception cref="ArgumentException">Occurs when the IDs of the Discord guild and the guild log don't match.</exception>
-        private async ValueTask<DiscordWebhook> GetWebhookAsync(DiscordClient client, DiscordGuild server, GuildLogEntity guildLog)
+        private async ValueTask<DiscordWebhook?> GetWebhookAsync(DiscordClient client, DiscordGuild server, GuildLogEntity guildLog)
         {
             if (server.Id != guildLog.GuildIdFK)
                 throw new ArgumentException("Guild ID and guild log ID cannot differ.");
@@ -390,21 +388,20 @@ namespace AkkoCore.Services.Events
             {
                 client.Logger.LogWarning(_guildLogEvent, $"The channel for a \"{guildLog.Type}\" guild log was deleted. Removing the guild log from the database.");
 
-                _dbCache.GuildLogs.TryGetValue(server.Id, out var guildLogs);
                 using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
                 // Remove guild log from the database
                 await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == server.Id && x.ChannelId == guildLog.ChannelId).ConfigureAwait(false);
 
                 // Remove guild log from the cache
-                if (guildLogs.TryRemove(guildLog) && guildLogs.Count is 0)
+                if (_dbCache.GuildLogs.TryGetValue(server.Id, out var guildLogs) && guildLogs.TryRemove(guildLog) && guildLogs.Count is 0)
                     _dbCache.GuildLogs.TryRemove(server.Id, out _);
 
                 // Remove logged messages
                 if (guildLog.Type is GuildLogType.MessageEvents && _akkoCache.GuildMessageCache.TryRemove(server.Id, out var messageCache))
                     messageCache.Clear();
 
-                return null;
+                return default;
             }
 
             try

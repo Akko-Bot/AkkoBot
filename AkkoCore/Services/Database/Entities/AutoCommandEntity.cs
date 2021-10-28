@@ -13,13 +13,13 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores command data and the context it should be automatically sent to.")]
     public class AutoCommandEntity : DbEntity
     {
-        private readonly string _commandString;
+        private readonly string _commandString = null!;
 
         /// <summary>
         /// The timer this autocommand is associated with.
         /// </summary>
         /// <remarks>This property is <see langword="null"/> if this autocommand is of type <see cref="AutoCommandType.Startup"/>.</remarks>
-        public TimerEntity TimerRel { get; init; }
+        public TimerEntity? TimerRel { get; init; }
 
         /// <summary>
         /// The database ID of the timer associated with this autocommand.
@@ -35,7 +35,7 @@ namespace AkkoCore.Services.Database.Entities
         public string CommandString
         {
             get => _commandString;
-            init => _commandString = value?.MaxLength(AkkoConstants.MaxMessageLength);
+            init => _commandString = value.MaxLength(AkkoConstants.MaxMessageLength);
         }
 
         /// <summary>

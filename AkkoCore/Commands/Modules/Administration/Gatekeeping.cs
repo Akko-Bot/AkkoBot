@@ -74,7 +74,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("greetchannel")]
         [Description("cmd_greetchannel")]
-        public async Task SetGreetChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task SetGreetChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
             var embed = new SerializableDiscordEmbed()
@@ -92,7 +92,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("farewellchannel")]
         [Description("cmd_farewellchannel")]
-        public async Task SetFarewellChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task SetFarewellChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             var isValid = channel?.PermissionsFor(context.Guild.CurrentMember).HasPermission(Permissions.AccessChannels | Permissions.SendMessages) is true;
             var embed = new SerializableDiscordEmbed()
@@ -110,7 +110,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("greetmessage"), Aliases("greetmsg", "greet")]
         [Description("cmd_greetmessage")]
-        public async Task SetGreetChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
+        public async Task SetGreetChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string? message = default)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
@@ -127,7 +127,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("farewellmessage"), Aliases("farewellmsg", "farewell", "byemsg", "bye")]
         [Description("cmd_farewellmessage")]
-        public async Task SetFarewellChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string message = null)
+        public async Task SetFarewellChannelMessageAsync(CommandContext context, [RemainingText, Description("arg_say")] string? message = default)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
@@ -176,7 +176,7 @@ namespace AkkoCore.Commands.Modules.Administration
             CommandContext context,
             [Description("arg_antialt_time")] TimeSpan time,
             [Description("arg_warnp_type")] PunishmentType action,
-            [Description("arg_discord_role")] DiscordRole role = null)
+            [Description("arg_discord_role")] DiscordRole? role = default)
         {
             if (time <= TimeSpan.Zero || action is PunishmentType.Softban or PunishmentType.RemoveRole || (action is not PunishmentType.AddRole && role is not null))
             {

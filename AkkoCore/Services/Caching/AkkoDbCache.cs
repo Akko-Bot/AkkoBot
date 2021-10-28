@@ -90,7 +90,7 @@ namespace AkkoCore.Services.Database
             GuildLogs = new();
         }
 
-        public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig botConfig = default)
+        public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig? botConfig = default)
         {
             if (Guilds.TryGetValue(sid, out var dbGuild))
                 return dbGuild;
@@ -178,7 +178,7 @@ namespace AkkoCore.Services.Database
             Tags.TryRemove(sid, out var guildTags);
             PermissionOverrides.TryRemove(sid, out var permOverrides);
 
-            if (dbGuild.CommandCooldownRel?.Count is not null and not 0)
+            if (dbGuild?.CommandCooldownRel is { Count: > 0 })
                 CommandCooldown.UnloadFromEntities(dbGuild.CommandCooldownRel);
 
             aliases?.Clear();
@@ -224,21 +224,21 @@ namespace AkkoCore.Services.Database
                     ClearNestedCache(PermissionOverrides);
                 }
 
-                Blacklist = null;
-                Guilds = null;
-                PlayingStatuses = null;
-                Aliases = null;
-                FilteredWords = null;
-                FilteredContent = null;
-                Polls = null;
-                Repeaters = null;
-                VoiceRoles = null;
-                Gatekeeping = null;
-                AutoSlowmode = null;
-                GuildLogs = null;
-                Tags = null;
-                CommandCooldown = null;
-                PermissionOverrides = null;
+                Blacklist = null!;
+                Guilds = null!;
+                PlayingStatuses = null!;
+                Aliases = null!;
+                FilteredWords = null!;
+                FilteredContent = null!;
+                Polls = null!;
+                Repeaters = null!;
+                VoiceRoles = null!;
+                Gatekeeping = null!;
+                AutoSlowmode = null!;
+                GuildLogs = null!;
+                Tags = null!;
+                CommandCooldown = null!;
+                PermissionOverrides = null!;
 
                 IsDisposed = true;
             }
@@ -250,7 +250,7 @@ namespace AkkoCore.Services.Database
         /// <typeparam name="T">The nested type.</typeparam>
         /// <param name="dictionary">The cache to be cleared.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ClearNestedCache<T>(IDictionary<ulong, ConcurrentHashSet<T>> dictionary)
+        private void ClearNestedCache<T>(IDictionary<ulong, ConcurrentHashSet<T>>? dictionary)
         {
             if (dictionary is null)
                 return;

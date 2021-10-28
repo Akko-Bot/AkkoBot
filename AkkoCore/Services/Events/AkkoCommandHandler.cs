@@ -11,6 +11,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.EventArgs;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -105,16 +106,16 @@ namespace AkkoCore.Services.Events
             return Task.CompletedTask;
         }
 
-        public Task CheckAndExecuteAsync(CommandContext context)
+        public Task? CheckAndExecuteAsync(CommandContext context)
         {
-            return (GetActiveOverride(context.Guild?.Id, context.Command, out var permOverride) && IsAllowedOverridenContext(context, permOverride))
+            return (GetActiveOverride(context.Guild?.Id, context.Command, out var permOverride) && IsAllowedOverridenContext(context, permOverride!))
                 ? Task.Run(async () => await context.Command.ExecuteAndLogAsync(context))           // Execute command with overriden permissions.
                 : (permOverride is null || !permOverride.IsActive)
                     ? Task.Run(async () => await context.CommandsNext.ExecuteCommandAsync(context)) // Execute command with default permissions. This method automatically performs the command checks.
                     : null;                                                                         // Command with overriden permission that failed to execute
         }
 
-        public bool GetActiveOverride(ulong? sid, Command cmd, out PermissionOverrideEntity permOverride)
+        public bool GetActiveOverride(ulong? sid, Command cmd, [MaybeNullWhen(false)] out PermissionOverrideEntity? permOverride)
         {
             if (cmd is null || (!_dbCache.PermissionOverrides.TryGetValue(sid ?? default, out var permOverrides) & !_dbCache.PermissionOverrides.TryGetValue(default, out var globalOverrides)))
             {

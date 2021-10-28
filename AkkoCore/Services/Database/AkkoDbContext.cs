@@ -1,4 +1,5 @@
-﻿using AkkoCore.Services.Database.Entities;
+﻿#nullable disable
+using AkkoCore.Services.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 

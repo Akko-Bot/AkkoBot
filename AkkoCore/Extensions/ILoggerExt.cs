@@ -22,7 +22,7 @@ namespace AkkoCore.Extensions
         /// <param name="context">The command context.</param>
         /// <param name="message">An optional message to be shown on the log's header.</param>
         /// <param name="exception">The excetion that occurred during command execution.</param>
-        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = "", Exception exception = null)
+        public static void LogCommand(this ILogger logger, LogLevel level, CommandContext context, string message = "", Exception? exception = default)
         {
             var logConfig = context.Services.GetRequiredService<LogConfig>();
 
@@ -43,7 +43,7 @@ namespace AkkoCore.Extensions
         /// <param name="context">The interaction context.</param>
         /// <param name="message">An optional message to be shown on the log's header.</param>
         /// <param name="exception">The excetion that occurred during command execution.</param>
-        public static void LogCommand(this ILogger logger, LogLevel level, InteractionContext context, string message = "", Exception exception = null)
+        public static void LogCommand(this ILogger logger, LogLevel level, InteractionContext context, string message = "", Exception? exception = default)
         {
             var logConfig = context.Services.GetRequiredService<LogConfig>();
 

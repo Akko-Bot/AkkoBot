@@ -54,7 +54,7 @@ namespace AkkoCore.Services.Events.Abstractions
         /// <exception cref="ArgumentNullException">
         /// Occurs when <paramref name="server"/> or <paramref name="emoji"/> are <see langword="null"/>.
         /// </exception>
-        DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string oldEmojiName = null);
+        DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string? oldEmojiName = default);
 
         /// <summary>
         /// Generates a log message for a <see cref="InviteCreateEventArgs"/> event.

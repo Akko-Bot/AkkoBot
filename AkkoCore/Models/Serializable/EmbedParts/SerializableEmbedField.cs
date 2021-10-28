@@ -9,8 +9,8 @@ namespace AkkoCore.Models.Serializable.EmbedParts
     /// </summary>
     public class SerializableEmbedField
     {
-        private string _title;
-        private string _text;
+        private string _title = string.Empty;
+        private string _text = string.Empty;
 
         /// <summary>
         /// Defines whether this field is inlined or not.
@@ -23,7 +23,7 @@ namespace AkkoCore.Models.Serializable.EmbedParts
         public string Title
         {
             get => _title;
-            set => _title = value?.MaxLength(AkkoConstants.MaxEmbedTitleLength);
+            set => _title = value.MaxLength(AkkoConstants.MaxEmbedTitleLength);
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace AkkoCore.Models.Serializable.EmbedParts
         public string Text
         {
             get => _text;
-            set => _text = value?.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]");
+            set => _text = value.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]");
         }
 
         public SerializableEmbedField()

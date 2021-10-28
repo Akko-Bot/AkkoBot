@@ -17,7 +17,7 @@ namespace AkkoCore.Services.Timers
 
         private event ElapsedEventHandler ActionHandler;
 
-        public event EventHandler OnDispose;
+        public event EventHandler OnDispose = null!;
 
         public int Id { get; }
         public TimeSpan Interval { get; }
@@ -135,11 +135,11 @@ namespace AkkoCore.Services.Timers
                     _internalTimer.Dispose();
 
                     // Fire the cleanup event
-                    OnDispose?.Invoke(this, new EventArgs());
+                    OnDispose?.Invoke(this, EventArgs.Empty);
                 }
 
-                ActionHandler = null;
-                OnDispose = null;
+                ActionHandler = null!;
+                OnDispose = null!;
 
                 _isDisposed = true;
             }

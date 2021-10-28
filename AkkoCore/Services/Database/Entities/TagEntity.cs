@@ -20,7 +20,7 @@ namespace AkkoCore.Services.Database.Entities
         /// The settings of the Discord guild this tag is associated with.
         /// </summary>
         /// <remarks>This property is <see langword="null"/> for global tags.</remarks>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// List of IDs ignored by this tag.
@@ -42,7 +42,7 @@ namespace AkkoCore.Services.Database.Entities
         /// </summary>
         [Required]
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string Trigger { get; set; }
+        public string Trigger { get; set; } = null!;
 
         /// <summary>
         /// The content to be sent to Discord. If <see cref="IsEmoji"/> is <see langword="true"/>,
@@ -50,7 +50,7 @@ namespace AkkoCore.Services.Database.Entities
         /// </summary>
         [Required]
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string Response { get; set; }
+        public string Response { get; set; } = null!;
 
         /// <summary>
         /// Determines whether this tag should be sent as emoji reactions to the triggering message.

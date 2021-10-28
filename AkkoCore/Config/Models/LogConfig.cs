@@ -25,13 +25,13 @@ namespace AkkoCore.Config.Models
         /// Defines the time format to be used in the logs.
         /// </summary>
         [YamlMember(Description = @"Defines the time format to be used in the logs. Leave it empty to use the default. Refer to: https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings")]
-        public string LogTimeFormat { get; set; }
+        public string? LogTimeFormat { get; set; }
 
         /// <summary>
         /// Defines time format to be used on log file names.
         /// </summary>
         [YamlMember(Description = @"Defines time format to be used on log file names. Leave it empty to use the default. Refer to: https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings")]
-        public string LogTimeStamp { get; set; }
+        public string? LogTimeStamp { get; set; }
 
         /// <summary>
         /// Determines whether logs should be written to a file.

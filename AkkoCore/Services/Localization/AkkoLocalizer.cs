@@ -76,7 +76,7 @@ namespace AkkoCore.Services.Localization
             return result;
         }
 
-        public string GetResponseString(string locale, string response)
+        public string GetResponseString(string locale, string? response)
         {
             if (string.IsNullOrWhiteSpace(response))
                 return string.Empty;
@@ -110,7 +110,7 @@ namespace AkkoCore.Services.Localization
             // Start deserialization
             foreach (var filePath in filePaths)
             {
-                var locale = GetFileLocale(filePath);
+                var locale = GetFileLocale(filePath)!;
                 var reader = new StreamReader(File.OpenRead(filePath));
                 var lStrings = reader.FromYaml<Dictionary<string, string>>();
 
@@ -126,7 +126,7 @@ namespace AkkoCore.Services.Localization
             }
         }
 
-        public string FormatLocalized(string locale, string key, params object[] args)
+        public string FormatLocalized(string locale, string key, params object?[] args)
         {
             for (var index = 0; index < args.Length; index++)
             {
@@ -160,7 +160,7 @@ namespace AkkoCore.Services.Localization
         /// </summary>
         /// <param name="filePath">Path to the file with the response strings.</param>
         /// <returns>The locale of the response string's file, <see langword="null"/> if no match occured.</returns>
-        private string GetFileLocale(string filePath)
+        private string? GetFileLocale(string filePath)
         {
             var match = _localeRegex.Match(filePath).Groups.Values.LastOrDefault()?.Value;
 

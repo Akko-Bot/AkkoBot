@@ -54,7 +54,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="avatar">The image stream of the webhook's avatar.</param>
         /// <returns><see langword="true"/> if the guild log was created, <see langword="false"/> is it was updated.</returns>
         /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
-        public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string name = null, Stream avatar = null)
+        public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string? name = default, Stream? avatar = default)
         {
             if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
                 throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
@@ -161,7 +161,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="locale">The locale to be used for the header.</param>
         /// <param name="extraInfo">Extra info to be appended to the header.</param>
         /// <returns>The message log, <see langword="null"/> if the message collection is empty.</returns>
-        public string GenerateMessageLog(IEnumerable<DiscordMessage> messages, DiscordChannel channel, string locale, string extraInfo = null)
+        public string? GenerateMessageLog(IEnumerable<DiscordMessage> messages, DiscordChannel channel, string locale, string? extraInfo = default)
         {
             var amount = messages?.Count();
 
@@ -170,7 +170,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             var msgLog = new StringBuilder(GenerateLogHeader(channel, amount.Value, locale, extraInfo));
 
-            foreach (var message in messages)
+            foreach (var message in messages!)
             {
                 msgLog.AppendLine(
                     $"{message.Author.GetFullname()} ({message.Author.Id}) [{message.CreationTimestamp.LocalDateTime}]" + Environment.NewLine +
@@ -190,7 +190,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="locale">The locale to be used for the header.</param>
         /// <param name="extraInfo">Extra info to be appended to the header.</param>
         /// <returns>The log header.</returns>
-        private string GenerateLogHeader(DiscordChannel channel, int messageAmount, string locale, string extraInfo = null)
+        private string GenerateLogHeader(DiscordChannel channel, int messageAmount, string locale, string? extraInfo = default)
         {
             return
                 $"==> {_localizer.GetResponseString(locale, "log_channel_name")}: {channel.Name} | {_localizer.GetResponseString(locale, "id")}: {channel.Id}" + Environment.NewLine +

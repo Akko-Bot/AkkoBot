@@ -48,7 +48,7 @@ namespace AkkoCore.Commands.Modules.Self
             await context.RespondLocalizedAsync(embed);
 
             // Clean-up
-            foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
+            foreach (var client in _shardedClient.ShardClients.Values)
                 await client.DisconnectAsync();
 
             context.Services.GetRequiredService<IBotLifetime>().Shutdown();
@@ -64,7 +64,7 @@ namespace AkkoCore.Commands.Modules.Self
             await context.RespondLocalizedAsync(embed);
 
             // Clean-up
-            foreach (var client in context.Services.GetService<DiscordShardedClient>().ShardClients.Values)
+            foreach (var client in _shardedClient.ShardClients.Values)
                 await client.DisconnectAsync();
 
             context.Services.GetRequiredService<IBotLifetime>().Restart();
@@ -74,20 +74,26 @@ namespace AkkoCore.Commands.Modules.Self
         [Description("cmd_senddm")]
         public async Task SendMessageAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser user, [RemainingText, Description("arg_say")] SmartString message)
         {
-            var server = context.Services.GetService<DiscordShardedClient>().ShardClients.Values
+            var server = _shardedClient.ShardClients.Values
                 .SelectMany(x => x.Guilds.Values)
                 .FirstOrDefault(x => x.Members.ContainsKey(user.Id));
 
-            var member = await server?.GetMemberSafelyAsync(user.Id);
+            if (server is null)
+            {
+                await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+                return;
+            }
 
-            if (server is null || member is null)
+            var member = await server.GetMemberSafelyAsync(user.Id);
+
+            if (member is null)
             {
                 await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                 return;
             }
 
             var dm = (_utilitiesService.DeserializeEmbed(message, out var dMsg))
-                ? await member.SendMessageSafelyAsync(dMsg)
+                ? await member.SendMessageSafelyAsync(dMsg!)
                 : await member.SendMessageSafelyAsync(message);
 
             await context.Message.CreateReactionAsync((dm is not null) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
@@ -97,7 +103,7 @@ namespace AkkoCore.Commands.Modules.Self
         [Description("cmd_send")]
         public async Task SendMessageAsync(CommandContext context, [Description("arg_channel_id")] ulong cid, [RemainingText, Description("arg_say")] SmartString message)
         {
-            var server = context.Services.GetService<DiscordShardedClient>().ShardClients.Values
+            var server = _shardedClient.ShardClients.Values
                 .SelectMany(x => x.Guilds.Values)
                 .FirstOrDefault(x => x.Channels.ContainsKey(cid));
 
@@ -108,7 +114,7 @@ namespace AkkoCore.Commands.Modules.Self
             }
 
             var dm = (_utilitiesService.DeserializeEmbed(message, out var dMsg))
-                ? await channel.SendMessageSafelyAsync(dMsg)
+                ? await channel.SendMessageSafelyAsync(dMsg!)
                 : await channel.SendMessageSafelyAsync(message);
 
             await context.Message.CreateReactionAsync((dm is not null) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);

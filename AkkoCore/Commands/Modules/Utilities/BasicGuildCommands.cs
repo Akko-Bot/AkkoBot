@@ -19,7 +19,7 @@ namespace AkkoCore.Commands.Modules.Utilities
     {
         [Command("userid"), Aliases("uid")]
         [Description("cmd_userid")]
-        public async Task UserIdAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        public async Task UserIdAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember? user = default)
         {
             user ??= context.Member;
 
@@ -31,7 +31,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [Command("channelid"), Aliases("cid")]
         [Description("cmd_channelid")]
-        public async Task ChannelIdAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task ChannelIdAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             channel ??= context.Channel;
 
@@ -95,9 +95,10 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequireBotPermissions(Permissions.ChangeNickname)]
         public async Task SetNicknameAsync(
             CommandContext context,
-            [Description("arg_discord_user")] DiscordMember user = null,
+            [Description("arg_discord_user")] DiscordMember? user = default,
             [RemainingText, Description("arg_nickname")] string nickname = "")
         {
+            user ??= context.Guild.CurrentMember;
             var success = context.Guild.CurrentMember.Hierarchy >= user.Hierarchy && context.Member.Hierarchy > user.Hierarchy;
 
             if (success)
@@ -108,7 +109,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
         [Command("listroles"), Aliases("roles")]
         [Description("cmd_listroles")]
-        public async Task ListRolesAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user = null)
+        public async Task ListRolesAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember? user = default)
         {
             var roles = (user?.Roles ?? context.Guild.Roles.Values)
                 .OrderByDescending(x => x.Position)
@@ -138,7 +139,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             var title = context.FormatLocalized("inrole_title", role.Name);
             var embed = new SerializableDiscordEmbed()
-                .WithFooter(context.FormatLocalized("total_of", ((users.Count - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault().Count));
+                .WithFooter(context.FormatLocalized("total_of", ((users.Count - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault()?.Count ?? 0));
 
             foreach (var userGroup in users)
                 embed.AddField(title, string.Join('\n', userGroup.ToArray()));
@@ -156,7 +157,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             public async Task CreatePublicThreadAsync(
                 CommandContext context,
                 [Description("arg_channel_name")] string name,
-                [Description("arg_discord_message")] DiscordMessage message = default)
+                [Description("arg_discord_message")] DiscordMessage? message = default)
             {
                 message ??= context.Message;
 
@@ -295,7 +296,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             [Command("moveuser")]
             [Description("cmd_moveuser")]
-            public async Task MoveUserAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_discord_voicechannel")] DiscordChannel channel = null)
+            public async Task MoveUserAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_discord_voicechannel")] DiscordChannel? channel = default)
             {
                 var success = user.VoiceState is not null
                     && channel?.Type is null or ChannelType.Voice
@@ -316,7 +317,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             [Command("createrole"), Aliases("cr")]
             [Description("cmd_createrole")]
-            public async Task CreateRoleAsync(CommandContext context, [RemainingText, Description("arg_role_name")] string name = null)
+            public async Task CreateRoleAsync(CommandContext context, [RemainingText, Description("arg_role_name")] string? name = default)
             {
                 await context.Guild.CreateRoleAsync(name);
                 await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
@@ -338,10 +339,10 @@ namespace AkkoCore.Commands.Modules.Utilities
             public async Task DeleteRoleAsync(CommandContext context, [RemainingText] string name)
             {
                 var role = context.Guild.Roles.Values.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-                var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+                var success = role is not null && CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
 
                 if (success)
-                    await role.DeleteAsync();
+                    await role!.DeleteAsync();
 
                 await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
             }

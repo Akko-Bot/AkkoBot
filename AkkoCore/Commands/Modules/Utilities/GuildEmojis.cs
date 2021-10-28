@@ -84,7 +84,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task AddEmojiAsync(
             CommandContext context,
             [Description("arg_emoji_url")] Uri url,
-            [Description("arg_emoji_name")] string name = null)
+            [Description("arg_emoji_name")] string? name = default)
         {
             var success = await _service.AddGuildEmojiAsync(context, url, name);
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
@@ -110,7 +110,9 @@ namespace AkkoCore.Commands.Modules.Utilities
             if (emojis.Length == 1)
             {
                 var gEmoji = await emojis[0].ToGuildEmojiAsync(context.Guild);
-                await gEmoji?.DeleteAsync();
+
+                if (gEmoji is not null)
+                    await gEmoji.DeleteAsync();
 
                 success = gEmoji is not null;
             }

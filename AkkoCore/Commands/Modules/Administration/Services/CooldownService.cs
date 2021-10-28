@@ -37,7 +37,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="time">For how long the cooldown should last.</param>
         /// <param name="server">The Discord guild associated with this cooldown, <see langword="null"/> if the cooldown is global.</param>
         /// <returns><see langword="true"/> if the cooldown was successfully added, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> AddCommandCooldownAsync(Command cmd, TimeSpan time, DiscordGuild server = null)
+        public async Task<bool> AddCommandCooldownAsync(Command cmd, TimeSpan time, DiscordGuild? server = default)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -76,7 +76,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// </summary>
         /// <param name="server">The Discord guild associated with the cooldowns, <see langword="null"/> if the cooldowns are global.</param>
         /// <returns>The collection of commands with a cooldown.</returns>
-        public IEnumerable<KeyValuePair<string, TimeSpan>> GetCooldownCommands(DiscordGuild server = null)
+        public IEnumerable<KeyValuePair<string, TimeSpan>> GetCooldownCommands(DiscordGuild? server = default)
         {
             return (server is null)
                 ? _cmdCooldown.GlobalCommands

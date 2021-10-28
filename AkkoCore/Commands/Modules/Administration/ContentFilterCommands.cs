@@ -27,37 +27,37 @@ namespace AkkoCore.Commands.Modules.Administration
 
         [Command("url"), Aliases("link")]
         [Description("cmd_fc_url")]
-        public async Task UrlToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task UrlToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
             => await SetPropertyAsync(context, channel, "fc_url_toggle", ContentFilter.Url);
 
         [Command("attachment"), Aliases("att")]
         [Description("cmd_fc_att")]
-        public async Task AttachmentToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task AttachmentToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
             => await SetPropertyAsync(context, channel, "fc_att_toggle", ContentFilter.Attachment);
 
         [Command("image"), Aliases("img")]
         [Description("cmd_fc_img")]
-        public async Task ImageToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task ImageToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
             => await SetPropertyAsync(context, channel, "fc_img_toggle", ContentFilter.Image);
 
         [Command("invite")]
         [Description("cmd_fc_invite")]
-        public async Task InviteToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task InviteToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
             => await SetPropertyAsync(context, channel, "fc_invite_toggle", ContentFilter.Invite);
 
         [Command("sticker")]
         [Description("cmd_fc_sticker")]
-        public async Task StickerToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task StickerToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
             => await SetPropertyAsync(context, channel, "fc_sticker_toggle", ContentFilter.Sticker);
 
         [Command("command"), Aliases("cmd")]
         [Description("cmd_fc_command")]
-        public async Task CommandToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task CommandToggleAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
             => await SetPropertyAsync(context, channel, "fc_command_toggle", ContentFilter.Command);
 
         [Command("remove"), Aliases("rm")]
         [Description("cmd_fc_remove")]
-        public async Task RemoveFilterAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel = null)
+        public async Task RemoveFilterAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
         {
             channel ??= context.Channel;
 
@@ -120,7 +120,7 @@ namespace AkkoCore.Commands.Modules.Administration
         /// <param name="responseKey">The response key to be sent in the message.</param>
         /// <param name="selector">A method to define which property is going to be updated.</param>
         /// <returns>The message sent to Discord.</returns>
-        private async Task<DiscordMessage> SetPropertyAsync(CommandContext context, DiscordChannel channel, string responseKey, ContentFilter filter)
+        private async Task<DiscordMessage> SetPropertyAsync(CommandContext context, DiscordChannel? channel, string responseKey, ContentFilter filter)
         {
             channel ??= context.Channel;
             var result = await _service.SetContentFilterAsync(context.Guild, channel, x => x.ContentType = (x.ContentType.HasFlag(filter)) ? x.ContentType & ~filter : x.ContentType | filter);

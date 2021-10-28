@@ -81,7 +81,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [GroupCommand, Command("status"), Aliases("check", "result")]
         [Description("cmd_poll_status")]
         [RequireGuild]
-        public async Task ShowPollStatusAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
+        public async Task ShowPollStatusAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage? message = default)
         {
             var polls = _service.GetPolls(context.Guild);
 
@@ -116,7 +116,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [Command("stop"), Aliases("end")]
         [Description("cmd_poll_stop")]
         [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
-        public async Task RemovePollAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage message = null)
+        public async Task RemovePollAsync(CommandContext context, [Description("arg_discord_message_link")] DiscordMessage? message = default)
         {
             var polls = _service.GetPolls(context.Guild);
 
@@ -167,7 +167,7 @@ namespace AkkoCore.Commands.Modules.Utilities
 
             embed.WithDescription(
                 (success)
-                ? context.FormatLocalized("voted_for", "\n" + poll.Answers[option - 1])
+                ? context.FormatLocalized("voted_for", "\n" + poll!.Answers[option - 1])
                 : "vote_failure"    // Poll doesn't exist or user has voted already
             );
 
@@ -209,17 +209,16 @@ namespace AkkoCore.Commands.Modules.Utilities
         /// <param name="context">The command context.</param>
         /// <param name="pollType">The type of the poll.</param>
         /// <param name="qAnswers">Question in the first index, followed by the answers to the poll.</param>
-        /// <returns>The poll that was just created.</returns>
-        private async Task<DiscordMessage> CreateNumeratedPollAsync(CommandContext context, PollType pollType, string[] qAnswers)
+        /// <returns>The poll that was just created or <see langword="null"/> if no poll was created.</returns>
+        private async Task<DiscordMessage?> CreateNumeratedPollAsync(CommandContext context, PollType pollType, string[] qAnswers)
         {
-            var embed = new SerializableDiscordEmbed();
-
             if (qAnswers.Length < 3 || (pollType is PollType.Numeric && qAnswers.Length > 11))
             {
                 await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
-                return null;
+                return default;
             }
 
+            var embed = new SerializableDiscordEmbed();
             var counter = 0;
             var answers = qAnswers
                 .Skip(1)

@@ -88,12 +88,14 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task RepeaterInfoAsync(CommandContext context, [Description("arg_uint")] int id)
         {
             var embed = new SerializableDiscordEmbed();
-            var repeater = _service.GetRepeaters(context.Guild, x => x.Id == id).FirstOrDefault();
+            var repeaters = _service.GetRepeaters(context.Guild, x => x.Id == id);
+            var isEmpty = repeaters is null or { Count: 0 };
 
-            if (repeater is null)
+            if (isEmpty)
                 embed.WithDescription(context.FormatLocalized("repeater_not_found", id));
             else
             {
+                var repeater = repeaters![0];
                 _akkoCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer);
                 var member = await context.Guild.GetMemberSafelyAsync(repeater.AuthorId);
                 var (dbTimer, dbUser) = await _service.GetRepeaterExtraInfoAsync(timer, repeater, member);
@@ -101,13 +103,13 @@ namespace AkkoCore.Commands.Modules.Utilities
                 embed.WithTitle(context.FormatLocalized("repeater") + $" #{repeater.Id}")
                     .WithDescription(Formatter.BlockCode(repeater.Content, "yaml"))
                     .AddField("interval", repeater.Interval.ToString(@"%d\d\ %h\h\ %m\m\ %s\s"), true)
-                    .AddField("triggers_on", (timer?.ElapseAt ?? dbTimer.ElapseAt).ToOffset(context.GetTimeZone().BaseUtcOffset).ToDiscordTimestamp(), true)
-                    .AddField("triggers_in", DateTimeOffset.Now.Add(timer?.ElapseIn ?? dbTimer.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime), true)
-                    .AddField("author", member?.GetFullname() ?? dbUser.FullName, true)
+                    .AddField("triggers_on", (timer?.ElapseAt ?? dbTimer!.ElapseAt).ToOffset(context.GetTimeZone().BaseUtcOffset).ToDiscordTimestamp(), true)
+                    .AddField("triggers_in", DateTimeOffset.Now.Add(timer?.ElapseIn ?? dbTimer!.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime), true)
+                    .AddField("author", member?.GetFullname() ?? dbUser!.FullName, true)
                     .AddField("channel", $"<#{repeater.ChannelId}>", true);
             }
 
-            await context.RespondLocalizedAsync(embed, repeater is null, repeater is null);
+            await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);
         }
 
         [Command("list"), Aliases("show")]
@@ -138,7 +140,10 @@ namespace AkkoCore.Commands.Modules.Utilities
                 var timers = new List<IAkkoTimer>(repeaters.Count);
 
                 foreach (var repeater in repeaters)
-                    timers.Add((_akkoCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer)) ? timer : null);
+                {
+                    if (_akkoCache.Timers.TryGetValue(repeater.TimerIdFK, out var timer))
+                        timers.Add(timer);
+                }
 
                 embed.WithTitle("repeater_list_title")
                     .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, "[...]"))), true)

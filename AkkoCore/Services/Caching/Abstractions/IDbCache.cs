@@ -127,7 +127,7 @@ namespace AkkoCore.Services.Caching.Abstractions
         /// <param name="botConfig">The default bot configurations.</param>
         /// <remarks>If the entry doesn't exist, it creates one.</remarks>
         /// <returns>The specified <see cref="GuildConfigEntity"/>.</returns>
-        ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig botConfig = default);
+        ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig? botConfig = default);
 
         /// <summary>
         /// Adds a database guild and pertinent navigation properties to the cache.

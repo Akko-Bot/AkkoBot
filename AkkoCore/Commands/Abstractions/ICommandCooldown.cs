@@ -27,7 +27,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="cmd">The command to be checked.</param>
         /// <param name="server">The Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <returns><see langword="true"/> if it has a cooldown, <see langword="false"/> otherwise.</returns>
-        bool ContainsCommand(Command cmd, DiscordGuild server = null);
+        bool ContainsCommand(Command cmd, DiscordGuild? server = default);
 
         /// <summary>
         /// Adds a command cooldown.
@@ -36,7 +36,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="duration">The time the cooldown should last.</param>
         /// <param name="server">The Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <returns><see langword="true"/> if the cooldown was successfully added, <see langword="false"/> otherwise.</returns>
-        bool AddCommand(Command cmd, TimeSpan duration, DiscordGuild server = null);
+        bool AddCommand(Command cmd, TimeSpan duration, DiscordGuild? server = default);
 
         /// <summary>
         /// Removes a command cooldown.
@@ -62,7 +62,7 @@ namespace AkkoCore.Commands.Abstractions
         /// <param name="server">The Discord guild specific to the cooldown or <see langword="null"/> if it's a global cooldown.</param>
         /// <remarks>In case a command has a global and a server cooldown, the longest will apply.</remarks>
         /// <returns><see langword="true"/> if the user has an active cooldown for <paramref name="cmd"/>, <see langword="false"/> otherwise.</returns>
-        bool IsOnCooldown(Command cmd, DiscordUser user, DiscordGuild server = null);
+        bool IsOnCooldown(Command cmd, DiscordUser user, DiscordGuild? server = default);
 
         /// <summary>
         /// Initializes this object with entries from the database.

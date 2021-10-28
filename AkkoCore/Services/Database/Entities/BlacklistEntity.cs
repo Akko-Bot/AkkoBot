@@ -12,8 +12,8 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores users, channels, and servers blacklisted from the bot.")]
     public class BlacklistEntity : DbEntity
     {
-        private string _name;
-        private string _reason;
+        private string? _name;
+        private string? _reason;
 
         /// <summary>
         /// The blacklisted ID.
@@ -29,7 +29,7 @@ namespace AkkoCore.Services.Database.Entities
         /// The name of the blacklisted entity.
         /// </summary>
         [MaxLength(37)]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => _name = value?.MaxLength(37);
@@ -39,7 +39,7 @@ namespace AkkoCore.Services.Database.Entities
         /// The reason for the blacklisting.
         /// </summary>
         [MaxLength(200)]
-        public string Reason
+        public string? Reason
         {
             get => _reason;
             set => _reason = value?.MaxLength(200);
@@ -53,7 +53,7 @@ namespace AkkoCore.Services.Database.Entities
         public static bool operator !=(BlacklistEntity x, BlacklistEntity y)
             => !(x == y);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || (obj is not null && obj is BlacklistEntity dbAlias && this == dbAlias);
 
         public override int GetHashCode()

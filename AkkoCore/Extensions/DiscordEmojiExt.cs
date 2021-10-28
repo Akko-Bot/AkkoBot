@@ -13,13 +13,13 @@ namespace AkkoCore.Extensions
         /// <param name="emoji">This emoji.</param>
         /// <param name="server">The server the emoji is from.</param>
         /// <returns>The guild emoji, <see langword="null"/> if the emoji is not from the specified guild.</returns>
-        public static async Task<DiscordGuildEmoji> ToGuildEmojiAsync(this DiscordEmoji emoji, DiscordGuild server)
+        public static async Task<DiscordGuildEmoji?> ToGuildEmojiAsync(this DiscordEmoji emoji, DiscordGuild server)
         {
             if (server is null || !server.Emojis.ContainsKey(emoji.Id))
-                return null;
+                return default;
 
             try { return await server.GetEmojiAsync(emoji.Id); }
-            catch { return null; }
+            catch { return default; }
         }
 
         /// <summary>

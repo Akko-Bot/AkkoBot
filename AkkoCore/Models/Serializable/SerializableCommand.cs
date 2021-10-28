@@ -89,7 +89,7 @@ namespace AkkoCore.Models.Serializable
                     result.Add(localizer.GetResponseString(locale, "perm_require_dm"));
                 else
                 {
-                    foreach (var arg in att.ConstructorArguments.Where(x => x.Value is long).SelectMany(x => ((Permissions)x.Value).ToStrings().Skip(1)))
+                    foreach (var arg in att.ConstructorArguments.Where(x => x.Value is long).SelectMany(x => ((Permissions)x.Value!).ToStrings().Skip(1)))
                         result.Add(localizer.GetResponseString(locale, "perm_" + arg.ToSnakeCase()));
                 }
             }

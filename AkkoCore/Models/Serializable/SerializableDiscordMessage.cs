@@ -17,26 +17,26 @@ namespace AkkoCore.Models.Serializable
     /// <remarks>For serialization purposes, all unused properties are set to <see langword="null"/>.</remarks>
     public class SerializableDiscordMessage
     {
-        private string _content;
+        private string? _content;
 
         /// <summary>
         /// The embeds contained in this message.
         /// </summary>
         /// <remarks>Only <see cref="AkkoConstants.MaxEmbedAmount"/> embeds will make it to the message.</remarks>
-        public List<SerializableDiscordEmbed> Embeds { get; private set; }
+        public List<SerializableDiscordEmbed>? Embeds { get; private set; }
 
         /// <summary>
         /// Gets the first embed of this message, <see langword="null"/> if there isn't one.
         /// </summary>
         /// <remarks>This property is not mapped.</remarks>
         [YamlIgnore, JsonIgnore]
-        public SerializableDiscordEmbed Embed
-            => (Embeds is not null && Embeds.Count is not 0) ? Embeds[0] : null;
+        public SerializableDiscordEmbed? Embed
+            => (Embeds is not null && Embeds.Count is not 0) ? Embeds[0] : default;
 
         /// <summary>
         /// Represents the message content outside of the embed.
         /// </summary>
-        public string Content
+        public string? Content
         {
             get => _content;
             set => _content = value?.MaxLength(AkkoConstants.MaxMessageLength, "[...]");
@@ -52,7 +52,7 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <param name="content">The content of the message.</param>
         /// <param name="embed">The message's first embed.</param>
-        public SerializableDiscordMessage(string content, SerializableDiscordEmbed embed = default)
+        public SerializableDiscordMessage(string? content, SerializableDiscordEmbed? embed = default)
         {
             Content = content;
 
@@ -65,7 +65,7 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <param name="content">The content of the message.</param>
         /// <param name="embeds">A collection of embeds to be included in the message.</param>
-        public SerializableDiscordMessage(string content, IEnumerable<SerializableDiscordEmbed> embeds)
+        public SerializableDiscordMessage(string? content, IEnumerable<SerializableDiscordEmbed> embeds)
         {
             Content = content;
 
@@ -111,7 +111,7 @@ namespace AkkoCore.Models.Serializable
         /// <param name="locale">The locale to be used.</param>
         /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
         /// <returns>This message builder.</returns>
-        public SerializableDiscordMessage WithLocalization(ILocalizer localizer, string locale, string color = default)
+        public SerializableDiscordMessage WithLocalization(ILocalizer localizer, string locale, string? color = default)
         {
             Content = localizer.GetResponseString(locale, Content);
 
@@ -173,7 +173,7 @@ namespace AkkoCore.Models.Serializable
             var message = new DiscordMessageBuilder() { Content = this.Content };
 
             if (Embeds?.Count is not null and not 0)
-                message.AddEmbeds(Embeds.Select(x => x.Build()).Select(x => x.Build()).Take(AkkoConstants.MaxEmbedAmount));
+                message.AddEmbeds(Embeds.Where(x => x.HasValidEmbed()).Select(x => x.Build()).Select(x => x!.Build()).Take(AkkoConstants.MaxEmbedAmount));
 
             return message;
         }
@@ -189,7 +189,7 @@ namespace AkkoCore.Models.Serializable
                 .WithContent(Content);
 
             if (Embeds?.Count is not null and not 0)
-                webhookMsg.AddEmbeds(Embeds.Select(x => x.Build()).Select(x => x.Build()).Take(AkkoConstants.MaxEmbedAmount));
+                webhookMsg.AddEmbeds(Embeds.Where(x => x.HasValidEmbed()).Select(x => x.Build()).Select(x => x!.Build()).Take(AkkoConstants.MaxEmbedAmount));
 
             return webhookMsg;
         }
@@ -205,7 +205,7 @@ namespace AkkoCore.Models.Serializable
                 .WithContent(Content);
 
             if (Embeds?.Count is not null and not 0)
-                response.AddEmbeds(Embeds.Select(x => x.Build().Build()));
+                response.AddEmbeds(Embeds.Where(x => x.HasValidEmbed()).Select(x => x.Build()!.Build()));
 
             return response;
         }
@@ -215,7 +215,7 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         public void Clear()
         {
-            Embeds.Clear();
+            Embeds?.Clear();
 
             _content = null;
             Embeds = null;
@@ -223,10 +223,10 @@ namespace AkkoCore.Models.Serializable
 
         /* Operator Overloads */
 
-        public static implicit operator DiscordMessageBuilder(SerializableDiscordMessage x) => x?.Build();
+        public static implicit operator DiscordMessageBuilder(SerializableDiscordMessage x) => x.Build();
 
-        public static implicit operator DiscordWebhookBuilder(SerializableDiscordMessage x) => x?.BuildWebhookMessage();
+        public static implicit operator DiscordWebhookBuilder(SerializableDiscordMessage x) => x.BuildWebhookMessage();
 
-        public static implicit operator SerializableDiscordMessage(DiscordMessageBuilder x) => x?.ToSerializableMessage();
+        public static implicit operator SerializableDiscordMessage(DiscordMessageBuilder x) => x.ToSerializableMessage();
     }
 }

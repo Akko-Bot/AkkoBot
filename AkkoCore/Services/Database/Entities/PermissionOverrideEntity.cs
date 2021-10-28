@@ -14,12 +14,12 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores data related to permission overrides for commands.")]
     public class PermissionOverrideEntity : DbEntity
     {
-        private string _command;
+        private string _command = null!;
 
         /// <summary>
         /// The settings of the Discord guild this command permission override is associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The list of user IDs allowed to run this command.
@@ -50,7 +50,7 @@ namespace AkkoCore.Services.Database.Entities
         public string Command
         {
             get => _command;
-            init => _command = value?.MaxLength(200);
+            init => _command = value.MaxLength(200);
         }
 
         /// <summary>

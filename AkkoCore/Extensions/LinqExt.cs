@@ -18,7 +18,7 @@ namespace AkkoCore.Extensions
         /// <param name="keySelector">A method that defines the value to be used as the key for the dictionary.</param>
         /// <returns>A <see cref="ConcurrentDictionary{T1, T2}"/> whose key is defined by <paramref name="keySelector"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when either the collection or the key selector are <see langword="null"/>.</exception>
-        public static ConcurrentDictionary<T1, T2> ToConcurrentDictionary<T1, T2>(this IEnumerable<T2> collection, Func<T2, T1> keySelector)
+        public static ConcurrentDictionary<T1, T2> ToConcurrentDictionary<T1, T2>(this IEnumerable<T2> collection, Func<T2, T1> keySelector) where T1 : notnull
         {
             if (collection is null || keySelector is null)
                 throw new ArgumentNullException(collection is null ? nameof(collection) : nameof(keySelector), "Argument cannot be null.");
@@ -73,7 +73,7 @@ namespace AkkoCore.Extensions
 
             foreach (var element in targetCollection)
             {
-                if (collection.Any(x => x.Equals(element)))
+                if (collection.Any(x => x?.Equals(element) is true))
                     matches++;
             }
 
@@ -112,7 +112,7 @@ namespace AkkoCore.Extensions
 
             foreach (var element in targetCollection)
             {
-                if (collection.Any(x => x.Equals(element)))
+                if (collection.Any(x => x?.Equals(element) is true))
                     return true;
             }
 
@@ -262,6 +262,8 @@ namespace AkkoCore.Extensions
         {
             if (collection is null)
                 throw new ArgumentNullException(nameof(collection), "Collection cannot be null.");
+            //else if (!collection.Any())
+            //    return new List<List<T>>(0);
 
             int index = 0, count = 0;
             var collectionCount = collection.Count();
@@ -287,7 +289,7 @@ namespace AkkoCore.Extensions
         /// <param name="selector">A method that defines the property to filter the elements.</param>
         /// <returns>An <see cref="IEnumerable{T1}"/> where all <typeparamref name="T1"/> have the same value for the property defined by <paramref name="selector"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when the predicate returns a null value.</exception>
-        public static ICollection<HashSet<T1>> SplitBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector)
+        public static ICollection<HashSet<T1>> SplitBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector) where T2 : notnull
         {
             if (collection is null || selector is null)
                 throw new ArgumentNullException(collection is null ? nameof(collection) : nameof(selector), "Argument cannot be null.");
@@ -307,6 +309,7 @@ namespace AkkoCore.Extensions
             return result.Values;
         }
 
+#nullable disable
         /// <summary>
         /// Gets the <typeparamref name="T1"/> with the maximum property value defined by <paramref name="selector"/> in this collection.
         /// </summary>
@@ -358,6 +361,7 @@ namespace AkkoCore.Extensions
 
             return result;
         }
+#nullable enable
 
         /// <summary>
         /// Gets a random <typeparamref name="T"/> from the current collection.
@@ -366,7 +370,7 @@ namespace AkkoCore.Extensions
         /// <param name="collection">This collection.</param>
         /// <param name="random">A <see cref="Random"/> instance to generate the random index.</param>
         /// <returns>A random <typeparamref name="T"/> element from this collection or <see langword="default"/>(<typeparamref name="T"/>) if the collection is empty.</returns>
-        public static T RandomElement<T>(this IEnumerable<T> collection, Random random = default)
+        public static T? RandomElementOrDefault<T>(this IEnumerable<T> collection, Random? random = default)
         {
             random ??= new();
             return collection.ElementAtOrDefault(random.Next(collection.Count()));
@@ -380,21 +384,10 @@ namespace AkkoCore.Extensions
         /// <param name="maxIndex">The maximum index to pick from.</param>
         /// <param name="random">A <see cref="Random"/> instance to generate the random index.</param>
         /// <returns>A random <typeparamref name="T"/> element from this collection or <see langword="default"/>(<typeparamref name="T"/>) if the collection is empty.</returns>
-        public static T RandomElement<T>(this IEnumerable<T> collection, int maxIndex, Random random = default)
+        public static T? RandomElementOrDefault<T>(this IEnumerable<T> collection, int maxIndex, Random? random = default)
         {
             random ??= new();
             return collection.ElementAtOrDefault(random.Next(Math.Min(collection.Count(), Math.Abs(maxIndex))));
         }
-
-        /// <summary>
-        /// Applies a deferred <paramref name="action"/> on a collection if the <paramref name="condition"/> is <see langword="true"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the elements.</typeparam>
-        /// <param name="collection">This collection.</param>
-        /// <param name="condition">The condition to be checked.</param>
-        /// <param name="action">The action to be performed.</param>
-        /// <returns>The modified collection if <paramref name="condition"/> is <see langword="true"/>, otherwise the original collection.</returns>
-        public static IEnumerable<T> If<T>(this IEnumerable<T> collection, bool condition, Func<IEnumerable<T>, IEnumerable<T>> action)
-            => condition ? action(collection) : collection;
     }
 }

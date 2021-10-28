@@ -30,14 +30,14 @@ namespace AkkoCore.Commands.Common
             LoadFromEntities(db.CommandCooldown.Where(x => !x.GuildIdFK.HasValue));
         }
 
-        public bool ContainsCommand(Command cmd, DiscordGuild server = null)
+        public bool ContainsCommand(Command cmd, DiscordGuild? server = default)
         {
             return (server is null)
                 ? _globalCooldown.ContainsKey(cmd.QualifiedName)
                 : _globalCooldown.ContainsKey(cmd.QualifiedName) || _serverCooldown.ContainsKey((cmd.QualifiedName, server.Id));
         }
 
-        public bool AddCommand(Command cmd, TimeSpan duration, DiscordGuild server = null)
+        public bool AddCommand(Command cmd, TimeSpan duration, DiscordGuild? server = default)
         {
             return (server is null)
                 ? _globalCooldown.TryAdd(cmd.QualifiedName, duration)
@@ -54,7 +54,7 @@ namespace AkkoCore.Commands.Common
         public bool AddUser(Command cmd, DiscordUser user)
             => _recentUsers.TryAdd((cmd.QualifiedName, user.Id), DateTimeOffset.Now);
 
-        public bool IsOnCooldown(Command cmd, DiscordUser user, DiscordGuild server = null)
+        public bool IsOnCooldown(Command cmd, DiscordUser user, DiscordGuild? server = default)
         {
             // Check cooldown
             if (IsOnGlobalCooldown(cmd, user) || IsOnServerCooldown(cmd, user, server))
@@ -96,9 +96,9 @@ namespace AkkoCore.Commands.Common
             _serverCooldown?.Clear();
             _recentUsers?.Clear();
 
-            _globalCooldown = null;
-            _serverCooldown = null;
-            _recentUsers = null;
+            _globalCooldown = default!;
+            _serverCooldown = default!;
+            _recentUsers = default!;
 
             GC.SuppressFinalize(this);
         }
@@ -123,7 +123,7 @@ namespace AkkoCore.Commands.Common
         /// <param name="user">The user to be checked.</param>
         /// <param name="server">The Discord guild specific to the cooldown.</param>
         /// <returns><see langword="true"/> if the user has an active server cooldown for <paramref name="cmd"/>, <see langword="false"/> otherwise.</returns>
-        private bool IsOnServerCooldown(Command cmd, DiscordUser user, DiscordGuild server)
+        private bool IsOnServerCooldown(Command cmd, DiscordUser user, DiscordGuild? server)
         {
             return _serverCooldown.TryGetValue((cmd.QualifiedName, server?.Id ?? default), out var cooldown)
                 && _recentUsers.TryGetValue((cmd.QualifiedName, user.Id), out var time)

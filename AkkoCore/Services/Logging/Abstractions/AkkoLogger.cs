@@ -13,7 +13,7 @@ namespace AkkoCore.Services.Logging.Abstractions
         /// </summary>
         protected static readonly object lockObject = new();
 
-        public abstract IDisposable BeginScope<TState>(TState state);
+        public abstract IDisposable? BeginScope<TState>(TState state);
 
         public abstract bool IsEnabled(LogLevel logLevel);
 

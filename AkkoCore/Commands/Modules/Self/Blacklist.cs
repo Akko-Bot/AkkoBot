@@ -28,11 +28,11 @@ namespace AkkoCore.Commands.Modules.Self
             => _service = service;
 
         [Command("add"), HiddenOverload]
-        public async Task BlacklistAddAsync(CommandContext context, DiscordChannel channel, [RemainingText] string reason = null)
+        public async Task BlacklistAddAsync(CommandContext context, DiscordChannel channel, [RemainingText] string? reason = default)
             => await BlacklistAddAsync(context, BlacklistType.Channel, channel.Id, reason);
 
         [Command("add")]
-        public async Task BlacklistAddAsync(CommandContext context, [Description("arg_mention")] DiscordUser entity, [RemainingText, Description("arg_punishment_reason")] string reason = null)
+        public async Task BlacklistAddAsync(CommandContext context, [Description("arg_mention")] DiscordUser entity, [RemainingText, Description("arg_punishment_reason")] string? reason = default)
             => await BlacklistAddAsync(context, BlacklistType.User, entity.Id, reason);
 
         [Command("remove"), HiddenOverload]
@@ -49,7 +49,7 @@ namespace AkkoCore.Commands.Modules.Self
             CommandContext context,
             [Description("arg_bltype")] BlacklistType type,
             [Description("arg_ulong_id")] ulong id,
-            [RemainingText] string reason = null)
+            [RemainingText] string? reason = default)
         {
             var (entry, success) = await _service.AddBlacklistAsync(context, type, id, reason);
 

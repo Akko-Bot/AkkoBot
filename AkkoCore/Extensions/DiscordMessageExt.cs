@@ -33,7 +33,7 @@ namespace AkkoCore.Extensions
 
             embed.WithLocalization(localizer, settings.Locale, (isError) ? settings.ErrorColor : settings.OkColor);
 
-            if (isMarked && !string.IsNullOrWhiteSpace(embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
+            if (isMarked && !string.IsNullOrWhiteSpace(embed.Body?.Description))   // Marks the message with the full name of the user who ran the command
                 embed.Body.Description = embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
 
             return (settings.UseEmbed)

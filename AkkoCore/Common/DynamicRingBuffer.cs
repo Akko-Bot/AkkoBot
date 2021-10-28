@@ -1,6 +1,8 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -251,7 +253,7 @@ namespace AkkoCore.Common
         /// <param name="result">The resulting element.</param>
         /// <returns><see langword="true"/> if the element was successfully fetched, <see langword="false"/> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="predicate"/> is <see langword="null"/>.</exception>
-        public bool TryGetValue(Func<T, bool> predicate, out T result)
+        public bool TryGetValue(Func<T, bool> predicate, [MaybeNullWhen(false)] out T result)
         {
             result = _internalList.FirstOrDefault(predicate);
             return !Equals(result, default(T)) && _internalList.IndexOf(result) is not -1;

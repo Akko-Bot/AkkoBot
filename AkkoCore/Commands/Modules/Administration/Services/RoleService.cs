@@ -103,22 +103,23 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <returns>The server mute role.</returns>
         public async Task<DiscordRole> FetchMuteRoleAsync(DiscordGuild server)
         {
-            _dbCache.Guilds.TryGetValue(server.Id, out var dbGuild);
+            var dbGuild = await _dbCache.GetDbGuildAsync(server.Id);
 
-            if (!server.Roles.TryGetValue(dbGuild.MuteRoleId ?? default, out var muteRole))
-            {
-                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+            if (server.Roles.TryGetValue(dbGuild.MuteRoleId ?? default, out var muteRole))
+                return muteRole;
 
-                // Create a new mute role
-                muteRole = await server.CreateRoleAsync("AkkoMute", MutePermsAllow);
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-                // Save it to the database
-                dbGuild.MuteRoleId = muteRole.Id;
-                await db.GuildConfig.UpdateAsync(
-                    x => x.GuildId == server.Id,
-                    _ => new GuildConfigEntity() { MuteRoleId = muteRole.Id }
-                );
-            }
+            // Create a new mute role
+            muteRole = await server.CreateRoleAsync("AkkoMute", MutePermsAllow);
+
+            // Save it to the database
+            dbGuild.MuteRoleId = muteRole.Id;
+
+            await db.GuildConfig.UpdateAsync(
+                x => x.GuildId == server.Id,
+                _ => new GuildConfigEntity() { MuteRoleId = muteRole.Id }
+            );
 
             return muteRole;
         }
@@ -137,7 +138,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// effectively making the mute permanent.
         /// </remarks>
         /// <returns><see langword="true"/> if a timer was created, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> MuteUserAsync(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string reason)
+        public async Task<bool> MuteUserAsync(CommandContext context, DiscordRole muteRole, DiscordMember user, TimeSpan time, string? reason)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -203,7 +204,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="muteRole">The mute role.</param>
         /// <param name="user">The Discord user being unmuted.</param>
         /// <param name="reason">The reason for the unmute.</param>
-        public async Task UnmuteUserAsync(DiscordGuild server, DiscordRole muteRole, DiscordMember user, string reason)
+        public async Task UnmuteUserAsync(DiscordGuild server, DiscordRole muteRole, DiscordMember user, string? reason)
         {
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -235,7 +236,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="responseKey">The key of the response string to be used in the response.</param>
         /// <param name="reason">The reason for the mute/unmute.</param>
         /// <returns>An embed with the appropriate response key.</returns>
-        public async Task<SerializableDiscordEmbed> SetVoiceMuteAsync(DiscordMember user, bool isMuting, string responseKey, string reason)
+        public async Task<SerializableDiscordEmbed> SetVoiceMuteAsync(DiscordMember user, bool isMuting, string responseKey, string? reason)
         {
             var embed = new SerializableDiscordEmbed();
 
@@ -258,7 +259,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
         /// <param name="responseKey">The key of the response string to be used in the response.</param>
         /// <param name="reason">The reason for the deaf/undeaf.</param>
         /// <returns>An embed with the appropriate response key.</returns>
-        public async Task<SerializableDiscordEmbed> SetDeafAsync(DiscordMember user, bool isDeafening, string responseKey, string reason)
+        public async Task<SerializableDiscordEmbed> SetDeafAsync(DiscordMember user, bool isDeafening, string responseKey, string? reason)
         {
             var embed = new SerializableDiscordEmbed();
 

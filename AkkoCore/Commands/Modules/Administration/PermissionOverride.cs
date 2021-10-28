@@ -183,7 +183,7 @@ namespace AkkoCore.Commands.Modules.Administration
         /// <param name="context">The command context.</param>
         /// <param name="input">The user input.</param>
         /// <returns>The <see cref="Command"/> represented by the input or <see langword="null"/> if it was not found.</returns>
-        private Command GetCommandFromInput(CommandContext context, string input)
+        private Command? GetCommandFromInput(CommandContext context, string input)
         {
             var commandString = GetCommandString(context.Prefix, input);
 

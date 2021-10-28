@@ -15,14 +15,14 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores settings and data related to gatekeeping.")]
     public class GatekeepEntity : DbEntity
     {
-        private string _customSanitizedName;
-        private string _greetMessage;
-        private string _farewellMessage;
+        private string? _customSanitizedName;
+        private string? _greetMessage;
+        private string? _farewellMessage;
 
         /// <summary>
         /// The settings of the Discord guild these gatekeeping settings are associated with.
         /// </summary>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord guild these settings are associated with.
@@ -38,7 +38,7 @@ namespace AkkoCore.Services.Database.Entities
         /// Defines the replacement name to be assigned to users whose names should be sanitized.
         /// </summary>
         [MaxLength(AkkoConstants.MaxUsernameLength)]
-        public string CustomSanitizedName
+        public string? CustomSanitizedName
         {
             get => _customSanitizedName;
             set => _customSanitizedName = value?.MaxLength(AkkoConstants.MaxUsernameLength);
@@ -48,7 +48,7 @@ namespace AkkoCore.Services.Database.Entities
         /// Defines the message to be sent when a user joins the guild.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string GreetMessage
+        public string? GreetMessage
         {
             get => _greetMessage;
             set => _greetMessage = value?.MaxLength(AkkoConstants.MaxMessageLength);
@@ -58,7 +58,7 @@ namespace AkkoCore.Services.Database.Entities
         /// Defines the message to be sent when a user leaves the guild.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string FarewellMessage
+        public string? FarewellMessage
         {
             get => _farewellMessage;
             set => _farewellMessage = value?.MaxLength(AkkoConstants.MaxMessageLength);

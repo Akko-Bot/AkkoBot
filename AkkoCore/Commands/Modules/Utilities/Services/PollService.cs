@@ -74,9 +74,9 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         public async Task<bool> RemovePollAsync(DiscordMessage message)
         {
             _dbCache.Polls.TryGetValue(message.Channel.Guild.Id, out var polls);
-            var poll = polls.FirstOrDefault(x => x.GuildIdFK == message.Channel.Guild.Id && x.ChannelId == message.Channel.Id && x.MessageId == message.Id);
+            var poll = polls?.FirstOrDefault(x => x.GuildIdFK == message.Channel.Guild.Id && x.ChannelId == message.Channel.Id && x.MessageId == message.Id);
 
-            if (poll is null)
+            if (polls is null || poll is null)
                 return false;
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
@@ -92,7 +92,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// </summary>
         /// <param name="poll">The database poll.</param>
         /// <returns><see langword="true"/> if the poll was successfully removed, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> RemovePollAsync(PollEntity poll)
+        public async Task<bool> RemovePollAsync(PollEntity? poll)
         {
             if (poll is null)
                 return false;
@@ -101,7 +101,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
             _dbCache.Polls.TryGetValue(poll.GuildIdFK, out var polls);
 
             db.Remove(poll);
-            polls.TryRemove(poll);
+            polls!.TryRemove(poll);
 
             return await db.SaveChangesAsync() is not 0;
         }

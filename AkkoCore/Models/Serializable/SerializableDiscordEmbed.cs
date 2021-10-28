@@ -23,28 +23,28 @@ namespace AkkoCore.Models.Serializable
         /// <summary>
         /// Represents the embed color, in hexadecimal.
         /// </summary>
-        public string Color { get; set; }
+        public string? Color { get; set; }
 
         /// <summary>
         /// Contains the embed's Author and ThumbnailUrl properties.
         /// </summary>
-        public SerializableEmbedHeader Header { get; set; }
+        public SerializableEmbedHeader? Header { get; set; }
 
         /// <summary>
         /// Contains the embed's Title, Description and ImageUrl properties.
         /// </summary>
-        public SerializableEmbedBody Body { get; set; }
+        public SerializableEmbedBody? Body { get; set; }
 
         /// <summary>
         /// Contains a collection of the embed's fields, if any.
         /// </summary>
         /// <remarks>This collection is <see langword="null"/> when there are no fields in the source embed.</remarks>
-        public List<SerializableEmbedField> Fields { get; set; } // This needs to be null. If I use an empty list, it shows up in the (de)serialization.
+        public List<SerializableEmbedField>? Fields { get; set; } // This needs to be null. If I use an empty list, it shows up in the (de)serialization.
 
         /// <summary>
         /// Contains the embed's Footer properties.
         /// </summary>
-        public SerializableEmbedFooter Footer { get; set; }
+        public SerializableEmbedFooter? Footer { get; set; }
 
         /// <summary>
         /// Contains the embed's timestamp property.
@@ -65,7 +65,7 @@ namespace AkkoCore.Models.Serializable
         /// <param name="url">URL to link with the displayed text.</param>
         /// <param name="imageUrl">URL to an image.</param>
         /// <returns>This embed builder.</returns>
-        public SerializableDiscordEmbed WithAuthor(string name, string url = null, string imageUrl = null)
+        public SerializableDiscordEmbed WithAuthor(string name, string? url = default, string? imageUrl = default)
         {
             Header ??= new SerializableEmbedHeader();
             Header.Author = new(name, url, imageUrl);
@@ -92,7 +92,7 @@ namespace AkkoCore.Models.Serializable
         /// <param name="name">The text to be displayed.</param>
         /// <param name="url">URL to link with the displayed text.</param>
         /// <returns>This embed builder.</returns>
-        public SerializableDiscordEmbed WithTitle(string name, string url = null)
+        public SerializableDiscordEmbed WithTitle(string name, string? url = default)
         {
             Body ??= new SerializableEmbedBody();
             Body.Title = new(name, url);
@@ -132,7 +132,7 @@ namespace AkkoCore.Models.Serializable
         /// <param name="text">The text to be displayed.</param>
         /// <param name="imageUrl">URL to an image.</param>
         /// <returns>This embed builder.</returns>
-        public SerializableDiscordEmbed WithFooter(string text, string imageUrl = null)
+        public SerializableDiscordEmbed WithFooter(string text, string? imageUrl = default)
         {
             Footer = new SerializableEmbedFooter(text, imageUrl);
             return this;
@@ -143,7 +143,7 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <param name="hexCode">A color code in hexadecimal.</param>
         /// <returns>This embed builder.</returns>
-        public SerializableDiscordEmbed WithColor(string hexCode)
+        public SerializableDiscordEmbed WithColor(string? hexCode)
         {
             Color = hexCode;
             return this;
@@ -200,9 +200,9 @@ namespace AkkoCore.Models.Serializable
         /// <param name="locale">The locale to be used.</param>
         /// <param name="color">A hexadecimal color to set the embed if it doesn't have one.</param>
         /// <returns>This embed builder.</returns>
-        public SerializableDiscordEmbed WithLocalization(ILocalizer localizer, string locale, string color = default)
+        public SerializableDiscordEmbed WithLocalization(ILocalizer localizer, string locale, string? color = default)
         {
-            static bool IsValidColor(string color)
+            static bool IsValidColor(string? color)
                 => color is not null && color.Length is 6 or 7;
 
             if (!IsValidColor(Color) && IsValidColor(color))
@@ -248,7 +248,7 @@ namespace AkkoCore.Models.Serializable
         /// </summary>
         /// <param name="stringBuilder">The string builder to be used during deconstruction.</param>
         /// <returns>The provided <paramref name="stringBuilder"/> with this embed's formatted content.</returns>
-        public StringBuilder Decompose(StringBuilder stringBuilder)
+        public StringBuilder Decompose(StringBuilder? stringBuilder = default)
         {
             stringBuilder ??= new StringBuilder();
 
@@ -282,14 +282,14 @@ namespace AkkoCore.Models.Serializable
         /// <param name="fields">Overrides the fields that should be included. Set it to <see langword="null"/> to use the fields in this builder.</param>
         /// <returns>A <see cref="DiscordEmbedBuilder"/>, <see langword="null"/> if the embed is invalid.</returns>
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
-        public DiscordEmbedBuilder Build(IEnumerable<SerializableEmbedField> fields = null)
+        public DiscordEmbedBuilder? Build(IEnumerable<SerializableEmbedField>? fields = default)
         {
             var localFields = (fields is not null)
                 ? fields.Where(x => !string.IsNullOrWhiteSpace(x.Title) && !string.IsNullOrWhiteSpace(x.Title)).ToList()
                 : Fields;
 
             if (!HasValidEmbed())
-                return null;
+                return default;
 
             var embed = new DiscordEmbedBuilder()
             {
@@ -350,9 +350,9 @@ namespace AkkoCore.Models.Serializable
         /// <summary>
         /// Constructs the Discord interactive response represented by this model.
         /// </summary>
-        /// <returns>A <see cref="DiscordInteractionResponseBuilder"/> with the embed content.</returns>
+        /// <returns>A <see cref="DiscordInteractionResponseBuilder"/> with the embed content, <see langword="null"/> if this embed is not valid.</returns>
         /// <exception cref="ArgumentException">Occurs when the embed <see cref="Color"/> is not a valid color.</exception>
-        public DiscordInteractionResponseBuilder BuildInteractiveResponse()
+        public DiscordInteractionResponseBuilder? BuildInteractiveResponse()
             => (HasValidEmbed()) ? new DiscordInteractionResponseBuilder().AddEmbed(Build()) : default;
 
         /// <summary>
@@ -380,11 +380,12 @@ namespace AkkoCore.Models.Serializable
 
         /* Operator Overloads */
 
-        public static implicit operator DiscordEmbedBuilder(SerializableDiscordEmbed x) => x?.Build();
+        public static implicit operator DiscordEmbedBuilder(SerializableDiscordEmbed x)
+            => x.Build() ?? throw new InvalidCastException($"This serializable embed is invalid and cannot be cast to a {typeof(DiscordEmbedBuilder).Name}.");
 
-        public static implicit operator DiscordMessageBuilder(SerializableDiscordEmbed x) => x?.BuildMessage();
+        public static implicit operator DiscordMessageBuilder(SerializableDiscordEmbed x) => x.BuildMessage();
 
-        public static implicit operator SerializableDiscordEmbed(DiscordEmbedBuilder x) => x?.ToSerializableEmbed();
+        public static implicit operator SerializableDiscordEmbed(DiscordEmbedBuilder x) => x.ToSerializableEmbed();
 
         /* Static Methods */
 

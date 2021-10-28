@@ -14,15 +14,15 @@ namespace AkkoCore.Services.Database.Entities
     [Comment("Stores command aliases.")]
     public class AliasEntity : DbEntity
     {
-        private readonly string _alias;
-        private string _command;
-        private string _arguments;
+        private readonly string _alias = null!;
+        private string _command = null!;
+        private string? _arguments;
 
         /// <summary>
         /// The settings of the Discord guild this tag is associated with.
         /// </summary>
         /// <remarks>This property is <see langword="null"/> for global aliases.</remarks>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord guild associated with this alias.
@@ -43,7 +43,7 @@ namespace AkkoCore.Services.Database.Entities
         public string Alias
         {
             get => _alias;
-            init => _alias = value?.MaxLength(AkkoConstants.MaxMessageLength);
+            init => _alias = value.MaxLength(AkkoConstants.MaxMessageLength);
         }
 
         /// <summary>
@@ -54,14 +54,14 @@ namespace AkkoCore.Services.Database.Entities
         public string Command
         {
             get => _command;
-            set => _command = value?.MaxLength(200);
+            set => _command = value.MaxLength(200);
         }
 
         /// <summary>
         /// The arguments of the command alias, if any.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
-        public string Arguments
+        public string? Arguments
         {
             get => _arguments;
             set => _arguments = value?.MaxLength(AkkoConstants.MaxMessageLength);
@@ -92,7 +92,7 @@ namespace AkkoCore.Services.Database.Entities
         public static bool operator !=(AliasEntity x, AliasEntity y)
             => !(x == y);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || (obj is not null && obj is AliasEntity dbAlias && this == dbAlias);
 
         public override int GetHashCode()

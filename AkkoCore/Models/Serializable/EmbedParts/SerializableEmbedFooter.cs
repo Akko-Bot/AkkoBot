@@ -8,17 +8,17 @@ namespace AkkoCore.Models.Serializable.EmbedParts
     /// </summary>
     public class SerializableEmbedFooter
     {
-        private string _text;
+        private string? _text;
 
         /// <summary>
         /// The URL of the image icon to be displayed on the embed's footer.
         /// </summary>
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         /// <summary>
         /// The text to be displayed on the embed's footer.
         /// </summary>
-        public string Text
+        public string? Text
         {
             get => _text;
             set => _text = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength);
@@ -28,7 +28,7 @@ namespace AkkoCore.Models.Serializable.EmbedParts
         {
         }
 
-        public SerializableEmbedFooter(string text, string imageUrl = null)
+        public SerializableEmbedFooter(string? text, string? imageUrl = default)
         {
             Text = text;
             ImageUrl = imageUrl;

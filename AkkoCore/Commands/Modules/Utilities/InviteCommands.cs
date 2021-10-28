@@ -57,7 +57,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         [RequirePermissions(Permissions.CreateInstantInvite)]
         public async Task CreateInviteAsync(
             CommandContext context,
-            [Description("arg_discord_channel")] DiscordChannel channel = null,
+            [Description("arg_discord_channel")] DiscordChannel? channel = default,
             [Description("arg_invite_time")] TimeSpan expiresIn = default,
             [Description("arg_invite_uses")] int maxUses = default,
             [Description("arg_invite_temporary")] bool temporary = false)

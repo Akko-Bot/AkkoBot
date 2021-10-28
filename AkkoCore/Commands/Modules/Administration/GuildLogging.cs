@@ -42,9 +42,9 @@ namespace AkkoCore.Commands.Modules.Administration
         public async Task StartLogAsync(
             CommandContext context,
             [Description("arg_guildlog_type")] GuildLogType logType,
-            [Description("arg_discord_channel")] DiscordChannel channel = null,
-            [Description("arg_webhook_name")] string webhookName = null,
-            [Description("arg_emoji_url")] string avatarUrl = null)
+            [Description("arg_discord_channel")] DiscordChannel? channel = default,
+            [Description("arg_webhook_name")] string? webhookName = default,
+            [Description("arg_emoji_url")] string? avatarUrl = default)
         {
             channel ??= context.Channel;
 
@@ -76,7 +76,7 @@ namespace AkkoCore.Commands.Modules.Administration
             CommandContext context,
             [Description("arg_discord_channel")] DiscordChannel channel,
             [Description("arg_webhook_name")] string newName,
-            [Description("arg_emoji_url")] string avatarUrl = null)
+            [Description("arg_emoji_url")] string? avatarUrl = default)
         {
             var guildLog = _service.GetGuildLogs(context.Guild)
                 .FirstOrDefault(x => x.ChannelId == channel.Id);
@@ -159,7 +159,7 @@ namespace AkkoCore.Commands.Modules.Administration
         /// <param name="server">The guild the channel is in.</param>
         /// <param name="guildLog">The guild log.</param>
         /// <returns>The channel mention or <see langword="null"/> if <paramref name="guildLog"/> is <see langword="null"/> or not active.</returns>
-        private string GetChannelMention(DiscordGuild server, GuildLogEntity guildLog)
+        private string? GetChannelMention(DiscordGuild server, GuildLogEntity? guildLog)
         {
             return (guildLog is null || !guildLog.IsActive || !server.Channels.TryGetValue(guildLog.ChannelId, out var channel))
                 ? null

@@ -15,18 +15,18 @@ namespace AkkoCore.Services.Database.Entities
         /// <summary>
         /// The Discord user associated with this timer.
         /// </summary>
-        public DiscordUserEntity UserRel { get; init; }
+        public DiscordUserEntity? UserRel { get; init; }
 
         /// <summary>
         /// The Discord guild this timer is associated with.
         /// </summary>
         /// <remarks>This property is <see langword="null"/> if this timer is not associated with a Discord guild (triggers in direct message).</remarks>
-        public GuildConfigEntity GuildConfigRel { get; init; }
+        public GuildConfigEntity? GuildConfigRel { get; init; }
 
         /// <summary>
         /// The infraction this timer is associated with.
         /// </summary>
-        public WarnEntity WarnRel { get; init; }
+        public WarnEntity? WarnRel { get; init; }
 
         /// <summary>
         /// The ID of the Discord user this timer is associated with.
@@ -138,7 +138,7 @@ namespace AkkoCore.Services.Database.Entities
         public static bool operator !=(TimerEntity x, TimerEntity y)
             => !(x == y);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || (obj is not null && obj is TimerEntity dbTimer && this == dbTimer);
 
         public override int GetHashCode()

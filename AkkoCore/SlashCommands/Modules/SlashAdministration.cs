@@ -24,7 +24,7 @@ namespace AkkoCore.SlashCommands.Modules
         }
 
         [SlashCommand("prefix", "Shows the prefix the bot responds to.")]
-        public async Task SlashPrefixAsync(InteractionContext context, [RemainingText, Option("newPrefix", "The new prefix the bot should respond to.")] string prefix = null)
+        public async Task SlashPrefixAsync(InteractionContext context, [RemainingText, Option("newPrefix", "The new prefix the bot should respond to.")] string? prefix = default)
         {
             if (prefix is not null
                 && ((AkkoUtilities.IsOwner(context, context.User.Id) && context.Guild is null)
@@ -43,7 +43,7 @@ namespace AkkoCore.SlashCommands.Modules
             if (isAllowed && context.Guild is null)
                 _botService.GetOrSetProperty(x => x.Prefix = prefix);
             else if (isAllowed)
-                await _guildService.SetPropertyAsync(context.Guild, x => x.Prefix = prefix);
+                await _guildService.SetPropertyAsync(context.Guild!, x => x.Prefix = prefix);
 
             await context.RespondLocalizedAsync(embed, isError: !isAllowed);
         }

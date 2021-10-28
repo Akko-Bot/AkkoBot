@@ -63,7 +63,7 @@ namespace AkkoCore.Services.Events
             var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.Prefix);
             var tag = globalTags
                 .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-                .RandomElement(_rng);
+                .RandomElementOrDefault(_rng);
 
             return (tag is null || IsIgnoredContext(eventArgs, tag) || HasLocalOverride(eventArgs, tag))
                 ? Task.CompletedTask
@@ -82,7 +82,7 @@ namespace AkkoCore.Services.Events
             var dummyContext = GetCommandContext(client, eventArgs, dbGuild.Prefix);
             var tag = dbTags
                 .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-                .RandomElement(_rng);
+                .RandomElementOrDefault(_rng);
 
             return (tag is null || IsIgnoredContext(eventArgs, tag))
                 ? Task.CompletedTask
@@ -103,7 +103,7 @@ namespace AkkoCore.Services.Events
             var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.Prefix);
             var tag = globalTags
                 .Where(x => FilterEmojiTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-                .RandomElement(_rng);
+                .RandomElementOrDefault(_rng);
 
             return (tag is null || IsIgnoredContext(eventArgs, tag) || HasLocalOverride(eventArgs, tag))
                 ? Task.CompletedTask
@@ -122,7 +122,7 @@ namespace AkkoCore.Services.Events
             var dummyContext = GetCommandContext(client, eventArgs, dbGuild.Prefix);
             var tag = dbTags
                 .Where(x => FilterEmojiTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-                .RandomElement(_rng);
+                .RandomElementOrDefault(_rng);
 
             return (tag is null || IsIgnoredContext(eventArgs, tag))
                 ? Task.CompletedTask
@@ -144,7 +144,7 @@ namespace AkkoCore.Services.Events
         /// <param name="dbGuild">The database guild.</param>
         /// <param name="eventArgs">The message event arguments.</param>
         /// <returns><see langword="true"/> if there are enough permissions, <see langword="false"/> otherwise.</returns>
-        private bool HasMinimumPermission(GuildConfigEntity dbGuild, MessageCreateEventArgs eventArgs)
+        private bool HasMinimumPermission(GuildConfigEntity? dbGuild, MessageCreateEventArgs eventArgs)
         {
             return dbGuild is null || dbGuild.MinimumTagPermissions is Permissions.None
                     || (eventArgs.Author as DiscordMember)?.PermissionsIn(eventArgs.Channel).HasPermission(dbGuild.MinimumTagPermissions) is true;
@@ -240,7 +240,7 @@ namespace AkkoCore.Services.Events
             if (!dbTag.IsEmoji
                 || (eventArgs.Guild is not null
                 && dbTag.AllowedPerms is not Permissions.None
-                && !(eventArgs.Author as DiscordMember).PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | dbTag.AllowedPerms)))
+                && !(eventArgs.Author as DiscordMember)!.PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | dbTag.AllowedPerms)))
                 return false;
 
             return (dbTag.Behavior.HasFlag(TagBehavior.Anywhere))
@@ -260,7 +260,7 @@ namespace AkkoCore.Services.Events
             if (dbTag.IsEmoji
                 || (eventArgs.Guild is not null
                 && dbTag.AllowedPerms is not Permissions.None
-                && !(eventArgs.Author as DiscordMember).PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | dbTag.AllowedPerms)))
+                && !(eventArgs.Author as DiscordMember)!.PermissionsIn(eventArgs.Channel).HasOneFlag(Permissions.Administrator | dbTag.AllowedPerms)))
                 return false;
 
             return (dbTag.Behavior.HasFlag(TagBehavior.Anywhere))
@@ -312,7 +312,7 @@ namespace AkkoCore.Services.Events
             _dbCache.Tags.TryGetValue(dbTag.GuildIdFK ?? default, out var tags);
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            tags.TryRemove(dbTag);
+            tags!.TryRemove(dbTag);
 
             if (tags.Count is 0)
                 _dbCache.Tags.TryRemove(dbTag.GuildIdFK ?? default, out _);

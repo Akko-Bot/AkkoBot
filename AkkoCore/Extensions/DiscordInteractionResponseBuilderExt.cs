@@ -24,7 +24,7 @@ namespace AkkoCore.Extensions
         /// <param name="locale">The locale to be used.</param>
         /// <param name="color">A hexadecimal color to set the embeds if they don't have one.</param>
         /// <returns>A new message builder with its content localized.</returns>
-        public static DiscordInteractionResponseBuilder WithLocalization(this DiscordInteractionResponseBuilder response, ILocalizer localizer, string locale, string color = default)
+        public static DiscordInteractionResponseBuilder WithLocalization(this DiscordInteractionResponseBuilder response, ILocalizer localizer, string locale, string? color = default)
         {
             if (!string.IsNullOrWhiteSpace(response.Content))
                 response.Content = localizer.GetResponseString(locale, response.Content);
