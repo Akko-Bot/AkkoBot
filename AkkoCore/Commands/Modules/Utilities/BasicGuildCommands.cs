@@ -138,8 +138,17 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .SplitInto(AkkoConstants.LinesPerPage);     // x users per page
 
             var title = context.FormatLocalized("inrole_title", role.Name);
-            var embed = new SerializableDiscordEmbed()
-                .WithFooter(context.FormatLocalized("total_of", ((users.Count - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault()?.Count ?? 0));
+            var embed = new SerializableDiscordEmbed();
+
+            if (users.Count is 0)
+            {
+                embed.WithDescription("error_user_not_found");
+                await context.RespondLocalizedAsync(embed, isError: true);
+
+                return;
+            }
+
+            embed.WithFooter(context.FormatLocalized("total_of", ((users.Count - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault()?.Count ?? 0));
 
             foreach (var userGroup in users)
                 embed.AddField(title, string.Join('\n', userGroup.ToArray()));

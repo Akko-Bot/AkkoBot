@@ -263,8 +263,7 @@ namespace AkkoTests.Core.Extensions
             // Empty collection
             sample = _dummiesEmpty.SplitInto(5);
 
-            Assert.NotEmpty(sample);
-            Assert.Empty(sample[0]);
+            Assert.Empty(sample);
 
             // Null input
             Assert.Throws<ArgumentNullException>(() => _nullCollection.SplitInto(5));

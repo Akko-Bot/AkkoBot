@@ -262,8 +262,8 @@ namespace AkkoCore.Extensions
         {
             if (collection is null)
                 throw new ArgumentNullException(nameof(collection), "Collection cannot be null.");
-            //else if (!collection.Any())
-            //    return new List<List<T>>(0);
+            else if (!collection.Any())
+                return new List<List<T>>(0);
 
             int index = 0, count = 0;
             var collectionCount = collection.Count();

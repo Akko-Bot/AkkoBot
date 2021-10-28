@@ -350,7 +350,7 @@ namespace AkkoCore.Services
                 content = localizer.GetResponseString(settings.Locale, content);
 
             var result = new List<Page>();
-            var splitFields = embed.Fields.SplitInto(maxFields).ToArray();
+            var splitFields = embed.Fields.SplitInto(maxFields);
 
             embed.WithLocalization(localizer, settings.Locale, settings.OkColor);
             var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");
@@ -361,9 +361,9 @@ namespace AkkoCore.Services
                 var embedCopy = embed.Build(fields);
 
                 if (embedCopy?.Footer is null)
-                    embedCopy?.WithFooter(string.Format(footerPrepend, ++counter, splitFields.Length));
+                    embedCopy?.WithFooter(string.Format(footerPrepend, ++counter, splitFields.Count));
                 else
-                    embedCopy.WithFooter(string.Format(footerPrepend + " | ", ++counter, splitFields.Length) + embedCopy.Footer.Text);
+                    embedCopy.WithFooter(string.Format(footerPrepend + " | ", ++counter, splitFields.Count) + embedCopy.Footer.Text);
 
                 result.Add(new Page(content, embedCopy));
             }
