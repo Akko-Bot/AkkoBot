@@ -34,7 +34,7 @@ namespace AkkoCore.Core.Common
         public void Shutdown()
         {
             _restartBot = false;
-            
+
             _ = _onShutdownEvent.InvokeAsync(this, GetEventArguments(TimeSpan.Zero, _restartBot));
             _cTokenSource.Cancel();
         }

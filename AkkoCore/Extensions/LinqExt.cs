@@ -310,6 +310,7 @@ namespace AkkoCore.Extensions
         }
 
 #nullable disable
+
         /// <summary>
         /// Gets the <typeparamref name="T1"/> with the maximum property value defined by <paramref name="selector"/> in this collection.
         /// </summary>
@@ -361,6 +362,7 @@ namespace AkkoCore.Extensions
 
             return result;
         }
+
 #nullable enable
 
         /// <summary>

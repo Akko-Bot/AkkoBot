@@ -105,7 +105,7 @@ namespace AkkoCore.Services.Events
                 return;
 
             var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog);
-                        
+
             if (webhook is not null)
                 await webhook.ExecuteAsync(_logGenerator.GetMessageDeleteLog(message));
 

@@ -6,7 +6,6 @@ using AkkoCore.Enums;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;
-using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;

@@ -33,8 +33,10 @@ namespace AkkoCore.Extensions
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
 #nullable disable
+
         public static string MaxLength(this string text, int maxLength)
             => text?.Substring(0, Math.Min(text.Length, maxLength));
+
 #nullable enable
 
         /// <summary>
@@ -47,10 +49,12 @@ namespace AkkoCore.Extensions
         /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
 #nullable disable
+
         public static string MaxLength(this string text, int maxLength, string append)
             => (text is null || text.Length <= maxLength)
                 ? text
                 : (text.MaxLength(Math.Max(0, maxLength - append.Length)) + append)[..maxLength];
+
 #nullable enable
 
         /// <summary>

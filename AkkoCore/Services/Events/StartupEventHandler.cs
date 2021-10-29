@@ -31,7 +31,7 @@ namespace AkkoCore.Services.Events
         private readonly IDbCache _dbCache;
         private readonly BotConfig _botConfig;
         private readonly StatusService _statusService;
-        
+
         public StartupEventHandler(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache, BotConfig botConfig, StatusService statusService)
         {
             _scopeFactory = scopeFactory;

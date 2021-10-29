@@ -32,7 +32,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
     {
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;
-        
+
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
         private readonly IConfigLoader _configLoader;
@@ -84,7 +84,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
 
             // Cache the status.
             // Static status should not be cached in the list.
-            if (time != TimeSpan.Zero)  
+            if (time != TimeSpan.Zero)
                 _dbCache.PlayingStatuses.Add(dbStatus);
             else
                 StaticStatus = dbStatus;

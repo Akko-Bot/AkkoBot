@@ -182,7 +182,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
             {
                 AutoCommandType.Startup => "-",
 
-                AutoCommandType.Scheduled or AutoCommandType.Repeated 
+                AutoCommandType.Scheduled or AutoCommandType.Repeated
                     => (_akkoCache.Timers.TryGetValue(dbEntry.TimerIdFK!.Value, out var timer))
                         ? DateTimeOffset.Now.Add(timer.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime)
                         : "-",

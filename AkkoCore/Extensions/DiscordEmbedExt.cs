@@ -85,7 +85,7 @@ namespace AkkoCore.Extensions
                 foreach (var field in embed.Fields)
                     model.AddField(field.Name, field.Value, field.Inline);
             }
-            
+
             return model;
         }
     }
