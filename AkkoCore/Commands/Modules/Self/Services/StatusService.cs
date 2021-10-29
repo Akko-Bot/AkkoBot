@@ -76,9 +76,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
                 _dbCache.PlayingStatuses.Add(newEntry);
             }
 
-            await db.SaveChangesAsync();
-
-            return true;
+            return await db.SaveChangesAsync() is not 0;
         }
 
         /// <summary>

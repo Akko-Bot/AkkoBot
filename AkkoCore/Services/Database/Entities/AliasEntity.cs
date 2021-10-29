@@ -58,7 +58,7 @@ namespace AkkoCore.Services.Database.Entities
         }
 
         /// <summary>
-        /// The arguments of the command alias, if any.
+        /// The arguments of the command alias, <see langword="null"/> if there aren't any.
         /// </summary>
         [MaxLength(AkkoConstants.MaxMessageLength)]
         public string? Arguments
@@ -83,19 +83,5 @@ namespace AkkoCore.Services.Database.Entities
         /// <returns>The command mapped to this alias.</returns>
         public Command GetCommand(CommandsNextExtension cmdHandler, out string arguments)
             => cmdHandler.FindCommand(Command + " " + Arguments, out arguments);
-
-        /* Overrides */
-
-        public static bool operator ==(AliasEntity x, AliasEntity y)
-            => x.GuildIdFK == y.GuildIdFK && x.IsDynamic == y.IsDynamic && x.Alias == y.Alias && x.Command == y.Command && x.Arguments == y.Arguments;
-
-        public static bool operator !=(AliasEntity x, AliasEntity y)
-            => !(x == y);
-
-        public override bool Equals(object? obj)
-            => ReferenceEquals(this, obj) || (obj is not null && obj is AliasEntity dbAlias && this == dbAlias);
-
-        public override int GetHashCode()
-            => base.GetHashCode();
     }
 }

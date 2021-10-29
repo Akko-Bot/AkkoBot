@@ -122,7 +122,7 @@ namespace AkkoCore.Extensions
         {
             var counter = 0;
 
-            foreach (var letter in text)
+            foreach (var letter in text.AsSpan())
             {
                 if (letter == target)
                     counter++;

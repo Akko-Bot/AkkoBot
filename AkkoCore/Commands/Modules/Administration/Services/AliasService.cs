@@ -52,32 +52,32 @@ namespace AkkoCore.Commands.Modules.Administration.Services
             if (cmd is null)
                 return false;
 
+            // Get the cached alias
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+            var guildId = context.Guild?.Id ?? default;
 
-            // Save the new entry to the database
-            var newEntry = new AliasEntity()
-            {
-                GuildIdFK = context.Guild?.Id,
-                IsDynamic = ((cmd is CommandGroup cg) && cg.Children.Count > 1)     // This is not perfect but it will do for now
-                    || cmd.Overloads.Any(x => x.Arguments.Count > args.Split(' ').Length - ((string.IsNullOrWhiteSpace(args)) ? 1 : 0)),
+            if (!_dbCache.Aliases.TryGetValue(guildId, out var aliases))
+                aliases = new();
 
-                Alias = alias,
-                Command = cmd.QualifiedName,
-                Arguments = args ?? string.Empty
-            };
+            var dbAlias = aliases.FirstOrDefault(x => x.GuildIdFK == context.Guild?.Id && x.Alias == alias)
+                ?? new AliasEntity() { GuildIdFK = context.Guild?.Id, Alias = alias };
 
-            var guildId = newEntry.GuildIdFK ?? default;
-            var trackedEntity = db.Upsert(newEntry);
-            var dbEntry = (AliasEntity)trackedEntity.Entity;
+            // Start tracking it
+            db.Upsert(dbAlias);
+
+            // Set its new info
+            dbAlias.Command = cmd.QualifiedName;
+            dbAlias.Arguments = args;
+            dbAlias.IsDynamic = ((cmd is CommandGroup cg) && cg.Children.Count > 1)     // This is not perfect but it will do for now
+                || cmd.Overloads.Any(x => x.Arguments.Count > args!.Occurrences(' ') + 1 - ((string.IsNullOrWhiteSpace(args)) ? 1 : 0));
 
             // Update the cache
             if (!_dbCache.Aliases.ContainsKey(guildId))
-                _dbCache.Aliases.TryAdd(guildId, new ConcurrentHashSet<AliasEntity>());
-            else if (trackedEntity.State is EntityState.Modified && _dbCache.Aliases.TryGetValue(guildId, out var aliases))
-                _dbCache.Aliases[guildId].TryRemove(aliases.FirstOrDefault(x => x.Id == dbEntry.Id)!);  // Passing null here is fine
+                _dbCache.Aliases.TryAdd(guildId, aliases);
 
-            _dbCache.Aliases[guildId].Add(dbEntry);
+            aliases.Add(dbAlias);
 
+            // Save to the database
             return await db.SaveChangesAsync() is not 0;
         }
 

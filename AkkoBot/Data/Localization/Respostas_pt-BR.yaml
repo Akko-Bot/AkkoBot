@@ -71,8 +71,8 @@ arg_mention: Um ID ou menção válido do Discord.
 arg_module: Um módulo válido.
 arg_nickname: O novo apelido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
-arg_permission: Uma [permissão](https://github.com/Kaoticz/AkkoBot/wiki/Permissions) do Discord, dentro de aspas.
-arg_permissions: '[Permissões](https://github.com/Kaoticz/AkkoBot/wiki/Permissions) do Discord, dentro de aspas e separados por espaço.'
+arg_permission: Uma [permissão](https://github.com/Akko-Bot/AkkoBot/wiki/Permissions) do Discord, dentro de aspas.
+arg_permissions: '[Permissões](https://github.com/Akko-Bot/AkkoBot/wiki/Permissions) do Discord, dentro de aspas e separados por espaço.'
 arg_poll_id: ID da enquete.
 arg_poll_qanswer: A pergunta e as respostas, separadas por ponto-vírgula `;`.
 arg_poll_question: Uma pergunta.

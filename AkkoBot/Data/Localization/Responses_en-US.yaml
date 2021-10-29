@@ -71,8 +71,8 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
-arg_permission: A Discord [permission](https://github.com/Kaoticz/AkkoBot/wiki/Permissions), wrapped around quotation marks.
-arg_permissions: Discord [permissions](https://github.com/Kaoticz/AkkoBot/wiki/Permissions), wrapped around quotation marks and separated by space.
+arg_permission: A Discord [permission](https://github.com/Akko-Bot/AkkoBot/wiki/Permissions), wrapped around quotation marks.
+arg_permissions: Discord [permissions](https://github.com/Akko-Bot/AkkoBot/wiki/Permissions), wrapped around quotation marks and separated by space.
 arg_poll_id: ID of the poll.
 arg_poll_qanswer: The question and the answers, separated by a semicolon `;`.
 arg_poll_question: A question.
@@ -325,7 +325,7 @@ cmd_moveuser: Moves a user to another voice channel. Provide no channel to force
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
-cmd_override: Groups commands for managing permission overrides. Use them to modify the permissions required for a command to be run. Using it in direct message with the bot requires bot ownership and makes the override global. Server overrides always take precedence over global overrides. Bot ownership cannot be overriden.
+cmd_override: Groups commands for managing permission overrides. Use them to modify the permissions required to run a command. Using it in direct message with the bot requires bot ownership and makes the override global. Server overrides always take precedence over global overrides. Bot ownership cannot be overriden.
 cmd_override_channel: Toggles command usage for the specified channel.
 cmd_override_clear: Removes all permission overrides from the specified command.
 cmd_override_clearall: Removes all permission overrides from this server. Using it in direct message removes all global overrides.

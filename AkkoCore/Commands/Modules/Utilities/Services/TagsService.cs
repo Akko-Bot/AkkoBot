@@ -42,6 +42,8 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <returns><see langword="true"/> if the tag was successfully added, <see langword="false"/> otherwise.</returns>
         public async Task<bool> AddTagAsync(CommandContext context, string trigger, string response, bool isEmoji)
         {
+            // Require bot ownership for global tags
+            // Require user to be the tag's author or a higher admin for guild tags
             if (string.IsNullOrWhiteSpace(trigger) || string.IsNullOrWhiteSpace(response)
                 || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id)))
                 return false;
