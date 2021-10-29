@@ -2,7 +2,9 @@ using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
+using AkkoCore.Core.Abstractions;
 using AkkoCore.Extensions;
+using AkkoCore.Models.EventArgs;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
@@ -30,20 +32,32 @@ namespace AkkoCore.Commands.Modules.Self.Services
     {
         private readonly Timer _rotationTimer = new();
         private int _currentStatusIndex = 0;
-
+        
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDbCache _dbCache;
         private readonly IConfigLoader _configLoader;
+        private readonly IBotLifetime _botLifetime;
         private readonly BotConfig _botConfig;
-        private readonly DiscordShardedClient _clients;
+        private readonly DiscordShardedClient _shardedClient;
 
-        public StatusService(IServiceScopeFactory scopeFactory, IDbCache dbCache, IConfigLoader configLoader, BotConfig botConfig, DiscordShardedClient clients)
+        /// <summary>
+        /// The current static status or <see langword="null"/> if it's not set.
+        /// </summary>
+        public PlayingStatusEntity? StaticStatus { get; private set; }
+
+        public StatusService(IServiceScopeFactory scopeFactory, IDbCache dbCache, IConfigLoader configLoader, IBotLifetime botLifetime, BotConfig botConfig, DiscordShardedClient shardedClient)
         {
             _scopeFactory = scopeFactory;
             _dbCache = dbCache;
             _configLoader = configLoader;
+            _botLifetime = botLifetime;
             _botConfig = botConfig;
-            _clients = clients;
+            _shardedClient = shardedClient;
+
+            _botLifetime.OnShutdown += StopRotationOnShutdownAsync;
+
+            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+            StaticStatus = db.PlayingStatuses.FirstOrDefault(x => x.RotationTime == TimeSpan.Zero);
         }
 
         /// <summary>
@@ -59,22 +73,21 @@ namespace AkkoCore.Commands.Modules.Self.Services
                 return false;
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+            var dbStatus = (time == TimeSpan.Zero && StaticStatus is not null)
+                ? StaticStatus
+                : new() { RotationTime = time, StreamUrl = activity.StreamUrl };
 
-            var newEntry = new PlayingStatusEntity()
-            {
-                Message = activity.Name,
-                Type = activity.ActivityType,
-                RotationTime = time,
-                StreamUrl = activity.StreamUrl
-            };
+            db.Upsert(dbStatus);
 
-            if (time == TimeSpan.Zero)
-                db.Upsert(newEntry); // Static status should not be cached
+            dbStatus.Message = activity.Name;
+            dbStatus.Type = activity.ActivityType;
+
+            // Cache the status.
+            // Static status should not be cached in the list.
+            if (time != TimeSpan.Zero)  
+                _dbCache.PlayingStatuses.Add(dbStatus);
             else
-            {
-                db.Add(newEntry);
-                _dbCache.PlayingStatuses.Add(newEntry);
-            }
+                StaticStatus = dbStatus;
 
             return await db.SaveChangesAsync() is not 0;
         }
@@ -92,7 +105,10 @@ namespace AkkoCore.Commands.Modules.Self.Services
                 .Select(x => x.Id)
                 .ToArrayAsyncEF();
 
-            _dbCache.PlayingStatuses.RemoveAll(x => entries.Contains(x.Id));
+            if (entries.Length is 1 && entries[0] == StaticStatus?.Id)
+                StaticStatus = default;
+            else
+                _dbCache.PlayingStatuses.RemoveAll(x => entries.Contains(x.Id));
 
             return await db.PlayingStatuses.DeleteAsync(x => entries.Contains(x.Id)) is not 0;
         }
@@ -101,7 +117,7 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// Gets all cached rotating statuses.
         /// </summary>
         /// <returns>A collection of statuses.</returns>
-        public IReadOnlyCollection<PlayingStatusEntity> GetStatuses()
+        public IReadOnlyList<PlayingStatusEntity> GetStatuses()
             => _dbCache.PlayingStatuses;
 
         /// <summary>
@@ -130,38 +146,29 @@ namespace AkkoCore.Commands.Modules.Self.Services
 
             if (_botConfig.RotateStatus)
             {
-                // Start rotation
                 var firstStatus = _dbCache.PlayingStatuses.FirstOrDefault();
 
                 if (firstStatus is null)
                     return false;
 
-                foreach (var client in _clients.ShardClients.Values)
-                    await client.UpdateStatusAsync(firstStatus.Activity);
+                await _shardedClient.UpdateStatusAsync(firstStatus.Activity);
 
+                // Start the timer
                 _rotationTimer.Interval = firstStatus.RotationTime.TotalMilliseconds;
                 _rotationTimer.Elapsed += async (x, y) => await SetNextStatusAsync();
                 _rotationTimer.Start();
             }
             else
             {
-                // Stop rotation
                 _currentStatusIndex = 0;
 
+                // Stop the timer
                 _rotationTimer.Elapsed -= async (x, y) => await SetNextStatusAsync();
                 _rotationTimer.Stop();
 
-                var staticStatus = await db.PlayingStatuses
-                    .FirstOrDefaultAsyncEF(x => x.RotationTime == TimeSpan.Zero);
-
-                if (staticStatus is not null)
-                {
-                    foreach (var client in _clients.ShardClients.Values)
-                        await client.UpdateStatusAsync(staticStatus.Activity);
-                }
+                if (StaticStatus is not null)
+                    await _shardedClient.UpdateStatusAsync(StaticStatus.Activity);
             }
-
-            await db.SaveChangesAsync();
 
             return true;
         }
@@ -171,14 +178,26 @@ namespace AkkoCore.Commands.Modules.Self.Services
         /// </summary>
         private async Task SetNextStatusAsync()
         {
-            if (++_currentStatusIndex >= _dbCache.PlayingStatuses.Count)
+            if (_dbCache.PlayingStatuses.Count is 0)
+                return;
+            else if (++_currentStatusIndex >= _dbCache.PlayingStatuses.Count)
                 _currentStatusIndex = 0;
 
             var nextStatus = _dbCache.PlayingStatuses[_currentStatusIndex];
             _rotationTimer.Interval = nextStatus.RotationTime.TotalMilliseconds;
 
-            foreach (var client in _clients.ShardClients.Values)
-                await client.UpdateStatusAsync(nextStatus.Activity);
+            await _shardedClient.UpdateStatusAsync(nextStatus.Activity);
+        }
+
+        /// <summary>
+        /// Stops status rotation when the bot shuts down or restarts.
+        /// </summary>
+        private Task StopRotationOnShutdownAsync(IBotLifetime botLifetime, ShutdownEventArgs eventArgs)
+        {
+            _rotationTimer.Elapsed -= async (x, y) => await SetNextStatusAsync();
+            _rotationTimer.Stop();
+
+            return Task.CompletedTask;
         }
     }
 }

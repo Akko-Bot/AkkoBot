@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace AkkoCore.Core.Common
 {
@@ -108,8 +109,7 @@ namespace AkkoCore.Core.Common
                 cmdHandler.Services.GetService<AkkoDbContext>()?.Dispose();
 
             // Dispose clients - this also disposes the extensions
-            foreach (var client in BotShardedClient.ShardClients.Values)
-                client.Dispose();
+            _ = BotShardedClient.StopAsync();
 
             GC.SuppressFinalize(this);
         }

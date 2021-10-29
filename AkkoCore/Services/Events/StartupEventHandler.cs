@@ -31,7 +31,7 @@ namespace AkkoCore.Services.Events
         private readonly IDbCache _dbCache;
         private readonly BotConfig _botConfig;
         private readonly StatusService _statusService;
-
+        
         public StartupEventHandler(IServiceScopeFactory scopeFactory, IAkkoCache akkoCache, IDbCache dbCache, BotConfig botConfig, StatusService statusService)
         {
             _scopeFactory = scopeFactory;
@@ -130,19 +130,12 @@ namespace AkkoCore.Services.Events
             return Task.CompletedTask;
         }
 
-        public Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs _)
+        public Task InitializePlayingStatuses(DiscordClient client, ReadyEventArgs eventArgs)
         {
             Task.Run(async () =>
             {
-                using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
-
-                var pStatus = await db.PlayingStatuses
-                    .Where(x => x.RotationTime == TimeSpan.Zero)
-                    .Select(x => new PlayingStatusEntity() { Message = x.Message, Type = x.Type, StreamUrl = x.StreamUrl })
-                    .FirstOrDefaultAsyncEF();
-
-                if (pStatus is not null)
-                    await client.UpdateStatusAsync(pStatus.Activity);
+                if (_statusService.StaticStatus is not null)
+                    await client.UpdateStatusAsync(_statusService.StaticStatus.Activity);
                 else if (_botConfig.RotateStatus && _dbCache.PlayingStatuses.Count is not 0)
                 {
                     _botConfig.RotateStatus = !_botConfig.RotateStatus;

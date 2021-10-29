@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AkkoCore.Models.EventArgs;
+using Emzi0767.Utilities;
+using System;
 
 namespace AkkoCore.Core.Abstractions
 {
@@ -7,6 +9,11 @@ namespace AkkoCore.Core.Abstractions
     /// </summary>
     public interface IBotLifetime : IDisposable
     {
+        /// <summary>
+        /// Fires when the bot shuts down or restarts.
+        /// </summary>
+        event AsyncEventHandler<IBotLifetime, ShutdownEventArgs> OnShutdown;
+
         /// <summary>
         /// Defines whether the bot should launch after stopping.
         /// </summary>

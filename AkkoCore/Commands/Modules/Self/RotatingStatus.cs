@@ -71,9 +71,9 @@ namespace AkkoCore.Commands.Modules.Self
             [RemainingText, Description("arg_pstatus")] string message)
         {
             var activity = new DiscordActivity(message, type);
+            var success = time != TimeSpan.Zero && await _statusService.CreateStatusAsync(activity, time);
 
-            await _statusService.CreateStatusAsync(activity, (time == TimeSpan.Zero) ? TimeSpan.FromSeconds(30) : time);
-            await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
+            await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
         [Command("add")]
@@ -83,38 +83,17 @@ namespace AkkoCore.Commands.Modules.Self
             [RemainingText, Description("arg_pstatus")] string message)
         {
             var activity = new DiscordActivity(message, ActivityType.Streaming) { StreamUrl = streamUrl };
-            var isValid = await _statusService.CreateStatusAsync(activity, (time == TimeSpan.Zero) ? TimeSpan.FromSeconds(30) : time);
+            var isValid = time != TimeSpan.Zero && await _statusService.CreateStatusAsync(activity, time);
 
             await context.Message.CreateReactionAsync((isValid) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
-        [Command("list"), Aliases("show")]
-        [Description("cmd_liststatus")]
-        public async Task ListStatusAsync(CommandContext context)
+        [Command("rotatestatus"), Aliases("rotate", "ropl")]
+        [Description("cmd_rotatestatus")]
+        public async Task RotateStatusAsync(CommandContext context)
         {
-            var statuses = _statusService.GetStatuses();
-
-            if (statuses.Count == 0)
-            {
-                var error = new SerializableDiscordEmbed()
-                    .WithDescription("pstatus_error");
-
-                await context.RespondLocalizedAsync(error, isError: true);
-                return;
-            }
-
-            var ids = string.Join('\n', statuses.Select(x => x.Id).ToArray());
-            var messages = string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, "[...]")).ToArray());
-            var time = string.Join('\n', statuses.Select(x => x.RotationTime).ToArray());
-
-            var embed = new SerializableDiscordEmbed()
-                .WithTitle("pstatus_title")
-                .AddField("id", ids, true)
-                .AddField("message", messages, true)
-                .AddField("pstatus_time", time, true)
-                .WithFooter(context.FormatLocalized("pstatus_rotation", (_botService.GetConfig().RotateStatus) ? "enabled" : "disabled"));
-
-            await context.RespondPaginatedByFieldsAsync(embed);
+            var success = await _statusService.RotateStatusesAsync();
+            await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
         [Command("remove"), Aliases("rm")]
@@ -123,7 +102,7 @@ namespace AkkoCore.Commands.Modules.Self
         {
             var success = await _statusService.RemoveStatusesAsync(x => x.Id == id);
 
-            if (_statusService.GetStatuses().Count == 0)
+            if (_statusService.GetStatuses().Count is 0)
                 await context.Client.UpdateStatusAsync();
 
             await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
@@ -139,12 +118,29 @@ namespace AkkoCore.Commands.Modules.Self
             await context.Message.CreateReactionAsync((amount is not 0) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
-        [Command("rotatestatus"), Aliases("ropl")]
-        [Description("cmd_rotatestatus")]
-        public async Task RotateStatusAsync(CommandContext context)
+        [GroupCommand, Command("list"), Aliases("show")]
+        [Description("cmd_liststatus")]
+        public async Task ListStatusAsync(CommandContext context)
         {
-            var success = await _statusService.RotateStatusesAsync();
-            await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
+            var statuses = _statusService.GetStatuses();
+
+            if (statuses.Count is 0)
+            {
+                var error = new SerializableDiscordEmbed()
+                    .WithDescription("pstatus_error");
+
+                await context.RespondLocalizedAsync(error, isError: true);
+                return;
+            }
+
+            var embed = new SerializableDiscordEmbed()
+                .WithTitle("pstatus_title")
+                .AddField("id", string.Join('\n', statuses.Select(x => x.Id)), true)
+                .AddField("message", string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, "[...]"))), true)
+                .AddField("pstatus_time", string.Join('\n', statuses.Select(x => x.RotationTime)), true)
+                .WithFooter(context.FormatLocalized("pstatus_rotation", (_botService.GetConfig().RotateStatus) ? "enabled" : "disabled"));
+
+            await context.RespondPaginatedByFieldsAsync(embed);
         }
     }
 }
