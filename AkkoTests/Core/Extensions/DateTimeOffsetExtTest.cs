@@ -21,7 +21,7 @@ namespace AkkoTests.Core.Extensions
         [InlineData(1, 1.000000001)]
         internal void StartOfDayTest(int goodOffset, double badOffset)
         {
-            var today = DateTimeOffset.Now;
+            var today = DateTimeOffset.UtcNow;
 
             // Offsets
             var inputOffset = TimeSpan.FromMinutes(badOffset);
@@ -42,7 +42,7 @@ namespace AkkoTests.Core.Extensions
         [InlineData(600, 600.000001)]
         [InlineData(1, 1.000000001)]
         internal void OffsetCorrectionTest(int expected, double actual)
-            => Assert.Equal(TimeSpan.FromMinutes(expected), DateTimeOffset.Now.StartOfDay(TimeSpan.FromMinutes(actual)).Offset);
+            => Assert.Equal(TimeSpan.FromMinutes(expected), DateTimeOffset.UtcNow.StartOfDay(TimeSpan.FromMinutes(actual)).Offset);
 
         [Theory]
         [InlineData(TimestampFormat.LongDate)]

@@ -295,12 +295,10 @@ namespace AkkoCore.Services.Events
 
             using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
+            db.Attach(dbTag);
             dbTag.LastDayUsed = DateTimeOffset.Now.StartOfDay();
 
-            return db.Tags.UpdateAsync(
-                x => x.Id == dbTag.Id,
-                _ => new() { LastDayUsed = dbTag.LastDayUsed }
-            );
+            return db.SaveChangesAsync();
         }
 
         /// <summary>
