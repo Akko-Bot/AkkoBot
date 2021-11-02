@@ -112,7 +112,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             {
                 embed.WithTitle("reminder_list_title");
 
-                foreach (var group in reminders.SplitInto(15))
+                foreach (var group in reminders.Chunk(15))
                 {
                     // Have to use .Bold for the IDs because .InlineCode misaligns the embed fields
                     embed.AddField("message", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + x.Content.Replace("\n", string.Empty).MaxLength(50, "[...]")).ToArray()), true)

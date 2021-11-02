@@ -114,7 +114,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var roles = (user?.Roles ?? context.Guild.Roles.Values)
                 .OrderByDescending(x => x.Position)
                 .Select(x => $"• {x.Name}")
-                .SplitInto(AkkoConstants.LinesPerPage);     // x roles per page
+                .Chunk(AkkoConstants.LinesPerPage);     // x roles per page
 
             var title = (user is null)
                 ? "roles_title"
@@ -135,7 +135,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var users = context.Guild.Members.Values.Where(x => x.Roles.Contains(role))
                 .OrderByDescending(x => x.Hierarchy)
                 .Select(x => $"● {x.GetFullname()}")
-                .SplitInto(AkkoConstants.LinesPerPage);     // x users per page
+                .Chunk(AkkoConstants.LinesPerPage);     // x users per page
 
             var title = context.FormatLocalized("inrole_title", role.Name);
             var embed = new SerializableDiscordEmbed();

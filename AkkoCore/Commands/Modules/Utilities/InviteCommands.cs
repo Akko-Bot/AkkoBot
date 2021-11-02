@@ -94,7 +94,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var fields = new List<SerializableEmbedField>();
             var invites = (await context.Guild.GetInvitesAsync())
                 .OrderByDescending(x => x.Uses)
-                .SplitInto(AkkoConstants.LinesPerPage);
+                .Chunk(AkkoConstants.LinesPerPage);
 
             foreach (var group in invites)
             {

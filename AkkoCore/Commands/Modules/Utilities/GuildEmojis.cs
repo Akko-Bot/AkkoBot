@@ -36,7 +36,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 .Where(emoji => emoji.IsAvailable)
                 .OrderBy(x => x.Name)
                 .OrderBy(x => x.IsAnimated) // ThenBy() doesn't do anything here, for some reason
-                .SplitInto(15);
+                .Chunk(15);
 
             foreach (var emojiGroup in emojis)
                 embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}").ToArray()), true);

@@ -157,7 +157,7 @@ namespace AkkoCore.Commands.Modules.Administration
             embed.WithTitle((context.Guild is null) ? "override_global_list_title" : "override_list_title")
                    .WithDescription(context.FormatLocalized("override_list_description", Formatter.InlineCode(context.Prefix + "help")));
 
-            foreach (var permOverrides in overrides.SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var permOverrides in overrides.Chunk(AkkoConstants.LinesPerPage))
                 embed.AddField(AkkoConstants.ValidWhitespace, string.Join("\n", permOverrides.Select(x => Formatter.InlineCode(context.Prefix + x.Command))), true);
 
             await context.RespondPaginatedByFieldsAsync(embed, 3);

@@ -143,23 +143,31 @@ namespace AkkoCore.Extensions
         }
 
         /// <summary>
-        /// Converts a collection of <see cref="Task{T}"/> into a <see cref="List{T}"/>.
+        /// Awaits all tasks in the current collection and returns their results in an array.
         /// </summary>
-        /// <param name="collection">This collection.</param>
         /// <typeparam name="T">The data that needs to be awaited.</typeparam>
-        /// <returns>A <see cref="List{T}"/>.</returns>
+        /// <param name="collection">This collection.</param>
+        /// <returns>An array of <typeparamref name="T"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when the collection is <see langword="null"/>.</exception>
-        public static async Task<List<T>> ToListAsync<T>(this IEnumerable<Task<T>> collection)
+        public static async Task<T[]> WhenAllAsync<T>(this IEnumerable<Task<T>> collection)
         {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection), "Collection cannot be null.");
+            return (collection is null)
+                ? throw new ArgumentNullException(nameof(collection), "Collection cannot be null.")
+                : await Task.WhenAll(collection).ConfigureAwait(false);
+        }
 
-            var result = new List<T>();
-
-            foreach (var element in collection)
-                result.Add(await element.ConfigureAwait(false));
-
-            return result;
+        /// <summary>
+        /// Awaits the first task that completes in the current collection and returns its result.
+        /// </summary>
+        /// <typeparam name="T">The data that needs to be awaited.</typeparam>
+        /// <param name="collection">This collection.</param>
+        /// <returns>The <typeparamref name="T"/> object of the task that first finished executing.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when the collection is <see langword="null"/>.</exception>
+        public static async Task<T> WhenAnyAsync<T>(this IEnumerable<Task<T>> collection)
+        {
+            return (collection is null)
+                ? throw new ArgumentNullException(nameof(collection), "Collection cannot be null.")
+                : await (await Task.WhenAny(collection).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -258,7 +266,7 @@ namespace AkkoCore.Extensions
         /// <typeparam name="T">Data type of this collection.</typeparam>
         /// <returns>A collection of <see cref="List{T}"/> with maximum length of <paramref name="amount"/>.</returns>
         /// <exception cref="ArgumentNullException">Occurs when the collection is <see langword="null"/>.</exception>
-        public static List<List<T>> SplitInto<T>(this IEnumerable<T> collection, int amount)
+        public static List<List<T>> Chunk<T>(this IEnumerable<T> collection, int amount)
         {
             if (collection is null)
                 throw new ArgumentNullException(nameof(collection), "Collection cannot be null.");
@@ -288,25 +296,15 @@ namespace AkkoCore.Extensions
         /// <param name="collection">This collection.</param>
         /// <param name="selector">A method that defines the property to filter the elements.</param>
         /// <returns>An <see cref="IEnumerable{T1}"/> where all <typeparamref name="T1"/> have the same value for the property defined by <paramref name="selector"/>.</returns>
-        /// <exception cref="ArgumentNullException">Occurs when the predicate returns a null value.</exception>
-        public static ICollection<HashSet<T1>> SplitBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector) where T2 : notnull
+        /// <exception cref="ArgumentNullException">Occurs when the collection or the selector are <see langword="null"/>.</exception>
+        public static IEnumerable<IEnumerable<T1>> ChunkBy<T1, T2>(this IEnumerable<T1> collection, Func<T1, T2> selector) where T2 : notnull
         {
-            if (collection is null || selector is null)
-                throw new ArgumentNullException(collection is null ? nameof(collection) : nameof(selector), "Argument cannot be null.");
-
-            var result = new Dictionary<T2, HashSet<T1>>();
-
-            foreach (var element in collection)
-            {
-                var key = selector(element);
-
-                if (result.ContainsKey(key))
-                    result[key].Add(element);
-                else
-                    result.TryAdd(key, new HashSet<T1>() { element });
-            }
-
-            return result.Values;
+            return (collection is null || selector is null)
+                ? throw new ArgumentNullException(collection is null ? nameof(collection) : nameof(selector), "Argument cannot be null.")
+                : collection
+                    .Select(x => (selector(x), collection.Where(y => selector(y).Equals(selector(x)))))
+                    .DistinctBy(x => x.Item1)
+                    .Select(x => x.Item2);
         }
 
 #nullable disable

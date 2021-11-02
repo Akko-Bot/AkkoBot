@@ -1,4 +1,4 @@
-﻿namespace AkkoTests.Entities
+﻿namespace AkkoTests.Models
 {
     /// <summary>
     /// Dummy object used for testing.

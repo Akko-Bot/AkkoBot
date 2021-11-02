@@ -71,7 +71,7 @@ namespace AkkoCore.Commands.Modules.Administration
             var fields = new List<SerializableEmbedField>();
             embed.WithTitle((context.Guild is null) ? "cooldown_title_global" : "cooldown_title_server");
 
-            foreach (var commandGroup in commands.SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var commandGroup in commands.Chunk(AkkoConstants.LinesPerPage))
             {
                 fields.Add(new("command", string.Join("\n", commandGroup.Select(x => x.Key)), true));
                 fields.Add(new("cooldown", string.Join("\n", commandGroup.Select(x => x.Value)), true));

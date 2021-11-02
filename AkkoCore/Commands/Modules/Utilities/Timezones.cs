@@ -34,7 +34,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var timezones = TimeZoneInfo.GetSystemTimeZones()
                 .OrderBy(x => x.Id)
                 .Select(x => x.Id)
-                .SplitInto(AkkoConstants.LinesPerPage);
+                .Chunk(AkkoConstants.LinesPerPage);
 
             var embed = new SerializableDiscordEmbed()
                 .WithTitle("timezone_list");

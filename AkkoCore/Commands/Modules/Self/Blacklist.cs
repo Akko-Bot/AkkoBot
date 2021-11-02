@@ -143,7 +143,7 @@ namespace AkkoCore.Commands.Modules.Self
                 embed.WithDescription("bl_empty");
             else
             {
-                foreach (var blGroup in blacklist.SplitInto(AkkoConstants.LinesPerPage))
+                foreach (var blGroup in blacklist.Chunk(AkkoConstants.LinesPerPage))
                 {
                     fields.Add(new("id", string.Join("\n", blGroup.Select(x => x.ContextId)), true));
                     fields.Add(new("type", string.Join("\n", blGroup.Select(x => x.Type)), true));

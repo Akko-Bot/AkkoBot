@@ -1,5 +1,5 @@
 ﻿using AkkoCore.Extensions;
-using AkkoTests.Entities;
+using AkkoTests.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -8,14 +8,9 @@ namespace AkkoTests.Core.Extensions
 {
     public sealed class EqualsAnyTests
     {
-        private readonly List<MockObject> _dummies;
-
-        public EqualsAnyTests()
-        {
-            _dummies = Enumerable.Range(0, 10)
-                .Select(x => new MockObject(x, char.ConvertFromUtf32(65 + x)))
-                .ToList();
-        }
+        private static readonly List<MockObject> _dummies = Enumerable.Range(0, 10)
+            .Select(x => new MockObject(x, char.ConvertFromUtf32(65 + x)))
+            .ToList();
 
         [Theory]
         [InlineData(1, "B", true)]

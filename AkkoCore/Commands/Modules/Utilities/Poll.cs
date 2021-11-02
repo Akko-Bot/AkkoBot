@@ -193,7 +193,7 @@ namespace AkkoCore.Commands.Modules.Utilities
             var fields = new List<SerializableEmbedField>();
             embed.WithTitle("poll_list_title");
 
-            foreach (var pollGroup in polls.SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var pollGroup in polls.Chunk(AkkoConstants.LinesPerPage))
             {
                 fields.Add(new("id", string.Join("\n", pollGroup.Select(x => x.Id)), true));
                 fields.Add(new("poll", string.Join("\n", pollGroup.Select(x => x.Question.MaxLength(50, "[...]"))), true));

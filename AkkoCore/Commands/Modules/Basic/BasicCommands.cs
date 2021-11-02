@@ -95,7 +95,7 @@ namespace AkkoCore.Commands.Modules.Basic
             var embed = new SerializableDiscordEmbed()
                 .WithAuthor($"Shard | {context.FormatLocalized("servers")}");
 
-            foreach (var listGroup in list.SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var listGroup in list.Chunk(AkkoConstants.LinesPerPage))
                 embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', listGroup));
 
             await context.RespondPaginatedByFieldsAsync(embed, 2);

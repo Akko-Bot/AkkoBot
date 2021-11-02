@@ -350,7 +350,7 @@ namespace AkkoCore.Services
                 content = localizer.GetResponseString(settings.Locale, content);
 
             var result = new List<Page>();
-            var splitFields = embed.Fields.SplitInto(maxFields);
+            var splitFields = embed.Fields.Chunk(maxFields);
 
             embed.WithLocalization(localizer, settings.Locale, settings.OkColor);
             var footerPrepend = localizer.GetResponseString(settings.Locale, "pages");

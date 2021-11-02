@@ -188,7 +188,7 @@ namespace AkkoCore.Commands.Modules.Self
             var fields = new List<SerializableEmbedField>();
             var guilds = client.Guilds.Values
                 .OrderBy(x => x.Name)
-                .SplitInto(AkkoConstants.LinesPerPage);
+                .Chunk(AkkoConstants.LinesPerPage);
 
             foreach (var group in guilds)
                 fields.Add(new(AkkoConstants.ValidWhitespace, string.Join("\n", group.Select(x => $"{Formatter.InlineCode(x.Id.ToString())} {x.Name}")), true));

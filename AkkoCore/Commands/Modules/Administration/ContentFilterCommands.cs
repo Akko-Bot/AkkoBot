@@ -102,7 +102,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             var fields = new List<SerializableEmbedField>();
 
-            foreach (var filterGroup in filters.SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var filterGroup in filters.Chunk(AkkoConstants.LinesPerPage))
             {
                 fields.Add(new("id", string.Join("\n", filterGroup.Select(x => x.Id)), true));
                 fields.Add(new("channel", string.Join("\n", filterGroup.Select(x => $"<#{x.ChannelId}>")), true));

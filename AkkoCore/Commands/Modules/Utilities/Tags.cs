@@ -466,7 +466,7 @@ namespace AkkoCore.Commands.Modules.Utilities
         {
             var result = new SerializableDiscordEmbed();
 
-            foreach (var column in tags.OrderBy(x => x.Id).SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var column in tags.OrderBy(x => x.Id).Chunk(AkkoConstants.LinesPerPage))
             {
                 result.AddField(
                     AkkoConstants.ValidWhitespace,

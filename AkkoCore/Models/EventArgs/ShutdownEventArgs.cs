@@ -6,7 +6,7 @@ namespace AkkoCore.Models.EventArgs
     /// <summary>
     /// Defines event arguments for when the bot is shutting down or restarting.
     /// </summary>
-    public class ShutdownEventArgs : AsyncEventArgs
+    public sealed class ShutdownEventArgs : AsyncEventArgs
     {
         /// <summary>
         /// Defines whether the bot is scheduled for a restart.

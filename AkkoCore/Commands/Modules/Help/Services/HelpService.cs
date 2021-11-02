@@ -93,11 +93,11 @@ namespace AkkoCore.Commands.Modules.Help.Services
 
                     return @"\" + emote + settings.Prefix + cmd.QualifiedName;
                 })
-                .ToListAsync();
+                .WhenAllAsync();
 
             var embed = new SerializableDiscordEmbed();
 
-            if (cmdGroup.Count is 0)
+            if (cmdGroup.Length is 0)
             {
                 embed.WithDescription(_localizer.FormatLocalized(settings.Locale, "module_not_exist", Formatter.InlineCode(settings.Prefix + "modules")))
                     .WithColor(settings.ErrorColor);
@@ -114,7 +114,7 @@ namespace AkkoCore.Commands.Modules.Help.Services
                     );
 
                 // Split the results into 3 columns
-                foreach (var column in cmdGroup.SplitInto((int)Math.Ceiling(cmdGroup.Count / 3.0)))
+                foreach (var column in cmdGroup.Chunk((int)Math.Ceiling(cmdGroup.Length / 3.0)))
                     embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', column), true);
             }
 
@@ -151,7 +151,7 @@ namespace AkkoCore.Commands.Modules.Help.Services
 
             embed.WithTitle(_localizer.FormatLocalized(settings.Locale, "search_result_description", Formatter.InlineCode(searchParameter)));
 
-            foreach (var cmd in cmds.SplitInto(AkkoConstants.LinesPerPage))
+            foreach (var cmd in cmds.Chunk(AkkoConstants.LinesPerPage))
             {
                 embed.AddField("command", string.Join("\n", cmd.Select(x => settings.Prefix + x.QualifiedName)), true);
                 embed.AddField("description", string.Join("\n", cmd.Select(x => _localizer.FormatLocalized(settings.Locale, x.Description).MaxLength(50, "[...]"))), true);

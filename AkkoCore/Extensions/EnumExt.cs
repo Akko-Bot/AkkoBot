@@ -44,17 +44,18 @@ namespace AkkoCore.Extensions
         }
 
         /// <summary>
-        /// Creates a collection of human-readable strings of this <see cref="Permissions"/>.
+        /// Creates a collection of human-readable strings of this enum.
         /// </summary>
         /// <typeparam name="T">The type of the enum.</typeparam>
-        /// <param name="permissions">This permissions.</param>
+        /// <param name="value">This enum.</param>
+        /// <param name="format">A format string ("G", "D", "X" or "F").</param>
         /// <remarks>Only works for enums marked with the <see cref="FlagsAttribute"/>.</remarks>
         /// <returns>The human-readable strings.</returns>
-        public static IEnumerable<string> ToStrings<T>(this T permissions) where T : struct, Enum
+        public static IEnumerable<string> ToStrings<T>(this T value, string? format = default) where T : struct, Enum
         {
             return Enum.GetValues<T>()
-                .Where(x => x.HasOneFlag(permissions))
-                .Select(x => x.ToString())
+                .Where(x => x.HasOneFlag(value))
+                .Select(x => x.ToString(format))
                 .OrderBy(x => x);
         }
 
