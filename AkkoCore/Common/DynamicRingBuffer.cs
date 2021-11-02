@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AkkoCore.Common
 {
@@ -176,13 +177,10 @@ namespace AkkoCore.Common
         /// <param name="item">The object to add to the <see cref="DynamicRingBuffer{T}"/>.</param>
         public void Add(T item)
         {
-            if (CurrentIndex < _internalList.Capacity)
-                _internalList[CurrentIndex++] = item;
-            else
-            {
+            if (CurrentIndex >= _internalList.Capacity)
                 CurrentIndex = 0;
-                _internalList[CurrentIndex++] = item;
-            }
+
+            _internalList[CurrentIndex++] = item;
         }
 
         /// <summary>
@@ -208,12 +206,13 @@ namespace AkkoCore.Common
         public int Remove(Func<T, bool> predicate)
         {
             var amount = 0;
+            var listSpan = CollectionsMarshal.AsSpan(_internalList);
 
             for (var index = 0; index < _internalList.Capacity; index++)
             {
-                if (predicate(_internalList[index]))
+                if (predicate(listSpan[index]))
                 {
-                    _internalList[index] = default;
+                    listSpan[index] = default;
                     amount++;
                 }
             }
@@ -234,16 +233,22 @@ namespace AkkoCore.Common
 
             if (newSize > _internalList.Capacity)
             {
-                _internalList.Capacity = newSize;
-                FillWithDefault(_internalList);
+                lock (_internalList)
+                {
+                    _internalList.Capacity = newSize;
+                    FillWithDefault(_internalList);
+                }
             }
             else if (newSize < _internalList.Capacity)
             {
-                _internalList.RemoveRange(newSize, _internalList.Capacity - newSize);
-                _internalList.Capacity = newSize;
+                lock (_internalList)
+                {
+                    _internalList.RemoveRange(newSize, _internalList.Capacity - newSize);
+                    _internalList.Capacity = newSize;
 
-                if (CurrentIndex >= newSize)
-                    CurrentIndex = newSize - 1;
+                    if (CurrentIndex >= newSize)
+                        CurrentIndex = newSize - 1;
+                }
             }
         }
 
@@ -278,8 +283,10 @@ namespace AkkoCore.Common
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Reset(List<T> list)
         {
+            var listSpan = CollectionsMarshal.AsSpan(list);
+
             for (var index = 0; index < list.Capacity; index++)
-                list[index] = default;
+                listSpan[index] = default;
         }
     }
 }

@@ -110,7 +110,7 @@ namespace AkkoCore.Services.Events
                 await webhook.ExecuteAsync(_logGenerator.GetMessageDeleteLog(message));
 
             // Remove from the cache
-            messageCache.Remove(x => x.Id == eventArgs.Message.Id);
+            messageCache.Remove(x => x?.Id == eventArgs.Message.Id);
         }
 
         public async Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs)

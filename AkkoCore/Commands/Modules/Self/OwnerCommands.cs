@@ -154,7 +154,7 @@ namespace AkkoCore.Commands.Modules.Self
 
         [Command("setavatar"), HiddenOverload]
         public async Task SetAvatarAsync(CommandContext context)
-            => await SetAvatarAsync(context, context.Message.Attachments.FirstOrDefault()?.Url ?? context.Guild.CurrentMember.DefaultAvatarUrl);
+            => await SetAvatarAsync(context, context.Message.Attachments.TryGetValue(0, out var attachment) ? attachment.Url : context.Guild.CurrentMember.DefaultAvatarUrl);
 
         [Command("setavatar")]
         [Description("cmd_setavatar")]

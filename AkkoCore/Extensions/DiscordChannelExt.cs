@@ -69,11 +69,8 @@ namespace AkkoCore.Extensions
                 .Where(x => x?.Channel.Id == channel.Id)
                 .MaxBy(x => x.CreationTimestamp);
 
-            if (message is null)
-            {
-                message = (await channel.GetMessagesAsync(1)).FirstOrDefault(); // Channel can be empty
+            if (message is null && (await channel.GetMessagesAsync(1)).TryGetValue(0, out message))
                 messageCache.Add(message!);  // It's fine to add null values to the message cache
-            }
 
             return message;
         }
