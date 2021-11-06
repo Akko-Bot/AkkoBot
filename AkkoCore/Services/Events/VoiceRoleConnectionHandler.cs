@@ -92,6 +92,7 @@ namespace AkkoCore.Services.Events
                 using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
                 await db.VoiceRoles.DeleteAsync(toRemove, CancellationToken.None);
             }
+			
             foreach (var role in toRemove)
                 voiceRoles.TryRemove(role);
 

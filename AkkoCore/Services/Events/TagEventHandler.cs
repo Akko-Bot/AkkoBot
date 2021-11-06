@@ -177,7 +177,7 @@ namespace AkkoCore.Services.Events
             );
 
             // Send the tag
-            var message = _utilitiesService.DeserializeEmbed(parsedResponse, out var responseContent)
+            var message = _utilitiesService.DeserializeMessage(parsedResponse, out var responseContent)
                 ? await channel.SendMessageAsync(responseContent).ConfigureAwait(false)
                 : await channel.SendMessageAsync(parsedResponse).ConfigureAwait(false);
 

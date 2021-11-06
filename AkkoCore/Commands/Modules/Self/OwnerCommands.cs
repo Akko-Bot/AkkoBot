@@ -92,7 +92,7 @@ namespace AkkoCore.Commands.Modules.Self
                 return;
             }
 
-            var dm = (_utilitiesService.DeserializeEmbed(message, out var dMsg))
+            var dm = (_utilitiesService.DeserializeMessage(message, out var dMsg))
                 ? await member.SendMessageSafelyAsync(dMsg!)
                 : await member.SendMessageSafelyAsync(message);
 
@@ -113,7 +113,7 @@ namespace AkkoCore.Commands.Modules.Self
                 return;
             }
 
-            var dm = (_utilitiesService.DeserializeEmbed(message, out var dMsg))
+            var dm = (_utilitiesService.DeserializeMessage(message, out var dMsg))
                 ? await channel.SendMessageSafelyAsync(dMsg!)
                 : await channel.SendMessageSafelyAsync(message);
 

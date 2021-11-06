@@ -74,7 +74,7 @@ namespace AkkoCore.Commands.Modules.Administration.Services
 
             var template = new SmartString(context, dbGuild.BanTemplate);
 
-            return (_utilitiesService.DeserializeEmbed(template, out var message))
+            return (_utilitiesService.DeserializeMessage(template, out var message))
                 ? await user.SendMessageSafelyAsync(message!)                                   // Send database ban notification
                 : string.IsNullOrWhiteSpace(template)                                           // If template is not serializable
                     ? await SendPunishmentDmAsync(context, user, "ban_notification", reason)    // Send default ban notification

@@ -40,18 +40,41 @@ namespace AkkoCore.Commands.Modules.Utilities
         public async Task SayAsync(CommandContext context, [RemainingText] SmartString message)
             => await SayAsync(context, context.Channel, message);
 
+        [Command("say"), HiddenOverload]
+        [Priority(3)]
+        public async Task SayAsync(CommandContext context)
+            => await SayAsync(context, context.Channel);
+
+        [Command("say"), HiddenOverload]
+        [Priority(2)]
+        public async Task SayAsync(CommandContext context, DiscordChannel channel)
+        {
+            if (!context.Message.Attachments.TryGetValue(0, out var attachment) || !attachment.FileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            {
+                await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+                return;
+            }
+
+            var content = await _service.GetOnlineStringAsync(attachment.Url);
+
+            if (string.IsNullOrWhiteSpace(content))
+                await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+            else
+                await SayAsync(context, channel, new SmartString(context, content));
+        }
+
         [Command("say")]
         [Description("cmd_say")]
-        [RequirePermissions(Permissions.ManageMessages)]
+        [RequireUserPermissions(Permissions.ManageMessages)]
         [Priority(1)]
         public async Task SayAsync(CommandContext _, [Description("arg_discord_channel")] DiscordChannel channel, [RemainingText, Description("arg_say")] SmartString message)
         {
             if (string.IsNullOrWhiteSpace(message))    // If command only contains a channel name
                 await channel.SendMessageAsync(channel.Name);
-            else if (_service.DeserializeEmbed(message, out var parsedMessage)) // If command contains an embed in yaml format
+            else if (_service.DeserializeMessage(message, out var parsedMessage)) // If command contains an embed in yaml format
                 await channel.SendMessageAsync(parsedMessage);
             else    // If command is just plain text
-                await channel.SendMessageAsync(message);
+                await channel.SendMessageAsync(message.Content.MaxLength(AkkoConstants.MaxMessageLength, "[...]"));
         }
 
         [Command("serverinfo"), Aliases("sinfo")]
@@ -122,7 +145,7 @@ namespace AkkoCore.Commands.Modules.Utilities
                 await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
                 return;
             }
-            _ = (_service.DeserializeEmbed(newMessage, out var dMsg))
+            _ = (_service.DeserializeMessage(newMessage, out var dMsg))
                 ? await message.ModifyAsync(dMsg)
                 : await message.ModifyAsync(newMessage);
 

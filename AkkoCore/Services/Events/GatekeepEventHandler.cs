@@ -110,7 +110,7 @@ namespace AkkoCore.Services.Events
             var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
             var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
-            if (_utilitiesService.DeserializeEmbed(parsedString, out var message))
+            if (_utilitiesService.DeserializeMessage(parsedString, out var message))
                 await eventArgs.Member.SendMessageSafelyAsync(message!);
             else
                 await eventArgs.Member.SendMessageSafelyAsync(parsedString);
@@ -206,7 +206,7 @@ namespace AkkoCore.Services.Events
             var parsedString = aggregator.ParseMessage(context, rawMessage);
             activeWaits.TryRemove(context.Guild.Id);    // Stop collecting members of this guild, as the message has been already parsed.
 
-            var discordMessage = (_utilitiesService.DeserializeEmbed(parsedString, out var message))
+            var discordMessage = (_utilitiesService.DeserializeMessage(parsedString, out var message))
                 ? await channel.SendMessageAsync(message)
                 : await channel.SendMessageAsync(parsedString);
 

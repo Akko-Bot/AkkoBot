@@ -9,6 +9,7 @@ using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -40,7 +41,7 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         /// <param name="input">The user's input.</param>
         /// <param name="result">The deserialized input.</param>
         /// <returns><see langword="true"/> if deserialization was successful, <see langword="false"/> otherwise.</returns>
-        public bool DeserializeEmbed(string input, out DiscordMessageBuilder? result)
+        public bool DeserializeMessage(string input, [MaybeNullWhen(false)] out DiscordMessageBuilder result)
         {
             try
             {
@@ -73,19 +74,33 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
 
             foreach (var guild in servers)
             {
-                if (guild.Emojis.Values
-                    .Where(x => (x.IsAvailable && x.Roles.Count == 0) || x.Roles.ContainsOne(guild.CurrentMember.Roles.Select(x => x.Id)))
-                    .Contains(emoji))
-                {
+                var canUse = guild.Emojis.Values
+                    .Where(x => (x.IsAvailable && x.Roles.Count is 0) || x.Roles.ContainsOne(guild.CurrentMember.Roles.Select(x => x.Id)))
+                    .Contains(emoji);
+
+                if (canUse)
                     return true;
-                }
             }
 
             return false;
         }
 
         /// <summary>
-        /// Creates a GET request to the specified URL and returns the result as a stream.
+        /// Creates a GET request to the specified URL and returns the result as a <see langword="string"/>.
+        /// </summary>
+        /// <param name="url">The URL to make the GET request.</param>
+        /// <param name="cToken">The cancellation token.</param>
+        /// <returns>A <see langword="string"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
+        public async Task<string?> GetOnlineStringAsync(string url, CancellationToken cToken = default)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+
+            try { return await httpClient.GetStringAsync(url, cToken); }
+            catch { return default; }
+        }
+
+        /// <summary>
+        /// Creates a GET request to the specified URL and returns the result as a <see cref="Stream"/>.
         /// </summary>
         /// <param name="url">The URL to make the GET request.</param>
         /// <param name="cToken">The cancellation token.</param>
@@ -94,9 +109,10 @@ namespace AkkoCore.Commands.Modules.Utilities.Services
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-            // Stream needs to be seekable
+            // Stream needs to be seekable.
+            // HttpClient.GetStreamAsync() returns a non-seekable stream.
             try { return await (await httpClient.GetAsync(url, cToken)).Content.ReadAsStreamAsync(cToken); }
-            catch { return null; }
+            catch { return default; }
         }
 
         /// <summary>

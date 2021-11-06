@@ -296,7 +296,7 @@ namespace AkkoCore.Commands.Common
 
         public static implicit operator string(SmartString x) => x.Content;
 
-        public static implicit operator Optional<string>(SmartString x) => x?.Content ?? Optional.FromNoValue<string>();
+        public static implicit operator Optional<string>(SmartString? x) => x?.Content ?? Optional.FromNoValue<string>();
 
         /* Overrides */
 

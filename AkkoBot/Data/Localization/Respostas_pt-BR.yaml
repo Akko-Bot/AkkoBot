@@ -376,7 +376,7 @@ cmd_rotatestatus: Ativa/Desativa a rotação dos status na lista de rotação.
 cmd_sanitizedname: Define o apelido a ser designado a usuários que tiverem caracteres especiais no início de seu apelido. Forneça nenhum parâmetro para sanitizar o apelido original.
 cmd_sanitizenames: Ativa ou desativa a sanitização de apelidos que começam com caracteres especiais.
 cmd_savechat: Salva em um arquivo as últimas mensagens enviadas a um canal de texto. Mensagens de bots são ignoradas. Usuários sem autoria do bot são limitados a 100 mensagens. Forneça nenhum parâmetro para salvar as 100 últimas mensagens do canal atual.
-cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual.
+cmd_say: Envia uma mensagem ao canal especificado. Se o canal for omitido, a mensagem será enviada ao canal atual. Aceita anexos `.txt` para mensagens que são longas demais para enviar no Discord.
 cmd_sban: Expulsa um usuário do servidor e exclui suas mensagens.
 cmd_search: Busca por um comando com a palavra-chave especificada.
 cmd_send: Envia uma mensagem ao canal do Discord especificado.

@@ -216,7 +216,7 @@ namespace AkkoCore.Services.Timers
                 );
 
                 var message = new SmartString(fakeContext, dbReminder.Content, true);
-                var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
+                var wasDeserialized = _utilitiesService.DeserializeMessage(message, out var dmsg);
                 dmsg ??= new();
 
                 var localizedDate = (server is null)
@@ -313,7 +313,7 @@ namespace AkkoCore.Services.Timers
                 var fakeContext = cmdHandler.CreateFakeContext(user, channel, dbRepeater.Content, dbGuild.Prefix, null);
 
                 var message = new SmartString(fakeContext, dbRepeater.Content);
-                var wasDeserialized = _utilitiesService.DeserializeEmbed(message, out var dmsg);
+                var wasDeserialized = _utilitiesService.DeserializeMessage(message, out var dmsg);
 
                 // If last message is the same repeated message, do nothing
                 if ((lastMessage is not null && lastMessage.Author == server.CurrentMember && wasDeserialized && lastMessage.Content == dmsg!.Content && lastMessage.Embeds[0] == dmsg.Embed)

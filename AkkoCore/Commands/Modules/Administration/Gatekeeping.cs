@@ -229,7 +229,7 @@ namespace AkkoCore.Commands.Modules.Administration
 
             if (string.IsNullOrWhiteSpace(parsedMessage))
                 await context.RespondLocalizedAsync(new SerializableDiscordEmbed().WithDescription(context.FormatLocalized("guild_prop_null", propName)), isError: true);
-            else if (_utilitiesService.DeserializeEmbed(parsedMessage, out var message))
+            else if (_utilitiesService.DeserializeMessage(parsedMessage, out var message))
                 await context.Channel.SendMessageAsync(message);
             else
                 await context.Channel.SendMessageAsync(parsedMessage);
