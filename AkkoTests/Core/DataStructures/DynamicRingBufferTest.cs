@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AkkoTests.Core.DataStructures;
@@ -231,6 +232,25 @@ public sealed class DynamicRingBufferTest
 
         Assert.Equal(amount, ringBuffer.Capacity);
         Assert.True(ringBuffer.All(x => x == default));
+    }
+
+    [Theory]
+    [InlineData(1, 5, 2, 8, 9, 10, 10, 3, 6)]
+    [InlineData(6, 3, 8, 1, 2, 5, 10, 5, 4)]
+    [InlineData(9, 10, 5, 4, 3, 1, 2, 7, 1)]
+    [InlineData(10, 9, 8, 7, 6, 5, 4, 3, 2)]
+    [InlineData(9, 9, 9, 9, 8, 8, 8, 8, 8)]
+    internal void ResizeMultiThreadTest(params int[] sizes)
+    {
+        var sample = CreateDynamicRingBuffer<int>(default);
+        var actions = sizes
+            .Select(x => () => sample.Resize(x))
+            .ToArray();
+
+        // This throws if a race condition occurs
+        Parallel.Invoke(actions);
+
+        Assert.True(sample.Capacity > 0);
     }
 
     /// <summary>

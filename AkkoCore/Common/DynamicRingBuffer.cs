@@ -231,14 +231,14 @@ public sealed class DynamicRingBuffer<T> : IList<T>, IReadOnlyList<T>
         if (newSize <= 0)
             throw new ArgumentOutOfRangeException(nameof(newSize), $"Ring buffer cannot be resized to zero or negative values. Value: {newSize}");
 
-        if (newSize > _internalList.Capacity)
+        lock (_internalList)
         {
-            _internalList.Capacity = newSize;
-            FillWithDefault(_internalList);
-        }
-        else if (newSize < _internalList.Capacity)
-        {
-            lock (_internalList)
+            if (newSize > _internalList.Capacity)
+            {
+                _internalList.Capacity = newSize;
+                FillWithDefault(_internalList);
+            }
+            else if (newSize < _internalList.Capacity)
             {
                 _internalList.RemoveRange(newSize, _internalList.Capacity - newSize);
                 _internalList.Capacity = newSize;
