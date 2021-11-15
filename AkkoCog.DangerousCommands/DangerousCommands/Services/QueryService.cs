@@ -47,7 +47,7 @@ public sealed class QueryService
     /// <param name="query">The SQL query to be run.</param>
     /// <returns>A collection of columns from the resulting query and time, in milliseconds, that it took to run.</returns>
     /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
-    public async Task<(IReadOnlyCollection<SerializableEmbedField>, double)> RunSelectQueryAsync(string query)
+    public async Task<(IReadOnlyList<SerializableEmbedField>, double)> RunSelectQueryAsync(string query)
     {
         var result = new List<SerializableEmbedField>();
         var fieldBuilders = new List<StringBuilder>();
@@ -55,8 +55,11 @@ public sealed class QueryService
         // Open database connection for manual read
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-        using var connection = db.Database.GetDbConnection();
-        await connection.OpenAsync();
+        var connection = db.Database.GetDbConnection(); // Connections created by EF Core should not be disposed
+
+        // Check if the connection is already open
+        if (connection.State is not System.Data.ConnectionState.Open)
+            await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = query;
@@ -111,6 +114,9 @@ public sealed class QueryService
                 ? string.Empty
                 : fieldBuilders[counter].ToString();
         }
+
+        // Close the database connection
+        await connection.CloseAsync();
 
         return (result, clock.Elapsed.TotalMilliseconds);
     }
