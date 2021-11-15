@@ -71,8 +71,8 @@ arg_mention: A valid Discord ID or mention.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
-arg_permission: A Discord [permission](https://github.com/Kaoticz/AkkoBot/wiki/Permissions), wrapped around quotation marks.
-arg_permissions: Discord [permissions](https://github.com/Kaoticz/AkkoBot/wiki/Permissions), wrapped around quotation marks and separated by space.
+arg_permission: A Discord [permission](https://github.com/Akko-Bot/AkkoBot/wiki/Permissions), wrapped around quotation marks.
+arg_permissions: Discord [permissions](https://github.com/Akko-Bot/AkkoBot/wiki/Permissions), wrapped around quotation marks and separated by space.
 arg_poll_id: ID of the poll.
 arg_poll_qanswer: The question and the answers, separated by a semicolon `;`.
 arg_poll_question: A question.
@@ -325,7 +325,7 @@ cmd_moveuser: Moves a user to another voice channel. Provide no channel to force
 cmd_mute: Mutes a user from text and voice channels.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
-cmd_override: Groups commands for managing permission overrides. Use them to modify the permissions required for a command to be run. Using it in direct message with the bot requires bot ownership and makes the override global. Server overrides always take precedence over global overrides. Bot ownership cannot be overriden.
+cmd_override: Groups commands for managing permission overrides. Use them to modify the permissions required to run a command. Using it in direct message with the bot requires bot ownership and makes the override global. Server overrides always take precedence over global overrides. Bot ownership cannot be overriden.
 cmd_override_channel: Toggles command usage for the specified channel.
 cmd_override_clear: Removes all permission overrides from the specified command.
 cmd_override_clearall: Removes all permission overrides from this server. Using it in direct message removes all global overrides.
@@ -376,7 +376,7 @@ cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
 cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Providing no parameter to sanitize the original nickname.
 cmd_sanitizenames: Toggles whether nicknames should have special characters removed from the beginning.
 cmd_savechat: Saves the last messages sent in a text channel to a file. Bot messages are ignored. Users with no bot ownership are limited to 100 messages. Provide no parameters to save the last 100 messages from the current channel.
-cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel.
+cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel. It accepts `.txt` attachments for messages that are too long to type on Discord.
 cmd_sban: Kicks a user from the server and deletes their messages.
 cmd_search: Searches for a command with the specified keyword.
 cmd_send: Sends a message to the specified Discord channel.

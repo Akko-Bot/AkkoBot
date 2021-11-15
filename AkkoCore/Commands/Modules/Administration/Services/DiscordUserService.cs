@@ -12,65 +12,64 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.Modules.Administration.Services
+namespace AkkoCore.Commands.Modules.Administration.Services;
+
+/// <summary>
+/// Groups utility methods for manipulating <see cref="DiscordUserEntity"/> objects.
+/// </summary>
+[CommandService(ServiceLifetime.Singleton)]
+public sealed class DiscordUserService
 {
-    /// <summary>
-    /// Groups utility methods for manipulating <see cref="DiscordUserEntity"/> objects.
-    /// </summary>
-    [CommandService(ServiceLifetime.Singleton)]
-    public sealed class DiscordUserService
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IDbCache _dbCache;
+
+    public DiscordUserService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IDbCache _dbCache;
+        _scopeFactory = scopeFactory;
+        _dbCache = dbCache;
+    }
 
-        public DiscordUserService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+    /// <summary>
+    /// Saves the specified Discord users to the database and cache.
+    /// </summary>
+    /// <param name="mentionedUsers">The users to be saved.</param>
+    /// <returns>The amount of inserted users and updated users, respectively.</returns>
+    public async ValueTask<(int, int)> SaveUsersAsync(IReadOnlyCollection<DiscordUser> mentionedUsers)
+    {
+        if (mentionedUsers.Count is 0)
+            return (0, 0);
+
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+        // Update old users
+        foreach (var user in mentionedUsers)
         {
-            _scopeFactory = scopeFactory;
-            _dbCache = dbCache;
+            if (!_dbCache.Users.TryGetValue(user.Id, out var dbUser) || dbUser.FullName.Equals(user.GetFullname(), StringComparison.Ordinal))
+                continue;
+
+            db.Upsert(dbUser);
+
+            dbUser.Username = user.Username;
+            dbUser.Discriminator = user.Discriminator;
         }
 
-        /// <summary>
-        /// Saves the specified Discord users to the database and cache.
-        /// </summary>
-        /// <param name="mentionedUsers">The users to be saved.</param>
-        /// <returns>The amount of inserted users and updated users, respectively.</returns>
-        public async ValueTask<(int, int)> SaveUsersAsync(IReadOnlyCollection<DiscordUser> mentionedUsers)
-        {
-            if (mentionedUsers.Count is 0)
-                return (0, 0);
+        var updated = await db.SaveChangesAsync();
 
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+        // Insert new users
+        var newDbUsers = mentionedUsers
+            .Where(x => !_dbCache.Users.ContainsKey(x.Id))
+            .Select(x => new DiscordUserEntity(x))
+            .ToArray();
 
-            // Update old users
-            foreach (var user in mentionedUsers)
-            {
-                if (!_dbCache.Users.TryGetValue(user.Id, out var dbUser) || dbUser.FullName.Equals(user.GetFullname(), StringComparison.Ordinal))
-                    continue;
+        if (newDbUsers.Length is 0)
+            return (0, updated);
 
-                db.Upsert(dbUser);
+        var inserted = await db.BulkCopyAsync(newDbUsers);
 
-                dbUser.Username = user.Username;
-                dbUser.Discriminator = user.Discriminator;
-            }
+        // Add new users to the cache
+        foreach (var dbUser in newDbUsers)
+            _dbCache.Users.TryAdd(dbUser.UserId, dbUser);
 
-            var updated = await db.SaveChangesAsync();
-
-            // Insert new users
-            var newDbUsers = mentionedUsers
-                .Where(x => !_dbCache.Users.ContainsKey(x.Id))
-                .Select(x => new DiscordUserEntity(x))
-                .ToArray();
-
-            if (newDbUsers.Length is 0)
-                return (0, updated);
-
-            var inserted = await db.BulkCopyAsync(newDbUsers);
-
-            // Add new users to the cache
-            foreach (var dbUser in newDbUsers)
-                _dbCache.Users.TryAdd(dbUser.UserId, dbUser);
-
-            return ((int)inserted.RowsCopied, updated);
-        }
+        return ((int)inserted.RowsCopied, updated);
     }
 }

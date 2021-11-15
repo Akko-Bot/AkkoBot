@@ -2,14 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AkkoCore.Services.Database.Config
+namespace AkkoCore.Services.Database.Config;
+
+/// <summary>
+/// Configures relationships for <see cref="BlacklistEntity"/>.
+/// </summary>
+public sealed class BlacklistEntityTypeConfiguration : IEntityTypeConfiguration<BlacklistEntity>
 {
-    /// <summary>
-    /// Configures relationships for <see cref="BlacklistEntity"/>.
-    /// </summary>
-    public sealed class BlacklistEntityTypeConfiguration : IEntityTypeConfiguration<BlacklistEntity>
-    {
-        public void Configure(EntityTypeBuilder<BlacklistEntity> builder)
-            => builder.HasAlternateKey(g => g.ContextId);
-    }
+    public void Configure(EntityTypeBuilder<BlacklistEntity> builder)
+        => builder.HasAlternateKey(g => g.ContextId);
 }

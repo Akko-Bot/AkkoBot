@@ -12,67 +12,66 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.Abstractions
+namespace AkkoCore.Commands.Abstractions;
+
+/// <summary>
+/// Defines the base behavior and actions for all command modules.
+/// </summary>
+[IsNotBlacklisted, GlobalCooldown, BaseBotPermissions(Permissions.SendMessages | Permissions.AddReactions | Permissions.SendMessagesInThreads)]
+public abstract class AkkoCommandModule : BaseCommandModule
 {
+    // Executes before command execution
+    public override Task BeforeExecutionAsync(CommandContext ctx)
+        => UpsertUsersInMessageAsync(ctx);
+
     /// <summary>
-    /// Defines the base behavior and actions for all command modules.
+    /// Caches the user who has interacted with the bot and up to 3 users mentioned in the message.
     /// </summary>
-    [IsNotBlacklisted, GlobalCooldown, BaseBotPermissions(Permissions.SendMessages | Permissions.AddReactions | Permissions.SendMessagesInThreads)]
-    public abstract class AkkoCommandModule : BaseCommandModule
+    /// <param name="context">The command context.</param>
+    private async Task UpsertUsersInMessageAsync(CommandContext context)
     {
-        // Executes before command execution
-        public override Task BeforeExecutionAsync(CommandContext ctx)
-            => UpsertUsersInMessageAsync(ctx);
+        var dbCache = context.Services.GetRequiredService<IDbCache>();
+        var userService = context.Services.GetRequiredService<DiscordUserService>();
+        var mentionedUsers = context.Message.MentionedUsers
+            .Concat(await GetUnmentionedUsersAsync(context, dbCache))
+            .Append(context.User)
+            .Distinct()
+            .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))
+            .ToArray();
 
-        /// <summary>
-        /// Caches the user who has interacted with the bot and up to 3 users mentioned in the message.
-        /// </summary>
-        /// <param name="context">The command context.</param>
-        private async Task UpsertUsersInMessageAsync(CommandContext context)
+        await userService.SaveUsersAsync(mentionedUsers);
+    }
+
+    /// <summary>
+    /// Gets up to 3 unmentioned users from a command string.
+    /// </summary>
+    /// <param name="context">The command context</param>
+    /// <param name="cache">The database cache.</param>
+    /// <returns>The unmentioned users.</returns>
+    private async Task<IReadOnlyList<DiscordUser>> GetUnmentionedUsersAsync(CommandContext context, IDbCache cache)
+    {
+        if (context.RawArguments.Count is 0)
+            return new List<DiscordUser>(0);
+
+        var result = new List<DiscordUser>(3);
+
+        try
         {
-            var dbCache = context.Services.GetRequiredService<IDbCache>();
-            var userService = context.Services.GetRequiredService<DiscordUserService>();
-            var mentionedUsers = context.Message.MentionedUsers
-                .Concat(await GetUnmentionedUsersAsync(context, dbCache))
-                .Append(context.User)
-                .Distinct()
-                .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))
-                .ToArray();
+            foreach (var word in context.RawArguments.Where(x => ulong.TryParse(x, out var number) && !cache.Users.ContainsKey(number)).Take(3))
+            {
+                // This fails if the ulong is not of a Discord user
+                var user = await context.CommandsNext.ConvertArgument<DiscordUser>(word, context) as DiscordUser;
 
-            await userService.SaveUsersAsync(mentionedUsers);
+                if (user is not null)
+                    result.Add(user);
+            }
         }
-
-        /// <summary>
-        /// Gets up to 3 unmentioned users from a command string.
-        /// </summary>
-        /// <param name="context">The command context</param>
-        /// <param name="cache">The database cache.</param>
-        /// <returns>The unmentioned users.</returns>
-        private async Task<IReadOnlyList<DiscordUser>> GetUnmentionedUsersAsync(CommandContext context, IDbCache cache)
+        catch
         {
-            if (context.RawArguments.Count is 0)
-                return new List<DiscordUser>(0);
-
-            var result = new List<DiscordUser>(3);
-
-            try
-            {
-                foreach (var word in context.RawArguments.Where(x => ulong.TryParse(x, out var number) && !cache.Users.ContainsKey(number)).Take(3))
-                {
-                    // This fails if the ulong is not of a Discord user
-                    var user = await context.CommandsNext.ConvertArgument<DiscordUser>(word, context) as DiscordUser;
-
-                    if (user is not null)
-                        result.Add(user);
-                }
-            }
-            catch
-            {
-                // Stop looping to avoid ratelimiting
-                return result;
-            }
-
+            // Stop looping to avoid ratelimiting
             return result;
         }
+
+        return result;
     }
 }

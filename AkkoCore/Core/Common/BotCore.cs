@@ -18,100 +18,98 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace AkkoCore.Core.Common
+namespace AkkoCore.Core.Common;
+
+/// <summary>
+/// Class that contains the Discord client and the command handlers.
+/// </summary>
+public class BotCore : IDisposable
 {
-    /// <summary>
-    /// Class that contains the Discord client and the command handlers.
-    /// </summary>
-    public class BotCore : IDisposable
+    public DiscordShardedClient BotShardedClient { get; }
+    public IReadOnlyDictionary<int, CommandsNextExtension> CommandExt { get; }
+    public IReadOnlyDictionary<int, SlashCommandsExtension> SlashExt { get; }
+
+    internal BotCore(
+        DiscordShardedClient client,
+        IReadOnlyDictionary<int, CommandsNextExtension> cmdHandlers,
+        IReadOnlyDictionary<int, SlashCommandsExtension> slashHandlers)
     {
-        public DiscordShardedClient BotShardedClient { get; }
-        public IReadOnlyDictionary<int, CommandsNextExtension> CommandExt { get; }
-        public IReadOnlyDictionary<int, SlashCommandsExtension> SlashExt { get; }
+        BotShardedClient = client;
+        CommandExt = cmdHandlers;
+        SlashExt = slashHandlers;
 
-        internal BotCore(
-            DiscordShardedClient client,
-            IReadOnlyDictionary<int, CommandsNextExtension> cmdHandlers,
-            IReadOnlyDictionary<int, SlashCommandsExtension> slashHandlers)
+        // Register command modules
+        RegisterCommandModules();
+    }
+
+    /// <summary>
+    /// Registers all commands in the project into the command handler.
+    /// </summary>
+    private void RegisterCommandModules()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var converters = AkkoUtilities.GetConcreteTypesOf<IArgumentConverter>(assembly);
+        var cogs = AkkoUtilities.GetCogAssemblies().ToArray();
+        var cogSetups = AkkoUtilities.GetCogSetups().ToArray();
+
+        // Loop through the list of selected assemblies and register
+        // each one of them to the command handler of each shard.
+        foreach (var cmdHandler in CommandExt.Values)
         {
-            BotShardedClient = client;
-            CommandExt = cmdHandlers;
-            SlashExt = slashHandlers;
+            // Remove the default TimeSpan converter, as Akko has her own converter
+            cmdHandler.UnregisterConverter<TimeSpan>();
 
-            // Register command modules
-            RegisterCommandModules();
+            // Register all core commands
+            cmdHandler.RegisterCommands(assembly);
+
+            // Register all argument converters
+            foreach (var converter in converters)
+                cmdHandler.RegisterConverter(converter);
+
+            // Register cog argument converters
+            foreach (var cogSetup in cogSetups)
+                cogSetup.RegisterArgumentConverters(cmdHandler);
+
+            // Register cog commands
+            foreach (var cog in cogs)
+                cmdHandler.RegisterCommands(cog);
         }
 
-        /// <summary>
-        /// Registers all commands in the project into the command handler.
-        /// </summary>
-        private void RegisterCommandModules()
+        foreach (var slashHandler in SlashExt.Values)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var converters = AkkoUtilities.GetConcreteTypesOf<IArgumentConverter>(assembly);
-            var cogs = AkkoUtilities.GetCogAssemblies().ToArray();
-            var cogSetups = AkkoUtilities.GetCogSetups().ToArray();
+            // Register all default slash commands, globally
+            slashHandler.RegisterCommands(assembly);
 
-            // Loop through the list of selected assemblies and register
-            // each one of them to the command handler of each shard.
-            foreach (var cmdHandler in CommandExt.Values)
-            {
-                // Remove the default TimeSpan converter, as Akko has her own converter
-                cmdHandler.UnregisterConverter<TimeSpan>();
-
-                // Register all core commands
-                cmdHandler.RegisterCommands(assembly);
-
-                // Register all argument converters
-                foreach (var converter in converters)
-                    cmdHandler.RegisterConverter(converter);
-
-                // Register cog argument converters
-                foreach (var cogSetup in cogSetups)
-                    cogSetup.RegisterArgumentConverters(cmdHandler);
-
-                // Register cog commands
-                foreach (var cog in cogs)
-                    cmdHandler.RegisterCommands(cog);
-            }
-
-            foreach (var slashHandler in SlashExt.Values)
-            {
-                // Register all default slash commands, globally
-                slashHandler.RegisterCommands(assembly);
-
-                // Register all slash commands from cogs
-                foreach (var cogSetup in cogSetups)
-                    cogSetup.RegisterSlashCommands(slashHandler);
-            }
+            // Register all slash commands from cogs
+            foreach (var cogSetup in cogSetups)
+                cogSetup.RegisterSlashCommands(slashHandler);
         }
+    }
 
-        public void Dispose()
-        {
-            // Dispose singletons
-            var discordEvents = CommandExt[0].Services.GetService<IDiscordEventManager>();
-            discordEvents?.UnregisterStartupEvents();
-            discordEvents?.UnregisterDefaultEvents();
+    public void Dispose()
+    {
+        // Dispose singletons
+        var discordEvents = CommandExt[0].Services.GetService<IDiscordEventManager>();
+        discordEvents?.UnregisterStartupEvents();
+        discordEvents?.UnregisterDefaultEvents();
 
-            CommandExt[0].Services.GetService<ILocalizer>()?.Dispose();
-            CommandExt[0].Services.GetService<ILoggerFactory>()?.Dispose();
-            CommandExt[0].Services.GetService<IAkkoLoggerProvider>()?.Dispose();
-            CommandExt[0].Services.GetService<IAkkoCache>()?.Dispose();
-            CommandExt[0].Services.GetService<IDbCache>()?.Dispose();
-            CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
-            CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();
-            CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
-            CommandExt[0].Services.GetService<IInteractionEventHandler>()?.Dispose();
+        CommandExt[0].Services.GetService<ILocalizer>()?.Dispose();
+        CommandExt[0].Services.GetService<ILoggerFactory>()?.Dispose();
+        CommandExt[0].Services.GetService<IAkkoLoggerProvider>()?.Dispose();
+        CommandExt[0].Services.GetService<IAkkoCache>()?.Dispose();
+        CommandExt[0].Services.GetService<IDbCache>()?.Dispose();
+        CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
+        CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();
+        CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
+        CommandExt[0].Services.GetService<IInteractionEventHandler>()?.Dispose();
 
-            // Dispose scoped
-            foreach (var cmdHandler in CommandExt.Values)
-                cmdHandler.Services.GetService<AkkoDbContext>()?.Dispose();
+        // Dispose scoped
+        foreach (var cmdHandler in CommandExt.Values)
+            cmdHandler.Services.GetService<AkkoDbContext>()?.Dispose();
 
-            // Dispose clients - this also disposes the extensions
-            foreach (var client in BotShardedClient.ShardClients.Values)
-                client.Dispose();
+        // Dispose clients - this also disposes the extensions
+        _ = BotShardedClient.StopAsync();
 
-            GC.SuppressFinalize(this);
-        }
+        GC.SuppressFinalize(this);
     }
 }

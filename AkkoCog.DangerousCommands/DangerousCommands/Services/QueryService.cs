@@ -11,108 +11,107 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AkkoCog.DangerousCommands.Services
+namespace AkkoCog.DangerousCommands.DangerousCommands.Services;
+
+/// <summary>
+/// Groups utility methods for querying the database manually.
+/// </summary>
+public sealed class QueryService
 {
+    // TODO: I may need to, in the future, specify which database needs to be queried
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    public QueryService(IServiceScopeFactory scopeFactory)
+        => _scopeFactory = scopeFactory;
+
     /// <summary>
-    /// Groups utility methods for querying the database manually.
+    /// Runs any non-SELECT query on the database.
     /// </summary>
-    public sealed class QueryService
+    /// <param name="query"></param>
+    /// <returns>The amount of rows affected and time, in milliseconds, the query took to run.</returns>
+    /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
+    public async Task<(int, double)> RunExecQueryAsync(string query)
     {
-        // TODO: I may need to, in the future, specify which database needs to be queried
-        private readonly IServiceScopeFactory _scopeFactory;
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-        public QueryService(IServiceScopeFactory scopeFactory)
-            => _scopeFactory = scopeFactory;
+        var clock = Stopwatch.StartNew();
+        var rows = await db.Database.ExecuteSqlRawAsync(query);
+        clock.Stop();
 
-        /// <summary>
-        /// Runs any non-SELECT query on the database.
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns>The amount of rows affected and time, in milliseconds, the query took to run.</returns>
-        /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
-        public async Task<(int, double)> RunExecQueryAsync(string query)
+        return (rows, clock.Elapsed.TotalMilliseconds);
+    }
+
+    /// <summary>
+    /// Runs a SELECT query on the database.
+    /// </summary>
+    /// <param name="query">The SQL query to be run.</param>
+    /// <returns>A collection of columns from the resulting query and time, in milliseconds, that it took to run.</returns>
+    /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
+    public async Task<(IReadOnlyCollection<SerializableEmbedField>, double)> RunSelectQueryAsync(string query)
+    {
+        var result = new List<SerializableEmbedField>();
+        var fieldBuilders = new List<StringBuilder>();
+
+        // Open database connection for manual read
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+        using var connection = db.Database.GetDbConnection();
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = query;
+
+        var clock = Stopwatch.StartNew();   // Start counting query execution time.
+        using var reader = await command.ExecuteReaderAsync();
+
+        // Get the column names
+        for (var column = 0; column < reader.FieldCount; column++)
         {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
-
-            var clock = Stopwatch.StartNew();
-            var rows = await db.Database.ExecuteSqlRawAsync(query);
-            clock.Stop();
-
-            return (rows, clock.Elapsed.TotalMilliseconds);
+            result.Add(new(reader.GetName(column), string.Empty, true));
+            fieldBuilders.Add(new());
         }
 
-        /// <summary>
-        /// Runs a SELECT query on the database.
-        /// </summary>
-        /// <param name="query">The SQL query to be run.</param>
-        /// <returns>A collection of columns from the resulting query and time, in milliseconds, that it took to run.</returns>
-        /// <exception cref="PostgresException">Occurs when the query is invalid or when it tries to fetch data that does not exist.</exception>
-        public async Task<(IReadOnlyCollection<SerializableEmbedField>, double)> RunSelectQueryAsync(string query)
+        // Get the row values
+        while (await reader.ReadAsync())
         {
-            var result = new List<SerializableEmbedField>();
-            var fieldBuilders = new List<StringBuilder>();
+            var row = 0;
+            var objs = new object[reader.FieldCount];
+            reader.GetValues(objs);
 
-            // Open database connection for manual read
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+            if (objs.All(x => x is null))
+                continue;
 
-            using var connection = db.Database.GetDbConnection();
-            await connection.OpenAsync();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = query;
-
-            var clock = Stopwatch.StartNew();   // Start counting query execution time.
-            using var reader = await command.ExecuteReaderAsync();
-
-            // Get the column names
-            for (var column = 0; column < reader.FieldCount; column++)
+            while (row < reader.FieldCount)
             {
-                result.Add(new(reader.GetName(column), string.Empty, true));
-                fieldBuilders.Add(new());
-            }
-
-            // Get the row values
-            while (await reader.ReadAsync())
-            {
-                var row = 0;
-                var objs = new object[reader.FieldCount];
-                reader.GetValues(objs);
-
-                if (objs.All(x => x is null))
-                    continue;
-
-                while (row < reader.FieldCount)
+                if (objs[row] is not ICollection collection)
+                    fieldBuilders[row].AppendLine(objs[row].ToString());
+                else
                 {
-                    if (objs[row] is not ICollection collection)
-                        fieldBuilders[row].AppendLine(objs[row].ToString());
-                    else
-                    {
-                        fieldBuilders[row].Append('{');
+                    fieldBuilders[row].Append('{');
 
-                        foreach (var obj in collection)
-                            fieldBuilders[row].Append(obj.ToString() + ", ");
+                    foreach (var obj in collection)
+                        fieldBuilders[row].Append(obj.ToString() + ", ");
 
-                        if (collection.Count is not 0)
-                            fieldBuilders[row].Remove(fieldBuilders[row].Length - 2, 2);
+                    if (collection.Count is not 0)
+                        fieldBuilders[row].Remove(fieldBuilders[row].Length - 2, 2);
 
-                        fieldBuilders[row].AppendLine("}");
-                    }
-
-                    row++;
+                    fieldBuilders[row].AppendLine("}");
                 }
+
+                row++;
             }
-
-            clock.Stop();   // Stop counting query execution time.
-
-            // Add row values to result fields
-            for (var counter = 0; counter < result.Count; counter++)
-            {
-                result[counter].Text = (string.IsNullOrWhiteSpace(fieldBuilders[counter].ToString()))
-                    ? string.Empty
-                    : fieldBuilders[counter].ToString();
-            }
-
-            return (result, clock.Elapsed.TotalMilliseconds);
         }
+
+        clock.Stop();   // Stop counting query execution time.
+
+        // Add row values to result fields
+        for (var counter = 0; counter < result.Count; counter++)
+        {
+            result[counter].Text = string.IsNullOrWhiteSpace(fieldBuilders[counter].ToString())
+                ? string.Empty
+                : fieldBuilders[counter].ToString();
+        }
+
+        return (result, clock.Elapsed.TotalMilliseconds);
     }
 }

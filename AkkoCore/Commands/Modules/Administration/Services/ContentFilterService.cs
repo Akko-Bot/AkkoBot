@@ -12,111 +12,110 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.Modules.Administration.Services
+namespace AkkoCore.Commands.Modules.Administration.Services;
+
+/// <summary>
+/// Groups utility methods for manipulating <see cref="FilteredContentEntity"/> objects.
+/// </summary>
+[CommandService(ServiceLifetime.Singleton)]
+public sealed class ContentFilterService
 {
-    /// <summary>
-    /// Groups utility methods for manipulating <see cref="FilteredContentEntity"/> objects.
-    /// </summary>
-    [CommandService(ServiceLifetime.Singleton)]
-    public sealed class ContentFilterService
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IDbCache _dbCache;
+
+    public ContentFilterService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IDbCache _dbCache;
+        _scopeFactory = scopeFactory;
+        _dbCache = dbCache;
+    }
 
-        public ContentFilterService(IServiceScopeFactory scopeFactory, IDbCache dbCache)
+    /// <summary>
+    /// Upserts a content filter to the database for the specified guild channel.
+    /// </summary>
+    /// <typeparam name="T">The type of the selected data.</typeparam>
+    /// <param name="server">The Discord guild.</param>
+    /// <param name="channel">The Discord channel.</param>
+    /// <param name="setter">A method to define which property is going to be updated.</param>
+    /// <returns>The updated property.</returns>
+    public async Task<T> SetContentFilterAsync<T>(DiscordGuild server, DiscordChannel channel, Func<FilteredContentEntity, T> setter)
+    {
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+        if (!_dbCache.FilteredContent.TryGetValue(server.Id, out var filters))
         {
-            _scopeFactory = scopeFactory;
-            _dbCache = dbCache;
+            _dbCache.FilteredContent.TryAdd(server.Id, new());
+            filters = new();
         }
 
-        /// <summary>
-        /// Upserts a content filter to the database for the specified guild channel.
-        /// </summary>
-        /// <typeparam name="T">The type of the selected data.</typeparam>
-        /// <param name="server">The Discord guild.</param>
-        /// <param name="channel">The Discord channel.</param>
-        /// <param name="setter">A method to define which property is going to be updated.</param>
-        /// <returns>The updated property.</returns>
-        public async Task<T> SetContentFilterAsync<T>(DiscordGuild server, DiscordChannel channel, Func<FilteredContentEntity, T> setter)
-        {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+        var dbFilter = filters.FirstOrDefault(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
+            ?? await db.FilteredContent.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
+            ?? new() { GuildIdFK = server.Id, ChannelId = channel.Id };
 
-            if (!_dbCache.FilteredContent.TryGetValue(server.Id, out var filters))
-            {
-                _dbCache.FilteredContent.TryAdd(server.Id, new());
-                filters = new();
-            }
+        // Update the database
+        db.FilteredContent.Upsert(dbFilter);
+        var result = setter(dbFilter);
+        await db.SaveChangesAsync();
 
-            var dbFilter = filters.FirstOrDefault(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
-                ?? await db.FilteredContent.FirstOrDefaultAsync(x => x.GuildIdFK == server.Id && x.ChannelId == channel.Id)
-                ?? new() { GuildIdFK = server.Id, ChannelId = channel.Id };
+        // Update the cache
+        if (dbFilter.IsActive)
+            _dbCache.FilteredContent[server.Id].Add(dbFilter);
+        else
+            _dbCache.FilteredContent[server.Id].TryRemove(dbFilter);
 
-            // Update the database
-            db.FilteredContent.Upsert(dbFilter);
-            var result = setter(dbFilter);
-            await db.SaveChangesAsync();
+        return result;
+    }
 
-            // Update the cache
-            if (dbFilter.IsActive)
-                _dbCache.FilteredContent[server.Id].Add(dbFilter);
-            else
-                _dbCache.FilteredContent[server.Id].TryRemove(dbFilter);
+    /// <summary>
+    /// Removes the content filter with the specified ID from the database.
+    /// </summary>
+    /// <param name="server">The Discord guild.</param>
+    /// <param name="id">The database ID of the filter.</param>
+    /// <returns><see langword="true"/> if the filter was successfully removed, <see langword="false"/> otherwise.</returns>
+    public async Task<bool> RemoveContentFilterAsync(DiscordGuild server, int id)
+    {
+        if (!_dbCache.FilteredContent.TryGetValue(server.Id, out var filters) || !filters.Any(x => x.Id == id))
+            return false;
 
-            return result;
-        }
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-        /// <summary>
-        /// Removes the content filter with the specified ID from the database.
-        /// </summary>
-        /// <param name="server">The Discord guild.</param>
-        /// <param name="id">The database ID of the filter.</param>
-        /// <returns><see langword="true"/> if the filter was successfully removed, <see langword="false"/> otherwise.</returns>
-        public async Task<bool> RemoveContentFilterAsync(DiscordGuild server, int id)
-        {
-            if (!_dbCache.FilteredContent.TryGetValue(server.Id, out var filters) || !filters.Any(x => x.Id == id))
-                return false;
+        var filter = filters.First(x => x.Id == id);
 
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+        db.Remove(filter);
+        var result = await db.SaveChangesAsync() is not 0;
 
-            var filter = filters.FirstOrDefault(x => x.Id == id);
+        _dbCache.FilteredContent[server.Id].TryRemove(filter);
 
-            db.Remove(filter);
-            var result = await db.SaveChangesAsync() is not 0;
+        return result;
+    }
 
-            _dbCache.FilteredContent[server.Id].TryRemove(filter);
+    /// <summary>
+    /// Removes all content filters from the database for the specified Discord guild.
+    /// </summary>
+    /// <param name="server">The Discord guild.</param>
+    /// <returns><see langword="true"/> if all filters were successfully removed, <see langword="false"/> if there was no filter to remove.</returns>
+    public async Task<bool> ClearContentFiltersAsync(DiscordGuild server)
+    {
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            return result;
-        }
+        if (!_dbCache.FilteredContent.TryRemove(server.Id, out var filters) || filters.Count is 0)
+            return false;
 
-        /// <summary>
-        /// Removes all content filters from the database for the specified Discord guild.
-        /// </summary>
-        /// <param name="server">The Discord guild.</param>
-        /// <returns><see langword="true"/> if all filters were successfully removed, <see langword="false"/> if there was no filter to remove.</returns>
-        public async Task<bool> ClearContentFiltersAsync(DiscordGuild server)
-        {
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+        db.RemoveRange(filters);
+        var success = await db.SaveChangesAsync() is not 0;
 
-            if (!_dbCache.FilteredContent.TryRemove(server.Id, out var filters) || filters.Count is 0)
-                return false;
+        filters.Clear();
 
-            db.RemoveRange(filters);
-            var success = await db.SaveChangesAsync() is not 0;
+        return success;
+    }
 
-            filters.Clear();
-
-            return success;
-        }
-
-        /// <summary>
-        /// Gets the content filters for the specified Discord guild.
-        /// </summary>
-        /// <param name="server">The Discord guild.</param>
-        /// <returns>A collection of content filters.</returns>
-        public IReadOnlyCollection<FilteredContentEntity> GetContentFilters(DiscordGuild server)
-        {
-            _dbCache.FilteredContent.TryGetValue(server.Id, out var filters);
-            return filters ?? new(1, 0);
-        }
+    /// <summary>
+    /// Gets the content filters for the specified Discord guild.
+    /// </summary>
+    /// <param name="server">The Discord guild.</param>
+    /// <returns>A collection of content filters.</returns>
+    public IReadOnlyCollection<FilteredContentEntity> GetContentFilters(DiscordGuild server)
+    {
+        _dbCache.FilteredContent.TryGetValue(server.Id, out var filters);
+        return filters ?? new(1, 0);
     }
 }

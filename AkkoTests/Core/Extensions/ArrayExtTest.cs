@@ -1,47 +1,65 @@
 ﻿using AkkoCore.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace AkkoTests.Core.Extensions
+namespace AkkoTests.Core.Extensions;
+
+public sealed class ArrayExtTest
 {
-    public sealed class ArrayExtTest
+    [Theory]
+    [MemberData(nameof(GetSampleArray), 1, 0)]
+    [MemberData(nameof(GetSampleArray), 10, 0)]
+    [MemberData(nameof(GetSampleArray), 10, 5)]
+    [MemberData(nameof(GetSampleArray), 10, 9)]
+    [MemberData(nameof(GetSampleArray), 50, 49)]
+    internal void TryGetValueTrueTest(int[] sample, int index)
     {
-        [Theory]
-        [InlineData(50)]
-        [InlineData(10)]
-        [InlineData(1)]
-        [InlineData(0)]
-        [InlineData(-1)]
-        [InlineData(-10)]
-        internal void TryGetValueTestTrue(int arraySize)
+        Assert.True(sample.TryGetValue(index, out var result));
+        Assert.Equal(sample[index], result);
+
+        // Test all elements
+        for (var currentIndex = 0; currentIndex < sample.Length; currentIndex++)
         {
-            var normalizedArraySize = Math.Abs(arraySize);
+            Assert.True(sample.TryGetValue(currentIndex, out var currentElement));
+            Assert.Equal(sample[currentIndex], currentElement);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GetSampleArray), 0, 0)]
+    [MemberData(nameof(GetSampleArray), 0, 1)]
+    [MemberData(nameof(GetSampleArray), 10, -1)]
+    [MemberData(nameof(GetSampleArray), 10, -10)]
+    [MemberData(nameof(GetSampleArray), 10, 10)]
+    [MemberData(nameof(GetSampleArray), 10, 11)]
+    internal void TryGetValueFalseTest(int[] sample, int index)
+    {
+        Assert.False(sample.TryGetValue(index, out var result));
+        Assert.Equal(default, result);
+    }
+
+    /// <summary>
+    /// Gets an int array and the desired index for a theory test.
+    /// </summary>
+    /// <param name="arraySize">The size of the array.</param>
+    /// <param name="index">The desired index.</param>
+    /// <returns>object[] { int[], int }</returns>
+    /// <exception cref="ArgumentException">Occurs when <paramref name="arraySize"/> is less than 0.</exception>
+    public static IEnumerable<object[]> GetSampleArray(int arraySize, int index)
+    {
+        if (arraySize < 0)
+            throw new ArgumentException("Array size cannot be less than 0.", nameof(arraySize));
+        else if (arraySize is 0)
+            yield return new object[] { Array.Empty<int>(), index };
+        else
+        {
             var sample = Enumerable
-                .Range(0, normalizedArraySize)
+                .Range(0, arraySize)
                 .ToArray();
 
-            for (var index = 0; index < normalizedArraySize; index++)
-            {
-                // Test all elements in the array
-                Assert.True(sample.TryGetValue(index, out var element));
-                Assert.Equal(index, element);
-            }
-
-            // Test last element in the array
-            if (normalizedArraySize is not 0)
-            {
-                Assert.True(sample.TryGetValue(normalizedArraySize - 1, out var lastElement));
-                Assert.Equal(normalizedArraySize - 1, lastElement);
-            }
-
-            // Test one index after last element
-            Assert.False(sample.TryGetValue(normalizedArraySize, out var defaultInt));
-            Assert.Equal(default, defaultInt);
-
-            // Test index out of bounds (lower)
-            Assert.False(sample.TryGetValue(-1, out defaultInt));
-            Assert.Equal(default, defaultInt);
+            yield return new object[] { sample, index };
         }
     }
 }

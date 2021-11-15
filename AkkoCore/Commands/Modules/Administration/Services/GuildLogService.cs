@@ -20,186 +20,185 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.Modules.Administration.Services
+namespace AkkoCore.Commands.Modules.Administration.Services;
+
+/// <summary>
+/// Groups utility methods for manipulating <see cref="GuildLogEntity"/> objects.
+/// </summary>
+[CommandService(ServiceLifetime.Singleton)]
+public sealed class GuildLogService
 {
-    /// <summary>
-    /// Groups utility methods for manipulating <see cref="GuildLogEntity"/> objects.
-    /// </summary>
-    [CommandService(ServiceLifetime.Singleton)]
-    public sealed class GuildLogService
+    private readonly string _headerSeparator = new('=', 30);
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IDbCache _dbCache;
+    private readonly ILocalizer _localizer;
+    private readonly BotConfig _botConfig;
+    private readonly DiscordWebhookClient _webhookClient;
+
+    public GuildLogService(IServiceScopeFactory scopeFactory, IDbCache dbCache, ILocalizer localizer, BotConfig botConfig, DiscordWebhookClient webhookClient)
     {
-        private readonly string _headerSeparator = new('=', 30);
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IDbCache _dbCache;
-        private readonly ILocalizer _localizer;
-        private readonly BotConfig _botConfig;
-        private readonly DiscordWebhookClient _webhookClient;
+        _scopeFactory = scopeFactory;
+        _dbCache = dbCache;
+        _localizer = localizer;
+        _botConfig = botConfig;
+        _webhookClient = webhookClient;
+    }
 
-        public GuildLogService(IServiceScopeFactory scopeFactory, IDbCache dbCache, ILocalizer localizer, BotConfig botConfig, DiscordWebhookClient webhookClient)
-        {
-            _scopeFactory = scopeFactory;
-            _dbCache = dbCache;
-            _localizer = localizer;
-            _botConfig = botConfig;
-            _webhookClient = webhookClient;
-        }
+    /// <summary>
+    /// Starts logging of a guild event.
+    /// </summary>
+    /// <param name="context">The command context.</param>
+    /// <param name="channel">The channel where logs are being output.</param>
+    /// <param name="logType">The type of guild event to generate logs for.</param>
+    /// <param name="name">The name of the webhook.</param>
+    /// <param name="avatar">The image stream of the webhook's avatar.</param>
+    /// <returns><see langword="true"/> if the guild log was created, <see langword="false"/> is it was updated.</returns>
+    /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
+    public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string? name = default, Stream? avatar = default)
+    {
+        if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
+            throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
 
-        /// <summary>
-        /// Starts logging of a guild event.
-        /// </summary>
-        /// <param name="context">The command context.</param>
-        /// <param name="channel">The channel where logs are being output.</param>
-        /// <param name="logType">The type of guild event to generate logs for.</param>
-        /// <param name="name">The name of the webhook.</param>
-        /// <param name="avatar">The image stream of the webhook's avatar.</param>
-        /// <returns><see langword="true"/> if the guild log was created, <see langword="false"/> is it was updated.</returns>
-        /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
-        public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string name = null, Stream avatar = null)
-        {
-            if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
-                throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+        if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
+            guildLogs ??= new();
 
-            if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
-                guildLogs ??= new();
+        var anyChannelLog = guildLogs.FirstOrDefault(x => x.ChannelId == channel.Id);
 
-            var anyChannelLog = guildLogs.FirstOrDefault(x => x.ChannelId == channel.Id);
+        var webhook = (anyChannelLog is null)
+            ? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar)
+            : _webhookClient.GetRegisteredWebhook(anyChannelLog.WebhookId)
+                ?? await context.Client.GetWebhookSafelyAsync(anyChannelLog.WebhookId)
+                ?? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar);
 
-            var webhook = (anyChannelLog is null)
-                ? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar)
-                : _webhookClient.GetRegisteredWebhook(anyChannelLog.WebhookId)
-                    ?? await context.Client.GetWebhookSafelyAsync(anyChannelLog.WebhookId)
-                    ?? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar);
-
-            var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType)
-                ?? new()
-                {
-                    GuildIdFK = context.Guild.Id,
-                    ChannelId = channel.Id,
-                    WebhookId = webhook.Id,
-                    IsActive = true,
-                    Type = logType
-                };
-
-            // If webhook is not being used by any other log, modify it
-            if (guildLog.ChannelId != channel.Id && guildLogs.Count(x => x.ChannelId == channel.Id) <= 1)
+        var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType)
+            ?? new()
             {
-                _webhookClient.TryRemove(guildLog.WebhookId);
-                webhook = await webhook.ModifyAsync(name ?? webhook.Name, avatar, channel.Id);
-            }
+                GuildIdFK = context.Guild.Id,
+                ChannelId = channel.Id,
+                WebhookId = webhook.Id,
+                IsActive = true,
+                Type = logType
+            };
 
-            // Update entry
-            db.GuildLogs.Upsert(guildLog);
-            guildLog.ChannelId = channel.Id;
-            guildLog.WebhookId = webhook.Id;
-            guildLog.IsActive = true;
-            guildLog.Type = logType;
-
-            await db.SaveChangesAsync();
-
-            // Update cache
-            var result = guildLogs.Add(guildLog);
-            _dbCache.GuildLogs.AddOrUpdate(context.Guild.Id, guildLogs, (_, _) => guildLogs);
-
-            // Update webhook cache
-            _webhookClient.TryAdd(webhook);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Stops logging of a guild event.
-        /// </summary>
-        /// <param name="context">The command context.</param>
-        /// <param name="logType">The type of guild event to generate logs for.</param>
-        /// <param name="deleteEntry"><see langword="true"/> to remove the entry from the database, <see langword="false"/> to update it.</param>
-        /// <returns><see langword="true"/> if the guild log was successfully disabled, <see langword="false"/> otherwise or if it is already disabled.</returns>
-        public async Task<bool> StopLogAsync(CommandContext context, GuildLogType logType, bool deleteEntry = false)
+        // If webhook is not being used by any other log, modify it
+        if (guildLog.ChannelId != channel.Id && guildLogs.Count(x => x.ChannelId == channel.Id) <= 1)
         {
-            if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
-                return false;
-
-            var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType);
-
-            if (guildLog is null || (!guildLog.IsActive && !deleteEntry))
-                return false;
-
-            // Update the cache
-            if (deleteEntry)
-                guildLogs.TryRemove(guildLog);
-            else
-                guildLog.IsActive = false;
-
-            // Update the database entry
-            using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
-
-            return (deleteEntry)
-                ? await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId) is not 0
-                : await db.GuildLogs.UpdateAsync(
-                    x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId,
-                    _ => new() { IsActive = false }
-                ) is not 0;
+            _webhookClient.TryRemove(guildLog.WebhookId);
+            webhook = await webhook.ModifyAsync(name ?? webhook.Name, avatar, channel.Id);
         }
 
-        /// <summary>
-        /// Gets the cached guild logs of the specified Discord guild.
-        /// </summary>
-        /// <param name="server">The Discord guild.</param>
-        /// <returns>The guild logs.</returns>
-        public IReadOnlyCollection<GuildLogEntity> GetGuildLogs(DiscordGuild server)
+        // Update entry
+        db.GuildLogs.Upsert(guildLog);
+        guildLog.ChannelId = channel.Id;
+        guildLog.WebhookId = webhook.Id;
+        guildLog.IsActive = true;
+        guildLog.Type = logType;
+
+        await db.SaveChangesAsync();
+
+        // Update cache
+        var result = guildLogs.Add(guildLog);
+        _dbCache.GuildLogs.AddOrUpdate(context.Guild.Id, guildLogs, (_, _) => guildLogs);
+
+        // Update webhook cache
+        _webhookClient.TryAdd(webhook);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Stops logging of a guild event.
+    /// </summary>
+    /// <param name="context">The command context.</param>
+    /// <param name="logType">The type of guild event to generate logs for.</param>
+    /// <param name="deleteEntry"><see langword="true"/> to remove the entry from the database, <see langword="false"/> to update it.</param>
+    /// <returns><see langword="true"/> if the guild log was successfully disabled, <see langword="false"/> otherwise or if it is already disabled.</returns>
+    public async Task<bool> StopLogAsync(CommandContext context, GuildLogType logType, bool deleteEntry = false)
+    {
+        if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
+            return false;
+
+        var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType);
+
+        if (guildLog is null || (!guildLog.IsActive && !deleteEntry))
+            return false;
+
+        // Update the cache
+        if (deleteEntry)
+            guildLogs.TryRemove(guildLog);
+        else
+            guildLog.IsActive = false;
+
+        // Update the database entry
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+
+        return (deleteEntry)
+            ? await db.GuildLogs.DeleteAsync(x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId) is not 0
+            : await db.GuildLogs.UpdateAsync(
+                x => x.GuildIdFK == context.Guild.Id && x.ChannelId == guildLog.ChannelId,
+                _ => new() { IsActive = false }
+            ) is not 0;
+    }
+
+    /// <summary>
+    /// Gets the cached guild logs of the specified Discord guild.
+    /// </summary>
+    /// <param name="server">The Discord guild.</param>
+    /// <returns>The guild logs.</returns>
+    public IReadOnlyCollection<GuildLogEntity> GetGuildLogs(DiscordGuild server)
+    {
+        _dbCache.GuildLogs.TryGetValue(server.Id, out var guildLogs);
+        return guildLogs ?? new ConcurrentHashSet<GuildLogEntity>(1, 0);
+    }
+
+    /// <summary>
+    /// Generates a message log for the specified Discord messages.
+    /// </summary>
+    /// <param name="messages">The messages to be logged.</param>
+    /// <param name="channel">The Discord channel the messages are from.</param>
+    /// <param name="locale">The locale to be used for the header.</param>
+    /// <param name="extraInfo">Extra info to be appended to the header.</param>
+    /// <returns>The message log, <see langword="null"/> if the message collection is empty.</returns>
+    public string? GenerateMessageLog(IEnumerable<DiscordMessage> messages, DiscordChannel channel, string locale, string? extraInfo = default)
+    {
+        var amount = messages?.Count();
+
+        if (amount is 0 or null || channel is null)
+            return null;
+
+        var msgLog = new StringBuilder(GenerateLogHeader(channel, amount.Value, locale, extraInfo));
+
+        foreach (var message in messages!)
         {
-            _dbCache.GuildLogs.TryGetValue(server.Id, out var guildLogs);
-            return guildLogs ?? new ConcurrentHashSet<GuildLogEntity>(1, 0);
+            msgLog.AppendLine(
+                $"{message.Author.GetFullname()} ({message.Author.Id}) [{message.CreationTimestamp.LocalDateTime}]" + Environment.NewLine +
+                message.Content + ((string.IsNullOrWhiteSpace(message.Content)) ? string.Empty : Environment.NewLine) +
+                ((message.Attachments.Count is 0) ? string.Empty : string.Join(Environment.NewLine, message.Attachments.Select(x => x.Url)) + Environment.NewLine)
+            );
         }
 
-        /// <summary>
-        /// Generates a message log for the specified Discord messages.
-        /// </summary>
-        /// <param name="messages">The messages to be logged.</param>
-        /// <param name="channel">The Discord channel the messages are from.</param>
-        /// <param name="locale">The locale to be used for the header.</param>
-        /// <param name="extraInfo">Extra info to be appended to the header.</param>
-        /// <returns>The message log, <see langword="null"/> if the message collection is empty.</returns>
-        public string GenerateMessageLog(IEnumerable<DiscordMessage> messages, DiscordChannel channel, string locale, string extraInfo = null)
-        {
-            var amount = messages?.Count();
+        return msgLog.ToString();
+    }
 
-            if (amount is 0 or null || channel is null)
-                return null;
-
-            var msgLog = new StringBuilder(GenerateLogHeader(channel, amount.Value, locale, extraInfo));
-
-            foreach (var message in messages)
-            {
-                msgLog.AppendLine(
-                    $"{message.Author.GetFullname()} ({message.Author.Id}) [{message.CreationTimestamp.LocalDateTime}]" + Environment.NewLine +
-                    message.Content + ((string.IsNullOrWhiteSpace(message.Content)) ? string.Empty : Environment.NewLine) +
-                    ((message.Attachments.Count is 0) ? string.Empty : string.Join(Environment.NewLine, message.Attachments.Select(x => x.Url)) + Environment.NewLine)
-                );
-            }
-
-            return msgLog.ToString();
-        }
-
-        /// <summary>
-        /// Generates the header of a message log.
-        /// </summary>
-        /// <param name="channel">The Discord channel the messages are from.</param>
-        /// <param name="messageAmount">The amount of messages being logged.</param>
-        /// <param name="locale">The locale to be used for the header.</param>
-        /// <param name="extraInfo">Extra info to be appended to the header.</param>
-        /// <returns>The log header.</returns>
-        private string GenerateLogHeader(DiscordChannel channel, int messageAmount, string locale, string extraInfo = null)
-        {
-            return
-                $"==> {_localizer.GetResponseString(locale, "log_channel_name")}: {channel.Name} | {_localizer.GetResponseString(locale, "id")}: {channel.Id}" + Environment.NewLine +
-                $"==> {_localizer.GetResponseString(locale, "log_channel_topic")}: {channel.Topic}" + Environment.NewLine +
-                $"==> {_localizer.GetResponseString(locale, "category")}: {channel.Parent.Name}" + Environment.NewLine +
-                $"==> {_localizer.GetResponseString(locale, "log_messages_logged")}: {messageAmount}" + Environment.NewLine +
-                extraInfo +
-                $"{_headerSeparator}/{_localizer.GetResponseString(locale, "log_start")}/{_headerSeparator}" +
-                Environment.NewLine + Environment.NewLine;
-        }
+    /// <summary>
+    /// Generates the header of a message log.
+    /// </summary>
+    /// <param name="channel">The Discord channel the messages are from.</param>
+    /// <param name="messageAmount">The amount of messages being logged.</param>
+    /// <param name="locale">The locale to be used for the header.</param>
+    /// <param name="extraInfo">Extra info to be appended to the header.</param>
+    /// <returns>The log header.</returns>
+    private string GenerateLogHeader(DiscordChannel channel, int messageAmount, string locale, string? extraInfo = default)
+    {
+        return
+            $"==> {_localizer.GetResponseString(locale, "log_channel_name")}: {channel.Name} | {_localizer.GetResponseString(locale, "id")}: {channel.Id}" + Environment.NewLine +
+            $"==> {_localizer.GetResponseString(locale, "log_channel_topic")}: {channel.Topic}" + Environment.NewLine +
+            $"==> {_localizer.GetResponseString(locale, "category")}: {channel.Parent.Name}" + Environment.NewLine +
+            $"==> {_localizer.GetResponseString(locale, "log_messages_logged")}: {messageAmount}" + Environment.NewLine +
+            extraInfo +
+            $"{_headerSeparator}/{_localizer.GetResponseString(locale, "log_start")}/{_headerSeparator}" +
+            Environment.NewLine + Environment.NewLine;
     }
 }

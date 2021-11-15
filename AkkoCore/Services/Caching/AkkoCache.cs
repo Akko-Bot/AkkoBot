@@ -6,34 +6,33 @@ using DSharpPlus.Entities;
 using System;
 using System.Collections.Concurrent;
 
-namespace AkkoCore.Services.Caching
+namespace AkkoCore.Services.Caching;
+
+/// <summary>
+/// Defines an object that caches Discord-related elements.
+/// </summary>
+public sealed class AkkoCache : IAkkoCache
 {
-    /// <summary>
-    /// Defines an object that caches Discord-related elements.
-    /// </summary>
-    public sealed class AkkoCache : IAkkoCache
+    public ConcurrentDictionary<ulong, DynamicRingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();
+    public ConcurrentDictionary<string, Command> DisabledCommandCache { get; internal set; } = null!;
+    public ITimerManager Timers { get; private set; }
+
+    public AkkoCache(ITimerManager timerManager)
+        => Timers = timerManager;
+
+    public void Dispose()
     {
-        public ConcurrentDictionary<ulong, DynamicRingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();
-        public ConcurrentDictionary<string, Command> DisabledCommandCache { get; internal set; }
-        public ITimerManager Timers { get; private set; }
+        foreach (var messageCache in GuildMessageCache.Values)
+            messageCache.Clear();
 
-        public AkkoCache(ITimerManager timerManager)
-            => Timers = timerManager;
+        GuildMessageCache?.Clear();
+        DisabledCommandCache?.Clear();
+        Timers?.Dispose();
 
-        public void Dispose()
-        {
-            foreach (var messageCache in GuildMessageCache.Values)
-                messageCache.Clear();
+        GuildMessageCache = null!;
+        DisabledCommandCache = null!;
+        Timers = null!;
 
-            GuildMessageCache?.Clear();
-            DisabledCommandCache?.Clear();
-            Timers?.Dispose();
-
-            GuildMessageCache = null;
-            DisabledCommandCache = null;
-            Timers = null;
-
-            GC.SuppressFinalize(this);
-        }
+        GC.SuppressFinalize(this);
     }
 }
