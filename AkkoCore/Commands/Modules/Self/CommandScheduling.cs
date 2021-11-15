@@ -95,7 +95,7 @@ public sealed class CommandScheduling : AkkoCommandModule
             foreach (var group in reminders.Chunk(15))
             {
                 // Have to use .Bold for the IDs because .InlineCode misaligns the embed fields
-                embed.AddField("command", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + context.Prefix + x.CommandString.Replace("\n", string.Empty).MaxLength(50, "[...]")).ToArray()), true)
+                embed.AddField("command", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + context.Prefix + x.CommandString.Replace("\n", string.Empty).MaxLength(50, AkkoConstants.EllipsisTerminator)).ToArray()), true)
                     .AddField("channel", string.Join("\n", group.Select(x => $"<#{x.ChannelId}>").ToArray()), true)
                     .AddField("triggers_in", string.Join("\n", group.Select(x => _service.GetElapseTime(x)).ToArray()), true);
             }

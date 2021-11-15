@@ -136,7 +136,7 @@ public sealed class RotatingStatus : AkkoCommandModule
         var embed = new SerializableDiscordEmbed()
             .WithTitle("pstatus_title")
             .AddField("id", string.Join('\n', statuses.Select(x => x.Id)), true)
-            .AddField("message", string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, "[...]"))), true)
+            .AddField("message", string.Join('\n', statuses.Select(x => $"{x.Type} {x.Message}".MaxLength(40, AkkoConstants.EllipsisTerminator))), true)
             .AddField("pstatus_time", string.Join('\n', statuses.Select(x => x.RotationTime)), true)
             .WithFooter(context.FormatLocalized("pstatus_rotation", (_botService.GetConfig().RotateStatus) ? "enabled" : "disabled"));
 

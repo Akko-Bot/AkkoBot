@@ -185,7 +185,7 @@ public sealed class WordFilter : AkkoCommandModule
         var isEmpty = dbEntry is null || words.Length is 0;
 
         var embed = new SerializableDiscordEmbed()
-            .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoConstants.MaxEmbedDescriptionLength, "[...]"));
+            .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoConstants.MaxEmbedDescriptionLength, AkkoConstants.EllipsisTerminator));
 
         if (!isEmpty)
         {
@@ -210,13 +210,13 @@ public sealed class WordFilter : AkkoCommandModule
                 .ToArray();
 
             if (channels.Length != 0)
-                embed.AddField("fw_ignored_channels", string.Join(", ", channels).MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"));
+                embed.AddField("fw_ignored_channels", string.Join(", ", channels).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));
 
             if (roles.Length != 0)
-                embed.AddField("fw_ignored_roles", string.Join(", ", roles).MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"));
+                embed.AddField("fw_ignored_roles", string.Join(", ", roles).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));
 
             if (members.Length != 0)
-                embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"));
+                embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));
 
             if (dbEntry!.Behavior.HasOneFlag(WordFilterBehavior.FilterInvite | WordFilterBehavior.FilterSticker))
             {

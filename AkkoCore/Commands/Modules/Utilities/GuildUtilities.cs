@@ -74,7 +74,7 @@ public sealed class GuildUtilities : AkkoCommandModule
         else if (_service.DeserializeMessage(message, out var parsedMessage)) // If command contains an embed in yaml format
             await channel.SendMessageAsync(parsedMessage);
         else    // If command is just plain text
-            await channel.SendMessageAsync(message.Content.MaxLength(AkkoConstants.MaxMessageLength, "[...]"));
+            await channel.SendMessageAsync(message.Content.MaxLength(AkkoConstants.MaxMessageLength, AkkoConstants.EllipsisTerminator));
     }
 
     [Command("serverinfo"), Aliases("sinfo")]
@@ -234,10 +234,10 @@ public sealed class GuildUtilities : AkkoCommandModule
             .WithTitle(context.FormatLocalized("checkperms_title", user.GetFullname(), channel.Name));
 
         if (!string.IsNullOrWhiteSpace(allowedPerms))
-            embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+            embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator), true);
 
         if (!string.IsNullOrWhiteSpace(deniedPerms))
-            embed.AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+            embed.AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator), true);
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -253,10 +253,10 @@ public sealed class GuildUtilities : AkkoCommandModule
             .WithTitle(context.FormatLocalized("checkperms_role_title", role.Name));
 
         if (!string.IsNullOrWhiteSpace(allowedPerms))
-            embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+            embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator), true);
 
         if (!string.IsNullOrWhiteSpace(deniedPerms))
-            embed.AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]"), true);
+            embed.AddField("denied", deniedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator), true);
 
         await context.RespondLocalizedAsync(embed);
     }

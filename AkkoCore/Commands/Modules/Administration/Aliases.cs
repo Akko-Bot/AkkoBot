@@ -69,7 +69,7 @@ public sealed class Aliases : AkkoCommandModule
         {
             embed.WithTitle((context.Guild is null) ? "alias_list_title_global" : "alias_list_title_server")
                 .AddField("alias", string.Join('\n', dbAliases.Select(x => x.Alias).ToArray()), true)
-                .AddField("command", string.Join('\n', dbAliases.Select(x => (context.Prefix + x.FullCommand).MaxLength(50, "[...]")).ToArray()), true);
+                .AddField("command", string.Join('\n', dbAliases.Select(x => (context.Prefix + x.FullCommand).MaxLength(50, AkkoConstants.EllipsisTerminator)).ToArray()), true);
         }
 
         await context.RespondLocalizedAsync(embed, isEmpty, isEmpty);

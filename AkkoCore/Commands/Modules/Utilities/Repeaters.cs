@@ -149,7 +149,7 @@ public sealed class Repeaters : AkkoCommandModule
             }
 
             embed.WithTitle("repeater_list_title")
-                .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, "[...]"))), true)
+                .AddField("message", string.Join("\n", repeaters.Select(x => (Formatter.Bold($"{x.Id}. ") + x.Content).MaxLength(50, AkkoConstants.EllipsisTerminator))), true)
                 .AddField("channel", string.Join("\n", repeaters.Select(x => $"<#{x.ChannelId}>")), true)
                 .AddField("triggers_in", string.Join("\n", timers.Select(x => (x is null) ? context.FormatLocalized("repeat_over_24h") : DateTimeOffset.Now.Add(x.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime))), true);
 

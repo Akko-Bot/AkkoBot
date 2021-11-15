@@ -153,7 +153,7 @@ public sealed class HelpService
         foreach (var cmd in cmds.Chunk(AkkoConstants.LinesPerPage))
         {
             embed.AddField("command", string.Join("\n", cmd.Select(x => settings.Prefix + x.QualifiedName)), true);
-            embed.AddField("description", string.Join("\n", cmd.Select(x => _localizer.FormatLocalized(settings.Locale, x.Description).MaxLength(50, "[...]"))), true);
+            embed.AddField("description", string.Join("\n", cmd.Select(x => _localizer.FormatLocalized(settings.Locale, x.Description).MaxLength(47, AkkoConstants.EllipsisTerminator))), true);
         }
 
         return embed;

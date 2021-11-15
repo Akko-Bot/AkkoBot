@@ -196,7 +196,7 @@ public sealed class Poll : AkkoCommandModule
         foreach (var pollGroup in polls.Chunk(AkkoConstants.LinesPerPage))
         {
             fields.Add(new("id", string.Join("\n", pollGroup.Select(x => x.Id)), true));
-            fields.Add(new("poll", string.Join("\n", pollGroup.Select(x => x.Question.MaxLength(50, "[...]"))), true));
+            fields.Add(new("poll", string.Join("\n", pollGroup.Select(x => x.Question.MaxLength(50, AkkoConstants.EllipsisTerminator))), true));
             fields.Add(new("channel", string.Join("\n", pollGroup.Select(x => $"<#{x.ChannelId}>")), true));
         }
 

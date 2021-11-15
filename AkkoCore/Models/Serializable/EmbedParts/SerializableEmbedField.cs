@@ -32,7 +32,7 @@ public class SerializableEmbedField
     public string Text
     {
         get => _text;
-        set => _text = value.MaxLength(AkkoConstants.MaxEmbedFieldLength, "[...]");
+        set => _text = value.MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator);
     }
 
     public SerializableEmbedField()

@@ -225,8 +225,8 @@ internal sealed class TimerActions : ITimerActions
             var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
 
             dmsg.Content = (dmsg.Content is null)
-                ? (header + ((wasDeserialized) ? string.Empty : message)).MaxLength(AkkoConstants.MaxMessageLength, "[...]")
-                : dmsg.Content.Insert(0, header).MaxLength(AkkoConstants.MaxMessageLength, "[...]");
+                ? (header + ((wasDeserialized) ? string.Empty : message)).MaxLength(AkkoConstants.MaxMessageLength, AkkoConstants.EllipsisTerminator)
+                : dmsg.Content.Insert(0, header).MaxLength(AkkoConstants.MaxMessageLength, AkkoConstants.EllipsisTerminator);
 
             await channel.SendMessageAsync(dmsg);
         }

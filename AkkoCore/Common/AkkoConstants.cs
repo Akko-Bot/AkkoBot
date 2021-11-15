@@ -51,6 +51,11 @@ public static class AkkoConstants
     public const string ValidWhitespace = "\u200B";
 
     /// <summary>
+    /// Represents the terminator for any block of text that is too long to be sent.
+    /// </summary>
+    public const string EllipsisTerminator = "[…]";
+
+    /// <summary>
     /// Represents the first part of a Discord guild invite link.
     /// </summary>
     public const string DiscordInviteLinkBase = "https://discord.gg/";

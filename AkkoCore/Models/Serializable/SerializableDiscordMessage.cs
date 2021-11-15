@@ -39,7 +39,7 @@ public class SerializableDiscordMessage
     public string? Content
     {
         get => _content;
-        set => _content = value?.MaxLength(AkkoConstants.MaxMessageLength, "[...]");
+        set => _content = value?.MaxLength(AkkoConstants.MaxMessageLength, AkkoConstants.EllipsisTerminator);
     }
 
     /// <summary>

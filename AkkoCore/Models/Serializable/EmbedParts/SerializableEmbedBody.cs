@@ -26,7 +26,7 @@ public class SerializableEmbedBody
     public string? Description
     {
         get => _description;
-        set => _description = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength, "[...]");
+        set => _description = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength, AkkoConstants.EllipsisTerminator);
     }
 
     public SerializableEmbedBody()
