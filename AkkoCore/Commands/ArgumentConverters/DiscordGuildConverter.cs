@@ -6,21 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.ArgumentConverters
+namespace AkkoCore.Commands.ArgumentConverters;
+
+internal sealed class DiscordGuildConverter : IArgumentConverter<DiscordGuild>
 {
-    internal sealed class DiscordGuildConverter : IArgumentConverter<DiscordGuild>
+    public Task<Optional<DiscordGuild>> ConvertAsync(string input, CommandContext ctx)
     {
-        public Task<Optional<DiscordGuild>> ConvertAsync(string input, CommandContext ctx)
-        {
-            if (!ulong.TryParse(input, out var sid))
-                return Task.FromResult(Optional.FromNoValue<DiscordGuild>());
+        if (!ulong.TryParse(input, out var sid))
+            return Task.FromResult(Optional.FromNoValue<DiscordGuild>());
 
-            var clients = ctx.Services.GetRequiredService<DiscordShardedClient>();
-            var server = clients.ShardClients.Values.SelectMany(client => client.Guilds.Values).FirstOrDefault(server => server.Id == sid);
+        var clients = ctx.Services.GetRequiredService<DiscordShardedClient>();
+        var server = clients.ShardClients.Values.SelectMany(client => client.Guilds.Values).FirstOrDefault(server => server.Id == sid);
 
-            return (server is null)
-                ? Task.FromResult(Optional.FromNoValue<DiscordGuild>())
-                : Task.FromResult(Optional.FromValue(server));
-        }
+        return (server is null)
+            ? Task.FromResult(Optional.FromNoValue<DiscordGuild>())
+            : Task.FromResult(Optional.FromValue(server));
     }
 }

@@ -1,28 +1,27 @@
-﻿namespace AkkoCore.Enums
+﻿namespace AkkoCore.Enums;
+
+/// <summary>
+/// Represents the connection status of a Discord user when they interact with voice channels.
+/// </summary>
+public enum UserVoiceState
 {
     /// <summary>
-    /// Represents the connection status of a Discord user when they interact with voice channels.
+    /// Represents a user who has connected to a voice channel.
     /// </summary>
-    public enum UserVoiceState
-    {
-        /// <summary>
-        /// Represents a user who has connected to a voice channel.
-        /// </summary>
-        Connected,
+    Connected,
 
-        /// <summary>
-        /// Represents a user who has moved from voice channels.
-        /// </summary>
-        Moved,
+    /// <summary>
+    /// Represents a user who has moved from voice channels.
+    /// </summary>
+    Moved,
 
-        /// <summary>
-        /// Represents a user who has disconnected from a voice channel.
-        /// </summary>
-        Disconnected,
+    /// <summary>
+    /// Represents a user who has disconnected from a voice channel.
+    /// </summary>
+    Disconnected,
 
-        /// <summary>
-        /// Represents a user that temporarily lost connection to a voice channel.
-        /// </summary>
-        Reconnected
-    }
+    /// <summary>
+    /// Represents a user that temporarily lost connection to a voice channel.
+    /// </summary>
+    Reconnected
 }

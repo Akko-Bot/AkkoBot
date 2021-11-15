@@ -5,34 +5,33 @@ using DSharpPlus.SlashCommands;
 using System;
 using System.Threading.Tasks;
 
-namespace AkkoCore.SlashCommands.Attributes
+namespace AkkoCore.SlashCommands.Attributes;
+
+/// <summary>
+/// Checks if the slash command was executed in direct message and sends an error message if it nas not issued by a bot owner.
+/// </summary>
+[AttributeUsage(
+AttributeTargets.Class |
+AttributeTargets.Method,
+AllowMultiple = false,
+Inherited = true)]
+public sealed class AkkoSlashRequireUserPermissionAttribute : SlashCheckBaseAttribute
 {
-    /// <summary>
-    /// Checks if the slash command was executed in direct message and sends an error message if it nas not issued by a bot owner.
-    /// </summary>
-    [AttributeUsage(
-    AttributeTargets.Class |
-    AttributeTargets.Method,
-    AllowMultiple = false,
-    Inherited = true)]
-    public sealed class AkkoSlashRequireUserPermissionAttribute : SlashCheckBaseAttribute
+    private readonly Permissions _permissions;
+
+    public AkkoSlashRequireUserPermissionAttribute(Permissions permissions)
+        => _permissions = permissions;
+
+    public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
     {
-        private readonly Permissions _permissions;
+        if (ctx.Member is null || ctx.Member.PermissionsIn(ctx.Channel).HasPermission(_permissions))
+            return Task.FromResult(true);
 
-        public AkkoSlashRequireUserPermissionAttribute(Permissions permissions)
-            => _permissions = permissions;
+        var embed = new SerializableDiscordEmbed()
+            .WithDescription("slash_user_cmd_error");
 
-        public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
-        {
-            if (ctx.Member is null || ctx.Member.PermissionsIn(ctx.Channel).HasPermission(_permissions))
-                return Task.FromResult(true);
+        _ = ctx.RespondLocalizedAsync(embed, true, true);
 
-            var embed = new SerializableDiscordEmbed()
-                .WithDescription("slash_user_cmd_error");
-
-            _ = ctx.RespondLocalizedAsync(embed, true, true);
-
-            return Task.FromResult(false);
-        }
+        return Task.FromResult(false);
     }
 }

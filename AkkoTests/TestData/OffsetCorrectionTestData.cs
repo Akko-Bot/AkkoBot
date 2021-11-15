@@ -2,17 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace AkkoTests.TestData
+namespace AkkoTests.TestData;
+
+/// <summary>
+/// Contains test data for the offset correction tests for <see cref="DateTimeOffsetExtTest"/>.
+/// </summary>
+internal sealed class OffsetCorrectionTestData : IEnumerable<object[]>
 {
-    /// <summary>
-    /// Contains test data for the offset correction tests for <see cref="DateTimeOffsetExtTest"/>.
-    /// </summary>
-    internal sealed class OffsetCorrectionTestData : IEnumerable<object[]>
+    // { Expected Offset, Calculated Offset }
+    // Offset is in minutes
+    private static readonly object[][] _testData = new object[][]
     {
-        // { Expected Offset, Calculated Offset }
-        // Offset is in minutes
-        private static readonly object[][] _testData = new object[][]
-        {
             new object[] { 0, 0 },
             new object[] { 0, 0.9 },
             new object[] { 180, 180 },
@@ -22,15 +22,14 @@ namespace AkkoTests.TestData
             new object[] { 123, 123.456789 },
             new object[] { 600, 600.000001 },
             new object[] { 1, 1.000000001 }
-        };
+    };
 
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
 
-        public IEnumerator<object[]> GetEnumerator()
-        {
-            foreach (var subArray in _testData)
-                yield return subArray;
-        }
+    public IEnumerator<object[]> GetEnumerator()
+    {
+        foreach (var subArray in _testData)
+            yield return subArray;
     }
 }

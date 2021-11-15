@@ -1,37 +1,36 @@
 ﻿using AkkoCore.Common;
 using AkkoCore.Extensions;
 
-namespace AkkoCore.Models.Serializable.EmbedParts
+namespace AkkoCore.Models.Serializable.EmbedParts;
+
+/// <summary>
+/// Represents the Footer Text and ImageUrl properties of an embed.
+/// </summary>
+public class SerializableEmbedFooter
 {
+    private string? _text;
+
     /// <summary>
-    /// Represents the Footer Text and ImageUrl properties of an embed.
+    /// The URL of the image icon to be displayed on the embed's footer.
     /// </summary>
-    public class SerializableEmbedFooter
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// The text to be displayed on the embed's footer.
+    /// </summary>
+    public string? Text
     {
-        private string? _text;
+        get => _text;
+        set => _text = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength);
+    }
 
-        /// <summary>
-        /// The URL of the image icon to be displayed on the embed's footer.
-        /// </summary>
-        public string? ImageUrl { get; set; }
+    public SerializableEmbedFooter()
+    {
+    }
 
-        /// <summary>
-        /// The text to be displayed on the embed's footer.
-        /// </summary>
-        public string? Text
-        {
-            get => _text;
-            set => _text = value?.MaxLength(AkkoConstants.MaxEmbedDescriptionLength);
-        }
-
-        public SerializableEmbedFooter()
-        {
-        }
-
-        public SerializableEmbedFooter(string? text, string? imageUrl = default)
-        {
-            Text = text;
-            ImageUrl = imageUrl;
-        }
+    public SerializableEmbedFooter(string? text, string? imageUrl = default)
+    {
+        Text = text;
+        ImageUrl = imageUrl;
     }
 }

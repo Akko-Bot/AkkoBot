@@ -1,23 +1,22 @@
-﻿namespace AkkoCore.Services.Database.Enums
+﻿namespace AkkoCore.Services.Database.Enums;
+
+/// <summary>
+/// Represents the type of a poll.
+/// </summary>
+public enum PollType
 {
     /// <summary>
-    /// Represents the type of a poll.
+    /// Represents a "yes or no" poll.
     /// </summary>
-    public enum PollType
-    {
-        /// <summary>
-        /// Represents a "yes or no" poll.
-        /// </summary>
-        Simple,
+    Simple,
 
-        /// <summary>
-        /// Represents a poll with up to 10 options that are voted on through reactions.
-        /// </summary>
-        Numeric,
+    /// <summary>
+    /// Represents a poll with up to 10 options that are voted on through reactions.
+    /// </summary>
+    Numeric,
 
-        /// <summary>
-        /// Represents a poll with unlimited options that are voted through Discord messages.
-        /// </summary>
-        Anonymous
-    }
+    /// <summary>
+    /// Represents a poll with unlimited options that are voted through Discord messages.
+    /// </summary>
+    Anonymous
 }

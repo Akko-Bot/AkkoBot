@@ -314,3 +314,4 @@ dotnet_diagnostic.IDE0058.severity = none
 
 # IDE0011: Add braces to 'if'/'else' statement
 dotnet_diagnostic.IDE0011.severity = none
+csharp_style_namespace_declarations=file_scoped:error

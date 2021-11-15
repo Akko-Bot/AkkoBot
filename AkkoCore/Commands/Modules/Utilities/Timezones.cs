@@ -11,38 +11,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AkkoCore.Commands.Modules.Utilities
+namespace AkkoCore.Commands.Modules.Utilities;
+
+public sealed class Timezones : AkkoCommandModule
 {
-    public sealed class Timezones : AkkoCommandModule
+    [Command("timezone")]
+    [Description("cmd_timezone")]
+    public async Task ServerTimezoneAsync(CommandContext context)
     {
-        [Command("timezone")]
-        [Description("cmd_timezone")]
-        public async Task ServerTimezoneAsync(CommandContext context)
-        {
-            var timezone = context.GetTimeZone();
-            var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("server_timezone", Formatter.InlineCode($"{timezone.StandardName} ({timezone.BaseUtcOffset.Hours:00}:{timezone.BaseUtcOffset.Minutes:00})")));
+        var timezone = context.GetTimeZone();
+        var embed = new SerializableDiscordEmbed()
+            .WithDescription(context.FormatLocalized("server_timezone", Formatter.InlineCode($"{timezone.StandardName} ({timezone.BaseUtcOffset.Hours:00}:{timezone.BaseUtcOffset.Minutes:00})")));
 
-            await context.RespondLocalizedAsync(embed);
-        }
+        await context.RespondLocalizedAsync(embed);
+    }
 
-        [Command("timezones")]
-        [Description("cmd_timezones")]
-        public async Task TimezoneAsync(CommandContext context)
-        {
-            var fields = new List<SerializableEmbedField>();
-            var timezones = TimeZoneInfo.GetSystemTimeZones()
-                .OrderBy(x => x.Id)
-                .Select(x => x.Id)
-                .Chunk(AkkoConstants.LinesPerPage);
+    [Command("timezones")]
+    [Description("cmd_timezones")]
+    public async Task TimezoneAsync(CommandContext context)
+    {
+        var fields = new List<SerializableEmbedField>();
+        var timezones = TimeZoneInfo.GetSystemTimeZones()
+            .OrderBy(x => x.Id)
+            .Select(x => x.Id)
+            .Chunk(AkkoConstants.LinesPerPage);
 
-            var embed = new SerializableDiscordEmbed()
-                .WithTitle("timezone_list");
+        var embed = new SerializableDiscordEmbed()
+            .WithTitle("timezone_list");
 
-            foreach (var group in timezones)
-                fields.Add(new(AkkoConstants.ValidWhitespace, string.Join("\n", group), true));
+        foreach (var group in timezones)
+            fields.Add(new(AkkoConstants.ValidWhitespace, string.Join("\n", group), true));
 
-            await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
-        }
+        await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
     }
 }
