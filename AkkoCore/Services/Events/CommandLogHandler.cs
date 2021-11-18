@@ -8,6 +8,7 @@ using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.EventArgs;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events;
@@ -26,32 +27,41 @@ internal sealed class CommandLogHandler : ICommandLogHandler
     public Task LogCmdErrorAsync(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
     {
         if (eventArgs.Exception
-            is not ArgumentException             // Ignore commands with invalid arguments and subcommands that do not exist
-            and not ChecksFailedException        // Ignore command check fails
-            and not CommandNotFoundException     // Ignore commands that do not exist
-            and not InvalidOperationException)   // Ignore groups that are not commands themselves
-        {
-            //Log common errors
-            cmdHandler.Client.Logger.LogCommand(
-                LogLevel.Error,
-                eventArgs.Context,
-                string.Empty,
-                eventArgs.Exception
-            );
-        }
-        else if (eventArgs.Exception is ChecksFailedException ex && ex.FailedChecks[0].GetType() == typeof(GlobalCooldownAttribute))
-        {
-            // Log command cooldowns
-            cmdHandler.Client.Logger.LogCommand(
-                LogLevel.Warning,
-                eventArgs.Context,
-                "Command execution has been cancelled due to an active cooldown."
-            );
+            is ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
+            or ChecksFailedException        // Ignore command check fails
+            or CommandNotFoundException     // Ignore commands that do not exist
+            or InvalidOperationException)   // Ignore groups that are not commands themselves
+            return Task.CompletedTask;
 
-            return eventArgs.Context.Message.CreateReactionAsync(AkkoStatics.CooldownEmoji);
-        }
+        //Log common errors
+        cmdHandler.Client.Logger.LogCommand(
+            LogLevel.Error,
+            eventArgs.Context,
+            string.Empty,
+            eventArgs.Exception
+        );
+
+        eventArgs.Handled = true;
 
         return Task.CompletedTask;
+    }
+
+    public Task LogCmdCooldownAsync(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs)
+    {
+        if (eventArgs.Exception is not ChecksFailedException ex || !ex.FailedChecks.Any(x => x.GetType() == typeof(GlobalCooldownAttribute)))
+            return Task.CompletedTask;
+
+        // Log command cooldowns
+        cmdHandler.Client.Logger.LogCommand(
+            LogLevel.Warning,
+            eventArgs.Context,
+            "Command execution has been cancelled due to an active cooldown."
+        );
+
+        eventArgs.Handled = true;
+
+        // React with a cooldown emoji
+        return eventArgs.Context.Message.CreateReactionAsync(AkkoStatics.CooldownEmoji);
     }
 
     public Task LogSlashCmdExecutionAsync(SlashCommandsExtension slashHandler, SlashCommandExecutedEventArgs eventArgs)

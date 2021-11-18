@@ -25,6 +25,8 @@ public static class StringExt
     public static string RemoveExtension(this string text)
         => text.Contains('.') ? text[..text.LastIndexOf('.')] : text;
 
+#nullable disable warnings
+
     /// <summary>
     /// Truncates the string to the maximum specified length.
     /// </summary>
@@ -32,12 +34,8 @@ public static class StringExt
     /// <param name="maxLength">The maximum length the string should have.</param>
     /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
-#nullable disable
-
     public static string MaxLength(this string text, int maxLength)
-        => text?.Substring(0, Math.Min(text.Length, maxLength));
-
-#nullable enable
+        => text?[..Math.Min(text.Length, maxLength)];
 
     /// <summary>
     /// Truncates the string to the maximum specified length.
@@ -48,14 +46,12 @@ public static class StringExt
     /// <remarks>The <paramref name="append"/> only gets added to the truncated string if this string exceeds <paramref name="maxLength"/> in length.</remarks>
     /// <returns>This string with length equal to or lower than <paramref name="maxLength"/>.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="maxLength"/> is less than zero.</exception>
-#nullable disable
-
     public static string MaxLength(this string text, int maxLength, string append)
         => (text is null || text.Length <= maxLength)
             ? text
             : (text.MaxLength(Math.Max(0, maxLength - append.Length)) + append)[..maxLength];
 
-#nullable enable
+#nullable enable warnings
 
     /// <summary>
     /// Returns a new string that has a space character inserted at its begining and that

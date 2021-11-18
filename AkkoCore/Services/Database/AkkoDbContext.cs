@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿#nullable disable warnings
 
 using AkkoCore.Services.Database.Entities;
 using Microsoft.EntityFrameworkCore;

@@ -171,10 +171,9 @@ internal sealed class TimerManager : ITimerManager
         timer.OnDispose += TimerAutoRemoval;
 
         // If it's a daily timer, set it to automatically create the permanent version of itself
-#nullable disable
         if (entity.TimeOfDay.HasValue && entity.Interval != TimeSpan.FromDays(1))
-            timer.OnDispose += async (x, _) => await UpdateDailyTimerAsync((IAkkoTimer)x, client);
-#nullable enable
+            timer.OnDispose += async (x, _) => await UpdateDailyTimerAsync((IAkkoTimer)x!, client);
+
         return timer;
     }
 

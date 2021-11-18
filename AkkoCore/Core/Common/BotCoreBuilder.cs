@@ -528,13 +528,13 @@ public sealed class BotCoreBuilder
         // Setup client configuration
         var botConfig = new DiscordConfiguration()
         {
-            Intents = DiscordIntents.All,   // Sign up for all intents. Forgetting to enable them on the developer portal will throw an exception!
-            Token = _creds.Token,           // Sets the bot token
-            TokenType = TokenType.Bot,      // Defines the type of token; User = 0, Bot = 1, Bearer = 2
-            AutoReconnect = true,           // Sets whether the bot should automatically reconnect in case it disconnects
-            ReconnectIndefinitely = false,  // Sets whether the bot should attempt to reconnect indefinitely
-            MessageCacheSize = 200,         // Defines how many messages should be cached per DiscordClient
-            LoggerFactory = _loggerFactory  // Overrides D#+ default logger with my own
+            Intents = DiscordIntents.All,                       // Sign up for all intents. Forgetting to enable them on the developer portal will throw an exception!
+            Token = _creds.Token,                               // Sets the bot token
+            TokenType = TokenType.Bot,                          // Defines the type of token; User = 0, Bot = 1, Bearer = 2
+            AutoReconnect = true,                               // Sets whether the bot should automatically reconnect in case it disconnects
+            ReconnectIndefinitely = false,                      // Sets whether the bot should attempt to reconnect indefinitely
+            MessageCacheSize = _botConfig.MessageSizeCache,     // Defines how many messages should be cached per DiscordClient
+            LoggerFactory = _loggerFactory                      // Overrides D#+ default logger with my own
         };
 
         // Setup client interactivity

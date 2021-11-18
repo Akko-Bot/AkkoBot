@@ -11,6 +11,11 @@ namespace AkkoCore.Services.Events.Abstractions;
 public interface ICommandLogHandler
 {
     /// <summary>
+    /// Logs when a command has hit a cooldown limit.
+    /// </summary>
+    Task LogCmdCooldownAsync(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs);
+
+    /// <summary>
     /// Logs exceptions thrown before or during command execution.
     /// </summary>
     Task LogCmdErrorAsync(CommandsNextExtension cmdHandler, CommandErrorEventArgs eventArgs);

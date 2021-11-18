@@ -213,6 +213,7 @@ internal sealed class DiscordEventManager : IDiscordEventManager
             cmdHandler.CommandExecuted += _cmdLogHandler.LogCmdExecutionAsync;
             cmdHandler.CommandExecuted += _guildEventsHandler.DeleteCommandOnMessageAsync;
             cmdHandler.CommandErrored += _cmdLogHandler.LogCmdErrorAsync;
+            cmdHandler.CommandErrored += _cmdLogHandler.LogCmdCooldownAsync;
         }
 
         foreach (var slashHandler in _shardedClient.ShardClients.Values.Select(x => x.GetSlashCommands()))
@@ -391,6 +392,7 @@ internal sealed class DiscordEventManager : IDiscordEventManager
             cmdHandler.CommandExecuted -= _cmdLogHandler.LogCmdExecutionAsync;
             cmdHandler.CommandExecuted -= _guildEventsHandler.DeleteCommandOnMessageAsync;
             cmdHandler.CommandErrored -= _cmdLogHandler.LogCmdErrorAsync;
+            cmdHandler.CommandErrored -= _cmdLogHandler.LogCmdCooldownAsync;
         }
 
         foreach (var slashHandler in _shardedClient.ShardClients.Values.Select(x => x.GetSlashCommands()))
