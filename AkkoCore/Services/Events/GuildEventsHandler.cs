@@ -32,7 +32,7 @@ namespace AkkoCore.Services.Events;
 internal sealed class GuildEventsHandler : IGuildEventsHandler
 {
     private static readonly Regex _imageUrlRegex = new(
-        @"http\S*?\.(png|jpg|jpeg|gif)",
+        @"https?:\/\/[^.].+((png|jpg|jpeg|gif)$)",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 

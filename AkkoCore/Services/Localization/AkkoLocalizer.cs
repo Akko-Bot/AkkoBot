@@ -24,7 +24,7 @@ public sealed class AkkoLocalizer : ILocalizer
     /// <summary>
     /// Regex to get the locale of the response files. Locale must be between "_" and ".yaml"
     /// </summary>
-    private static readonly Regex _localeRegex = new(@"_([\w-]+?(?=\.(?:yaml|yml)$))", RegexOptions.Compiled);
+    private static readonly Regex _localeRegex = new(@"_([\w-][^_]+(?=\.(?:yaml|yml)$))", RegexOptions.Compiled);
 
     public IReadOnlyCollection<string> Locales
         => _localizedStrings.Keys;
@@ -110,15 +110,15 @@ public sealed class AkkoLocalizer : ILocalizer
         // Start deserialization
         foreach (var filePath in filePaths)
         {
-            var locale = GetFileLocale(filePath)!;
+            var locale = _localeRegex.Match(filePath).Groups.Values.Last().Value;
             var reader = new StreamReader(File.OpenRead(filePath));
-            var lStrings = reader.FromYaml<Dictionary<string, string>>();
+            var localizedStrings = reader.FromYaml<Dictionary<string, string>>();
 
             if (!_localizedStrings.ContainsKey(locale))
-                _localizedStrings.Add(locale, lStrings);
+                _localizedStrings.Add(locale, localizedStrings);
             else
             {
-                foreach (var stringPair in lStrings)
+                foreach (var stringPair in localizedStrings)
                     _localizedStrings[locale].Add(stringPair.Key, stringPair.Value);
             }
 
@@ -153,20 +153,5 @@ public sealed class AkkoLocalizer : ILocalizer
         _localizedStrings.TrimExcess();
 
         GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Gets the locale of the response string file, assuming it follows the "*_{locale}.yaml" format.
-    /// </summary>
-    /// <param name="filePath">Path to the file with the response strings.</param>
-    /// <returns>The locale of the response string's file, <see langword="null"/> if no match occured.</returns>
-    private string? GetFileLocale(string filePath)
-    {
-        var match = _localeRegex.Match(filePath).Groups.Values.LastOrDefault()?.Value;
-
-        if (match is not null && match.Contains('_'))
-            match = match[(match.LastOccurrenceOf('_', 0) + 1)..];
-
-        return match;
     }
 }

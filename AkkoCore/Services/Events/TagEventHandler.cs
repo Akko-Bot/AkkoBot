@@ -171,7 +171,7 @@ internal sealed class TagEventHandler : ITagEventHandler
         // This is needed to parse {remaining.text} correctly
         parsedResponse.Replace(
             _remainingTextPlaceholder,
-            triggerIndex <= 0 && eventArgs.Message.Content.Length > parsedTrigger.Length
+            (triggerIndex <= 0 && eventArgs.Message.Content.Length > parsedTrigger.Length)
                 ? eventArgs.Message.Content[(triggerIndex + parsedTrigger.Length + 1)..]
                 : string.Empty
         );
