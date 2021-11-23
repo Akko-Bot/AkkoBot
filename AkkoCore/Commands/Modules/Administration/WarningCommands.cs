@@ -270,7 +270,7 @@ public sealed class WarningCommands : AkkoCommandModule
             return;
         }
 
-        var amount = string.Join("\n", punishments.Select(x => x.WarnAmount).ToArray());
+        var amount = string.Join("\n", punishments.Select(x => x.WarnAmount));
 
         var punish = string.Join(
             "\n",
@@ -278,10 +278,10 @@ public sealed class WarningCommands : AkkoCommandModule
                 (context.Guild.Roles.TryGetValue(x.PunishRoleId ?? default, out var punishRole))
                     ? context.FormatLocalized(x.Type.ToString().ToLowerInvariant()) + ": " + punishRole.Name
                     : context.FormatLocalized(x.Type.ToString().ToLowerInvariant())
-            ).ToArray()
+            )
         );
 
-        var interval = string.Join("\n", punishments.Select(x => x.Interval?.ToString(@"%d\d\ %h\h\ %m\m") ?? "-").ToArray());
+        var interval = string.Join("\n", punishments.Select(x => x.Interval?.ToString(@"%d\d\ %h\h\ %m\m") ?? "-"));
 
         embed.AddField("warnpl_amount", amount, true)
             .AddField("warnpl_punish", punish, true)

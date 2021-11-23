@@ -70,7 +70,7 @@ public sealed class VoiceRoles : AkkoCommandModule
             embed.WithTitle("vcrole_list_title");
 
             foreach (var channel in voiceRoles.Select(x => x.ChannelId).Distinct())
-                fields.Add(new SerializableEmbedField(context.Guild.GetChannel(channel).Name, string.Join("\n", voiceRoles.Where(x => x.ChannelId == channel).Select(x => context.Guild.GetRole(x.RoleId).Name).ToArray()), true));
+                fields.Add(new SerializableEmbedField(context.Guild.GetChannel(channel).Name, string.Join("\n", voiceRoles.Where(x => x.ChannelId == channel).Select(x => context.Guild.GetRole(x.RoleId).Name)), true));
         }
 
         await context.RespondPaginatedByFieldsAsync(embed, fields, 9);

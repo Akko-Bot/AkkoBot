@@ -185,8 +185,8 @@ public sealed class BotConfigCommands : AkkoCommandModule
 
         var embed = new SerializableDiscordEmbed()
             .WithTitle("bot_settings_title")
-            .AddField("settings", string.Join("\n", settings.Keys.ToArray()), true)
-            .AddField("value", string.Join("\n", settings.Values.ToArray()), true);
+            .AddField("settings", string.Join("\n", settings.Keys), true)
+            .AddField("value", string.Join("\n", settings.Values), true);
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -336,12 +336,11 @@ public sealed class BotConfigCommands : AkkoCommandModule
         public async Task ListOwnersAsync(CommandContext context)
         {
             var ids = _creds.OwnerIds
-                .Select(id => $"<@{id}>")
-                .ToArray();
+                .Select(id => $"<@{id}>");
 
             var embed = new SerializableDiscordEmbed()
-                .AddField("owners", (ids.Length is 0) ? "-" : string.Join("\n", ids), true)
-                .AddField("app_owners", string.Join("\n", context.Client.CurrentApplication.Owners.Select(user => user.Mention).ToArray()), true);
+                .AddField("owners", (!ids.Any()) ? "-" : string.Join("\n", ids), true)
+                .AddField("app_owners", string.Join("\n", context.Client.CurrentApplication.Owners.Select(user => user.Mention)), true);
 
             await context.RespondLocalizedAsync(embed);
         }

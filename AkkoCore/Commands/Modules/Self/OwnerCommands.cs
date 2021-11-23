@@ -125,11 +125,11 @@ public sealed class OwnerCommands : AkkoCommandModule
     public async Task ExportCommandsAsync(CommandContext context, [Description("arg_exportcommand_format")] string format = "yaml")
     {
         var locale = context.GetMessageSettings().Locale;
-        var result = context.CommandsNext.RegisteredCommands.Values
+        using var result = context.CommandsNext.RegisteredCommands.Values
             .Distinct()
             .Select(x => new SerializableCommand(_localizer, x, locale))
             .OrderBy(x => x.Name)
-            .ToArray();
+            .ToRentedArray();
 
         var isJson = format.Equals("json", StringComparison.InvariantCultureIgnoreCase);
         var text = (isJson)
@@ -139,7 +139,7 @@ public sealed class OwnerCommands : AkkoCommandModule
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
 
         var message = new DiscordMessageBuilder()
-            .WithContent(context.FormatLocalized("exportcommands_description", Formatter.Bold(result.Length.ToString())))
+            .WithContent(context.FormatLocalized("exportcommands_description", Formatter.Bold(result.Count.ToString())))
             .WithFile($"commands.{((isJson) ? "json" : "yaml")}", stream);
 
         await context.Channel.SendMessageAsync(message);

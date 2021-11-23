@@ -34,7 +34,7 @@ public class AkkoSlashCommandModule : ApplicationCommandModule
     {
         var dbCache = context.Services.GetRequiredService<IDbCache>();
         var userService = context.Services.GetRequiredService<DiscordUserService>();
-        var mentionedUsers = context.ResolvedUserMentions ?? Enumerable.Empty<DiscordUser>() // Why is this null, wtf?
+        var mentionedUsers = (context.ResolvedUserMentions ?? Enumerable.Empty<DiscordUser>()) // Why is this null, wtf?
             .Append(context.User)
             .Distinct()
             .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))

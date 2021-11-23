@@ -179,10 +179,9 @@ public sealed class WordFilter : AkkoCommandModule
         var dbEntry = _service.GetFilteredWords(context.Guild.Id);
         var words = dbEntry?.Words
             .OrderBy(x => x.Trim('*'))
-            .Select(x => Formatter.InlineCode(x))
-            .ToArray() ?? Array.Empty<string>();
+            .Select(x => Formatter.InlineCode(x)) ?? Array.Empty<string>();
 
-        var isEmpty = dbEntry is null || words.Length is 0;
+        var isEmpty = dbEntry is null || !words.Any();
 
         var embed = new SerializableDiscordEmbed()
             .WithDescription((isEmpty) ? "fw_list_empty" : string.Join(", ", words).MaxLength(AkkoConstants.MaxEmbedDescriptionLength, AkkoConstants.EllipsisTerminator));
@@ -194,28 +193,25 @@ public sealed class WordFilter : AkkoCommandModule
             var channels = context.Guild.Channels.Values
                 .Where(x => dbEntry!.IgnoredIds.Contains((long)x.Id))
                 .OrderBy(x => x.Name)
-                .Select(x => '#' + x.Name)
-                .ToArray();
+                .Select(x => '#' + x.Name);
 
             var roles = context.Guild.Roles.Values
                 .Where(x => dbEntry!.IgnoredIds.Contains((long)x.Id))
                 .OrderBy(x => x.Name)
-                .Select(x => x.Name)
-                .ToArray();
+                .Select(x => x.Name);
 
             var members = context.Guild.Members.Values
                 .Where(x => dbEntry!.IgnoredIds.Contains((long)x.Id))
                 .OrderBy(x => x.Username)
-                .Select(x => x.GetFullname())
-                .ToArray();
+                .Select(x => x.GetFullname());
 
-            if (channels.Length != 0)
+            if (channels.Any())
                 embed.AddField("fw_ignored_channels", string.Join(", ", channels).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));
 
-            if (roles.Length != 0)
+            if (roles.Any())
                 embed.AddField("fw_ignored_roles", string.Join(", ", roles).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));
 
-            if (members.Length != 0)
+            if (members.Any())
                 embed.AddField("fw_ignored_users", string.Join(", ", members).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));
 
             if (dbEntry!.Behavior.HasOneFlag(WordFilterBehavior.FilterInvite | WordFilterBehavior.FilterSticker))

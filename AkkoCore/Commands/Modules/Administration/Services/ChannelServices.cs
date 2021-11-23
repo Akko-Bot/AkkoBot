@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Attributes;
+using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,14 +73,13 @@ public sealed class ChannelService
     /// <param name="server">The Discord server.</param>
     /// <param name="predicate">A method that defines what overwrites should be removed.</param>
     /// <param name="reason">The reason for the mute.</param>
-    public async Task RemoveOverwritesAsync(DiscordGuild server, string? reason, Func<DiscordOverwrite, bool> predicate)
+    public Task RemoveOverwritesAsync(DiscordGuild server, string? reason, Func<DiscordOverwrite, bool> predicate)
     {
         var overwrites = server.Channels.Values
             .Where(x => x.Users.Contains(server.CurrentMember))
             .SelectMany(x => x.PermissionOverwrites.Where(predicate))
-            .ToArray();
+            .Select(x => x.DeleteAsync(reason));
 
-        for (var index = 0; index < overwrites.Length; index++)
-            await overwrites[index].DeleteAsync(reason);
+        return Task.WhenAll(overwrites);
     }
 }

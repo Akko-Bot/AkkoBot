@@ -131,11 +131,11 @@ public sealed class Administration : AkkoCommandModule
             .Where(role => role.Permissions.HasOneFlag(_lockChannelModPerms));
 
         // Get overwrites from non-mod roles
-        var toLock = context.Channel.PermissionOverwrites.Where(overwrite =>
-            !overwrite.Denied.HasFlag(Permissions.SendMessages) // Exclude the mute role
-            && context.Guild.Roles.Values
-                .Except(modRoles)
-                .Select(role => role.Id)
+        var toLock = context.Channel.PermissionOverwrites
+            .Where(overwrite => !overwrite.Denied.HasFlag(Permissions.SendMessages) // Exclude the mute role
+                && context.Guild.Roles.Values
+                    .Except(modRoles)
+                    .Select(role => role.Id)
                     .Contains(overwrite.Id)
         )
         .ToArray();
@@ -161,11 +161,11 @@ public sealed class Administration : AkkoCommandModule
             .Where(role => role.Permissions.HasOneFlag(_lockChannelModPerms));
 
         // Get overwrites from non-mod roles
-        var toUnlock = context.Channel.PermissionOverwrites.Where(overwrite =>
-            !overwrite.Denied.HasFlag(Permissions.SendMessages) // Exclude the mute role
-            && context.Guild.Roles.Values
-                .Except(modRoles)
-                .Select(role => role.Id)
+        var toUnlock = context.Channel.PermissionOverwrites
+            .Where(overwrite => !overwrite.Denied.HasFlag(Permissions.SendMessages) // Exclude the mute role
+                && context.Guild.Roles.Values
+                    .Except(modRoles)
+                    .Select(role => role.Id)
                     .Contains(overwrite.Id)
         )
         .ToArray();

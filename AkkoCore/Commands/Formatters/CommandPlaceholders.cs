@@ -6,6 +6,7 @@ using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -139,7 +140,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.shortdateandtime"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.ShortDateTime);
@@ -147,7 +148,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.shortdate"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.ShortDate);
@@ -155,7 +156,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.shorttime"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.ShortTime);
@@ -163,7 +164,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.longdateandtime"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.LongDateTime);
@@ -171,7 +172,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.longdate"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.LongDate);
@@ -179,7 +180,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.longtime"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.LongTime);
@@ -187,7 +188,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["date.relativetime"] = (context, parameter) =>
         {
-            return parameter is not string[] arguments || arguments.Length != 1
+            return parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
                 || !long.TryParse(arguments[0], out var unixSeconds)
                 ? null
                 : DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToDiscordTimestamp(TimestampFormat.RelativeTime);
@@ -202,7 +203,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
         ["rng"] = (context, parameter) =>
         {
             // If array is the wrong length or contains invalid arguments, quit
-            if (parameter is not string[] arguments || arguments.Length is not 1 and not 2
+            if (parameter is not IReadOnlyList<string> arguments || arguments.Count is not 1 and not 2
             | (!arguments.TryGetValue(0, out var first) & !arguments.TryGetValue(1, out var second))
             | (!int.TryParse(first, out var x) & !int.TryParse(second, out var y)))
                 return null;
@@ -215,14 +216,14 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["choose"] = (context, parameter) =>
         {
-            return (parameter is not string[] arguments || arguments.Length == 0)
+            return (parameter is not IReadOnlyList<string> arguments || arguments.Count == 0)
                 ? null
-                : arguments[context.Services.GetRequiredService<Random>().Next(0, arguments.Length)].Trim();
+                : arguments[context.Services.GetRequiredService<Random>().Next(0, arguments.Count)].Trim();
         },
 
         ["cmd.argument"] = (context, parameter) =>
         {
-            return (parameter is not string[] arguments || arguments.Length != 1
+            return (parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
             || !int.TryParse(arguments[0], out var index)
             || context.RawArguments.Count <= index)
                 ? null

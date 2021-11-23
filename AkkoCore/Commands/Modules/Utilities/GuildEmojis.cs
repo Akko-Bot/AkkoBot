@@ -39,7 +39,7 @@ public sealed class GuildEmojis : AkkoCommandModule
             .Chunk(15);
 
         foreach (var emojiGroup in emojis)
-            embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}").ToArray()), true);
+            embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}")), true);
 
         await context.RespondPaginatedByFieldsAsync(embed, 2);
     }

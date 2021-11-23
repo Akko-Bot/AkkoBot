@@ -32,8 +32,7 @@ public static class DiscordInteractionResponseBuilderExt
         if (response.Embeds.Count is not 0 && response.Embeds is List<DiscordEmbed> embeds)
         {
             var newEmbeds = response.Embeds
-                .Select(embed => embed.WithLocalization(localizer, locale, color))
-                .ToArray();
+                .Select(embed => embed.WithLocalization(localizer, locale, color));
 
             embeds.Clear();
             response.AddEmbeds(newEmbeds);

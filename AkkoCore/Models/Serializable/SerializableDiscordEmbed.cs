@@ -448,25 +448,25 @@ public class SerializableDiscordEmbed
         var result = new StringBuilder();
 
         // Get the names and values of the grouped fields
-        var names = fields.Select(x => x.Title).ToArray();
+        using var names = fields.Select(x => x.Title).ToRentedArray();
         var namesLengthCounter = 0;
 
-        var values = fields
+        using var values = fields
             .Select(x => x.Text.Split(_newlines, StringSplitOptions.None))
             .Fill(string.Empty)
             .Select(x =>
             {
                 var maxLength = Math.Max(x.MaxElementLength(), names[namesLengthCounter++].Length);
-                return x.Select(x => x.HardPad(maxLength + 2)).ToArray();
-            }).ToArray();
+                return x.Select(x => x.HardPad(maxLength + 2)).ToRentedArray();
+            }).ToRentedArray();
 
-        var valueLines = new List<string>(values.Length);
+        var valueLines = new List<string>(values.Count);
         var counter = 0;
 
         // Format the values
-        for (int index = 0, totalIterations = 0; totalIterations < values.Length * values[0].Length; totalIterations++)
+        for (int index = 0, totalIterations = 0; totalIterations < values.Count * values[0].Count; totalIterations++)
         {
-            if (counter < names.Length - 1)
+            if (counter < names.Count - 1)
             {
                 // If value is not the last in the line
                 valueLines.Add(values[counter++][index]);
@@ -480,7 +480,7 @@ public class SerializableDiscordEmbed
         }
 
         // Format the header
-        for (var index = 0; index < names.Length; index++)
+        for (var index = 0; index < names.Count; index++)
         {
             var toPad = values[index].MaxElementLength();
             if (names[index].Length < toPad)
@@ -495,9 +495,13 @@ public class SerializableDiscordEmbed
         // Assemble the field string
         result.Append('|');                   // Add the first |
         result.AppendJoin("|", names);        // Add the table's header
-        result.AppendLine("|\n" + new string('-', totalLength + values.Length)); // Add header separator
+        result.AppendLine("|\n" + new string('-', totalLength + values.Count)); // Add header separator
         result.Append('|');                   // Add the first | for the values
         result.AppendJoin("|", valueLines);   // Add the values
+
+        // Disposal
+        foreach (var value in values)
+            value.Dispose();
 
         return result.ToString();
     }

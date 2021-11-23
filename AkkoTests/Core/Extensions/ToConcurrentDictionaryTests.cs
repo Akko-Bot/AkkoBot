@@ -36,6 +36,6 @@ public sealed partial class LinqExtTests
         var sample = collection.ToConcurrentDictionary(x => x.Id);
 
         Assert.True(sample.All(x => collection.Contains(x.Value)));    // Verify if elements exist in the original collection
-        Assert.True(collection.All(x => sample.Values.Contains(x)));    // Verify if all original elements are in the sample
+        Assert.True(collection.All(x => sample.Values.Contains(x)));   // Verify if all original elements are in the sample
     }
 }

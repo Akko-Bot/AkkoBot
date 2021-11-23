@@ -62,11 +62,10 @@ internal sealed class StartupEventHandler : IStartupEventHandler
 
             // Filter out the guilds that are already in the database
             var newGuilds = client.Guilds.Keys
-            .Except(db.GuildConfig.Select(dbGuild => dbGuild.GuildId))
-            .Select(key => new GuildConfigEntity(_botConfig) { GuildId = key })
-            .ToArray();
+                .Except(db.GuildConfig.Select(dbGuild => dbGuild.GuildId))
+                .Select(key => new GuildConfigEntity(_botConfig) { GuildId = key });
 
-            if (newGuilds.Length is not 0)
+            if (newGuilds.Any())
             {
                 // Save the new guilds to the database
                 await db.BulkCopyAsync(100, newGuilds);

@@ -115,9 +115,9 @@ public sealed class Reminders : AkkoCommandModule
             foreach (var group in reminders.Chunk(15))
             {
                 // Have to use .Bold for the IDs because .InlineCode misaligns the embed fields
-                embed.AddField("message", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + x.Content.Replace("\n", string.Empty).MaxLength(50, AkkoConstants.EllipsisTerminator)).ToArray()), true)
-                    .AddField("channel", string.Join("\n", group.Select(x => (x.IsPrivate) ? "private" : $"<#{x.ChannelId}>").ToArray()), true)
-                    .AddField("triggers_in", string.Join("\n", group.Select(x => DateTimeOffset.Now.Add(x.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime)).ToArray()), true);
+                embed.AddField("message", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + x.Content.Replace("\n", string.Empty).MaxLength(50, AkkoConstants.EllipsisTerminator))), true)
+                    .AddField("channel", string.Join("\n", group.Select(x => (x.IsPrivate) ? "private" : $"<#{x.ChannelId}>")), true)
+                    .AddField("triggers_in", string.Join("\n", group.Select(x => DateTimeOffset.Now.Add(x.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime))), true);
             }
 
             await context.RespondPaginatedByFieldsAsync(embed, 3);

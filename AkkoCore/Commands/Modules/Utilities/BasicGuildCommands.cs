@@ -123,7 +123,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         var embed = new SerializableDiscordEmbed();
 
         foreach (var roleGroup in roles)
-            embed.AddField(title, string.Join('\n', roleGroup.ToArray()));
+            embed.AddField(title, string.Join('\n', roleGroup));
 
         await context.RespondPaginatedByFieldsAsync(embed, 1);
     }
@@ -151,7 +151,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         embed.WithFooter(context.FormatLocalized("total_of", ((users.Count() - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault()?.Length ?? 0));
 
         foreach (var userGroup in users)
-            embed.AddField(title, string.Join('\n', userGroup.ToArray()));
+            embed.AddField(title, string.Join('\n', userGroup));
 
         await context.RespondPaginatedByFieldsAsync(embed, 1);
     }
@@ -407,7 +407,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
                 .Where(role => CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role) && !role.Name.Equals("@everyone"))
                 .ToArray();
 
-            if (roles.Length == 0)
+            if (roles.Length is 0)
             {
                 var embed = new SerializableDiscordEmbed()
                     .WithDescription("deleteallroles_error");
@@ -422,7 +422,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
                 .WithDescription(
                     context.FormatLocalized(
                         "q_are_you_sure",                                                           // Key
-                        context.FormatLocalized("q_deleteallroles", roles.Length), "q_yes", "q_no"  // Values
+                        context.FormatLocalized("q_deleteallroles", roles.Length), "q_yes", "q_no"   // Values
                     )
                 );
 

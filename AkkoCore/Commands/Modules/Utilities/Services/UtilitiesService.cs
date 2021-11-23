@@ -269,7 +269,7 @@ public sealed class UtilitiesService
                 break;
 
             case ChannelType.Category:
-                embed.AddField("contains", string.Join(", ", channel.Children.Select(x => x.Name).ToArray()), false);
+                embed.AddField("contains", string.Join(", ", channel.Children.Select(x => x.Name)), false);
                 break;
 
             default:
