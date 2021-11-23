@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Common;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
@@ -10,6 +11,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +21,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles events related to gatekeeping.
 /// </summary>
+[CommandService<IGatekeepEventHandler>(ServiceLifetime.Singleton)]
 internal sealed class GatekeepEventHandler : IGatekeepEventHandler
 {
     private readonly ConcurrentHashSet<ulong> _waitingGreets = new();

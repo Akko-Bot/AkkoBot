@@ -23,7 +23,9 @@ internal sealed class DangerousCommandsCogSetup : ICogSetup
     public string LocalizationDirectory { get; } = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? string.Empty, "Localization");
 
     public void RegisterServices(IServiceCollection ioc)
-        => ioc.AddSingleton<QueryService>();
+    {
+        // This cog doesn't register services with factories or concrete implementations
+    }
 
     public void RegisterSlashCommands(SlashCommandsExtension slashHandler)
     {

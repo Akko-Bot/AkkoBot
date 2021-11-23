@@ -1,4 +1,5 @@
-﻿using AkkoCore.Extensions;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services.Database;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace AkkoCog.DangerousCommands.DangerousCommands.Services;
 /// <summary>
 /// Groups utility methods for querying the database manually.
 /// </summary>
+[CommandService(ServiceLifetime.Singleton)]
 public sealed class QueryService
 {
     // TODO: I may need to, in the future, specify which database needs to be queried

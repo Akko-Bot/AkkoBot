@@ -1,10 +1,12 @@
-﻿using AkkoCore.Config.Models;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -13,6 +15,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles global events.
 /// </summary>
+[CommandService<IGlobalEventsHandler>(ServiceLifetime.Singleton)]
 internal sealed class GlobalEventsHandler : IGlobalEventsHandler
 {
     private readonly IGuildEventsHandler _guildEventsHandler;

@@ -1,3 +1,4 @@
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Self.Services;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
@@ -25,6 +26,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles the behavior the bot should have for specific Discord events on startup.
 /// </summary>
+[CommandService<IStartupEventHandler>(ServiceLifetime.Singleton)]
 internal sealed class StartupEventHandler : IStartupEventHandler
 {
     private readonly IServiceScopeFactory _scopeFactory;

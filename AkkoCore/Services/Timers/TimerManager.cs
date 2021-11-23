@@ -1,3 +1,4 @@
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
@@ -21,6 +22,7 @@ namespace AkkoCore.Services.Timers;
 /// <summary>
 /// This class initializes timers from the database and manages their execution and lifetime.
 /// </summary>
+[CommandService<ITimerManager>(ServiceLifetime.Singleton)]
 internal sealed class TimerManager : ITimerManager
 {
     private const int _updateTimerDayAge = 1;

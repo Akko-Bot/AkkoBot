@@ -1,6 +1,8 @@
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Localization.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,6 +15,7 @@ namespace AkkoCore.Services.Localization;
 /// <summary>
 /// Manages the cache for the response strings loaded into memory.
 /// </summary>
+[CommandService<ILocalizer>(ServiceLifetime.Singleton)]
 public sealed class AkkoLocalizer : ILocalizer
 {
     /// <summary>

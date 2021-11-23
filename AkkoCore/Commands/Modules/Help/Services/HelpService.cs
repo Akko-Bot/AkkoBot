@@ -127,8 +127,8 @@ public sealed class HelpService
     /// <param name="cmdHandler">The command handler.</param>
     /// <param name="searchParameter">The parameter to search for.</param>
     /// <remarks>
-    /// <br>The embed may contain more than 25 fields, so use it with pagination.</br>
-    /// <br>Searches with no result return an embed with its color set to <see cref="IMessageSettings.ErrorColor"/>.</br>
+    /// The embed may contain more than 25 fields, so use it with pagination. <br />
+    /// Searches with no result return an embed with its color set to <see cref="IMessageSettings.ErrorColor"/>.
     /// </remarks>
     /// <returns>A Discord embed with the search results.</returns>
     public SerializableDiscordEmbed SearchCommandByKeyword(IMessageSettings settings, CommandsNextExtension cmdHandler, string searchParameter)

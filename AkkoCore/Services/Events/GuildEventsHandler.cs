@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Modules.Administration.Services;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
@@ -29,6 +30,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles guild-related events.
 /// </summary>
+[CommandService<IGuildEventsHandler>(ServiceLifetime.Singleton)]
 internal sealed class GuildEventsHandler : IGuildEventsHandler
 {
     private static readonly Regex _imageUrlRegex = new(

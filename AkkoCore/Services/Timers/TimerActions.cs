@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Common;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
 using AkkoCore.Config.Models;
@@ -28,6 +29,7 @@ namespace AkkoCore.Services.Timers;
 /// <summary>
 /// Defines the actions to be performed when a timer triggers.
 /// </summary>
+[CommandService<ITimerActions>(ServiceLifetime.Singleton)]
 internal sealed class TimerActions : ITimerActions
 {
     private readonly EventId _timerLogEvent = new(99, nameof(TimerActions));

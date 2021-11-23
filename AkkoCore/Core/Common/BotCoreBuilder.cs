@@ -1,27 +1,16 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
-using AkkoCore.Commands.Common;
-using AkkoCore.Commands.Formatters;
 using AkkoCore.Common;
-using AkkoCore.Config;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
-using AkkoCore.Core.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Services;
-using AkkoCore.Services.Caching;
-using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
-using AkkoCore.Services.Events;
 using AkkoCore.Services.Events.Abstractions;
-using AkkoCore.Services.Events.Common;
-using AkkoCore.Services.Localization;
 using AkkoCore.Services.Localization.Abstractions;
 using AkkoCore.Services.Logging;
 using AkkoCore.Services.Logging.Abstractions;
-using AkkoCore.Services.Timers;
-using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Executors;
@@ -48,6 +37,7 @@ namespace AkkoCore.Core.Common;
 /// </summary>
 public sealed class BotCoreBuilder
 {
+    private readonly string _dbConnectionString;
     private ILoggerFactory? _loggerFactory;
     private readonly Credentials _creds;
     private readonly BotConfig _botConfig;
@@ -61,6 +51,14 @@ public sealed class BotCoreBuilder
         _logConfig = logConfig ?? throw new ArgumentNullException(nameof(logConfig), "Configuration objects cannot be null.");
         _loggerFactory = loggerFactory;
         _cmdServices = cmdServices ?? new ServiceCollection();
+
+        _dbConnectionString =
+            @"Server=127.0.0.1;" +
+            @"Port=5432;" +
+            @"Database=AkkoBotDb;" +
+            $"User Id={_creds.Database["role"]};" +
+            $"Password={_creds.Database["password"]};" +
+            @"CommandTimeout=20;";
     }
 
     /// <summary>
@@ -131,29 +129,20 @@ public sealed class BotCoreBuilder
     /// </summary>
     /// <param name="assembly">The assembly to register the services from.</param>
     /// <returns>This <see cref="BotCoreBuilder"/>.</returns>
+    /// <exception cref="ArgumentException">Occurs when a service is registered more than once.</exception>
+    /// <exception cref="InvalidOperationException">Occurs when a service is registered with an invalid interface.</exception>
     public BotCoreBuilder WithDefaultServices(Assembly assembly)
     {
-        var types = AkkoUtilities.GetConcreteTypesWithAttribute<CommandServiceAttribute>(assembly);
+        // Need to get multiple attributes per type to account for derived types,
+        // but only get the first one, as this is the one that got applied to the derived type.
+        // ---
+        // This will cause issues for services that don't have the attribute applied to them,
+        // but inherit from a service that does.
+        var typesAndAttributes = AkkoUtilities.GetConcreteTypesWithAttribute<CommandServiceAttributeBase>(assembly)
+            .Select(x => (Type: x, Attribute: x.GetCustomAttributes<CommandServiceAttributeBase>().First()));
 
-        foreach (var type in types)
-        {
-            var attribute = type.GetCustomAttribute<CommandServiceAttribute>();
-
-            switch (attribute!.Lifespan)
-            {
-                case ServiceLifetime.Singleton:
-                    _cmdServices.AddSingleton(type);
-                    break;
-
-                case ServiceLifetime.Scoped:
-                    _cmdServices.AddScoped(type);
-                    break;
-
-                case ServiceLifetime.Transient:
-                    _cmdServices.AddTransient(type);
-                    break;
-            }
-        }
+        foreach (var (type, attribute) in typesAndAttributes)
+            attribute.RegisterService(_cmdServices, type);
 
         return this;
     }
@@ -316,7 +305,7 @@ public sealed class BotCoreBuilder
         using var dbContext = new AkkoDbContext(
             new DbContextOptionsBuilder<AkkoDbContext>()
                 .UseSnakeCaseNamingConvention()
-                .UseNpgsql(GetDefaultConnectionString(), x => x.MigrationsAssembly(assemblyName))
+                .UseNpgsql(_dbConnectionString, x => x.MigrationsAssembly(assemblyName))
                 .Options
         );
 
@@ -325,7 +314,7 @@ public sealed class BotCoreBuilder
         // Register the database context
         return WithDbContext<AkkoDbContext>(options =>
             options.UseSnakeCaseNamingConvention()
-                .UseNpgsql(GetDefaultConnectionString(), x => x.MigrationsAssembly(assemblyName))
+                .UseNpgsql(_dbConnectionString, x => x.MigrationsAssembly(assemblyName))
                 .UseLoggerFactory(_loggerFactory)
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
         );
@@ -406,14 +395,19 @@ public sealed class BotCoreBuilder
     private IReadOnlyList<ICogSetup> RegisterFinalServices(DiscordShardedClient shardedClient)
     {
         // Load cog services and response strings
+        var cogAssemblies = AkkoUtilities.GetCogAssemblies();
         var cogSetups = AkkoUtilities.GetCogSetups().ToArray();
 
+        // Register attribute services
+        foreach (var cogAssembly in cogAssemblies)
+            WithDefaultServices(cogAssembly);
+
+        // Register factory and implementation services
         foreach (var cogSetup in cogSetups)
             cogSetup.RegisterServices(_cmdServices);
 
-        // Add the clients to the IoC container
-        _cmdServices.AddSingleton(shardedClient);
-        _cmdServices.AddHttpClient();   // Adds the default IHttpClientFactory
+        _cmdServices.AddSingleton(shardedClient);   // Add the sharded client to the IoC container
+        _cmdServices.AddHttpClient();               // Add the default IHttpClientFactory
 
         var servicesList = new ServiceDescriptor[]
         {
@@ -423,47 +417,9 @@ public sealed class BotCoreBuilder
                 ServiceDescriptor.Singleton(_botConfig),
                 ServiceDescriptor.Singleton(_logConfig),
 
-                // > Caching
-                ServiceDescriptor.Singleton<IDbCache, AkkoDbCache>(),
-                ServiceDescriptor.Singleton<IAkkoCache, AkkoCache>(),
-
-                // > Localization
-                ServiceDescriptor.Singleton<ILocalizer, AkkoLocalizer>(),
-
-                // > Timers
-                ServiceDescriptor.Singleton<ITimerActions, TimerActions>(),
-                ServiceDescriptor.Singleton<ITimerManager, TimerManager>(),
-
-                // > Discord Interactivity
-                ServiceDescriptor.Singleton<IInteractionResponseManager, InteractionResponseManager>(),
-
                 // > Utilities
-                ServiceDescriptor.Transient<IMemberAggregator, MemberAggregator>(),
-                ServiceDescriptor.Singleton<IAntiAltActions, AntiAltActions>(),
-                ServiceDescriptor.Singleton<IConfigLoader, ConfigLoader>(),
                 ServiceDescriptor.Singleton(_ => new DiscordWebhookClient(loggerFactory: _loggerFactory, minimumLogLevel: LogLevel.None)),
-                ServiceDescriptor.Singleton(_ => new Random()),
-
-                // > Commands
-                ServiceDescriptor.Transient<IHelpFormatter, HelpFormatter>(),
-                ServiceDescriptor.Singleton<ICommandHandler, AkkoCommandHandler>(),
-                ServiceDescriptor.Singleton<IPlaceholderFormatter, CommandPlaceholders>(),
-                ServiceDescriptor.Singleton<IPrefixResolver, PrefixResolver>(),
-                ServiceDescriptor.Singleton<ICommandCooldown, AkkoCooldown>(),
-
-                // > Event Handlers
-                ServiceDescriptor.Singleton<IDiscordEventManager, DiscordEventManager>(),
-                ServiceDescriptor.Singleton<IStartupEventHandler, StartupEventHandler>(),
-                ServiceDescriptor.Singleton<IVoiceRoleConnectionHandler, VoiceRoleConnectionHandler>(),
-                ServiceDescriptor.Singleton<IGuildLoadHandler, GuildLoadHandler>(),
-                ServiceDescriptor.Singleton<IGuildEventsHandler, GuildEventsHandler>(),
-                ServiceDescriptor.Singleton<IGlobalEventsHandler, GlobalEventsHandler>(),
-                ServiceDescriptor.Singleton<ICommandLogHandler, CommandLogHandler>(),
-                ServiceDescriptor.Singleton<IGatekeepEventHandler, GatekeepEventHandler>(),
-                ServiceDescriptor.Singleton<IGuildLogEventHandler, GuildLogEventHandler>(),
-                ServiceDescriptor.Singleton<IGuildLogGenerator, GuildLogGenerator>(),
-                ServiceDescriptor.Singleton<ITagEventHandler, TagEventHandler>(),
-                ServiceDescriptor.Singleton<IInteractionEventHandler, InteractionEventHandler>()
+                ServiceDescriptor.Singleton(_ => new Random())
         };
 
         foreach (var service in servicesList)
@@ -556,20 +512,5 @@ public sealed class BotCoreBuilder
         await shardedClients.UseInteractivityAsync(interactivityOptions);
 
         return shardedClients;
-    }
-
-    /// <summary>
-    /// Gets the default database connection string.
-    /// </summary>
-    /// <returns>The connection string.</returns>
-    private string GetDefaultConnectionString()
-    {
-        return
-            @"Server=127.0.0.1;" +
-            @"Port=5432;" +
-            @"Database=AkkoBotDb;" +
-            $"User Id={_creds.Database["role"]};" +
-            $"Password={_creds.Database["password"]};" +
-            @"CommandTimeout=20;";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
@@ -15,6 +16,7 @@ namespace AkkoCore.Commands.Common;
 /// <summary>
 /// Keeps track of commands and users on a global and/or guild cooldown.
 /// </summary>
+[CommandService<ICommandCooldown>(ServiceLifetime.Singleton)]
 internal sealed class AkkoCooldown : ICommandCooldown
 {
     private ConcurrentDictionary<string, TimeSpan> _globalCooldown = new();

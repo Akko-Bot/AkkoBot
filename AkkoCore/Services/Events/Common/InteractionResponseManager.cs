@@ -1,6 +1,8 @@
-﻿using AkkoCore.Services.Events.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Events.Controllers.Abstractions;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,6 +11,7 @@ namespace AkkoCore.Services.Events.Common;
 /// <summary>
 /// Generates interactive responses.
 /// </summary>
+[CommandService<IInteractionResponseManager>(ServiceLifetime.Singleton)]
 internal sealed class InteractionResponseManager : IInteractionResponseManager
 {
     private readonly List<ISlashController> _slashControllers = new();

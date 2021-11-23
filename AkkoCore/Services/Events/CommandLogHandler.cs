@@ -6,6 +6,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles log messages when a command is executed.
 /// </summary>
+[CommandService<ICommandLogHandler>(ServiceLifetime.Singleton)]
 internal sealed class CommandLogHandler : ICommandLogHandler
 {
     public Task LogCmdExecutionAsync(CommandsNextExtension cmdHandler, CommandExecutionEventArgs eventArgs)

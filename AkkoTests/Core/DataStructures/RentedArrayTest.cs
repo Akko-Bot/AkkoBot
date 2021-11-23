@@ -22,7 +22,7 @@ public sealed class RentedArrayTest
             return;
         }
 
-        using var rentedArray =  new RentedArray<MockObject>(collection);
+        using var rentedArray = new RentedArray<MockObject>(collection);
 
         Assert.Equal(collection.Length, rentedArray.Count);
 

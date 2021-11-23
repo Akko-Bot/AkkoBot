@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Modules.Utilities.Services;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -24,6 +25,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles guild log events.
 /// </summary>
+[CommandService<IGuildLogEventHandler>(ServiceLifetime.Singleton)]
 internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 {
     private readonly EventId _guildLogEvent = new(98, nameof(GuildLogEventHandler));

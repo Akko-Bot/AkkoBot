@@ -1,9 +1,11 @@
-﻿using AkkoCore.Commands.Common;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Formatters;
 using AkkoCore.Services.Events.Abstractions;
 using ConcurrentCollections;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -13,6 +15,7 @@ namespace AkkoCore.Services.Events.Common;
 /// <summary>
 /// Parses gatekeeping messages into individualized or bulk versions.
 /// </summary>
+[CommandService<IMemberAggregator>(ServiceLifetime.Transient)]
 public sealed class MemberAggregator : IMemberAggregator
 {
     private readonly ConcurrentDictionary<ulong, ConcurrentHashSet<DiscordMember>> _toGreet = new();

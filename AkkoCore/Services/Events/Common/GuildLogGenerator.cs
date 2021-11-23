@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Modules.Administration.Services;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
@@ -11,6 +12,7 @@ using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +25,7 @@ namespace AkkoCore.Services.Events.Common;
 /// <summary>
 /// Generates guild log messages.
 /// </summary>
+[CommandService<IGuildLogGenerator>(ServiceLifetime.Singleton)]
 internal sealed class GuildLogGenerator : IGuildLogGenerator
 {
     private readonly TimeSpan _24hours = TimeSpan.FromDays(1);

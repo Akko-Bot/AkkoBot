@@ -114,7 +114,7 @@ public sealed class ConfigLoader : IConfigLoader
 
             PauseProgram(
                 @"A credentials file has been generated for you at:" +
-                Environment.NewLine + AkkoEnvironment.CredsPath + Environment.NewLine +
+                Environment.NewLine + Environment.NewLine + AkkoEnvironment.CredsPath + Environment.NewLine + Environment.NewLine +
                 @"Please, add your data to it and"
             );
         }

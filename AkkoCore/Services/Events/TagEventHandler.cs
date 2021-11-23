@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Common;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
@@ -24,6 +25,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles execution of global and guild tags.
 /// </summary>
+[CommandService<ITagEventHandler>(ServiceLifetime.Singleton)]
 internal sealed class TagEventHandler : ITagEventHandler
 {
     private const string _remainingTextPlaceholder = "{remaining.text}";

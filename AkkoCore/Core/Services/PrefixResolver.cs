@@ -1,8 +1,10 @@
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
 using AkkoCore.Services.Caching.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Core.Services;
@@ -10,6 +12,7 @@ namespace AkkoCore.Core.Services;
 /// <summary>
 /// Processes Discord messages for the presence of a command prefix.
 /// </summary>
+[CommandService<IPrefixResolver>(ServiceLifetime.Singleton)]
 internal sealed class PrefixResolver : IPrefixResolver
 {
     private readonly IDbCache _dbCache;

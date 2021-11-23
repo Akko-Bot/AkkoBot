@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -20,6 +21,7 @@ namespace AkkoCore.Services.Caching;
 /// <summary>
 /// This class caches entries retrieved from the database.
 /// </summary>
+[CommandService<IDbCache>(ServiceLifetime.Singleton)]
 public sealed class AkkoDbCache : IDbCache
 {
     private readonly IServiceScopeFactory _scopeFactory;

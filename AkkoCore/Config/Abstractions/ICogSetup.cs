@@ -1,4 +1,5 @@
-﻿using AkkoCore.Services.Events.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Events.Controllers.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -56,6 +57,10 @@ public interface ICogSetup
     /// Registers services from this cog to the bot's IoC container.
     /// </summary>
     /// <param name="ioc">The IoC container.</param>
+    /// <remarks>
+    /// Prefer to register services by applying the <see cref="CommandServiceAttribute"/> attribute to them.
+    /// Use this method to register services that require a factory or a concrete implementation.
+    /// </remarks>
     void RegisterServices(IServiceCollection ioc);
 
     /// <summary>

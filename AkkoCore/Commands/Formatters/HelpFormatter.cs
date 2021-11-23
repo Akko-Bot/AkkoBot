@@ -11,6 +11,7 @@ using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace AkkoCore.Commands.Formatters;
 /// <summary>
 /// Generates help messages for a specific command.
 /// </summary>
+[CommandService<IHelpFormatter>(ServiceLifetime.Transient)]
 internal sealed class HelpFormatter : IHelpFormatter
 {
     private readonly SerializableDiscordEmbed _helpMessage = new();

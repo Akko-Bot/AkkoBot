@@ -1,8 +1,10 @@
-﻿using AkkoCore.Common;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Common;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 
@@ -11,6 +13,7 @@ namespace AkkoCore.Services.Caching;
 /// <summary>
 /// Defines an object that caches Discord-related elements.
 /// </summary>
+[CommandService<IAkkoCache>(ServiceLifetime.Singleton)]
 public sealed class AkkoCache : IAkkoCache
 {
     public ConcurrentDictionary<ulong, DynamicRingBuffer<DiscordMessage>> GuildMessageCache { get; private set; } = new();

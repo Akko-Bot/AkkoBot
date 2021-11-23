@@ -146,7 +146,7 @@ public static class AkkoUtilities
                     !type.IsInterface
                     && !type.IsAbstract
                     && !type.IsNested
-                    && type.CustomAttributes.Any(x => x.AttributeType == attributeType)
+                    && type.CustomAttributes.Any(x => x.AttributeType == attributeType || x.AttributeType.IsAssignableTo(attributeType))
             );
     }
 

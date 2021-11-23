@@ -1,4 +1,5 @@
-﻿using AkkoCore.Enums;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Enums;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -22,6 +23,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles role assignment and removal on voice channel connections and disconnections.
 /// </summary>
+[CommandService<IVoiceRoleConnectionHandler>(ServiceLifetime.Singleton)]
 internal sealed class VoiceRoleConnectionHandler : IVoiceRoleConnectionHandler
 {
     /// <summary>

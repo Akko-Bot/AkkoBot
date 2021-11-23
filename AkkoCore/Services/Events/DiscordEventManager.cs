@@ -1,8 +1,10 @@
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.SlashCommands;
 using LinqToDB;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 
@@ -11,6 +13,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Defines the behavior the bot should have for specific user actions.
 /// </summary>
+[CommandService<IDiscordEventManager>(ServiceLifetime.Singleton)]
 internal sealed class DiscordEventManager : IDiscordEventManager
 {
     private readonly IStartupEventHandler _startup;

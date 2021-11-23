@@ -1,3 +1,4 @@
+using AkkoCore.Commands.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -6,18 +7,19 @@ namespace AkkoCore.Commands.Attributes;
 /// <summary>
 /// Marks a class as a command service and defines its lifespan.
 /// </summary>
-[AttributeUsage(
-AttributeTargets.Class |
-AttributeTargets.Method,
-AllowMultiple = false,
-Inherited = true)]
-public sealed class CommandServiceAttribute : Attribute
+/// <inheritdoc/>
+public sealed class CommandServiceAttribute : CommandServiceAttributeBase
 {
-    /// <summary>
-    /// Defines the lifespan of this service.
-    /// </summary>
-    public ServiceLifetime Lifespan { get; }
+    public CommandServiceAttribute(ServiceLifetime lifespan) : base(lifespan)
+    {
+    }
 
-    public CommandServiceAttribute(ServiceLifetime lifespan)
-        => Lifespan = lifespan;
+    protected override void RegisterSingleton(IServiceCollection ioc, Type implementationType)
+        => ioc.AddSingleton(implementationType);
+
+    protected override void RegisterScoped(IServiceCollection ioc, Type implementationType)
+        => ioc.AddScoped(implementationType);
+
+    protected override void RegisterTransient(IServiceCollection ioc, Type implementationType)
+        => ioc.AddTransient(implementationType);
 }

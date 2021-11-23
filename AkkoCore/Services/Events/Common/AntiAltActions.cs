@@ -1,9 +1,11 @@
-﻿using AkkoCore.Commands.Modules.Administration.Services;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ namespace AkkoCore.Services.Events.Common;
 /// <summary>
 /// Handles punishment for alt accounts.
 /// </summary>
+[CommandService<IAntiAltActions>(ServiceLifetime.Singleton)]
 internal sealed class AntiAltActions : IAntiAltActions
 {
     private readonly RoleService _roleService;

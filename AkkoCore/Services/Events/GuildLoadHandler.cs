@@ -1,8 +1,10 @@
-﻿using AkkoCore.Config.Models;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Config.Models;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events;
@@ -10,6 +12,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles caching of guild settings.
 /// </summary>
+[CommandService<IGuildLoadHandler>(ServiceLifetime.Singleton)]
 internal sealed class GuildLoadHandler : IGuildLoadHandler
 {
     private readonly IDbCache _dbCache;

@@ -14,8 +14,8 @@ namespace AkkoCore.Common;
 /// </summary>
 /// <typeparam name="T">The type of the items to be stored.</typeparam>
 /// <remarks>
-/// Use this for short-lived arrays that exceed 1000 bytes in size or methods whose Gen0 allocation exceeds 1000 bytes.
-/// <br>Call <see cref="RentedArray{T}.Dispose"/> to return the array to the <see cref="ArrayPool{T}"/>.</br>
+/// Use this for short-lived arrays that exceed 1000 bytes in size or methods whose Gen0 allocation exceeds 1000 bytes. <br />
+/// Call <see cref="RentedArray{T}.Dispose"/> to return the array to the <see cref="ArrayPool{T}"/>.
 /// </remarks>
 public sealed class RentedArray<T> : ICollection<T>, IList<T>, IReadOnlyList<T>, IEnumerable<T>, IDisposable
 {
@@ -206,7 +206,7 @@ public sealed class RentedArray<T> : ICollection<T>, IList<T>, IReadOnlyList<T>,
     /// <returns><see langword="true"/> if the item was successfully fetched, <see langword="false"/> otherwise.</returns>
     /// <exception cref="ArgumentNullException">Occurs when <paramref name="predicate"/> is <see langword="null"/>.</exception>
     public bool TryGetValue(Func<T, bool> predicate, [MaybeNullWhen(false)] out T item)
-    {        
+    {
         item = _internalArray.FirstOrDefault(predicate);
         return !Equals(item, default(T)) && IndexOf(item) is not -1;
     }

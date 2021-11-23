@@ -92,7 +92,7 @@ public sealed class Bot : IDisposable
                 @"An error has occurred while attempting to connect to Discord. " +
                 @"Make sure your credentials are correct and that you don't have " +
                 $"a firewall or any external software blocking the connection. Error message:" + Environment.NewLine +
-                ex.Message + Environment.NewLine
+                Environment.NewLine + ex.Message + Environment.NewLine
             );
 
             Console.WriteLine("Press Enter to exit.");

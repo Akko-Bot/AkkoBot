@@ -10,6 +10,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace AkkoCore.Services.Events;
 /// <summary>
 /// Handles command execution.
 /// </summary>
+[CommandService<ICommandHandler>(ServiceLifetime.Singleton)]
 internal sealed class AkkoCommandHandler : ICommandHandler
 {
     private readonly IDbCache _dbCache;
@@ -144,6 +146,6 @@ internal sealed class AkkoCommandHandler : ICommandHandler
             && (context.Member is null || permOverride.Permissions is Permissions.None || context.Member.PermissionsIn(context.Channel).HasOneFlag(permOverride.Permissions))
             && (permOverride.AllowedUserIds.Count is 0 || permOverride.AllowedUserIds.Contains((long)context.User.Id))
             && (permOverride.AllowedChannelIds.Count is 0 || permOverride.AllowedChannelIds.Contains((long)context.Channel.Id))
-            && !context.Command.ExecutionChecks.Any(x => !IsContextValid(x, context));
+            && context.Command.ExecutionChecks.All(x => IsContextValid(x, context));
     }
 }

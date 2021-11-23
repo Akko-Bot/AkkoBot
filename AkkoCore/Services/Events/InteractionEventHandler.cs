@@ -1,7 +1,9 @@
-﻿using AkkoCore.Services.Events.Abstractions;
+﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -15,6 +17,7 @@ namespace AkkoCore.Services.Events;
 /// Handles interactive Discord messages.
 /// </summary>
 /// <remarks>This implementation only processes interactions whose ID are suffixed with either "_update" or "_end".</remarks>
+[CommandService<IInteractionEventHandler>(ServiceLifetime.Singleton)]
 internal sealed class InteractionEventHandler : IInteractionEventHandler
 {
     private const string _updateInteractionSuffix = "_update";

@@ -1,4 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using DSharpPlus;
@@ -6,7 +7,6 @@ using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -15,6 +15,7 @@ namespace AkkoCore.Commands.Formatters;
 /// <summary>
 /// Defines the base formatter for command placeholders.
 /// </summary>
+[CommandService<IPlaceholderFormatter>(ServiceLifetime.Singleton)]
 public class CommandPlaceholders : IPlaceholderFormatter
 {
     /// <summary>
