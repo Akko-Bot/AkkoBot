@@ -362,7 +362,7 @@ public sealed class BotCoreBuilder
         var shardedClient = await GetBotClientAsync(timeout);   // Initialize the sharded clients
 
         var cogSetups = RegisterFinalServices(shardedClient);   // Add the last services needed
-        var services = _cmdServices.BuildServiceProvider();     // Initialize the IoC container
+        var services = _cmdServices.BuildServiceProvider(true); // Initialize the IoC container
 
         // Initialize the command handlers
         var cmdHandlers = await GetCommandHandlersAsync(shardedClient, services, isCaseSensitive, withDms, withMentionPrefix);
