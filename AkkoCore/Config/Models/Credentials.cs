@@ -25,6 +25,7 @@ public sealed class Credentials
     public Dictionary<string, string> Database { get; init; } = new()
     {
         { "role", Environment.UserName },
-        { "password", "postgres_password_here" }
+        { "password", "postgres_password_here" },
+        { "custom_connection_string", null! }
     };
 }

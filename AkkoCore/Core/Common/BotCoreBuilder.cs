@@ -52,13 +52,14 @@ public sealed class BotCoreBuilder
         _loggerFactory = loggerFactory;
         _cmdServices = cmdServices ?? new ServiceCollection();
 
-        _dbConnectionString =
-            @"Server=127.0.0.1;" +
-            @"Port=5432;" +
-            @"Database=AkkoBotDb;" +
-            $"User Id={_creds.Database["role"]};" +
-            $"Password={_creds.Database["password"]};" +
-            @"CommandTimeout=20;";
+        _dbConnectionString = (!string.IsNullOrWhiteSpace(_creds.Database["custom_connection_string"]))
+            ? _creds.Database["custom_connection_string"]
+            : @"Server=127.0.0.1;" +
+              @"Port=5432;" +
+              @"Database=AkkoBotDb;" +
+              $"User Id={_creds.Database["role"]};" +
+              $"Password={_creds.Database["password"]};" +
+              @"CommandTimeout=20;";
     }
 
     /// <summary>
