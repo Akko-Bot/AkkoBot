@@ -198,4 +198,14 @@ public sealed class OwnerCommands : AkkoCommandModule
 
         await context.RespondPaginatedByFieldsAsync(embed, fields, 2);
     }
+
+    [Command("leave")]
+    [Description("cmd_leave")]
+    public async Task ListServersAsync(CommandContext context, DiscordGuild? server = default)
+    {
+        server ??= context.Guild;
+
+        await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
+        await server.LeaveAsync();
+    }
 }

@@ -103,10 +103,6 @@ public class BotCore : IDisposable
         CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
         CommandExt[0].Services.GetService<IInteractionEventHandler>()?.Dispose();
 
-        // Dispose scoped
-        foreach (var cmdHandler in CommandExt.Values)
-            cmdHandler.Services.GetService<AkkoDbContext>()?.Dispose();
-
         // Dispose clients - this also disposes the extensions
         _ = BotShardedClient.StopAsync();
 

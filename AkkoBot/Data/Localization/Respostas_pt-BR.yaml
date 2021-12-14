@@ -848,3 +848,5 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
+
+cmd_leave: Remove o bot do servidor especificado. Forneça nenhum parâmetro para removê-lo do servidor atual.
