@@ -1,6 +1,8 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Help.Services;
+using AkkoCore.Common;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -14,9 +16,13 @@ namespace AkkoCore.Commands.Modules.Help;
 public sealed class Help : AkkoCommandModule
 {
     private readonly HelpService _service;
+    private readonly BotConfig _botConfig;
 
-    public Help(HelpService service)
-        => _service = service;
+    public Help(HelpService service, BotConfig botConfig)
+    {
+        _service = service;
+        _botConfig = botConfig;
+    }
 
     [Command("help"), HiddenOverload]
     public async Task HelpCommandAsync(CommandContext context)
@@ -26,6 +32,12 @@ public sealed class Help : AkkoCommandModule
     [Description("cmd_help")]
     public async Task HelpCommandAsync(CommandContext context, [Description("arg_command")] params string[] command)
     {
+        if (command.Length is 0 && !_botConfig.EnableDefaultHelpMessage)
+        {
+            await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+            return;
+        }
+        
         using var scope = context.Services.GetRequiredScopedService<IHelpFormatter>(out var helpBuilder);
         var message = helpBuilder.GenerateHelpMessage(context, command);
 

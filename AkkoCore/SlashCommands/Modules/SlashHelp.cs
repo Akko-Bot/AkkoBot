@@ -1,6 +1,9 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Modules.Help.Services;
+using AkkoCore.Common;
+using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
+using AkkoCore.Models.Serializable;
 using AkkoCore.SlashCommands.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -14,9 +17,13 @@ namespace AkkoCore.SlashCommands.Modules;
 public sealed class SlashHelp : AkkoSlashCommandModule
 {
     private readonly HelpService _service;
+    private readonly BotConfig _botConfig;
 
-    public SlashHelp(HelpService service)
-        => _service = service;
+    public SlashHelp(HelpService service, BotConfig botConfig)
+    {
+        _service = service;
+        _botConfig = botConfig;
+    }
 
     [SlashCommand("help", "Gets help on how to use a command.")]
     public async Task SlashHelpCommandAsync(InteractionContext context, [RemainingText, Option("command", "The command to get help for.")] string command = "")
@@ -29,7 +36,9 @@ public sealed class SlashHelp : AkkoSlashCommandModule
         var settings = context.GetMessageSettings();
 
         var fakeContext = cmdHandler.CreateFakeContext(context.User, context.Channel, command, settings.Prefix, cmd, args);
-        var message = helpBuilder.GenerateHelpMessage(fakeContext, string.IsNullOrWhiteSpace(command) ? Array.Empty<string>() : command.Split(' '));
+        var message = (command.Length is 0 && !_botConfig.EnableDefaultHelpMessage)
+            ? new SerializableDiscordMessage(AkkoStatics.FailureEmoji.ToString())
+            : helpBuilder.GenerateHelpMessage(fakeContext, string.IsNullOrWhiteSpace(command) ? Array.Empty<string>() : command.Split(' '));
 
         await context.RespondLocalizedAsync(message, isError: helpBuilder.IsErroed);
     }

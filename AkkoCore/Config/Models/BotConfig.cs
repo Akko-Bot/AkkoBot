@@ -27,7 +27,7 @@ public sealed class BotConfig : Settings, IMessageSettings
     /// <summary>
     /// The default bot locale.
     /// </summary>
-    [YamlMember(Description = @"The default bot locale. Defaults to """ + AkkoConstants.DefaultLanguage + @""".")]
+    [YamlMember(Description = $@"The default bot locale. Defaults to ""{AkkoConstants.DefaultLanguage}"".")]
     public string Locale
     {
         get => _locale;
@@ -101,9 +101,15 @@ public sealed class BotConfig : Settings, IMessageSettings
     public bool EnableHelp { get; set; } = true;
 
     /// <summary>
+    /// Defines whether the bot responds to help commands with no parameter.
+    /// </summary>
+    [YamlMember(Description = @"Defines whether the bot responds to help commands with no parameter. Defaults to ""true"". Values: true, false")]
+    public bool EnableDefaultHelpMessage { get; set; } = true;
+
+    /// <summary>
     /// Defines whether the bot has statuses in rotation.
     /// </summary>
-    [YamlMember(Description = @"Defines whether the bot has statuses in rotation. Setting it to ""false"" disables status rotation.")]
+    [YamlMember(Description = @"Defines whether the bot has statuses in rotation. Setting it to ""false"" disables status rotation. Values: true, false")]
     public bool RotateStatus { get; set; } = false;
 
     /// <summary>

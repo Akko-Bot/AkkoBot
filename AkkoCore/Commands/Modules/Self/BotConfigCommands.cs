@@ -139,6 +139,11 @@ public sealed class BotConfigCommands : AkkoCommandModule
     public async Task SetBotEnableHelpAsync(CommandContext context, [Description("arg_bool")] bool enableHelp)
         => await ChangePropertyAsync(context, x => x.EnableHelp = enableHelp);
 
+    [Command("defaulthelp"), Aliases("withdefaulthelp")]
+    [Description("cmd_config_defaulthelp")]
+    public async Task SetBotEnableDefaultHelpAsync(CommandContext context, [Description("arg_bool")] bool enableDefaultHelp)
+        => await ChangePropertyAsync(context, x => x.EnableDefaultHelpMessage = enableDefaultHelp);
+
     [Command("mentionprefix"), Aliases("mention")]
     [Description("cmd_config_mention")]
     public async Task SetBotMentionPrefixAsync(CommandContext context, [Description("arg_bool")] bool mention)
