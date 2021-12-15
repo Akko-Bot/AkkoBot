@@ -244,7 +244,7 @@ public sealed class DynamicRingBufferTest
     {
         var sample = CreateDynamicRingBuffer<int>(default);
         var actions = sizes
-            .Select(x => () => sample.Resize(x))
+            .Select(x => (Action)(() => sample.Resize(x))) // Need to cast explicitly, compiler regression
             .ToArray();
 
         // This throws if a race condition occurs

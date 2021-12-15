@@ -87,7 +87,9 @@ public sealed class ConfigLoader : IConfigLoader
 
             return false;
         }
-        else if (string.IsNullOrWhiteSpace(creds.Database["password"]) || creds.Database["password"].Equals("postgres_password_here"))
+        else if (string.IsNullOrWhiteSpace(creds.Database["custom_connection_string"])
+            && (string.IsNullOrWhiteSpace(creds.Database["password"])
+            || creds.Database["password"].Equals("postgres_password_here", StringComparison.Ordinal)))
         {
             PauseProgram(
                 "You forgot to set your database password." + Environment.NewLine +

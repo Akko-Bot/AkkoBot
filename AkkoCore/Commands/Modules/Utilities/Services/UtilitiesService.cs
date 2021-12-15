@@ -213,9 +213,7 @@ public sealed class UtilitiesService
                 "info",
                 context.FormatLocalized(
                     "{0}: {1}\n" +
-                    "{2}: {3}\n" +
-                    "{4}: {5}",
-                    "region", server.VoiceRegion.Name,
+                    "{2}: {3}\n",
                     "verification_level", server.VerificationLevel.ToString().ToLowerInvariant(),
                     "created_on", server.CreationTimestamp.ToString("d", AkkoUtilities.GetCultureInfo(context.GetMessageSettings().Locale, true))
                 ),
