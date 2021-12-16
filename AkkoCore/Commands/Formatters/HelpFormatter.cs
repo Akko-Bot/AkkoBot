@@ -1,5 +1,6 @@
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
@@ -31,15 +32,17 @@ internal sealed class HelpFormatter : IHelpFormatter
     private readonly ILocalizer _localizer;
     private readonly ICommandHandler _commandHandler;
     private readonly BotConfig _botConfig;
+    private readonly UtilitiesService _utilitiesService;
 
     public bool IsErroed { get; private set; }
 
-    public HelpFormatter(IDbCache dbCache, ILocalizer localizer, ICommandHandler commandHandler, BotConfig botConfig)
+    public HelpFormatter(IDbCache dbCache, ILocalizer localizer, ICommandHandler commandHandler, BotConfig botConfig, UtilitiesService utilitiesService)
     {
         _dbCache = dbCache;
         _localizer = localizer;
         _commandHandler = commandHandler;
         _botConfig = botConfig;
+        _utilitiesService = utilitiesService;
     }
 
     public SerializableDiscordMessage GenerateHelpMessage(CommandContext context)
@@ -50,7 +53,13 @@ internal sealed class HelpFormatter : IHelpFormatter
         inputCommand ??= (List<string>)context.RawArguments;
 
         // If no parameter, send the default help message
-        if (inputCommand.Count is 0)
+        if (inputCommand.Count is 0 && !string.IsNullOrWhiteSpace(_botConfig.DefaultHelpMessage))
+        {
+            return (_utilitiesService.DeserializeMessage(_botConfig.DefaultHelpMessage, out var message))
+                ? message
+                : new SerializableDiscordMessage(_botConfig.DefaultHelpMessage);
+        }
+        else if (inputCommand.Count is 0)
         {
             // Default help message (no command)
             var name = context.FormatLocalized("name").ToLowerInvariant();

@@ -17,6 +17,7 @@ public sealed class BotConfig : Settings, IMessageSettings
     private string _okColor = "007FFF";
     private string _errorColor = "FB3D28";
     private TimeSpan _bulkGatekeepingTime = TimeSpan.FromSeconds(5);
+    private string _defaultHelpMessage = string.Empty;
 
     /// <summary>
     /// Groups the qualified name of commands that have been disabled globally.
@@ -135,6 +136,17 @@ public sealed class BotConfig : Settings, IMessageSettings
     /// </summary>
     [YamlMember(Description = @"Defines the maximum amount of time that an interactive command waits for user input. Defaults to ""00:01:00"".")]
     public TimeSpan? InteractiveTimeout { get; set; } = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// Defines the message to be sent when the help command is used without parameters.
+    /// </summary>
+    /// <remarks>Set it to <see cref="string.Empty"/> to use the built-in default help message.</remarks>
+    [YamlMember(Description = @"Defines the message to be sent when the help command is used without parameters. Default is '' (uses the default Akko help message).")]
+    public string DefaultHelpMessage
+    {
+        get => _defaultHelpMessage;
+        set => _defaultHelpMessage = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
+    }
 
     public override IReadOnlyDictionary<string, string> GetSettings()
     {

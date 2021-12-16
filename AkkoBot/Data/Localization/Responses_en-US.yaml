@@ -850,3 +850,5 @@ x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
 cmd_leave: Makes the bot leave the specified server. Provide no parameter to make it leave the current server.
 cmd_config_defaulthelp: Sets whether the bot should respond to help commands with no parameters.
+arg_defaulthelp: The default help message.
+cmd_config_setdefaulthelp: Sets the default help message. Provide no parameter to reset.
