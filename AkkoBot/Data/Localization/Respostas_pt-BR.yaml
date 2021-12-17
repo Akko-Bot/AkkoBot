@@ -852,3 +852,6 @@ cmd_leave: Remove o bot do servidor especificado. Forneça nenhum parâmetro par
 cmd_config_defaulthelp: Define se o bot deve responder a comandos de ajuda sem parâmetros.
 arg_defaulthelp: A mensagem de ajuda padrão.
 cmd_config_setdefaulthelp: Define a mensagem de ajuda. Forneça nenhum parâmetro para redefinir ao padrão.
+dm_source_msg: Esta {0} foi enviada do servidor {1}.
+cmd_config_tagdm: Define se mensagens de boas-vindas e tags enviadas em mensagem direta devem ter uma nota indicando o servidor que originou a mensagem.
+greet_msg: mensagem de boas-vindas

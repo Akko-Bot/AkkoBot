@@ -90,6 +90,12 @@ public sealed class BotConfig : Settings, IMessageSettings
     public bool RespondToDms { get; set; } = true;
 
     /// <summary>
+    /// Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
+    /// </summary>
+    [YamlMember(Description = @"Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from. Defaults to ""false"".")]
+    public bool MarkDmsWithSource { get; set; } = false;
+
+    /// <summary>
     /// Defines whether the bot responds to commands prefixed with a mention to the bot.
     /// </summary>
     [YamlMember(Description = @"Defines whether the bot responds to commands prefixed with a mention to the bot. Defaults to ""false"". Values: true, false")]

@@ -37,7 +37,7 @@ public sealed class Help : AkkoCommandModule
             await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
             return;
         }
-        
+
         using var scope = context.Services.GetRequiredScopedService<IHelpFormatter>(out var helpBuilder);
         var message = helpBuilder.GenerateHelpMessage(context, command);
 

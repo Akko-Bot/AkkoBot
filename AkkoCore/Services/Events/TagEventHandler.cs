@@ -1,8 +1,10 @@
 ﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
+using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
+using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
@@ -178,10 +180,12 @@ internal sealed class TagEventHandler : ITagEventHandler
                 : string.Empty
         );
 
+        var response = (_utilitiesService.DeserializeMessage(parsedResponse, out var responseContent))
+            ? responseContent.AppendDmSourceNote(context, channel, _botConfig, "dm_source_msg", "tag", Formatter.Bold(eventArgs.Guild.Name))
+            : new DiscordMessageBuilder() { Content = parsedResponse }.AppendDmSourceNote(context, channel, _botConfig, "dm_source_msg", "tag", Formatter.Bold(eventArgs.Guild.Name));
+
         // Send the tag
-        var message = _utilitiesService.DeserializeMessage(parsedResponse, out var responseContent)
-            ? await channel.SendMessageAsync(responseContent).ConfigureAwait(false)
-            : await channel.SendMessageAsync(parsedResponse).ConfigureAwait(false);
+        await channel.SendMessageAsync(response).ConfigureAwait(false);
 
         // Delete the trigger message
         if (dbTag.Behavior.HasFlag(TagBehavior.Delete) && eventArgs.Guild?.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages) is true)

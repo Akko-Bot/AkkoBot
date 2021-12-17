@@ -852,3 +852,6 @@ cmd_leave: Makes the bot leave the specified server. Provide no parameter to mak
 cmd_config_defaulthelp: Sets whether the bot should respond to help commands with no parameters.
 arg_defaulthelp: The default help message.
 cmd_config_setdefaulthelp: Sets the default help message. Provide no parameter to reset.
+dm_source_msg: This {0} was sent from the server {1}.
+cmd_config_tagdm: Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
+greet_msg: greet message

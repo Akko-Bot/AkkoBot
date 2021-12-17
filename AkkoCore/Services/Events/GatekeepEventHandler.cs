@@ -113,10 +113,11 @@ internal sealed class GatekeepEventHandler : IGatekeepEventHandler
         var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
         var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
-        if (_utilitiesService.DeserializeMessage(parsedString, out var message))
-            await eventArgs.Member.SendMessageSafelyAsync(message!);
-        else
-            await eventArgs.Member.SendMessageSafelyAsync(parsedString);
+        var response = (_utilitiesService.DeserializeMessage(parsedString, out var message))
+            ? message.AppendDmSourceNote(fakeContext, channel, _botConfig, "dm_source_msg", "greet_msg", Formatter.Bold(eventArgs.Guild.Name))
+            : new DiscordMessageBuilder() { Content = parsedString }.AppendDmSourceNote(fakeContext, channel, _botConfig, "dm_source_msg", "greet_msg", Formatter.Bold(eventArgs.Guild.Name));
+
+        await eventArgs.Member.SendMessageSafelyAsync(response);
     }
 
     public async Task SendGreetMessageAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
