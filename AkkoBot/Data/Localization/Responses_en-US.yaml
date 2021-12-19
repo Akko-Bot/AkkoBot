@@ -34,6 +34,7 @@ arg_color: A 6-digit, hexadecimal code of a color.
 arg_command: A valid command.
 arg_config_timeout: How long the bot should wait on interactive commands. Minimum of __10s__.
 arg_cooldown_time: For how long the cooldown should last.
+arg_defaulthelp: The default help message.
 arg_discord_channel: ID or mention to a Discord channel.
 arg_discord_color: The hexadecimal value of a color.
 arg_discord_invite: The link or code of a Discord server invite.
@@ -94,6 +95,7 @@ arg_stream_url: The URL of the stream.
 arg_tag_behavior: The tag behavior.
 arg_tag_clearold_time: Time the tag hasn't been used.
 arg_tag_ids: Multiple tag IDs, separated by space.
+arg_tag_import: The exported tags.
 arg_tag_keyword: Any text present in the tag's response.
 arg_tag_response: The tag's response.
 arg_tag_trigger: The tag's trigger.
@@ -196,6 +198,7 @@ cmd_clearstatus: Removes all statuses from the bot.
 cmd_config: Groups settings that define how the bot should behave globally.
 cmd_config_cache: Sets how many messages should be cached per channel. Requires a restart to take effect.
 cmd_config_case: Sets whether commands should be case sensitive or not. Requires a restart to take effect.
+cmd_config_defaulthelp: Sets whether the bot should respond to help commands with no parameters.
 cmd_config_dm: Sets whether the bot should execute commands in direct messages or not. Requires a restart to take effect.
 cmd_config_embed: Sets whether the bot should use embeds for responses or not.
 cmd_config_errorcolor: Sets the default color that should be used on embeds that return an error message.
@@ -211,6 +214,7 @@ cmd_config_log_save: Sets whether logs should be saved to a text file.
 cmd_config_log_size: Defines the size a log file should have, in MB.
 cmd_config_log_timeformat: Sets the time format used for logging on the console. You can find the reference [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings).
 cmd_config_log_timeformat_arg: The time format to be used. Leave it empty to reset to the default.
+cmd_config_markdm: Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
 cmd_config_mention: Sets whether the bot should respond to commands executed with a mention to itself as a prefix. Requires a restart to take effect.
 cmd_config_okcolor: Sets the default color that should be used on embeds.
 cmd_config_owner: Groups commands related to the bot owners.
@@ -219,6 +223,7 @@ cmd_config_owner_list: Lists the bot owners.
 cmd_config_owner_rem: Removes a bot owner from the credentials file.
 cmd_config_prefix: Sets the default prefix for the bot.
 cmd_config_reloadlocales: Reloads the response strings available to the bot.
+cmd_config_setdefaulthelp: Sets the default help message. Provide no parameter to reset.
 cmd_config_timeout: Sets how long interactive commands should wait for user input, in seconds. Minimum of 10 seconds.
 cmd_config_webhooklogname: Sets the default name to be used on the webhooks for guild logs.
 cmd_cooldown: Groups commands related to command cooldowns.
@@ -308,6 +313,7 @@ cmd_invite_remove: Deletes the specified invite.
 cmd_joinrole: Adds or removes a role to the list of roles that should be automatically assigned to a user when they join the server. Maximum of 3 roles per server. Provide no parameter to see the list of join roles.
 cmd_kick: Kicks a user from the server.
 cmd_ldc: Lists all commands that have been disabled globally.
+cmd_leave: Makes the bot leave the specified server. Provide no parameter to make it leave the current server.
 cmd_listroles: Lists the roles of this server. Provide a user to see the user's roles.
 cmd_listservers: Lists the servers serviced by the specified shard. Provide no parameter to list the servers on the current shard.
 cmd_liststatus: Lists all rotating statuses and their corresponding ID.
@@ -401,6 +407,8 @@ cmd_tag_clear: Removes all tags that meet the specified criteria. Provide no par
 cmd_tag_clearold: Removes all tags from the bot that haven't been used in a while.
 cmd_tag_editresponse: Edits the response of the specified tag.
 cmd_tag_edittrigger: Edits the trigger of the specified tag.
+cmd_tag_export: Exports tags from the current server to a text file. Use it in direct message to export global tags. Provide no parameter to export all tags.
+cmd_tag_import: Imports all specified tags to the current server. Use it in direct message to import as global tags. Provide no parameter to import from attachments.
 cmd_tag_info: Shows information about the specified tag.
 cmd_tag_list: Lists the tags available in this server according to the specified criteria. Use this command in direct message to list global tags.
 cmd_tag_permission: Toggles the permission required for the user to execute the specified tag. Permissions can be stacked.
@@ -456,6 +464,7 @@ delmsgoncmd_enabled: Automatic deletion of messages has been enabled. Commands w
 denied: Denied
 description: Description
 disabled: disabled
+dm_source_msg: This {0} was sent from the server {1}.
 duration: Duration
 edited_on: Edited on
 emoji_list_title: Server Emojis
@@ -509,6 +518,7 @@ greet_channel_removed: The greet channel has been successfully removed.
 greet_channel_set: The greet message will be sent to the {0} channel.
 greet_message: greet message
 greet_message_set: The greet message has been successfully set.
+greet_msg: greet message
 greetdel_disable: Automatic deletion of greet messages has been disabled.
 greetdel_enable: Greet messages will be automatically deleted in {0} seconds.
 greetdm_disabled: Greet messages will now be sent in the server.
@@ -603,7 +613,9 @@ log_ignore_add: Added {0} to the ignored list.
 log_ignore_remove: Removed {0} from the ignored list.
 log_invite_created_title: Invite created
 log_invite_deleted_title: Invite deleted
+log_joiningalt_title: ❗Possible alt has joined
 log_joiningmember_title: User has joined
+log_leavingalt_title: ❗Possible alt has left
 log_leavingmember_title: User has left
 log_list_title: Server Logs
 log_message_deleted_title: Message deleted
@@ -779,6 +791,7 @@ tag_delete_old_tags: delete tags that weren't used in the last {0} days
 tag_delete_success: Successfully deleted {0} tags.
 tag_delete_trigger_tags: delete tags with the {0} trigger
 tag_delete_trigger_user_tags: delete tags from user {0} with the {1} trigger
+tag_export_content: Successfully exported {0} tags.
 tag_global_list_title: List of Global Tags
 tag_list_empty: No tags were found.
 tag_list_title: List of Server Tags
@@ -848,15 +861,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-cmd_leave: Makes the bot leave the specified server. Provide no parameter to make it leave the current server.
-cmd_config_defaulthelp: Sets whether the bot should respond to help commands with no parameters.
-arg_defaulthelp: The default help message.
-cmd_config_setdefaulthelp: Sets the default help message. Provide no parameter to reset.
-dm_source_msg: This {0} was sent from the server {1}.
-cmd_config_markdm: Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
-greet_msg: greet message
-
-tag_export_content: Successfully exported {0} tags.
-cmd_tag_export: Exports tags from the current server to a text file. Use it in direct message to export global tags. Provide no parameter to export all tags.
-arg_tag_import: The exported tags.
-cmd_tag_import: Imports all specified tags to the current server. Use it in direct message to import as global tags. Provide no parameter to import from attachments.

@@ -108,7 +108,7 @@ public class GatekeepEntity : DbEntity
     /// <summary>
     /// Defines the time difference between joining date and creation date for a user to be considered an alt.
     /// </summary>
-    public TimeSpan AntiAltTime { get; set; } = TimeSpan.Zero;
+    public TimeSpan AntiAltTime { get; set; } = TimeSpan.FromDays(1);
 
     /// <summary>
     /// Defines whether gatekeeping is active for this guild.

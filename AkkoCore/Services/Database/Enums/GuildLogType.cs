@@ -64,8 +64,13 @@ public enum GuildLogType
     UserPresence = 1 << 9,
 
     /// <summary>
+    /// Join and leave events for possible alt accounts.
+    /// </summary>
+    AltEvents = 1 << 10,
+
+    /// <summary>
     /// All events.
     /// </summary>
     All = Unknown | ChannelEvents | BanEvents | MemberEvents | MessageEvents
-        | VoiceEvents | RoleEvents | InviteEvents | EmojiEvents | UserPresence
+        | VoiceEvents | RoleEvents | InviteEvents | EmojiEvents | UserPresence | AltEvents
 }

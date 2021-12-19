@@ -21,6 +21,7 @@ internal sealed class GuildLogConverter : IArgumentConverter<GuildLogType>
             "roleevents" or "role" or "roles" => Task.FromResult(Optional.FromValue(GuildLogType.RoleEvents)),
             "inviteevents" or "invite" or "invites" => Task.FromResult(Optional.FromValue(GuildLogType.InviteEvents)),
             "emojievents" or "emoji" or "emojis" => Task.FromResult(Optional.FromValue(GuildLogType.EmojiEvents)),
+            "altevents" or "alt" or "alts" => Task.FromResult(Optional.FromValue(GuildLogType.AltEvents)),
             //"userpresence" or "presence" => Task.FromResult(Optional.FromValue(GuildLog.UserPresence)),   // Status changes offer nothing of value
             _ => Task.FromResult(Optional.FromNoValue<GuildLogType>())
         };

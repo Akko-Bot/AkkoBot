@@ -187,7 +187,7 @@ public sealed class Tags : AkkoCommandModule
             embed.WithTitle(context.FormatLocalized("{0} {1}", "tag", $"#{tag.Id}"))
                 .WithDescription((tag.IsEmoji) ? tag.Response : Formatter.BlockCode(tag.Response, "yaml"))
                 .AddField("trigger", tag.Trigger, true)
-                .AddField("author", dbUser?.FullName ?? author!.GetFullname(), true)
+                .AddField("author", dbUser?.FullName ?? author?.GetFullname() ?? "DeletedUser", true)
                 .WithFooter(context.FormatLocalized("{0}: {1}", "reaction", (tag.IsEmoji) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji));
 
             if (tag.Behavior is not TagBehavior.None)
@@ -244,7 +244,7 @@ public sealed class Tags : AkkoCommandModule
             var parsedTags = tags.FromYaml<SerializableTagEntity[]>();
             var result = await _service.ImportTagsAsync(context, parsedTags);
 
-            await context.Message.CreateReactionAsync((result is not 0) ? AkkoStatics.SuccessEmoji : AkkoStatics.WarningEmoji);
+            await context.Message.CreateReactionAsync((result > 0) ? AkkoStatics.SuccessEmoji : AkkoStatics.WarningEmoji);
         }
         catch
         {

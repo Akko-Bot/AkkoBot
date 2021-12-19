@@ -34,6 +34,7 @@ arg_color: Um código de cor hexadecimal de seis dígitos.
 arg_command: Um comando válido.
 arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos. Mínimo de __10s__.
 arg_cooldown_time: Por quanto tempo o cooldown deve durar.
+arg_defaulthelp: A mensagem de ajuda padrão.
 arg_discord_channel: ID ou menção a um canal de texto do Discord.
 arg_discord_color: O valor hexadecimal de uma cor.
 arg_discord_invite: O link ou o código do convite de servidor.
@@ -94,6 +95,7 @@ arg_stream_url: A URL do stream.
 arg_tag_behavior: O comportamento da tag.
 arg_tag_clearold_time: Tempo em que a tag não foi utilizada.
 arg_tag_ids: Múltiplos IDs de tags, separados por espaço.
+arg_tag_import: As tags exportadas.
 arg_tag_keyword: Qualquer texto presente na resposta da tag.
 arg_tag_response: A resposta.
 arg_tag_trigger: O gatilho.
@@ -196,6 +198,7 @@ cmd_clearstatus: Remove todos os status do bot.
 cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
 cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
 cmd_config_case: Define se o bot deve diferenciar letras maiúsculas de minúsculas nos comandos. Requer reinicialização para tomar efeito.
+cmd_config_defaulthelp: Define se o bot deve responder a comandos de ajuda sem parâmetros.
 cmd_config_dm: Define se o bot deve responder a comandos executados em mensagem privada. Requer reinicialização para tomar efeito.
 cmd_config_embed: Define se o bot deve utilizar embeds em suas respostas.
 cmd_config_errorcolor: Define a cor padrão a ser utilizada em embeds que retornam uma mensagem de erro.
@@ -211,6 +214,7 @@ cmd_config_log_save: Define se os logs devem ser salvos em um arquivo de texto.
 cmd_config_log_size: Define o tamanho que arquivos de log devem ter, em MB.
 cmd_config_log_timeformat: Define o formato de hora a ser utilizado nos logs. Você pode visualizar a referência [aqui](https://docs.microsoft.com/pt-br/dotnet/standard/base-types/custom-date-and-time-format-strings).
 cmd_config_log_timeformat_arg: O formato de hora a ser utilizado. Deixe vazio para redefini-lo de volta ao valor padrão.
+cmd_config_markdm: Define se mensagens de boas-vindas e tags enviadas em mensagem direta devem ter uma nota indicando o servidor que originou a mensagem.
 cmd_config_mention: Define se o bot deve responder a comandos executados com uma menção a si como prefixo. Requer reinicialização para tomar efeito.
 cmd_config_okcolor: Define a cor padrão a ser utilizada em embeds.
 cmd_config_owner: Agrupa comandos relacionados aos donos to bot.
@@ -219,6 +223,7 @@ cmd_config_owner_list: Lista os donos do bot.
 cmd_config_owner_rem: Remove um dono das credenciais do bot.
 cmd_config_prefix: Define o prefixo padrão do bot.
 cmd_config_reloadlocales: Recarrega os textos de resposta disponíveis ao bot.
+cmd_config_setdefaulthelp: Define a mensagem de ajuda. Forneça nenhum parâmetro para redefinir ao padrão.
 cmd_config_timeout: Define por quanto tempo comandos interativos devem esperar por uma resposta do usuário, em segundos. Mínimo de 10 segundos.
 cmd_config_webhooklogname: Define o nome padrão a ser utilizado por webhooks para registros de servidor.
 cmd_cooldown: Agrupa comandos relacionados a cooldowns.
@@ -308,6 +313,7 @@ cmd_invite_remove: Exclui o convite especificado.
 cmd_joinrole: Adiciona ou remove um cargo à lista de cargos que devem ser automaticamente adicionados a um usuário que entrar no servidor. Máximo de 3 cargos por servidor. Forneça nenhum parâmetro para exibir a lista de cargos de entrada.
 cmd_kick: Expulsa um usuário do servidor.
 cmd_ldc: Exibe todos os comandos desativados.
+cmd_leave: Remove o bot do servidor especificado. Forneça nenhum parâmetro para removê-lo do servidor atual.
 cmd_listroles: Lista os cargos desse servidor. Forneça um usuário para exibir seus cargos.
 cmd_listservers: Exibe os servidores na shard especificada. Forneça nenhum parâmetro para listar os servidores na shard atual.
 cmd_liststatus: Lista todos os status em rotação e seus IDs correspondentes.
@@ -401,6 +407,8 @@ cmd_tag_clear: Remove todas as tags que atendem ao critério especificado. Forne
 cmd_tag_clearold: Remove todas as tags do bot que não foram utilizadas recentemente.
 cmd_tag_editresponse: Edita a resposta da tag especificada.
 cmd_tag_edittrigger: Edita o gatilho da tag especificada.
+cmd_tag_export: Exporta as tags do servidor atual para um arquivo de texto. Use em mensagem direta para exportar tags globais. Forneça nenhum parâmetro para exportar todas as tags.
+cmd_tag_import: Importa todas as tags especificadas para o servidor atual. Use em mensagem direta para importar como tags globais. Forneça nenhum parâmetro para importar de anexos.
 cmd_tag_info: Exibe informação sobre a tag especificada.
 cmd_tag_list: Exibe as tags disponíveis nesse servidor de acordo com o critério especificado. Use esse comando em mensagem direta para exibir tags globais.
 cmd_tag_permission: Adiciona ou remove uma permissão necessária para que o usuário execute a tag especificada. Permissões podem ser acumuladas.
@@ -456,6 +464,7 @@ delmsgoncmd_enabled: A exclusão automática de comandos foi ativada. Comandos s
 denied: Negado
 description: Descrição
 disabled: desativado
+dm_source_msg: Esta {0} foi enviada do servidor {1}.
 duration: Duração
 edited_on: Alterado em
 emoji_list_title: Emojis do Servidor
@@ -509,6 +518,7 @@ greet_channel_removed: Canal de boas-vindas removido com sucesso.
 greet_channel_set: A mensagem de boas-vindas será enviada no canal {0}.
 greet_message: mensagem de boas-vindas
 greet_message_set: Mensagem de boas-vindas definida com sucesso.
+greet_msg: mensagem de boas-vindas
 greetdel_disable: Exclusão automática de mensagens de boas-vindas foi desativada.
 greetdel_enable: Mensagens de boas-vindas serão automaticamente excluídas em {0} segundos.
 greetdm_disabled: A mensagem de boas-vindas será enviada no servidor.
@@ -603,7 +613,9 @@ log_ignore_add: '{0} foi adicionado à lista de canais ignorados.'
 log_ignore_remove: '{0} foi removido da lista de canais ignorados.'
 log_invite_created_title: Convite criado
 log_invite_deleted_title: Convite excluído
+log_joiningalt_title: ❗Possível alt entrou
 log_joiningmember_title: Usuário entrou
+log_leavingalt_title: ❗Possível alt saiu
 log_leavingmember_title: Usuário saiu
 log_list_title: Registros do Servidor
 log_message_deleted_title: Mensagem excluída
@@ -779,6 +791,7 @@ tag_delete_old_tags: excluir tags que não foram usadas nos últimos {0} dias
 tag_delete_success: '{0} tags excluídas com sucesso.'
 tag_delete_trigger_tags: excluir tags com o gatilho {0}
 tag_delete_trigger_user_tags: excluir as tags do usuário {0} com o gatilho {1}
+tag_export_content: '{0} tags exportadas com sucesso.'
 tag_global_list_title: Lista de Tags Globais
 tag_list_empty: Nenhuma tag foi encontrada.
 tag_list_title: Lista de Tags do Servidor
@@ -848,15 +861,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-cmd_leave: Remove o bot do servidor especificado. Forneça nenhum parâmetro para removê-lo do servidor atual.
-cmd_config_defaulthelp: Define se o bot deve responder a comandos de ajuda sem parâmetros.
-arg_defaulthelp: A mensagem de ajuda padrão.
-cmd_config_setdefaulthelp: Define a mensagem de ajuda. Forneça nenhum parâmetro para redefinir ao padrão.
-dm_source_msg: Esta {0} foi enviada do servidor {1}.
-cmd_config_markdm: Define se mensagens de boas-vindas e tags enviadas em mensagem direta devem ter uma nota indicando o servidor que originou a mensagem.
-greet_msg: mensagem de boas-vindas
-
-tag_export_content: '{0} tags exportadas com sucesso.'
-cmd_tag_export: Exporta as tags do servidor atual para um arquivo de texto. Use em mensagem direta para exportar tags globais. Forneça nenhum parâmetro para exportar todas as tags.
-arg_tag_import: As tags exportadas.
-cmd_tag_import: Importa todas as tags especificadas para o servidor atual. Use em mensagem direta para importar como tags globais. Forneça nenhum parâmetro para importar de anexos.
