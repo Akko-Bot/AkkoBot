@@ -14,7 +14,9 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Utilities;
@@ -25,11 +27,13 @@ public sealed class Tags : AkkoCommandModule
 {
     private readonly IDbCache _dbCache;
     private readonly TagsService _service;
+    private readonly UtilitiesService _utilitiesService;
 
-    public Tags(IDbCache dbCache, TagsService service)
+    public Tags(IDbCache dbCache, TagsService service, UtilitiesService utilitiesService)
     {
         _dbCache = dbCache;
         _service = service;
+        _utilitiesService = utilitiesService;
     }
 
     [Command("add")]
@@ -194,6 +198,58 @@ public sealed class Tags : AkkoCommandModule
         }
 
         await context.RespondLocalizedAsync(embed, tag is null, tag is null);
+    }
+
+    [Command("export")]
+    [Description("cmd_tag_export")]
+    [RequireUserPermissions(Permissions.ManageGuild)]
+    public async Task ExportTagsAsync(CommandContext context, [RemainingText, Description("arg_tag_ids")] params int[] tagIds)
+    {
+        using var tags = _service.GetTags(context.Guild?.Id)
+            .If(tagIds.Length is not 0, x => x.Where(y => tagIds.Contains(y.Id)))
+            .Select(x => new SerializableTagEntity(x))
+            .ToRentedArray();
+
+        if (tags.Count is 0)
+        {
+            await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+            return;
+        }
+
+        using var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(tags.ToYaml()));
+
+        var message = new DiscordMessageBuilder()
+            .WithContent(context.FormatLocalized("tag_export_content", tags.Count))
+            .WithFile($"{context.Guild?.Name ?? "global"}_tags.yaml", fileStream);
+
+        await context.Channel.SendMessageAsync(message);
+    }
+
+    [Command("import")]
+    [Description("cmd_tag_import")]
+    [RequireUserPermissions(Permissions.ManageGuild)]
+    public async Task ImportTagsAsync(CommandContext context, [RemainingText, Description("arg_tag_import")] string? tags = default)
+    {
+        if (string.IsNullOrWhiteSpace(tags))
+        {
+            var content = await context.Message.Attachments
+                .Select(x => _utilitiesService.GetOnlineStringAsync(x.Url))
+                .WhenAllAsync();
+
+            tags = string.Join('\n', content);
+        }
+
+        try
+        {
+            var parsedTags = tags.FromYaml<SerializableTagEntity[]>();
+            var result = await _service.ImportTagsAsync(context, parsedTags);
+
+            await context.Message.CreateReactionAsync((result is not 0) ? AkkoStatics.SuccessEmoji : AkkoStatics.WarningEmoji);
+        }
+        catch
+        {
+            await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+        }
     }
 
     #region Clear

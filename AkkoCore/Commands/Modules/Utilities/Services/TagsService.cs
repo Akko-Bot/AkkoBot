@@ -1,5 +1,6 @@
 ﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
+using AkkoCore.Models.Serializable;
 using AkkoCore.Services;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -8,11 +9,14 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Utilities.Services;
@@ -43,9 +47,7 @@ public sealed class TagsService
     public async Task<bool> AddTagAsync(CommandContext context, string trigger, string response, bool isEmoji)
     {
         // Require bot ownership for global tags
-        // Require user to be the tag's author or a higher admin for guild tags
-        if (string.IsNullOrWhiteSpace(trigger) || string.IsNullOrWhiteSpace(response)
-            || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id)))
+        if (!IsValidAddContext(context, trigger, response))
             return false;
 
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
@@ -74,6 +76,48 @@ public sealed class TagsService
     }
 
     /// <summary>
+    /// Imports the specified tags to the current context.
+    /// </summary>
+    /// <param name="context">The command context.</param>
+    /// <param name="tags">The tags to be imported.</param>
+    /// <returns>The amount of tags that were imported.</returns>
+    public async Task<int> ImportTagsAsync(CommandContext context, IReadOnlyCollection<SerializableTagEntity> tags)
+    {
+        if (!_dbCache.Tags.TryGetValue(context.Guild?.Id ?? default, out var cachedTags))
+            cachedTags = new(1, 0);
+
+        var toAdd = tags
+            .Where( // Remove tags that already exist
+                x => IsValidAddContext(context, x.Trigger, x.Response)
+                    && !cachedTags.Any(y => x.Trigger == y.Trigger && x.Response == y.Response)
+            )
+            .Select(x => x.Build(context.Guild?.Id))
+            .ToRentedArray();
+
+        if (toAdd.Count is 0)
+            return 0;
+
+        _dbCache.Tags.TryAdd(context.Guild?.Id ?? default, cachedTags);
+
+        using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
+        await db.BulkCopyAsync(toAdd);
+
+        // Cache the new db entries
+        var dbTags = await db.Tags
+            .Where(x =>
+                x.GuildIdFK == ((context.Guild == null) ? null : context.Guild.Id)
+                    && toAdd.Select(y => y.Trigger).Contains(x.Trigger)
+                    && toAdd.Select(y => y.Response).Contains(x.Response)
+            )
+            .ToArrayAsyncEF();
+
+        foreach (var tag in dbTags)
+            cachedTags.Add(tag);
+
+        return dbTags.Length;
+    }
+
+    /// <summary>
     /// Removes a tag from the database.
     /// </summary>
     /// <param name="context">The command context.</param>
@@ -89,7 +133,7 @@ public sealed class TagsService
         // Require bot ownership for global tags
         // Require user to be the tag's author or a higher admin for guild tags
         if (dbTag is null || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id))
-            || !(dbTag.AuthorId == context.User.Id || context.Member?.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageGuild)) is true))
+            || !(dbTag.AuthorId == context.User.Id || context.Member.Hierarchy is int.MaxValue || context.Member?.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageGuild)) is true))
             return false;
 
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
@@ -179,8 +223,8 @@ public sealed class TagsService
 
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
-        db.Tags.Attach(dbTag!);
-        var result = setter(dbTag!);
+        db.Tags.Attach(dbTag);
+        var result = setter(dbTag);
         await db.SaveChangesAsync();
 
         return result;
@@ -204,11 +248,26 @@ public sealed class TagsService
     /// <param name="id">The database ID of the tag.</param>
     /// <param name="dbTag">The tag if found, <see langword="null"/> if it was not found.</param>
     /// <returns><see langword="true"/> if the tag was found, <see langword="false"/> otherwise.</returns>
-    private bool GetCachedTag(ulong? sid, int id, out TagEntity? dbTag)
+    private bool GetCachedTag(ulong? sid, int id, [MaybeNullWhen(false)] out TagEntity dbTag)
     {
         _dbCache.Tags.TryGetValue(sid ?? default, out var tags);
         dbTag = tags?.FirstOrDefault(x => x.Id == id);
 
         return dbTag is not null;
+    }
+
+    /// <summary>
+    /// Checks if a tag can be created in the current context.
+    /// </summary>
+    /// <param name="context">The command context.</param>
+    /// <param name="trigger">The tag's trigger.</param>
+    /// <param name="response">The tag's response.</param>
+    /// <returns><see langword="true"/> if the tag can be created, <see langword="false"/> otherwise.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool IsValidAddContext(CommandContext context, string trigger, string response)
+    {
+        return !string.IsNullOrWhiteSpace(trigger)
+            && !string.IsNullOrWhiteSpace(response)
+            && (context.Guild is not null || AkkoUtilities.IsOwner(context, context.User.Id));
     }
 }

@@ -296,4 +296,15 @@ public static class LinqExt
         random ??= new();
         return collection.ElementAtOrDefault(random.Next(Math.Min(collection.Count(), Math.Abs(maxIndex))));
     }
+
+    /// <summary>
+    /// Applies a deferred <paramref name="action"/> on a collection if the <paramref name="condition"/> is <see langword="true"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements.</typeparam>
+    /// <param name="collection">This collection.</param>
+    /// <param name="condition">The condition to be checked.</param>
+    /// <param name="action">The action to be performed.</param>
+    /// <returns>The modified collection if <paramref name="condition"/> is <see langword="true"/>, otherwise the original collection.</returns>
+    public static IEnumerable<T> If<T>(this IEnumerable<T> collection, bool condition, Func<IEnumerable<T>, IEnumerable<T>> action)
+        => (condition) ? action(collection) : collection;
 }

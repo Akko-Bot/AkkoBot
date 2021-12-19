@@ -134,10 +134,10 @@ public sealed class BotConfigCommands : AkkoCommandModule
     public async Task SetBotRespondDmsAsync(CommandContext context, [Description("arg_bool")] bool respondToDms)
         => await ChangePropertyAsync(context, x => x.RespondToDms = respondToDms);
 
-    [Command("tagdm"), Aliases("tagdms")]
-    [Description("cmd_config_tagdm")]
-    public async Task SetTagDmsWithSourceAsync(CommandContext context, [Description("arg_bool")] bool tagDmsWithSource)
-        => await ChangePropertyAsync(context, x => x.MarkDmsWithSource = tagDmsWithSource);
+    [Command("markdm"), Aliases("markdms")]
+    [Description("cmd_config_markdm")]
+    public async Task SetMarkDmsWithSourceAsync(CommandContext context, [Description("arg_bool")] bool markDmsWithSource)
+        => await ChangePropertyAsync(context, x => x.MarkDmsWithSource = markDmsWithSource);
 
     [Command("help"), Aliases("withhelp")]
     [Description("cmd_config_help")]

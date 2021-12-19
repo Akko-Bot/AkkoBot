@@ -853,5 +853,10 @@ cmd_config_defaulthelp: Sets whether the bot should respond to help commands wit
 arg_defaulthelp: The default help message.
 cmd_config_setdefaulthelp: Sets the default help message. Provide no parameter to reset.
 dm_source_msg: This {0} was sent from the server {1}.
-cmd_config_tagdm: Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
+cmd_config_markdm: Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
 greet_msg: greet message
+
+tag_export_content: Successfully exported {0} tags.
+cmd_tag_export: Exports tags from the current server to a text file. Use it in direct message to export global tags. Provide no parameter to export all tags.
+arg_tag_import: The exported tags.
+cmd_tag_import: Imports all specified tags to the current server. Use it in direct message to import as global tags. Provide no parameter to import from attachments.
