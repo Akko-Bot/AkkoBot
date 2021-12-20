@@ -15,12 +15,16 @@ namespace AkkoCog.DangerousCommands.DangerousCommandsSetup;
 /// </summary>
 internal sealed class DangerousCommandsCogSetup : ICogSetup
 {
-    public string Name { get; } = "DangerousCommands v1.0.0";
+    public string Name { get; } = "DangerousCommands";
+
+    public string Version { get; } = "1.0.0";
 
     public string Author { get; } = "Kotz#7922";
 
+    public string Description { get; } = "cog_dangerouscommands_desc";
+
     // Localization files inside the "../Localization" folder
-    public string LocalizationDirectory { get; } = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? string.Empty, "Localization");
+    public string? LocalizationDirectory { get; } = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? string.Empty, "Localization");
 
     public void RegisterServices(IServiceCollection ioc)
     {

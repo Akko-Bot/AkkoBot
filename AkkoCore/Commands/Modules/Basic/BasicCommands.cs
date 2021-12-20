@@ -1,6 +1,7 @@
 ﻿using AkkoCore.Commands.Abstractions;
 using AkkoCore.Common;
 using AkkoCore.Config.Models;
+using AkkoCore.Core.Abstractions;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;
@@ -20,21 +21,24 @@ namespace AkkoCore.Commands.Modules.Basic;
 public sealed class BasicCommands : AkkoCommandModule, IDisposable
 {
     private const string _botAuthor = "Kotz#7922";
-    private const string _versionString = "AkkoBot v0.2.1-beta";
+    private const string _versionString = "AkkoBot v0.3.0-beta";
     private readonly DateTimeOffset _startup = DateTimeOffset.Now;
     private readonly Process _currentProcess = Process.GetCurrentProcess();
 
     private readonly ICommandHandler _commandHandler;
     private readonly IGlobalEventsHandler _globalEvents;
     private readonly IDbCache _dbCache;
+    private readonly ICogs _cogs;
     private readonly DiscordShardedClient _shardedClient;
     private readonly Credentials _creds;
 
-    public BasicCommands(ICommandHandler commandHandler, IGlobalEventsHandler globalEvents, IDbCache dbCache, DiscordShardedClient shardedClient, Credentials creds)
+    public BasicCommands(ICommandHandler commandHandler, IGlobalEventsHandler globalEvents, IDbCache dbCache,
+        ICogs cogs, DiscordShardedClient shardedClient, Credentials creds)
     {
         _commandHandler = commandHandler;
         _globalEvents = globalEvents;
         _dbCache = dbCache;
+        _cogs = cogs;
         _shardedClient = shardedClient;
         _creds = creds;
     }
@@ -61,7 +65,7 @@ public sealed class BasicCommands : AkkoCommandModule, IDisposable
             .AddField("author", _botAuthor, true)
             .AddField("commands_executed", $"{_commandHandler.CommandsRan} ({_commandHandler.CommandsRan / elapsed.TotalSeconds:F2}/s)", true)
             .AddField("Shards", $"#{context.Client.ShardId}/{context.Client.ShardCount}", true) // Shards is not localized - this is intentional
-            .AddField("gateway", $"v{context.Client.GatewayVersion}", true)
+            .AddField("cogs", _cogs.Headers.Count.ToString(), true)
             .AddField("messages", $"{_globalEvents.MessageCount} ({_globalEvents.MessageCount / elapsed.TotalSeconds:F2}/s)", true)
             .AddField("memory", $"{_currentProcess.PrivateMemorySize64 / 1_000_000.0:F1} MB", true)    // Process needs to be fetched every single time for the value to update
             .AddField("owner_ids", string.Join("\n", GetBotOwnerIds(context.Client, _creds)), true)

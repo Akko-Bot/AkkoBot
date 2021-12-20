@@ -30,6 +30,7 @@ arg_channel_id: The ID of a Discord channel.
 arg_channel_name: Name of the channel.
 arg_channel_newname: The new name of the channel.
 arg_channel_topic: The new channel topic.
+arg_cog_name: The name of the cog.
 arg_color: A 6-digit, hexadecimal code of a color.
 arg_command: A valid command.
 arg_config_timeout: How long the bot should wait on interactive commands. Minimum of __10s__.
@@ -195,6 +196,9 @@ cmd_chatmute: Server mutes a user, preventing them from messaging on text channe
 cmd_chatunmute: Server unmutes a user, allowing them to message on text channels.
 cmd_checkperms: Shows the permissions of a role or a user in the specified channel. Provide no parameter to check your own permissions in the current channel.
 cmd_clearstatus: Removes all statuses from the bot.
+cmd_cogs: Groups commands related to cogs.
+cmd_cogs_info: Shows information about the specified cog.
+cmd_cogs_list: Lists all cogs currently loaded.
 cmd_config: Groups settings that define how the bot should behave globally.
 cmd_config_cache: Sets how many messages should be cached per channel. Requires a restart to take effect.
 cmd_config_case: Sets whether commands should be case sensitive or not. Requires a restart to take effect.
@@ -438,6 +442,11 @@ cmd_warne: Sets for how long warnings should last before being automatically rem
 cmd_warnp: 'Sets an automatic punishment to be applied on a user that reaches a certain amount of warnings. Omit the punishment to remove it. The valid punishments are: __Mute__, __Kick__, __Softban__, __Ban__, __AddRole__ and __RemoveRole__.'
 cmd_warnpl: Shows the punishments enabled for this server.
 code: Code
+cog_info_title: Cog info
+cog_not_found: No cog of name {0} was found.
+cogs: Cogs
+cogs_empty: No cogs are loaded.
+cogs_list_title: List of cogs
 command: Command
 command_check_failed: The user does not have enough permissions to execute this command.
 command_modules_footer: Use {0} to see the usage for a specific command.
@@ -839,6 +848,7 @@ vanity_url: Vanity URL
 vcrole_empty: No voice roles were found.
 vcrole_list_title: List of Voice Roles
 verification_level: Verification Level
+version: Version
 visible_to: Visible To
 voice: Voice
 voice_failure: The user needs to be connected to a voice channel for this command to work.

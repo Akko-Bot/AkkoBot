@@ -97,7 +97,7 @@ public sealed class AkkoLocalizer : ILocalizer
         return response;
     }
 
-    public void LoadLocalizedStrings(string localesDirectory)
+    public void LoadLocalizedStrings(string? localesDirectory)
     {
         if (string.IsNullOrWhiteSpace(localesDirectory))
             return;

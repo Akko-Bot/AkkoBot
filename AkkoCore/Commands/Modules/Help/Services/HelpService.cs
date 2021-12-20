@@ -90,7 +90,7 @@ public sealed class HelpService
                         ? (await cmd.RunChecksAsync(fakeContext, false)).Any() ? AkkoStatics.FailureEmoji : AkkoStatics.SuccessEmoji
                         : AkkoStatics.FailureEmoji;
 
-                return @"\" + emote + settings.Prefix + cmd.QualifiedName;
+                return @"\" + emote + " " + settings.Prefix + cmd.QualifiedName;
             })
             .WhenAllAsync();
 
@@ -133,7 +133,7 @@ public sealed class HelpService
     /// <returns>A Discord embed with the search results.</returns>
     public SerializableDiscordEmbed SearchCommandByKeyword(IMessageSettings settings, CommandsNextExtension cmdHandler, string searchParameter)
     {
-        if (searchParameter.StartsWith(settings.Prefix))
+        if (searchParameter.StartsWith(settings.Prefix, StringComparison.Ordinal))
             searchParameter = searchParameter[settings.Prefix.Length..];
 
         var embed = new SerializableDiscordEmbed();

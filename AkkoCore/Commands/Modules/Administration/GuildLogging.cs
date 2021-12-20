@@ -143,10 +143,10 @@ public sealed class GuildLogging : AkkoCommandModule
             .WithTitle("log_list_title")
             .WithDescription(
                 string.Join(
-                    "\n",
+                    '\n',
                     Enum.GetValues<GuildLogType>()
                         .Where(x => x is not GuildLogType.None and not GuildLogType.All and not GuildLogType.Unknown and not GuildLogType.UserPresence)
-                        .Select(x => $"{x}\t{GetChannelMention(context.Guild, guildLogs.FirstOrDefault(y => y.Type == x))}")
+                        .Select(x => $"{x} {GetChannelMention(context.Guild, guildLogs.FirstOrDefault(y => y.Type == x))}")
                 )
             );
 

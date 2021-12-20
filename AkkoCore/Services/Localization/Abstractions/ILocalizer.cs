@@ -88,7 +88,7 @@ public interface ILocalizer : IDisposable
     /// <exception cref="DirectoryNotFoundException"/>
     /// <exception cref="FileNotFoundException"/>
     /// <exception cref="IOException"/>
-    void LoadLocalizedStrings(string localesDirectory);
+    void LoadLocalizedStrings(string? localesDirectory);
 
     /// <summary>
     /// Localizes a response string that contains string formatters.

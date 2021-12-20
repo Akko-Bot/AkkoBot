@@ -2,6 +2,7 @@ arg_sql: Uma instrução SQL válida.
 cmd_massban: Bane múltiplos usuários do servidor.
 cmd_massunban: Desbane múltiplos usuários do servidor.
 cmd_sql: Executa uma instrução SQL no banco de dados.
+cog_dangerouscommands_desc: Contém comandos que podem quebrar funcionalidades do bot ou bani-lo do Discord.
 massban: Banimento em Massa
 massban_description: Banindo {0} usuários.
 massban_failure: Ninguém foi banido porque nenhum dos IDs são válidos ou os usuários já foram banidos.

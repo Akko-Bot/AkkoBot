@@ -412,15 +412,18 @@ public sealed class BotCoreBuilder
 
         var servicesList = new ServiceDescriptor[]
         {
-                /* Add subsystems in here as needed */
-                // > Base Settings
-                ServiceDescriptor.Singleton(_creds),
-                ServiceDescriptor.Singleton(_botConfig),
-                ServiceDescriptor.Singleton(_logConfig),
+            /* Add subsystems in here as needed */
+            // > Base Settings
+            ServiceDescriptor.Singleton(_creds),
+            ServiceDescriptor.Singleton(_botConfig),
+            ServiceDescriptor.Singleton(_logConfig),
 
-                // > Utilities
-                ServiceDescriptor.Singleton(_ => new DiscordWebhookClient(loggerFactory: _loggerFactory, minimumLogLevel: LogLevel.None)),
-                ServiceDescriptor.Singleton(_ => new Random())
+            // > Utilities
+            ServiceDescriptor.Singleton(_ => new DiscordWebhookClient(loggerFactory: _loggerFactory, minimumLogLevel: LogLevel.None)),
+            ServiceDescriptor.Singleton(_ => new Random()),
+
+            // > Cogs
+            ServiceDescriptor.Singleton<ICogs>(_ => new Cogs(cogSetups))
         };
 
         foreach (var service in servicesList)

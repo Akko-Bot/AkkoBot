@@ -30,6 +30,7 @@ arg_channel_id: O ID de um canal do Discord.
 arg_channel_name: Nome do canal.
 arg_channel_newname: O novo nome do canal.
 arg_channel_topic: O novo tópico do canal.
+arg_cog_name: O nome da cog.
 arg_color: Um código de cor hexadecimal de seis dígitos.
 arg_command: Um comando válido.
 arg_config_timeout: Quanto tempo o bot deve esperar durante comands interativos. Mínimo de __10s__.
@@ -195,6 +196,9 @@ cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
 cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
 cmd_checkperms: Exibe as permissões de um cargo ou usuário no canal especificado. Forneça nenhum parâmetro para visualizar suas permissões no canal atual.
 cmd_clearstatus: Remove todos os status do bot.
+cmd_cogs: Agrupa comandos relacionados a cogs.
+cmd_cogs_info: Exibe informação sobre a cog especificada.
+cmd_cogs_list: Exibe todas as cogs atualmente carregadas.
 cmd_config: Agrupa configurações que definem como o bot deve se comportar globalmente.
 cmd_config_cache: Define quantas mensagens devem ser guardadas no cache por canal. Requer reinicialização para tomar efeito.
 cmd_config_case: Define se o bot deve diferenciar letras maiúsculas de minúsculas nos comandos. Requer reinicialização para tomar efeito.
@@ -438,6 +442,11 @@ cmd_warne: Define por quanto tempo as advertências devem permanecer antes de se
 cmd_warnp: 'Define uma punição automática a ser aplicada em um usuário que atingir uma determinada quantidade de advertências. Omita a punição para removê-la. As punições válidas são: __Mute__, __Kick__, __Softban__, __Ban__, __AddRole__ e __RemoveRole__.'
 cmd_warnpl: Exibe as punições habilitadas nesse servidor.
 code: Código
+cog_info_title: Informação da cog
+cog_not_found: Nenhuma cog de nome {0} foi encontrada.
+cogs: Cogs
+cogs_empty: Não há nenhuma cog carregada.
+cogs_list_title: Lista de cogs
 command: Comando
 command_check_failed: O usuário não possui permissões suficientes para executar esse comando.
 command_modules_footer: Utilize {0} para visualizar o uso de um comando específico.
@@ -839,6 +848,7 @@ vanity_url: Vanity URL
 vcrole_empty: Nenhum cargo de voz foi encontrado.
 vcrole_list_title: Lista de Cargos de Voz
 verification_level: Nível de Verificação
+version: Versão
 visible_to: Visível Para
 voice: Voz
 voice_failure: O usuário precisa estar conectado a um canal de voz para este comando funcionar.

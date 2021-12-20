@@ -22,15 +22,25 @@ public interface ICogSetup
     string Name { get; }
 
     /// <summary>
+    /// The current version of this cog.
+    /// </summary>
+    string Version { get; }
+
+    /// <summary>
     /// The author of this cog.
     /// </summary>
     string Author { get; }
 
     /// <summary>
+    /// A brief description of what this cog does.
+    /// </summary>
+    string Description { get; }
+
+    /// <summary>
     /// The full path to the directory where the localized response strings are stored.
     /// </summary>
-    /// <remarks>The files must be in Yaml format.</remarks>
-    string LocalizationDirectory { get; }
+    /// <remarks>The files must be in Yaml format. Set it to <see langword="null"/> if the cog has no localization.</remarks>
+    string? LocalizationDirectory { get; }
 
     /// <summary>
     /// Registers slash commands and associated events from this cog.
@@ -73,5 +83,5 @@ public interface ICogSetup
     /// to add the interaction controllers defined in this cog.
     /// </remarks>
     /// <exception cref="ArgumentException">Occurs when a two responses get registered under the same ID.</exception>
-    public void RegisterComponentResponses(IInteractionResponseManager responseGenerator);
+    void RegisterComponentResponses(IInteractionResponseManager responseGenerator);
 }
