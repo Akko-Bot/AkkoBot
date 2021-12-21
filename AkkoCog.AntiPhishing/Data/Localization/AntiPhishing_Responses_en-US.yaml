@@ -1,0 +1,6 @@
+antiphishing_punish_reason: Phishing Link
+antiphishing_toggle_desc: Anti-phishing has been {0} on this server.
+cmd_antiphishing: Groups commands for managing anti-phishing settings on servers.
+cmd_antiphishing_punishment: Sets the punishment to be automatically applied to users who send phishing links. Possible punishments are `Mute`, `Kick`, `Softban`, and `Ban`. Provide no parameter to remove the punishment.
+cmd_antiphishing_toggle: Toggles the anti-phishing filter for the current server.
+cog_antiphishing_desc: Automatically filters phishing links with the `https://anti-fish.harmony.rocks/` API.

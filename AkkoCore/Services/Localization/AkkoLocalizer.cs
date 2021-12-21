@@ -117,7 +117,9 @@ public sealed class AkkoLocalizer : ILocalizer
             var reader = new StreamReader(File.OpenRead(filePath));
             var localizedStrings = reader.FromYaml<Dictionary<string, string>>();
 
-            if (!_localizedStrings.ContainsKey(locale))
+            if (localizedStrings is null)
+                continue;
+            else if (!_localizedStrings.ContainsKey(locale))
                 _localizedStrings.Add(locale, localizedStrings);
             else
             {

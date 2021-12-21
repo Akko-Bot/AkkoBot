@@ -70,7 +70,7 @@ public sealed class RoleService
     /// <returns><see langword="true"/> if the context user is above in the hierarchy, <see langword="false"/> otherwise.</returns>
     public async Task<bool> CheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
     {
-        if (!CheckHierarchyAsync(context.Member, user))
+        if (!CheckHierarchy(context.Member, user))
         {
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(errorMessage);
@@ -84,12 +84,12 @@ public sealed class RoleService
     }
 
     /// <summary>
-    /// Checks if the <paramref name="userA"/> can perform actions on <paramref name="userB"/>.
+    /// Checks if <paramref name="userA"/> can perform actions on <paramref name="userB"/>.
     /// </summary>
     /// <param name="userA">The user that is performing the action.</param>
     /// <param name="userB">The user that is being acted upon.</param>
-    /// <returns><see langword="true"/> if the <paramref name="userA"/> is above in the hierarchy, <see langword="false"/> otherwise.</returns>
-    public bool CheckHierarchyAsync(DiscordMember userA, DiscordMember userB)
+    /// <returns><see langword="true"/> if <paramref name="userA"/> is above in the hierarchy, <see langword="false"/> otherwise.</returns>
+    public bool CheckHierarchy(DiscordMember userA, DiscordMember userB)
     {
         return (userA.Hierarchy > userB.Hierarchy || userA.Guild.CurrentMember.Hierarchy > userB.Hierarchy)
         && !userB.Equals(userA.Guild.CurrentMember);

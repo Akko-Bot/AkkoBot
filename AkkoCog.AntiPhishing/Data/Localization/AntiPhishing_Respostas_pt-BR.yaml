@@ -1,0 +1,6 @@
+antiphishing_punish_reason: Link de Golpe
+antiphishing_toggle_desc: Anti-phishing foi {0} nesse servidor.
+cmd_antiphishing: Agrupa comandos relacionados a configurações de anti-phishing em servidores.
+cmd_antiphishing_punishment: Define a punição a ser automaticamente aplicada a usuários que enviarem links duvidosos. As punições possíveis são `Mute`, `Kick`, `Softban`, e `Ban`. Forneça nenhum parâmetro para remover a punição.
+cmd_antiphishing_toggle: Ativa ou desativa o filtro anti-phishing no servidor atual.
+cog_antiphishing_desc: Automaticamente filtra links duvidosos com a API `https://anti-fish.harmony.rocks/`.

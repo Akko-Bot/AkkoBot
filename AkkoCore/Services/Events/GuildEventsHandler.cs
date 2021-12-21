@@ -444,7 +444,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
         var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
         var toWarn = eventArgs.Message.Author is DiscordMember member
             && filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete)
-            && _roleService.CheckHierarchyAsync(eventArgs.Guild.CurrentMember, member);
+            && _roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, member);
 
         var embed = new SerializableDiscordEmbed()
         {

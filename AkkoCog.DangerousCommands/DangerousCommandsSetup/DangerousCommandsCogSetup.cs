@@ -1,5 +1,4 @@
-﻿using AkkoCog.DangerousCommands.DangerousCommands.Services;
-using AkkoCore.Config.Abstractions;
+﻿using AkkoCore.Config.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -28,17 +27,17 @@ internal sealed class DangerousCommandsCogSetup : ICogSetup
 
     public void RegisterServices(IServiceCollection ioc)
     {
-        // This cog doesn't register services with factories or concrete implementations
+        // This cog doesn't register services with factories or concrete implementations.
     }
 
     public void RegisterSlashCommands(SlashCommandsExtension slashHandler)
     {
-        // This cog doesn't have slash commands
+        // This cog doesn't have slash commands.
     }
 
     public void RegisterArgumentConverters(CommandsNextExtension cmdHandler)
     {
-        // This cog doesn't need argument converters
+        // This cog doesn't need argument converters.
     }
 
     public void RegisterCallbacks(DiscordShardedClient shardedClient)
