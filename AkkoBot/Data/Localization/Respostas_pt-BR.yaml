@@ -70,6 +70,7 @@ arg_keyword: O termo da busca.
 arg_locale: O idioma a ser utilizado nas respostas.
 arg_loglevel: 'O nível do log. Os valores possíveis são: __Debug__, __Info__, __Warning__, __Critical__ e __None__.'
 arg_mention: Um ID ou menção válido do Discord.
+arg_modrole_behavior: O comportamento do cargo de gerência.
 arg_module: Um módulo válido.
 arg_nickname: O novo apelido.
 arg_notice: A anotação a ser adicionada ao modlog desse usuário.
@@ -330,6 +331,13 @@ cmd_log_list: Exibe a lista de eventos disponíveis para registro e o canal onde
 cmd_log_start: Inicia registros de servidor no canal especificado. Use `log list` para visualizar a lista de eventos disponíveis para registrar. Forneça nenhum canal para gravar os registros no canal atual.
 cmd_log_stop: Encerra o registro do evento especificado.
 cmd_modlog: Exibe anotações e infrações de um usuário.
+cmd_modrole: Agrupa comandos relacionados a cargos de gerência. Cargos de gerência são cargos que dão a seus usuários a capacidade de designar cargos específicos a outros usuários sem precisar de permissão para gerenciar cargos no servidor.
+cmd_modrole_add: Adiciona cargos-alvo a um cargo de gerência.
+cmd_modrole_behavior: Ativa ou desativa comportamentos para o cargo de gerência especificado. Os valores possíveis são `EnforceHierarchy` (impede que usuários adicionem ou removam cargos-alvo que estejam acima deles na hierarquia de cargos) e `Exclusive` (somente um cargo-alvo pode ser designado por vez). 
+cmd_modrole_list: Exibe of cargos de gerência do servidor.
+cmd_modrole_remove: Remove cargos-alvo de um cargo de gerência. Forneça nenhum cargo-alvo para remover o cargo de gerência.
+cmd_modrole_set: Adiciona um cargo-alvo ao usuário especificado.
+cmd_modrole_unset: Remove um cargo-alvo do usuário especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
 cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal para forçá-lo a se desconectar.
 cmd_mute: Silencia um usuário nos canais de voz e texto.
@@ -651,7 +659,13 @@ messages: Mensagens
 minutes: Minutos
 moderator: Moderador
 modlog_description: '{0} anotações, {1} advertências, {2} silenciamentos, {3} expulsões, {4} expulsões com exclusão, {5} banimentos.'
+modrole_add_fail: Falha ao adicionar cargos-alvo ao cargo de gerência {1}.
+modrole_add_success: '{0} cargos-alvo foram adicionados com sucesso al cargo de gerência {1}.'
+modrole_behavior_toggle: Comportamento {0} foi {1} para o cargo de gerência {2}.
+modrole_not_valid: Esse cargo não é um cargo de gerência.
 modroles: Cargos de Moderador
+modroles_list_empty: Nenhum cargo de gerência foi encontrado.
+modroles_list_title: Lista de cargos de gerência.
 module_not_exist: Esse módulo não existe. Utilize {0} para visualizar os módulos disponíveis.
 modules_footer: Utilize {0} para visualizar os comandos sob um determinado módulo.
 modules_title: Módulos Disponíveis

@@ -136,6 +136,19 @@ public static class LinqExt
     }
 
     /// <summary>
+    /// Awaits all tasks in the current collection and returns when all of them have completed.
+    /// </summary>
+    /// <param name="collection">This collection.</param>
+    /// <exception cref="ArgumentNullException">Occurs when the collection is <see langword="null"/>.</exception>
+    public static async Task WhenAllAsync(this IEnumerable<Task> collection)
+    {
+        if (collection is null)
+            throw new ArgumentNullException(nameof(collection), "Collection cannot be null.");
+
+        await Task.WhenAll(collection).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Awaits all tasks in the current collection and returns their results in an array.
     /// </summary>
     /// <typeparam name="T">The data that needs to be awaited.</typeparam>
@@ -147,6 +160,19 @@ public static class LinqExt
         return (collection is null)
             ? throw new ArgumentNullException(nameof(collection), "Collection cannot be null.")
             : await Task.WhenAll(collection).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Awaits all tasks in the current collection and returns when any of them have completed.
+    /// </summary>
+    /// <param name="collection">This collection.</param>
+    /// <exception cref="ArgumentNullException">Occurs when the collection is <see langword="null"/>.</exception>
+    public static async Task WhenAnyAsync(this IEnumerable<Task> collection)
+    {
+        if (collection is null)
+            throw new ArgumentNullException(nameof(collection), "Collection cannot be null.");
+
+        await (await Task.WhenAny(collection).ConfigureAwait(false)).ConfigureAwait(false);
     }
 
     /// <summary>

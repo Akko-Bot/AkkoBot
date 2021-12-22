@@ -131,5 +131,12 @@ public sealed class GuildConfigEntityTypeConfiguration : IEntityTypeConfiguratio
             .HasForeignKey(x => x.GuildIdFK)
             .HasPrincipalKey(x => x.GuildId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Guild -> Modroles
+        builder.HasMany(x => x.ModrolesRel)
+            .WithOne(x => x.GuildConfigRel)
+            .HasForeignKey(x => x.GuildIdFK)
+            .HasPrincipalKey(x => x.GuildId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

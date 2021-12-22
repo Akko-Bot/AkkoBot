@@ -112,6 +112,11 @@ public class GuildConfigEntity : DbEntity, IMessageSettings
     public List<PermissionOverrideEntity>? PermissionOverrideRel { get; init; }
 
     /// <summary>
+    /// The list of modroles.
+    /// </summary>
+    public List<ModroleEntity>? ModrolesRel { get; init; }
+
+    /// <summary>
     /// The IDs of the roles that should be assigned to a Discord user when they join the guild.
     /// </summary>
     public List<long> JoinRoles { get; init; } = new();

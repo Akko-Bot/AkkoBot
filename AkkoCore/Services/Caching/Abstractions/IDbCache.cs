@@ -121,6 +121,12 @@ public interface IDbCache : IDisposable
     ConcurrentDictionary<ulong, ConcurrentHashSet<PermissionOverrideEntity>> PermissionOverrides { get; }
 
     /// <summary>
+    /// Stores all modroles.
+    /// </summary>
+    /// <remarks>The <see langword="ulong"/> is the ID of the Discord guild, the <see cref="ConcurrentHashSet{T}"/> is the collection of modroles of the guild.</remarks>
+    ConcurrentDictionary<ulong, ConcurrentHashSet<ModroleEntity>> Modroles { get; }
+
+    /// <summary>
     /// Safely gets a database guild.
     /// </summary>
     /// <param name="sid">The GuildId of the database entry.</param>

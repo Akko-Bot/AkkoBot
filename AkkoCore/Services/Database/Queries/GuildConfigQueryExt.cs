@@ -13,7 +13,7 @@ public static class GuildConfigQueryExt
     /// <remarks>
     /// Included properties:
     /// AliasRel, CommandCooldownRel, TagsRel, GatekeepRel, FilteredWordsRel, FilteredContentRel, VoiceRolesRel,
-    /// RepeaterRel, PollRel, AutoSlowmodeRel, PermissionOverrideRel
+    /// RepeaterRel, PollRel, AutoSlowmodeRel, PermissionOverrideRel, Modroles
     /// </remarks>
     /// <returns>A query that includes the aforementioned navigation properties.</returns>
     public static IQueryable<GuildConfigEntity> IncludeCacheable(this IQueryable<GuildConfigEntity> query)
@@ -30,6 +30,7 @@ public static class GuildConfigQueryExt
             .Include(x => x.PollRel)
             .Include(x => x.AutoSlowmodeRel)
             .Include(x => x.GuildLogsRel)
-            .Include(x => x.PermissionOverrideRel);
+            .Include(x => x.PermissionOverrideRel)
+            .Include(x => x.ModrolesRel);
     }
 }

@@ -70,6 +70,7 @@ arg_keyword: The term to search for.
 arg_locale: The language to be used in the responses.
 arg_loglevel: 'The log level. Possible values are: __Debug__, __Info__, __Warning__, __Critical__ and __None__.'
 arg_mention: A valid Discord ID or mention.
+arg_modrole_behavior: The behavior of the modrole.
 arg_module: A valid module.
 arg_nickname: The new nickname.
 arg_notice: The notice to be added to this user's modlog.
@@ -330,6 +331,13 @@ cmd_log_list: Lists the available log events and the channel they are currently 
 cmd_log_start: Starts logging on the specified channel. Use `log list` to see the list of events available for logging. Provide no channel to output the logs in the current channel.
 cmd_log_stop: Stops logging of the specified log event.
 cmd_modlog: Shows notices and infractions of a user.
+cmd_modrole: Groups commands for managing modroles. Modroles are roles that give their users the ability to assign specific roles to other users without the need of server permission to manage roles.
+cmd_modrole_add: Adds target roles to a modrole.
+cmd_modrole_behavior: Toggles the behavior of the specified modrole. Possible values are `EnforceHierarchy` (disallows users to assign or remove target roles that are above them in the role hierarchy) and `Exclusive` (only one target role can be assigned at a time). 
+cmd_modrole_list: Lists the modroles in the server.
+cmd_modrole_remove: Removes target roles from a modrole. Provide no target roles to remove the modrole.
+cmd_modrole_set: Adds a target role to the specified user.
+cmd_modrole_unset: Removes a target role from the specified user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_moveuser: Moves a user to another voice channel. Provide no channel to force them to disconnect.
 cmd_mute: Mutes a user from text and voice channels.
@@ -651,7 +659,13 @@ messages: Messages
 minutes: Minutes
 moderator: Moderator
 modlog_description: '{0} notices, {1} warnings, {2} mutes, {3} kicks, {4} soft-bans, {5} bans.'
+modrole_add_fail: Failed to add target roles to the modrole {1}.
+modrole_add_success: Successfully added {0} target roles to the modrole {1}.
+modrole_behavior_toggle: Behavior {0} has been {1} for modrole {2}.
+modrole_not_valid: This role is not a modrole.
 modroles: Moderator Roles
+modroles_list_empty: No modroles were found.
+modroles_list_title: List of modroles
 module_not_exist: This module doesn't exist. Use {0} to see the list of available modules.
 modules_footer: Use {0} to see the commands under that module.
 modules_title: Available Modules

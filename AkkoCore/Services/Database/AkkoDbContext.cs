@@ -34,6 +34,7 @@ public sealed class AkkoDbContext : DbContext
     public DbSet<GuildLogEntity> GuildLogs { get; init; }
     public DbSet<TagEntity> Tags { get; init; }
     public DbSet<PermissionOverrideEntity> PermissionOverride { get; init; }
+    public DbSet<ModroleEntity> Modroles { get; init; }
 
     public AkkoDbContext(DbContextOptions<AkkoDbContext> ctxOpt) : base(ctxOpt)
     {

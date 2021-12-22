@@ -42,6 +42,7 @@ public sealed class AkkoDbCache : IDbCache
     public ConcurrentDictionary<ulong, ConcurrentHashSet<GuildLogEntity>> GuildLogs { get; private set; }
     public ConcurrentDictionary<ulong, ConcurrentHashSet<TagEntity>> Tags { get; private set; }
     public ConcurrentDictionary<ulong, ConcurrentHashSet<PermissionOverrideEntity>> PermissionOverrides { get; private set; }
+    public ConcurrentDictionary<ulong, ConcurrentHashSet<ModroleEntity>> Modroles { get; private set; }
     public ICommandCooldown CommandCooldown { get; private set; }
 
     public AkkoDbCache(IServiceScopeFactory scopeFactory, ICommandCooldown commandCooldown)
@@ -91,6 +92,7 @@ public sealed class AkkoDbCache : IDbCache
         Polls = new();
         AutoSlowmode = new();
         GuildLogs = new();
+        Modroles = new();
     }
 
     public async ValueTask<GuildConfigEntity> GetDbGuildAsync(ulong sid, BotConfig? botConfig = default)
@@ -134,31 +136,34 @@ public sealed class AkkoDbCache : IDbCache
         if (dbGuild.AutoSlowmodeRel is not null)
             AutoSlowmode.TryAdd(dbGuild.GuildId, dbGuild.AutoSlowmodeRel);
 
-        if (dbGuild.AliasRel?.Count is not null and not 0)
+        if (dbGuild.AliasRel is { Count: > 0 })
             Aliases.TryAdd(dbGuild.GuildId, dbGuild.AliasRel.ToConcurrentHashSet());
 
-        if (dbGuild.FilteredContentRel?.Count is not null and not 0)
+        if (dbGuild.FilteredContentRel is { Count: > 0 })
             FilteredContent.TryAdd(dbGuild.GuildId, dbGuild.FilteredContentRel.ToConcurrentHashSet());
 
-        if (dbGuild.VoiceRolesRel?.Count is not null and not 0)
+        if (dbGuild.VoiceRolesRel is { Count: > 0 })
             VoiceRoles.TryAdd(dbGuild.GuildId, dbGuild.VoiceRolesRel.ToConcurrentHashSet());
 
-        if (dbGuild.RepeaterRel?.Count is not null and not 0)
+        if (dbGuild.RepeaterRel is { Count: > 0 })
             Repeaters.TryAdd(dbGuild.GuildId, dbGuild.RepeaterRel.ToConcurrentHashSet());
 
-        if (dbGuild.PollRel?.Count is not null and not 0)
+        if (dbGuild.PollRel is { Count: > 0 })
             Polls.TryAdd(dbGuild.GuildId, dbGuild.PollRel.ToConcurrentHashSet());
 
-        if (dbGuild.GuildLogsRel?.Count is not null and not 0)
+        if (dbGuild.GuildLogsRel is { Count: > 0 })
             GuildLogs.TryAdd(dbGuild.GuildId, dbGuild.GuildLogsRel.ToConcurrentHashSet());
 
-        if (dbGuild.TagsRel?.Count is not null and not 0)
+        if (dbGuild.TagsRel is { Count: > 0 })
             Tags.TryAdd(dbGuild.GuildId, dbGuild.TagsRel.ToConcurrentHashSet());
 
-        if (dbGuild.PermissionOverrideRel?.Count is not null and not 0)
+        if (dbGuild.PermissionOverrideRel is { Count: > 0 })
             PermissionOverrides.TryAdd(dbGuild.GuildId, dbGuild.PermissionOverrideRel.ToConcurrentHashSet());
 
-        if (dbGuild.CommandCooldownRel?.Count is not null and not 0)
+        if (dbGuild.ModrolesRel is { Count: > 0 })
+            Modroles.TryAdd(dbGuild.GuildId, dbGuild.ModrolesRel.ToConcurrentHashSet());
+
+        if (dbGuild.CommandCooldownRel is { Count: > 0 })
             CommandCooldown.LoadFromEntities(dbGuild.CommandCooldownRel);
 
         return true;
@@ -180,6 +185,7 @@ public sealed class AkkoDbCache : IDbCache
         GuildLogs.TryRemove(sid, out var guildLogs);
         Tags.TryRemove(sid, out var guildTags);
         PermissionOverrides.TryRemove(sid, out var permOverrides);
+        Modroles.TryRemove(sid, out var modroles);
 
         if (dbGuild?.CommandCooldownRel is { Count: > 0 })
             CommandCooldown.UnloadFromEntities(dbGuild.CommandCooldownRel);
@@ -191,6 +197,7 @@ public sealed class AkkoDbCache : IDbCache
         guildLogs?.Clear();
         guildTags?.Clear();
         permOverrides?.Clear();
+        modroles?.Clear();
 
         return dbGuild is not null;
     }
@@ -225,6 +232,7 @@ public sealed class AkkoDbCache : IDbCache
                 ClearNestedCache(GuildLogs);
                 ClearNestedCache(Tags);
                 ClearNestedCache(PermissionOverrides);
+                ClearNestedCache(Modroles);
             }
 
             Blacklist = null!;
@@ -242,6 +250,7 @@ public sealed class AkkoDbCache : IDbCache
             Tags = null!;
             CommandCooldown = null!;
             PermissionOverrides = null!;
+            Modroles = null!;
 
             IsDisposed = true;
         }
