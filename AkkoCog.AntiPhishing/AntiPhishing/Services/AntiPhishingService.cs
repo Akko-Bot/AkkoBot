@@ -45,7 +45,7 @@ public sealed class AntiPhishingService
         => _cache.TryGetValue(sid, out var guildConfig) && guildConfig.IsActive;
 
     /// <summary>
-    /// Gets the punishment for the guild of the specified ID. 
+    /// Gets the punishment for the guild of the specified ID.
     /// </summary>
     /// <param name="sid">The ID of the Discord guild.</param>
     /// <returns>The active punishment or <see langword="null"/> if there is no punishment.</returns>

@@ -72,7 +72,7 @@ public interface ICommandCooldown : IDisposable
     ICommandCooldown LoadFromEntities(IEnumerable<CommandCooldownEntity> dbCommands);
 
     /// <summary>
-    /// Removes command cooldowns with entries from the database.
+    /// Removes command cooldown with entries from the database.
     /// </summary>
     /// <param name="dbCommands">Collection of entries to be loaded into memory.</param>
     /// <returns>This <see cref="ICommandCooldown"/>.</returns>

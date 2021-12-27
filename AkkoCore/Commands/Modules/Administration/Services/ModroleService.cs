@@ -5,7 +5,6 @@ using AkkoCore.Services.Database;
 using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Enums;
 using AkkoCore.Services.Database.Queries;
-using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;

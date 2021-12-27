@@ -341,8 +341,3 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-
-# Akko specific files
-Config/**
-Cogs/**
-Logs/**

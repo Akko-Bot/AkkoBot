@@ -12,6 +12,7 @@ Features include, but are not limited to:
 
 - Moderation
 	- Kick, ban, or mute users (temporarily or permanently)
+	- Modroles to allow users to assign specific roles to other users without the need of giving them server permission to manage roles.
 	- Issue infractions to misbehaving users and automatically punish them when they hit a certain threshold.
 	- Lock and unlock text channels with ease
 	- Delete messages in bulk

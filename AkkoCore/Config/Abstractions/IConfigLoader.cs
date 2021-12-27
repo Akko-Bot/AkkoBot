@@ -2,6 +2,9 @@
 
 namespace AkkoCore.Config.Abstractions;
 
+/// <summary>
+/// Represents an object that loads and saves config YAML files and the bot's credentials.
+/// </summary>
 public interface IConfigLoader
 {
     /// <summary>

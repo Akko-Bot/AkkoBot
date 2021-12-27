@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoTests.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System;

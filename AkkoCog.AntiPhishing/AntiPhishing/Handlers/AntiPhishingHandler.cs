@@ -153,7 +153,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
                 break;
 
             default:
-                client.Logger.LogWarning(_eventLog, "Failed applying punishment of type \"{PunishmentType}\". It's either unsupported or the bot has no permission to apply it.", punishmentType);
+                client.Logger.LogWarning(_eventLog, "Failed applying punishment of type \"{PunishmentType}\". It's either unsupported or the bot has no permission to apply it.", punishmentType.ToString());
                 break;
         }
     }

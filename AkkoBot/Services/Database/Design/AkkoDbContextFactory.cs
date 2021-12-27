@@ -22,18 +22,19 @@ public class AkkoDbContextFactory : IDesignTimeDbContextFactory<AkkoDbContext>
     public AkkoDbContext CreateDbContext(string[] args)
     {
         var creds = LoadCredentials(AkkoEnvironment.CredsPath);
+        var connectionString = (string.IsNullOrWhiteSpace(creds.Database["custom_connection_string"]))
+            ? creds.Database["custom_connection_string"]
+            : @"Server=127.0.0.1;" +
+              @"Port=5432;" +
+              @"Database=AkkoBotDb;" +
+              $"User Id={creds.Database["role"]};" +
+              $"Password={creds.Database["password"]};" +
+              @"CommandTimeout=20;";
 
         var options = new DbContextOptionsBuilder<AkkoDbContext>()
             .UseSnakeCaseNamingConvention()
-            .UseNpgsql(
-                    @"Server=127.0.0.1;" +
-                    @"Port=5432;" +
-                    @"Database=AkkoBotDb;" +
-                    $"User Id={creds.Database["role"]};" +
-                    $"Password={creds.Database["password"]};" +
-                    @"CommandTimeout=20;",
-                x => x.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
-            ).Options;
+            .UseNpgsql(connectionString, x => x.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName))
+            .Options;
 
         return new AkkoDbContext(options);
     }

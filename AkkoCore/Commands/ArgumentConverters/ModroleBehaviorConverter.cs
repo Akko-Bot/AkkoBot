@@ -2,7 +2,6 @@ using AkkoCore.Services.Database.Enums;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
-using System;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters;

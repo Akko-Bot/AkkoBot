@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	  <DebugType>embedded</DebugType>
-	  <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	<DebugType>embedded</DebugType>
+	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
-	  <!-- Enable NRT code analysis -->
-	  <Nullable>enable</Nullable>
+	<!-- Enable NRT code analysis -->
+    <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
 
     <!-- Enable Preview Features: remove this when .NET 7 releases -->
