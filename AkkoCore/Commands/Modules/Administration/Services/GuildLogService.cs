@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -66,11 +66,12 @@ public sealed class GuildLogService
 
         var anyChannelLog = guildLogs.FirstOrDefault(x => x.ChannelId == channel.Id);
 
+        // These methods dispose the avatar stream because whoever wrote them is a 🐒
         var webhook = (anyChannelLog is null)
-            ? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar)
+            ? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar?.GetCopy())
             : _webhookClient.GetRegisteredWebhook(anyChannelLog.WebhookId)
                 ?? await context.Client.GetWebhookSafelyAsync(anyChannelLog.WebhookId)
-                ?? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar);
+                ?? await channel.CreateWebhookAsync(name ?? _botConfig.WebhookLogName, avatar?.GetCopy());
 
         var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType)
             ?? new()
@@ -86,7 +87,7 @@ public sealed class GuildLogService
         if (guildLog.ChannelId != channel.Id && guildLogs.Count(x => x.ChannelId == channel.Id) <= 1)
         {
             _webhookClient.TryRemove(guildLog.WebhookId);
-            webhook = await webhook.ModifyAsync(name ?? webhook.Name, avatar, channel.Id);
+            webhook = await webhook.ModifyAsync(name ?? webhook.Name, avatar?.GetCopy(), channel.Id);
         }
 
         // Update entry

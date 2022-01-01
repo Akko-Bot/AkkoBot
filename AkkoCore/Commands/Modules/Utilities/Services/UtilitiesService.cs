@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
