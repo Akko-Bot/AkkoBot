@@ -1,4 +1,4 @@
-﻿using DSharpPlus;
+using DSharpPlus;
 using DSharpPlus.EventArgs;
 using System.Threading.Tasks;
 
@@ -98,4 +98,14 @@ public interface IGuildLogEventHandler
     /// Logs user leave.
     /// </summary>
     Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs alt joins.
+    /// </summary>
+    Task LogJoiningAltAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs alt leaves.
+    /// </summary>
+    Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs);
 }

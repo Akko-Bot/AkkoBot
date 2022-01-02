@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
@@ -7,7 +7,6 @@ using AkkoCore.Enums;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
 using AkkoCore.Services.Caching.Abstractions;
-using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -29,8 +28,6 @@ namespace AkkoCore.Services.Events.Common;
 [CommandService<IGuildLogGenerator>(ServiceLifetime.Singleton)]
 internal sealed class GuildLogGenerator : IGuildLogGenerator
 {
-    private readonly TimeSpan _24hours = TimeSpan.FromDays(1);
-
     private readonly ILocalizer _localizer;
     private readonly IDbCache _dbCache;
     private readonly GuildLogService _logService;
@@ -384,25 +381,27 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
 
         var settings = GetMessageSettings(eventArgs.Guild.Id);
-        _dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper);
-
-        var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.CreationTimestamp);
-        var message = new SerializableDiscordEmbed()
-            .WithColor(settings.OkColor)
-            .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
-            .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
-            .AddField("created_on", eventArgs.Member.CreationTimestamp.ToDiscordTimestamp(), true)
+        var message = GetBaseMemberActivityLog(settings, eventArgs.Member)
             .AddField("joined_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
-            .WithTitle(
-                (IsAlt(eventArgs.Member, gatekeeper))
-                    ? "log_joiningalt_title"
-                    : "log_joiningmember_title"
-            )
-            .WithFooter(
-                ((IsAlt(eventArgs.Member, gatekeeper))
-                    ? $"{_localizer.FormatLocalized(settings.Locale, "time_difference")}: {GetSmallestTimeString(timeDifference, settings.Locale)} | "
-                    : string.Empty) +
+            .WithTitle("log_joiningmember_title")
+            .WithFooter($"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}")
+            .WithLocalization(_localizer, settings.Locale);
 
+        return GetStandardMessage(message, settings);
+    }
+
+    public DiscordWebhookBuilder GetJoiningAltLog(GuildMemberAddEventArgs eventArgs)
+    {
+        if (eventArgs is null)
+            throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+        var settings = GetMessageSettings(eventArgs.Guild.Id);
+        var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.CreationTimestamp);
+        var message = GetBaseMemberActivityLog(settings, eventArgs.Member)
+            .AddField("joined_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .WithTitle("log_joiningalt_title")
+            .WithFooter(
+                $"{_localizer.FormatLocalized(settings.Locale, "time_difference")}: {GetSmallestTimeString(timeDifference, settings.Locale)} | " +
                 $"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}"
             )
             .WithLocalization(_localizer, settings.Locale);
@@ -416,20 +415,27 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
 
         var settings = GetMessageSettings(eventArgs.Guild.Id);
-        _dbCache.Gatekeeping.TryGetValue(eventArgs.Guild.Id, out var gatekeeper);
+        var message = GetBaseMemberActivityLog(settings, eventArgs.Member)
+            .WithTitle("log_leavingmember_title")
+            .AddField("left_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .WithFooter($"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}")
+            .WithLocalization(_localizer, settings.Locale);
+
+        return GetStandardMessage(message, settings);
+    }
+
+    public DiscordWebhookBuilder GetLeavingAltLog(GuildMemberRemoveEventArgs eventArgs)
+    {
+        if (eventArgs is null)
+            throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+
+        var settings = GetMessageSettings(eventArgs.Guild.Id);
 
         var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.JoinedAt);
-        var message = new SerializableDiscordEmbed()
-            .WithColor(settings.OkColor)
-            .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
-            .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
-            .AddField("created_on", eventArgs.Member.CreationTimestamp.ToDiscordTimestamp(), true)
+
+        var message = GetBaseMemberActivityLog(settings, eventArgs.Member)
+            .WithTitle("log_leavingalt_title")
             .AddField("left_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
-            .WithTitle(
-                (IsAlt(eventArgs.Member, gatekeeper))
-                    ? "log_leavingalt_title"
-                    : "log_leavingmember_title"
-            )
             .WithFooter(
                 $"{_localizer.FormatLocalized(settings.Locale, "stayed_for")}: {GetSmallestTimeString(timeDifference, settings.Locale)} | " +
                 $"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}"
@@ -437,7 +443,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithLocalization(_localizer, settings.Locale);
 
         return GetStandardMessage(message, settings);
-    }
+    }   
 
     /// <summary>
     /// Returns the appropriate webhook message for the guild's embed setting.
@@ -459,16 +465,6 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         => (_dbCache.Guilds.TryGetValue(sid ?? default, out var dbGuild)) ? dbGuild : _botconfig;
 
     /// <summary>
-    /// Determines if the specified user is an alt.
-    /// </summary>
-    /// <param name="user">The user to be analysed.</param>
-    /// <param name="gatekeep">The gatekeep settings.</param>
-    /// <returns><see langword="true"/> is the user is an alt, <see langword="false"/> otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool IsAlt(DiscordUser user, GatekeepEntity? gatekeep)
-        => DateTimeOffset.Now.Subtract(user.CreationTimestamp) < (gatekeep?.AntiAltTime ?? _24hours);
-
-    /// <summary>
     /// Returns the smallest time string for the specified time span.
     /// </summary>
     /// <param name="time">The time span.</param>
@@ -483,5 +479,21 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
                 : (time.TotalMinutes >= 1.0)
                     ? $"{time.TotalMinutes:0.00} {_localizer.FormatLocalized(locale, "minutes")}"
                     : $"{time.TotalSeconds:0.00} {_localizer.FormatLocalized(locale, "seconds")}";
+    }
+
+    /// <summary>
+    /// Gets the base log for when a user joins or leaves the Discord guild.
+    /// </summary>
+    /// <param name="settings">The guild message settings.</param>
+    /// <param name="user">The Discord user.</param>
+    /// <returns>The base log.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private SerializableDiscordEmbed GetBaseMemberActivityLog(IMessageSettings settings, DiscordMember user)
+    {
+        return new SerializableDiscordEmbed()
+            .WithColor(settings.OkColor)
+            .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
+            .WithDescription($"{user.Mention} | {user.GetFullname()}")
+            .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(), true);
     }
 }

@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events;
@@ -28,6 +29,7 @@ namespace AkkoCore.Services.Events;
 [CommandService<IGuildLogEventHandler>(ServiceLifetime.Singleton)]
 internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 {
+    private readonly TimeSpan _24hours = TimeSpan.FromDays(1);
     private readonly EventId _guildLogEvent = new(98, nameof(GuildLogEventHandler));
 
     private readonly IServiceScopeFactory _scopeFactory;
@@ -306,37 +308,59 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public async Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLogs(eventArgs.Guild.Id, GuildLogType.MemberEvents | GuildLogType.AltEvents, out var guildLogs))
+        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
+            || IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
             return;
 
-        foreach (var guildLog in guildLogs)
-        {
-            if (!guildLog.IsActive)
-                continue;
+        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
 
-            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-            if (webhook is not null)
-                _ = webhook.ExecuteAsync(_logGenerator.GetJoiningMemberLog(eventArgs));
-        }
+        if (webhook is not null)
+            _ = webhook.ExecuteAsync(_logGenerator.GetJoiningMemberLog(eventArgs));
     }
 
     public async Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLogs(eventArgs.Guild.Id, GuildLogType.MemberEvents | GuildLogType.AltEvents, out var guildLogs))
+        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
+            || IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
             return;
 
-        foreach (var guildLog in guildLogs)
-        {
-            if (!guildLog.IsActive)
-                continue;
+        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
 
-            var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-            if (webhook is not null)
-                _ = webhook.ExecuteAsync(_logGenerator.GetLeavingMemberLog(eventArgs));
-        }
+        if (webhook is not null)
+            _ = webhook.ExecuteAsync(_logGenerator.GetLeavingMemberLog(eventArgs));
     }
+
+    public async Task LogJoiningAltAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+    {
+        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive)
+            return;
+
+        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
+
+        if (webhook is not null)
+            _ = webhook.ExecuteAsync(_logGenerator.GetJoiningAltLog(eventArgs));
+    }
+
+    public async Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
+    {
+        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive)
+            return;
+
+        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
+
+        if (webhook is not null)
+            _ = webhook.ExecuteAsync(_logGenerator.GetLeavingAltLog(eventArgs));
+    }
+
+    /// <summary>
+    /// Determines if the specified user is an alt.
+    /// </summary>
+    /// <param name="user">The user to be analysed.</param>
+    /// <param name="gatekeep">The gatekeep settings.</param>
+    /// <returns><see langword="true"/> is the user is an alt, <see langword="false"/> otherwise.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool IsAlt(DiscordUser user, GatekeepEntity? gatekeep)
+        => DateTimeOffset.Now.Subtract(user.CreationTimestamp) < (gatekeep?.AntiAltTime ?? _24hours);
 
     /// <summary>
     /// Checks if the provided ids are from an ignored context.
@@ -365,6 +389,18 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Checks if <paramref name="user"/> is an alt and if AltEvents are enabled for the guild of the specified ID.
+    /// </summary>
+    /// <param name="sid">The ID of the Discord guild.</param>
+    /// <param name="user">The Discord user.</param>
+    /// <returns><see langword="true"/> if the user is an alt and AltEvents are enabled, <see langword="false"/> otherwise.</returns>
+    private bool IsAltEventsEnabled(ulong sid, DiscordMember user)
+    {
+        _dbCache.Gatekeeping.TryGetValue(sid, out var gatekeep);
+        return TryGetGuildLog(sid, GuildLogType.AltEvents, out var altLog) && altLog.IsActive && IsAlt(user, gatekeep);
     }
 
     /// <summary>

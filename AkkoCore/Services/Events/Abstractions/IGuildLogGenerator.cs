@@ -1,4 +1,4 @@
-﻿using DSharpPlus.Entities;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using System;
 using System.Collections.Generic;
@@ -162,4 +162,20 @@ public interface IGuildLogGenerator
     /// <returns>The guild log message.</returns>
     /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
     DiscordWebhookBuilder GetLeavingMemberLog(GuildMemberRemoveEventArgs eventArgs);
+
+    /// <summary>
+    /// Generates a log message for a <see cref="GuildMemberAddEventArgs"/> event, when the user is an alt.
+    /// </summary>
+    /// <param name="eventArgs">The event argument.</param>
+    /// <returns>The guild log message.</returns>
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    DiscordWebhookBuilder GetJoiningAltLog(GuildMemberAddEventArgs eventArgs);
+
+    /// <summary>
+    /// Generates a log message for a <see cref="GuildMemberRemoveEventArgs"/> event, when the user is an alt.
+    /// </summary>
+    /// <param name="eventArgs">The event argument.</param>
+    /// <returns>The guild log message.</returns>
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    DiscordWebhookBuilder GetLeavingAltLog(GuildMemberRemoveEventArgs eventArgs);
 }
