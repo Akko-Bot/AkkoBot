@@ -118,6 +118,8 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.GuildMemberRemoved += _guildLogger.LogLeavingAltAsync;
 
+        _shardedClient.GuildMemberUpdated += _guildLogger.LogMemberRoleChangeAsync;
+
         #endregion Log Events
 
         #region Bot Events
@@ -300,6 +302,8 @@ internal sealed class DiscordEventManager : IDiscordEventManager
         _shardedClient.GuildMemberAdded -= _guildLogger.LogJoiningAltAsync;
 
         _shardedClient.GuildMemberRemoved -= _guildLogger.LogLeavingAltAsync;
+
+        _shardedClient.GuildMemberUpdated -= _guildLogger.LogMemberRoleChangeAsync;
 
         #endregion Log Events
 

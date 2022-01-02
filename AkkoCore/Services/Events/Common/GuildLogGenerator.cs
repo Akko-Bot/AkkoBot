@@ -443,7 +443,39 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithLocalization(_localizer, settings.Locale);
 
         return GetStandardMessage(message, settings);
-    }   
+    }
+
+    public DiscordWebhookBuilder GetRoleChangeLog(GuildMemberUpdateEventArgs eventArgs)
+    {
+        if (eventArgs is null)
+            throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+        else if (eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count)
+            throw new ArgumentException("Cannot log role changes if no role was added or removed.", nameof(eventArgs));
+
+        var settings = GetMessageSettings(eventArgs.Guild.Id);
+        var wasAdded = eventArgs.RolesAfter.Count > eventArgs.RolesBefore.Count;
+        var target = (wasAdded)
+            ? eventArgs.RolesBefore
+            : eventArgs.RolesAfter;
+
+        var role = eventArgs.RolesAfter
+            .Concat(eventArgs.RolesBefore)
+            .Except(target)
+            .First();
+
+        var message = new SerializableDiscordEmbed()
+            .WithColor(settings.OkColor)
+            .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
+            .WithAuthor((wasAdded) ? "add_role" : "remove_role")
+            .WithTitle(eventArgs.Member.GetFullname())
+            .AddField("role", role.Mention, true)
+            .AddField("name", role.Name, true)
+            .AddField("id", role.Id.ToString(), true)
+            .WithFooter($"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}")
+            .WithLocalization(_localizer, settings.Locale);
+
+        return GetStandardMessage(message, settings);
+    }
 
     /// <summary>
     /// Returns the appropriate webhook message for the guild's embed setting.

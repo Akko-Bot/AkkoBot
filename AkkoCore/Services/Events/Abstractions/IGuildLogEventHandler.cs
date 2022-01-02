@@ -108,4 +108,9 @@ public interface IGuildLogEventHandler
     /// Logs alt leaves.
     /// </summary>
     Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs role assignments and removals.
+    /// </summary>
+    Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
 }

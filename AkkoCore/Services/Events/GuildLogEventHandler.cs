@@ -352,6 +352,18 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             _ = webhook.ExecuteAsync(_logGenerator.GetLeavingAltLog(eventArgs));
     }
 
+    public async Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
+    {
+        if (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+            return;
+
+        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
+
+        if (webhook is not null)
+            _ = webhook.ExecuteAsync(_logGenerator.GetRoleChangeLog(eventArgs));
+    }
+
     /// <summary>
     /// Determines if the specified user is an alt.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
@@ -21,7 +21,7 @@ namespace AkkoCore.Commands.Modules.Basic;
 public sealed class BasicCommands : AkkoCommandModule, IDisposable
 {
     private const string _botAuthor = "Kotz#7922";
-    private const string _versionString = "AkkoBot v0.3.0-beta";
+    private const string _versionString = "AkkoBot v0.3.1-beta";
     private readonly DateTimeOffset _startup = DateTimeOffset.Now;
     private readonly Process _currentProcess = Process.GetCurrentProcess();
 
