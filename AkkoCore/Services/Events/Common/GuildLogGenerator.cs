@@ -454,13 +454,8 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
 
         var settings = GetMessageSettings(eventArgs.Guild.Id);
         var wasAdded = eventArgs.RolesAfter.Count > eventArgs.RolesBefore.Count;
-        var target = (wasAdded)
-            ? eventArgs.RolesBefore
-            : eventArgs.RolesAfter;
-
         var role = eventArgs.RolesAfter
-            .Concat(eventArgs.RolesBefore)
-            .Except(target)
+            .Unique(eventArgs.RolesBefore)
             .First();
 
         var message = new SerializableDiscordEmbed()

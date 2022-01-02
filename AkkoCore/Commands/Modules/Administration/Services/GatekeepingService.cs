@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -47,10 +47,7 @@ public sealed class GatekeepingService
         db.Update(gatekeeper);
         await db.SaveChangesAsync();
 
-        if (gatekeeper.IsActive)
-            _dbCache.Gatekeeping.TryAdd(server.Id, gatekeeper);
-        else
-            _dbCache.Gatekeeping.TryRemove(server.Id, out _);
+        _dbCache.Gatekeeping.TryAdd(server.Id, gatekeeper);
 
         return result;
     }

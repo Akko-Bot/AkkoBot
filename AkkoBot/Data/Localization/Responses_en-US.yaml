@@ -333,7 +333,7 @@ cmd_log_stop: Stops logging of the specified log event.
 cmd_modlog: Shows notices and infractions of a user.
 cmd_modrole: Groups commands for managing modroles. Modroles are roles that give their users the ability to assign specific roles to other users without the need of server permission to manage roles.
 cmd_modrole_add: Adds target roles to a modrole.
-cmd_modrole_behavior: Toggles the behavior of the specified modrole. Possible values are `EnforceHierarchy` (disallows users to assign or remove target roles that are above them in the role hierarchy) and `Exclusive` (only one target role can be assigned at a time). 
+cmd_modrole_behavior: Toggles the behavior of the specified modrole. Possible values are `EnforceHierarchy` (disallows users to assign or remove target roles that are above them in the role hierarchy) and `Exclusive` (only one target role can be assigned at a time).
 cmd_modrole_list: Lists the modroles in the server.
 cmd_modrole_remove: Removes target roles from a modrole. Provide no target roles to remove the modrole.
 cmd_modrole_set: Adds a target role to the specified user.

@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Timers.Abstractions;
@@ -22,6 +22,16 @@ public sealed class AkkoCache : IAkkoCache
 
     public AkkoCache(ITimerManager timerManager)
         => Timers = timerManager;
+
+    public bool UnloadMessageCache(ulong sid)
+    {
+        if (!GuildMessageCache.TryRemove(sid, out var messageCache))
+            return false;
+
+        messageCache.Clear();
+
+        return true;
+    }
 
     public void Dispose()
     {

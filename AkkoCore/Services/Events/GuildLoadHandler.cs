@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
@@ -16,11 +16,13 @@ namespace AkkoCore.Services.Events;
 internal sealed class GuildLoadHandler : IGuildLoadHandler
 {
     private readonly IDbCache _dbCache;
+    private readonly IAkkoCache _akkoCache;
     private readonly BotConfig _botConfig;
 
-    public GuildLoadHandler(IDbCache dbCache, BotConfig botConfig)
+    public GuildLoadHandler(IDbCache dbCache, IAkkoCache akkoCache, BotConfig botConfig)
     {
         _dbCache = dbCache;
+        _akkoCache = akkoCache;
         _botConfig = botConfig;
     }
 
@@ -36,6 +38,7 @@ internal sealed class GuildLoadHandler : IGuildLoadHandler
     public Task RemoveGuildOnLeaveAsync(DiscordClient client, GuildDeleteEventArgs eventArgs)
     {
         _dbCache.TryRemoveDbGuild(eventArgs.Guild.Id);
+        _akkoCache.UnloadMessageCache(eventArgs.Guild.Id);
         return Task.CompletedTask;
     }
 }

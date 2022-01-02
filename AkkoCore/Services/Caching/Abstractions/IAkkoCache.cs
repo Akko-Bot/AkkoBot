@@ -1,4 +1,4 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -32,4 +32,11 @@ public interface IAkkoCache : IDisposable
     /// </summary>
     /// <remarks>This property is lazily initialized on startup.</remarks>
     ITimerManager Timers { get; }
+
+    /// <summary>
+    /// Clears the message cache for the Discord guild of the specified ID.
+    /// </summary>
+    /// <param name="sid">The ID of the Discord guild.</param>
+    /// <returns><see langword="true"/> if the cache was successfully removed, <see langword="false"/> if there was no cache.</returns>
+    bool UnloadMessageCache(ulong sid);
 }

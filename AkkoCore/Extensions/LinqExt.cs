@@ -26,6 +26,17 @@ public static class LinqExt
         => new(collection);
 
     /// <summary>
+    /// Applies a deferred <paramref name="action"/> on a collection if the <paramref name="condition"/> is <see langword="true"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements.</typeparam>
+    /// <param name="collection">This collection.</param>
+    /// <param name="condition">The condition to be checked.</param>
+    /// <param name="action">The action to be performed.</param>
+    /// <returns>The modified collection if <paramref name="condition"/> is <see langword="true"/>, otherwise the original collection.</returns>
+    public static IEnumerable<T> If<T>(this IEnumerable<T> collection, bool condition, Func<IEnumerable<T>, IEnumerable<T>> action)
+        => (condition) ? action(collection) : collection;
+
+    /// <summary>
     /// Saves an <see cref="IEnumerable{T2}"/> collection to a concurrent dictionary.
     /// </summary>
     /// <typeparam name="T1">Type of the key.</typeparam>
@@ -324,13 +335,20 @@ public static class LinqExt
     }
 
     /// <summary>
-    /// Applies a deferred <paramref name="action"/> on a collection if the <paramref name="condition"/> is <see langword="true"/>.
+    /// Gets the symetric difference between all elements in the current and specified collections.
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
     /// <param name="collection">This collection.</param>
-    /// <param name="condition">The condition to be checked.</param>
-    /// <param name="action">The action to be performed.</param>
-    /// <returns>The modified collection if <paramref name="condition"/> is <see langword="true"/>, otherwise the original collection.</returns>
-    public static IEnumerable<T> If<T>(this IEnumerable<T> collection, bool condition, Func<IEnumerable<T>, IEnumerable<T>> action)
-        => (condition) ? action(collection) : collection;
+    /// <param name="collections">The collections to get the difference from.</param>
+    /// <returns>The symetric difference of all collections.</returns>
+    /// <exception cref="ArgumentNullException">Occurs when the either of the collections are <see langword="null"/>.</exception>
+    public static IEnumerable<T> Unique<T>(this IEnumerable<T> collection, params IEnumerable<T>[] collections)
+    {
+        return (collection is null || collections is null)
+            ? throw new ArgumentNullException(collection is null ? nameof(collection) : nameof(collections), "Argument cannot be null.")
+            : collection
+                .Concat(collections.SelectMany(x => x))
+                .Except(collections.SelectMany(x => x).Intersect(collection))
+                .Distinct();
+    }
 }

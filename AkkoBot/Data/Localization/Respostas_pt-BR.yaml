@@ -333,7 +333,7 @@ cmd_log_stop: Encerra o registro do evento especificado.
 cmd_modlog: Exibe anotações e infrações de um usuário.
 cmd_modrole: Agrupa comandos relacionados a cargos de gerência. Cargos de gerência são cargos que dão a seus usuários a capacidade de designar cargos específicos a outros usuários sem precisar de permissão para gerenciar cargos no servidor.
 cmd_modrole_add: Adiciona cargos-alvo a um cargo de gerência.
-cmd_modrole_behavior: Ativa ou desativa comportamentos para o cargo de gerência especificado. Os valores possíveis são `EnforceHierarchy` (impede que usuários adicionem ou removam cargos-alvo que estejam acima deles na hierarquia de cargos) e `Exclusive` (somente um cargo-alvo pode ser designado por vez). 
+cmd_modrole_behavior: Ativa ou desativa comportamentos para o cargo de gerência especificado. Os valores possíveis são `EnforceHierarchy` (impede que usuários adicionem ou removam cargos-alvo que estejam acima deles na hierarquia de cargos) e `Exclusive` (somente um cargo-alvo pode ser designado por vez).
 cmd_modrole_list: Exibe of cargos de gerência do servidor.
 cmd_modrole_remove: Remove cargos-alvo de um cargo de gerência. Forneça nenhum cargo-alvo para remover o cargo de gerência.
 cmd_modrole_set: Adiciona um cargo-alvo ao usuário especificado.

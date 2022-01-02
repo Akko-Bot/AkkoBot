@@ -55,7 +55,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public Task CacheMessageOnCreationAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog!.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog.IsActive)
             return Task.CompletedTask;
 
         if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
@@ -69,15 +69,15 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
         return Task.CompletedTask;
     }
 
-    public async Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
+    public Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
-            || !guildLog!.IsActive
+            || !guildLog.IsActive
             || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is true  // This check is needed because pins trigger this event
 
             || (eventArgs.Message.Author is DiscordMember member && IsIgnoredContext(eventArgs.Guild.Id, member.Roles.Select(x => x.Id).Append(eventArgs.Author.Id).Append(eventArgs.Channel.Id))))
-            return;
+            return Task.CompletedTask;
 
         // Cache uncached edited messages, but don't log them.
         if (eventArgs.MessageBefore is null)
@@ -89,29 +89,23 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             }
 
             messageCache.Add(eventArgs.Message);
-            return;
+            return Task.CompletedTask;
         }
 
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetMessageUpdateLog(eventArgs)).ConfigureAwait(false);
+        return DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetMessageUpdateLog(eventArgs));
     }
 
     public async Task LogDeletedMessageAsync(DiscordClient client, MessageDeleteEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
-            || !guildLog!.IsActive
+            || !guildLog.IsActive
             || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
             || !messageCache.TryGetValue(x => x.Id == eventArgs.Message.Id, out var message)
             || (eventArgs.Message.Author is DiscordMember member && IsIgnoredContext(eventArgs.Guild.Id, member.Roles.Select(x => x.Id).Append(eventArgs.Message.Author.Id).Append(eventArgs.Channel.Id))))
             return;
 
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetMessageDeleteLog(message)).ConfigureAwait(false);
+        await DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetMessageDeleteLog(message)).ConfigureAwait(false);
 
         // Remove from the cache
         messageCache.Remove(x => x?.Id == eventArgs.Message.Id);
@@ -121,7 +115,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     {
         if (eventArgs.Guild is null || eventArgs.Messages.All(x => x.Author?.IsBot is not false)
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
-            || !guildLog!.IsActive
+            || !guildLog.IsActive
             || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
             || IsIgnoredContext(eventArgs.Guild.Id, eventArgs.Channel.Id))
             return;
@@ -133,235 +127,157 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             .Where(x => x?.ChannelId == eventArgs.Channel.Id && x.CreationTimestamp >= firstDeletedTime)
             .OrderBy(x => x.CreationTimestamp);
 
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetMessageBulkDeleteLog(messages, stream, eventArgs)).ConfigureAwait(false);
+        await DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetMessageBulkDeleteLog(messages, stream, eventArgs)).ConfigureAwait(false);
 
         // Remove from the cache
         messageCache.Remove(x => x?.Id == eventArgs.Channel.Id && x.CreationTimestamp >= firstDeletedTime);
     }
 
-    public async Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
+    public Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var target = (eventArgs.EmojisBefore.Count > eventArgs.EmojisAfter.Count)
-            ? eventArgs.EmojisAfter.Values
-            : eventArgs.EmojisBefore.Values;
+        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiEvents, out var guildLog) || !guildLog.IsActive)
+            return Task.CompletedTask;
 
         var emoji = eventArgs.EmojisAfter.Values
-            .Concat(eventArgs.EmojisBefore.Values)
-            .Except(target)
+            .Unique(eventArgs.EmojisBefore.Values)
             .First();
 
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-        {
-            await webhook.ExecuteAsync(
-                _logGenerator.GetEmojiUpdateLog(
-                    eventArgs.Guild,
-                    emoji,
-                    eventArgs.EmojisBefore.Count - eventArgs.EmojisAfter.Count,
-                    eventArgs.EmojisBefore.Values.FirstOrDefault(x => x.Id == emoji.Id)?.Name
-                )
-            ).ConfigureAwait(false);
-        }
+        return DispatchLogAsync(client, eventArgs.Guild, guildLog, () =>
+            _logGenerator.GetEmojiUpdateLog(
+                eventArgs.Guild,
+                emoji,
+                eventArgs.EmojisBefore.Count - eventArgs.EmojisAfter.Count,
+                eventArgs.EmojisBefore.Values.FirstOrDefault(x => x.Id == emoji.Id)?.Name
+            )
+        );
     }
 
-    public async Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs)
+    public Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetCreatedInviteLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedInviteLog(eventArgs));
     }
 
-    public async Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs)
+    public Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetDeletedInviteLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedInviteLog(eventArgs));
     }
 
     public async Task LogBannedUserAsync(DiscordClient client, GuildBanAddEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog!.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
             return;
 
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
         var auditLog = (await eventArgs.Guild.GetAuditLogsAsync(1, null, AuditLogActionType.Ban).ConfigureAwait(false))[0];
 
-        if (auditLog is DiscordAuditLogBanEntry banLog && webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetBannedUserLog(banLog, eventArgs)).ConfigureAwait(false);
+        if (auditLog is DiscordAuditLogBanEntry banLog && banLog.Target.Id == eventArgs.Member.Id)
+            await DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetBannedUserLog(banLog, eventArgs)).ConfigureAwait(false);
     }
 
     public async Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog!.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
             return;
 
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
         var auditLog = (await eventArgs.Guild.GetAuditLogsAsync(1, null, AuditLogActionType.Unban).ConfigureAwait(false))[0];
 
-        if (auditLog is DiscordAuditLogBanEntry unbanLog && webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetUnbannedUserLog(unbanLog, eventArgs)).ConfigureAwait(false);
+        if (auditLog is DiscordAuditLogBanEntry unbanLog && unbanLog.Target.Id == eventArgs.Member.Id)
+            await DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetUnbannedUserLog(unbanLog, eventArgs)).ConfigureAwait(false);
     }
 
-    public async Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs)
+    public Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetCreatedRoleLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedRoleLog(eventArgs));
     }
 
-    public async Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs)
+    public Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetDeletedRoleLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedRoleLog(eventArgs));
     }
 
-    public async Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs)
+    public Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetEditedRoleLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEditedRoleLog(eventArgs));
     }
 
-    public async Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs)
+    public Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetCreatedChannelLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedChannelLog(eventArgs));
     }
 
-    public async Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs)
+    public Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetDeletedChannelLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedChannelLog(eventArgs));
     }
 
-    public async Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs)
+    public Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog)
-            || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetEditedChannelLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEditedChannelLog(eventArgs));
     }
 
-    public async Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
+    public Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Before == eventArgs.After || eventArgs.Guild is null
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog!.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            await webhook.ExecuteAsync(_logGenerator.GetVoiceStateLog(eventArgs)).ConfigureAwait(false);
+        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
     }
 
-    public async Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+    public Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
             || IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            _ = webhook.ExecuteAsync(_logGenerator.GetJoiningMemberLog(eventArgs));
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetJoiningMemberLog(eventArgs));
     }
 
-    public async Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
+    public Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
             || IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            _ = webhook.ExecuteAsync(_logGenerator.GetLeavingMemberLog(eventArgs));
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetLeavingMemberLog(eventArgs));
     }
 
-    public async Task LogJoiningAltAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+    public Task LogJoiningAltAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            _ = webhook.ExecuteAsync(_logGenerator.GetJoiningAltLog(eventArgs));
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive
+            || !IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetJoiningAltLog(eventArgs));
     }
 
-    public async Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
+    public Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            _ = webhook.ExecuteAsync(_logGenerator.GetLeavingAltLog(eventArgs));
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive
+            || !IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetLeavingAltLog(eventArgs));
     }
 
-    public async Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
+    public Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
+        return (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
-            return;
-
-        var webhook = await GetWebhookAsync(client, eventArgs.Guild, guildLog).ConfigureAwait(false);
-
-        if (webhook is not null)
-            _ = webhook.ExecuteAsync(_logGenerator.GetRoleChangeLog(eventArgs));
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
     }
 
     /// <summary>
@@ -444,6 +360,26 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             ?? Array.Empty<GuildLogEntity>();
 
         return guildLogs.Count is not 0;
+    }
+
+    /// <summary>
+    /// Sends a guild log to its appropriate webhook.
+    /// </summary>
+    /// <param name="client">The Discord client.</param>
+    /// <param name="server">The Discord guild the webhook is from.</param>
+    /// <param name="guildLog">The guild log settings.</param>
+    /// <param name="responseFactory">The method responsible for generating the log message.</param>
+    /// <returns><see langword="true"/> if the log was sent, <see langword="false"/> otherwise.</returns>
+    private async Task<bool> DispatchLogAsync(DiscordClient client, DiscordGuild server, GuildLogEntity guildLog, Func<DiscordWebhookBuilder> responseFactory)
+    {
+        var webhook = await GetWebhookAsync(client, server, guildLog).ConfigureAwait(false);
+
+        if (webhook is null)
+            return false;
+
+        await webhook.ExecuteAsync(responseFactory()).ConfigureAwait(false);
+
+        return true;
     }
 
     /// <summary>
