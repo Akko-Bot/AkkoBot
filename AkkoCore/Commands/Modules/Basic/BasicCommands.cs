@@ -80,7 +80,7 @@ public sealed class BasicCommands : AkkoCommandModule, IDisposable
                 "presence",
                 context.FormatLocalized("{0}: {1}\n", "servers", _shardedClient.ShardClients.Values.Sum(client => client.Guilds.Count)) +
                 context.FormatLocalized("{0}: {1}\n", "channels", _shardedClient.ShardClients.Values.Sum(client => client.Guilds.Values.Sum(y => y.Channels.Count))) +
-                context.FormatLocalized("{0}: {1}", "users", _dbCache.Users.Count),
+                context.FormatLocalized("{0}: {1}", "users", _shardedClient.ShardClients.Values.Sum(client => client.Guilds.Values.Sum(y => y.MemberCount))),
                 inline: true
             );
 

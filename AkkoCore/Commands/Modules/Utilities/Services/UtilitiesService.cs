@@ -215,12 +215,12 @@ public sealed class UtilitiesService
                     "{0}: {1}\n" +
                     "{2}: {3}\n",
                     "verification_level", server.VerificationLevel.ToString().ToLowerInvariant(),
-                    "created_on", server.CreationTimestamp.ToString("d", AkkoUtilities.GetCultureInfo(context.GetMessageSettings().Locale, true))
+                    "created_on", server.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDate)
                 ),
                 true
             )
             .AddField("roles", server.Roles.Count.ToString(), true)
-            .AddField("shard", $"{(server.Id >> 22) % (ulong)context.Client.ShardCount}/{context.Client.ShardCount}");
+            .AddField("Shard", $"{(server.Id >> 22) % (ulong)context.Client.ShardCount}/{context.Client.ShardCount}");  // Shards is not localized - this is intentional
 
         var modroles = server.Roles.Values
             .Where(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers))
