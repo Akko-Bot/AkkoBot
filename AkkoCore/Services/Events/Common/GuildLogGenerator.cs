@@ -472,6 +472,32 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         return GetStandardMessage(message, settings);
     }
 
+    public DiscordWebhookBuilder GetNameChangeLog(DiscordUser user, ulong serverId, string? oldName, string? newName, string logTitle)
+    {
+        if (user is null || logTitle is null || (oldName is null && newName is null))
+            throw new ArgumentNullException(string.Empty, "Arguments cannot be null.");
+        else if (oldName?.Equals(newName, StringComparison.Ordinal) is true)
+            throw new ArgumentException($"{nameof(oldName)} and {nameof(newName)} cannot be equal.");
+
+        var settings = GetMessageSettings(serverId);
+        var message = new SerializableDiscordEmbed()
+            .WithColor(settings.OkColor)
+            .WithAuthor(logTitle)
+            .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
+            .WithTitle(user.GetFullname())
+            .WithFooter($"{_localizer.FormatLocalized(settings.Locale, "id")}: {user.Id}");
+
+        if (oldName is not null)
+            message.AddField("old_name", oldName, true);
+
+        if (newName is not null)
+            message.AddField("new_name", newName, true);
+
+        message.WithLocalization(_localizer, settings.Locale);
+
+        return GetStandardMessage(message, settings);
+    }
+
     /// <summary>
     /// Returns the appropriate webhook message for the guild's embed setting.
     /// </summary>

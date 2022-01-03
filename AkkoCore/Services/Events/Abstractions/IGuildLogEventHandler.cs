@@ -113,4 +113,9 @@ public interface IGuildLogEventHandler
     /// Logs role assignments and removals.
     /// </summary>
     Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs nickname changes.
+    /// </summary>
+    Task LogMemberNicknameChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
 }

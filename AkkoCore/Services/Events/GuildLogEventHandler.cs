@@ -280,6 +280,22 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
     }
 
+    public Task LogMemberNicknameChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || eventArgs.NicknameBefore == eventArgs.NicknameAfter
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () =>
+                _logGenerator.GetNameChangeLog(
+                    eventArgs.Member,
+                    eventArgs.Guild.Id,
+                    eventArgs.NicknameBefore,
+                    eventArgs.NicknameAfter,
+                    "nickname_changed"
+                )
+            );
+    }
+
     /// <summary>
     /// Determines if the specified user is an alt.
     /// </summary>
