@@ -1,4 +1,4 @@
-﻿using AkkoCore.Services.Database.Abstractions;
+using AkkoCore.Services.Database.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;

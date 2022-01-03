@@ -1,4 +1,4 @@
-﻿using AkkoCore.Extensions;
+using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Abstractions;
 using DSharpPlus;
 using Microsoft.EntityFrameworkCore;

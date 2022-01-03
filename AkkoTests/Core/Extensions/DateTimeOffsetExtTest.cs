@@ -1,4 +1,4 @@
-﻿using AkkoCore.Extensions;
+using AkkoCore.Extensions;
 using AkkoTests.TestData;
 using DSharpPlus;
 using System;

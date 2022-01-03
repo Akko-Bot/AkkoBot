@@ -1,4 +1,4 @@
-﻿using AkkoCore.Config.Abstractions;
+using AkkoCore.Config.Abstractions;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 

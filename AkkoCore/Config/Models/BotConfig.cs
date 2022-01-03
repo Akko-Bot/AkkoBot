@@ -1,4 +1,4 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Extensions;
 using ConcurrentCollections;

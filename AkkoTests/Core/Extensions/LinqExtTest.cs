@@ -1,4 +1,4 @@
-﻿using AkkoCore.Extensions;
+using AkkoCore.Extensions;
 using AkkoTests.Models;
 using System;
 using System.Collections.Generic;

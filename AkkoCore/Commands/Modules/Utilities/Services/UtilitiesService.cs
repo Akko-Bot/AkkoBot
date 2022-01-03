@@ -2,7 +2,6 @@ using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
-using AkkoCore.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;

@@ -1,4 +1,4 @@
-﻿//namespace AkkoCore.Services.Events.Controllers.Constants
+//namespace AkkoCore.Services.Events.Controllers.Constants
 //{
 //    public static class GuildConfigInteractionType
 //    {

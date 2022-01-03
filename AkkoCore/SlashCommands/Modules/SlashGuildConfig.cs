@@ -1,4 +1,4 @@
-﻿//using AkkoCore.Extensions;
+//using AkkoCore.Extensions;
 //using AkkoCore.Services.Events.Controllers.Abstractions;
 //using AkkoCore.SlashCommands.Abstractions;
 //using DSharpPlus;

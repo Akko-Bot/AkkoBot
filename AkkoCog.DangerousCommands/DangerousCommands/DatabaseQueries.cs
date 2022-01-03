@@ -1,4 +1,4 @@
-﻿using AkkoCog.DangerousCommands.DangerousCommands.Services;
+using AkkoCog.DangerousCommands.DangerousCommands.Services;
 using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Extensions;

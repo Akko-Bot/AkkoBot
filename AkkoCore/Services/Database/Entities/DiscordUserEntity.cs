@@ -1,4 +1,4 @@
-﻿using AkkoCore.Services.Database.Abstractions;
+using AkkoCore.Services.Database.Abstractions;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;

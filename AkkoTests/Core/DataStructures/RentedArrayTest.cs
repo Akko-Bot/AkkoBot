@@ -1,4 +1,4 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoTests.Models;
 using AkkoTests.TestData;
 using System;

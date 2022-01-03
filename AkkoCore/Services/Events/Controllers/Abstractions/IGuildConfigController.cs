@@ -1,4 +1,4 @@
-﻿//using DSharpPlus.Entities;
+//using DSharpPlus.Entities;
 //using System.Threading.Tasks;
 
 //namespace AkkoCore.Services.Events.Controllers.Abstractions

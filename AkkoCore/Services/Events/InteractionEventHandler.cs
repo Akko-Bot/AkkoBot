@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;

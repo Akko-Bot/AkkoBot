@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Commands.Modules.Self.Services;

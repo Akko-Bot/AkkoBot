@@ -1,4 +1,4 @@
-﻿using AkkoCore.Services.Database.Abstractions;
+using AkkoCore.Services.Database.Abstractions;
 using AkkoCore.Services.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;

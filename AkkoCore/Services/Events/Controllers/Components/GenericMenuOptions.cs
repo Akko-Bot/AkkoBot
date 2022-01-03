@@ -1,4 +1,4 @@
-﻿//using AkkoCore.Common;
+//using AkkoCore.Common;
 //using DSharpPlus;
 //using DSharpPlus.Entities;
 //using GML = AkkoCore.Services.Events.Controllers.Components.GenericMenuLabels;

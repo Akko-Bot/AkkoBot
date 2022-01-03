@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
