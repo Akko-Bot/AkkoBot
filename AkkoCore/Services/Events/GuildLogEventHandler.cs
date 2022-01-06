@@ -1,6 +1,7 @@
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Config.Models;
+using AkkoCore.Enums;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database;
@@ -72,7 +73,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageUpdated, out var guildLog)
             || !guildLog.IsActive
             || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is true  // This check is needed because pins trigger this event
 
@@ -98,7 +99,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public async Task LogDeletedMessageAsync(DiscordClient client, MessageDeleteEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageDeleted, out var guildLog)
             || !guildLog.IsActive
             || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
             || !messageCache.TryGetValue(x => x.Id == eventArgs.Message.Id, out var message)
@@ -114,7 +115,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public async Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Messages.All(x => x.Author?.IsBot is not false)
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageBulkDeleted, out var guildLog)
             || !guildLog.IsActive
             || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
             || IsIgnoredContext(eventArgs.Guild.Id, eventArgs.Channel.Id))
@@ -133,35 +134,40 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
         messageCache.Remove(x => x?.Id == eventArgs.Channel.Id && x.CreationTimestamp >= firstDeletedTime);
     }
 
+    public Task LogEmojiCreateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || eventArgs.GetStatus() is not EmojiActivity.Created
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiCreated, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEmojiLog(eventArgs));
+    }
+
     public Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiEvents, out var guildLog) || !guildLog.IsActive)
-            return Task.CompletedTask;
+        return (eventArgs.Guild is null || eventArgs.GetStatus() is not EmojiActivity.Updated
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiUpdated, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEmojiLog(eventArgs));
+    }
 
-        var emoji = eventArgs.EmojisAfter.Values
-            .Unique(eventArgs.EmojisBefore.Values)
-            .First();
-
-        return DispatchLogAsync(client, eventArgs.Guild, guildLog, () =>
-            _logGenerator.GetEmojiUpdateLog(
-                eventArgs.Guild,
-                emoji,
-                eventArgs.EmojisBefore.Count - eventArgs.EmojisAfter.Count,
-                eventArgs.EmojisBefore.Values.FirstOrDefault(x => x.Id == emoji.Id)?.Name
-            )
-        );
+    public Task LogEmojiDeleteAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || eventArgs.GetStatus() is not EmojiActivity.Deleted
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.EmojiDeleted, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEmojiLog(eventArgs));
     }
 
     public Task LogCreatedInviteAsync(DiscordClient client, InviteCreateEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteCreated, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedInviteLog(eventArgs));
     }
 
     public Task LogDeletedInviteAsync(DiscordClient client, InviteDeleteEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.InviteDeleted, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedInviteLog(eventArgs));
     }
@@ -169,7 +175,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public async Task LogBannedUserAsync(DiscordClient client, GuildBanAddEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.UserBanned, out var guildLog) || !guildLog.IsActive)
             return;
 
         var auditLog = (await eventArgs.Guild.GetAuditLogsAsync(1, null, AuditLogActionType.Ban).ConfigureAwait(false))[0];
@@ -181,7 +187,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public async Task LogUnbannedUserAsync(DiscordClient client, GuildBanRemoveEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || !eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ViewAuditLog))
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.BanEvents, out var guildLog) || !guildLog.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.UserUnbanned, out var guildLog) || !guildLog.IsActive)
             return;
 
         var auditLog = (await eventArgs.Guild.GetAuditLogsAsync(1, null, AuditLogActionType.Unban).ConfigureAwait(false))[0];
@@ -192,49 +198,81 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogCreatedRoleAsync(DiscordClient client, GuildRoleCreateEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleCreated, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedRoleLog(eventArgs));
     }
 
     public Task LogDeletedRoleAsync(DiscordClient client, GuildRoleDeleteEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleDeleted, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedRoleLog(eventArgs));
     }
 
     public Task LogEditedRoleAsync(DiscordClient client, GuildRoleUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleUpdated, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEditedRoleLog(eventArgs));
     }
 
+    public Task LogMemberRoleAssignmentAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleAssigned, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
+    }
+
+    public Task LogMemberRoleRevokeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleRevoked, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
+    }
+
     public Task LogCreatedChannelAsync(DiscordClient client, ChannelCreateEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelCreated, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedChannelLog(eventArgs));
     }
 
     public Task LogDeletedChannelAsync(DiscordClient client, ChannelDeleteEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelDeleted, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedChannelLog(eventArgs));
     }
 
     public Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelEvents, out var guildLog) || !guildLog.IsActive)
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelUpdated, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEditedChannelLog(eventArgs));
     }
 
-    public Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
+    public Task LogVoiceStateConnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null
+        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Connected
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
+    }
+
+    public Task LogVoiceStateMoveAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Moved
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
+    }
+
+    public Task LogVoiceStateDisconnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Disconnected
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
@@ -242,7 +280,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogJoiningMemberAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.UserJoined, out var guildLog) || !guildLog.IsActive
             || IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetJoiningMemberLog(eventArgs));
@@ -250,7 +288,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogLeavingMemberAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.UserLeft, out var guildLog) || !guildLog.IsActive
             || IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetLeavingMemberLog(eventArgs));
@@ -258,7 +296,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogJoiningAltAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltJoined, out var guildLog) || !guildLog.IsActive
             || !IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetJoiningAltLog(eventArgs));
@@ -266,24 +304,16 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs)
     {
-        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltEvents, out var guildLog) || !guildLog.IsActive
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.AltLeft, out var guildLog) || !guildLog.IsActive
             || !IsAltEventsEnabled(eventArgs.Guild.Id, eventArgs.Member))
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetLeavingAltLog(eventArgs));
     }
 
-    public Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
-    {
-        return (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleEvents, out var guildLog) || !guildLog.IsActive)
-            ? Task.CompletedTask
-            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
-    }
-
     public Task LogMemberNicknameChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
     {
         return (eventArgs.Guild is null || eventArgs.NicknameBefore == eventArgs.NicknameAfter
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MemberEvents, out var guildLog) || !guildLog.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.NicknameChanged, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () =>
                 _logGenerator.GetNameChangeLog(

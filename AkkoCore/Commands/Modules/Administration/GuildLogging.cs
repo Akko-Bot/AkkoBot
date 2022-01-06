@@ -48,26 +48,39 @@ public sealed class GuildLogging : AkkoCommandModule
     {
         channel ??= context.Channel;
 
+        var success = false;
         using var avatarStream = (string.IsNullOrWhiteSpace(avatarUrl))
             ? await _utilities.GetOnlineStreamAsync(context.Guild.CurrentMember.AvatarUrl ?? context.Guild.CurrentMember.DefaultAvatarUrl)
             : await _utilities.GetOnlineStreamAsync(avatarUrl);
 
-        await _service.StartLogAsync(context, channel, logType, webhookName?.MaxLength(AkkoConstants.MaxUsernameLength), avatarStream);
-        var message = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("log_started", Formatter.InlineCode(logType.ToString()), channel.Mention));
+        // Save the guild log to the database. Account for guild log groups.
+        await context.TriggerTypingAsync();
 
-        await context.RespondLocalizedAsync(message);
+        var logGroup = GetDecomposedLogTypes(logType);
+
+        foreach (var dbLogType in logGroup)
+            success |= await _service.StartLogAsync(context, channel, dbLogType, webhookName?.MaxLength(AkkoConstants.MaxUsernameLength), avatarStream);
+
+        var message = new SerializableDiscordEmbed()
+            .WithDescription(context.FormatLocalized((success) ? "log_started" : "log_invalid", Formatter.InlineCode(logType.ToString()), channel.Mention));
+
+        await context.RespondLocalizedAsync(message, isError: !success);
     }
 
     [Command("stop")]
     [Description("cmd_log_stop")]
     public async Task StopLogAsync(CommandContext context, [Description("arg_guildlog_type")] GuildLogType logType)
     {
-        var result = await _service.StopLogAsync(context, logType);
-        var message = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized(((result) ? "log_stopped_success" : "log_stopped_failure"), Formatter.InlineCode(logType.ToString())));
+        var success = false;
+        var logGroup = GetDecomposedLogTypes(logType);
 
-        await context.RespondLocalizedAsync(message, isError: !result);
+        foreach (var dbLogType in logGroup)
+            success |= await _service.StopLogAsync(context, dbLogType);
+
+        var message = new SerializableDiscordEmbed()
+            .WithDescription(context.FormatLocalized(((success) ? "log_stopped_success" : "log_stopped_failure"), Formatter.InlineCode(logType.ToString())));
+
+        await context.RespondLocalizedAsync(message, isError: !success);
     }
 
     [Command("edit")]
@@ -138,19 +151,29 @@ public sealed class GuildLogging : AkkoCommandModule
     public async Task ListGuildLogsAsync(CommandContext context)
     {
         var guildLogs = _service.GetGuildLogs(context.Guild);
-
         var message = new SerializableDiscordEmbed()
             .WithTitle("log_list_title")
-            .WithDescription(
-                string.Join(
-                    '\n',
-                    Enum.GetValues<GuildLogType>()
-                        .Where(x => x is not GuildLogType.None and not GuildLogType.All and not GuildLogType.Unknown and not GuildLogType.UserPresence)
-                        .Select(x => $"{x} {GetChannelMention(context.Guild, guildLogs.FirstOrDefault(y => y.Type == x))}")
-                )
-            );
+            .WithDescription("log_list_desc")
+            .AddField(GuildLogType.MessageEvents.ToString(), GetLogSubtypes(GuildLogType.MessageEvents), true)
+            .AddField(GuildLogType.ChannelEvents.ToString(), GetLogSubtypes(GuildLogType.ChannelEvents), true)
+            .AddField(GuildLogType.RoleEvents.ToString(), GetLogSubtypes(GuildLogType.RoleEvents), true)
+            .AddField(GuildLogType.MemberEvents.ToString(), GetLogSubtypes(GuildLogType.MemberEvents), true)
+            .AddField(GuildLogType.AltEvents.ToString(), GetLogSubtypes(GuildLogType.AltEvents), true)
+            .AddField(GuildLogType.PunishmentEvents.ToString(), GetLogSubtypes(GuildLogType.PunishmentEvents), true)
+            .AddField(GuildLogType.VoiceEvents.ToString(), GetLogSubtypes(GuildLogType.VoiceEvents), true)
+            .AddField(GuildLogType.InviteEvents.ToString(), GetLogSubtypes(GuildLogType.InviteEvents), true)
+            .AddField(GuildLogType.EmojiEvents.ToString(), GetLogSubtypes(GuildLogType.EmojiEvents), true)
+            .AddField(GuildLogType.PresenceEvents.ToString(), GetLogSubtypes(GuildLogType.PresenceEvents), true);
 
         await context.RespondLocalizedAsync(message, false);
+
+        string GetLogSubtypes(GuildLogType typeGroup)
+            => string.Join(
+                '\n',
+                Enum.GetValues<GuildLogType>()
+                    .Where(x => x is not GuildLogType.None and not GuildLogType.All && x != typeGroup && typeGroup.HasFlag(x) && !x.HasOneFlag(GuildLogService.ForbiddenTypes))
+                    .Select(x => $"{x} {GetChannelMention(context.Guild, guildLogs.FirstOrDefault(y => y.Type == x))}")
+            );
     }
 
     /// <summary>
@@ -183,5 +206,17 @@ public sealed class GuildLogging : AkkoCommandModule
             collection.Add(element);
 
         return !result;
+    }
+
+    /// <summary>
+    /// Gets all enum flags present in <paramref name="logType"/>.
+    /// </summary>
+    /// <param name="logType">The type of guild logging.</param>
+    /// <returns>A collection of all usable log types present in <paramref name="logType"/>.</returns>
+    private IEnumerable<GuildLogType> GetDecomposedLogTypes(GuildLogType logType)
+    {
+        return logType.ToValues()
+            .Where(x => x is not GuildLogType.None and not GuildLogType.All)
+            .If(x => x.Count() > 1, x => x.Where(x => x != logType));
     }
 }

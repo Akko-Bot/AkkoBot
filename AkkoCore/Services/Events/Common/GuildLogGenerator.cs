@@ -107,24 +107,31 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .AddFile($"Logs_BulkDelete_{eventArgs.Channel.Name}_{DateTimeOffset.Now}.txt", stream);
     }
 
-    public DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string? oldEmojiName = default)
+    public DiscordWebhookBuilder GetEmojiLog(GuildEmojisUpdateEventArgs eventArgs)
     {
-        if (server is null || emoji is null)
-            throw new ArgumentNullException((server is null) ? nameof(server) : nameof(emoji), (server is null) ? "Discord guild cannot be null" : "Emoji cannot be null.");
+        if (eventArgs is null)
+            throw new ArgumentNullException(nameof(eventArgs), "Event arguments cannot be null.");
 
-        var settings = GetMessageSettings(server.Id);
+        var emoji = eventArgs.EmojisAfter.Values
+            .Unique(eventArgs.EmojisBefore.Values)
+            .First();
 
-        var description = (action is 0 && emoji.Name.Equals(oldEmojiName, StringComparison.Ordinal))
+        var settings = GetMessageSettings(eventArgs.Guild.Id);
+        var activity = eventArgs.GetStatus();
+        var oldEmojiName = eventArgs.EmojisBefore.Values.FirstOrDefault(x => x.Id == emoji.Id)?.Name;
+
+        var description = (activity is EmojiActivity.Updated && emoji.Name.Equals(oldEmojiName, StringComparison.Ordinal))
             ? _localizer.GetResponseString(settings.Locale, "log_emoji_edited_simple")
-            : action switch
+            : activity switch
             {
-                0 => _localizer.GetResponseString(settings.Locale, "log_emoji_edited"),
-                < 0 => _localizer.GetResponseString(settings.Locale, "log_emoji_added"),
-                > 0 => _localizer.GetResponseString(settings.Locale, "log_emoji_deleted")
+                EmojiActivity.Updated => _localizer.GetResponseString(settings.Locale, "log_emoji_edited"),
+                EmojiActivity.Created => _localizer.GetResponseString(settings.Locale, "log_emoji_added"),
+                EmojiActivity.Deleted => _localizer.GetResponseString(settings.Locale, "log_emoji_deleted"),
+                _ => throw new NotSupportedException($"Emoji activity of type {activity} is not supported.")
             };
 
         var message = new SerializableDiscordEmbed()
-            .WithColor((action <= 0) ? settings.OkColor : settings.ErrorColor)
+            .WithColor((activity is not EmojiActivity.Deleted) ? settings.OkColor : settings.ErrorColor)
             .WithTitle("log_emoji_title")
             .WithThumbnail(emoji.Url)
             .WithDescription(string.Format(description, Formatter.InlineCode(oldEmojiName ?? emoji.Name), Formatter.InlineCode(emoji.Name)))
@@ -363,11 +370,11 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             UserVoiceState.Connected => _localizer.FormatLocalized(settings.Locale, "log_voicestate_connected", eventArgs.User.Mention, Formatter.Bold(eventArgs.After.Channel.Name)),
             UserVoiceState.Disconnected => _localizer.FormatLocalized(settings.Locale, "log_voicestate_disconnected", eventArgs.User.Mention, Formatter.Bold(eventArgs.Before.Channel.Name)),
             UserVoiceState.Moved => _localizer.FormatLocalized(settings.Locale, "log_voicestate_moved", eventArgs.User.Mention, Formatter.Bold(eventArgs.Before.Channel.Name), Formatter.Bold(eventArgs.After.Channel.Name)),
-            _ => throw new ArgumentException($"Voice state of value \"{voiceState}\" is invalid.", nameof(eventArgs))
+            _ => throw new ArgumentException($"Voice state of value \"{voiceState}\" is not valid.", nameof(eventArgs))
         };
 
         var message = new SerializableDiscordEmbed()
-            .WithColor((voiceState is UserVoiceState.Disconnected) ? settings.ErrorColor : settings.OkColor)
+            .WithColor((voiceState is not UserVoiceState.Disconnected) ? settings.OkColor : settings.ErrorColor)
             .WithAuthor(eventArgs.User.GetFullname(), imageUrl: eventArgs.User.AvatarUrl ?? eventArgs.User.DefaultAvatarUrl)
             .WithDescription(description)
             .AddField(AkkoConstants.ValidWhitespace, DateTimeOffset.Now.ToDiscordTimestamp());

@@ -887,3 +887,4 @@ x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
 
 nickname_changed: Nickname Changed
+log_invalid: Log of type {0} is not valid.

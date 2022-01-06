@@ -35,6 +35,30 @@ public sealed class GuildLogService
     private readonly BotConfig _botConfig;
     private readonly DiscordWebhookClient _webhookClient;
 
+    /// <summary>
+    /// Contains the flags of the guild log types that are not supported for guild logging.
+    /// </summary>
+    public const GuildLogType ForbiddenTypes = GuildLogType.MessageCreated | GuildLogType.MessagePinned | GuildLogType.UserStatusUpdated;
+
+    /// <summary>
+    /// Contains the flags of all groups of guild logs.
+    /// </summary>
+    public static GuildLogType[] GuildLogTypeGroups { get; } = new[] 
+    {
+        GuildLogType.None,
+        GuildLogType.All,
+        GuildLogType.ChannelEvents,
+        GuildLogType.PunishmentEvents,
+        GuildLogType.MemberEvents,
+        GuildLogType.MessageEvents,
+        GuildLogType.VoiceEvents,
+        GuildLogType.RoleEvents,
+        GuildLogType.InviteEvents,
+        GuildLogType.EmojiEvents,
+        GuildLogType.AltEvents,
+        GuildLogType.PresenceEvents
+    };
+
     public GuildLogService(IServiceScopeFactory scopeFactory, IDbCache dbCache, ILocalizer localizer, BotConfig botConfig, DiscordWebhookClient webhookClient)
     {
         _scopeFactory = scopeFactory;
@@ -52,12 +76,15 @@ public sealed class GuildLogService
     /// <param name="logType">The type of guild event to generate logs for.</param>
     /// <param name="name">The name of the webhook.</param>
     /// <param name="avatar">The image stream of the webhook's avatar.</param>
-    /// <returns><see langword="true"/> if the guild log was created, <see langword="false"/> is it was updated.</returns>
+    /// <remarks>The method does not accept the types present in <see cref="ForbiddenTypes"/> and <see cref="GuildLogTypeGroups"/></remarks>
+    /// <returns><see langword="true"/> if the guild log was created or updated, <see langword="false"/> otherwise.</returns>
     /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
     public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string? name = default, Stream? avatar = default)
     {
         if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
             throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
+        else if (logType.HasOneFlag(ForbiddenTypes) || GuildLogTypeGroups.Contains(logType))
+            return false;
 
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
@@ -100,13 +127,13 @@ public sealed class GuildLogService
         await db.SaveChangesAsync();
 
         // Update cache
-        var result = guildLogs.Add(guildLog);
+        guildLogs.Add(guildLog);
         _dbCache.GuildLogs.AddOrUpdate(context.Guild.Id, guildLogs, (_, _) => guildLogs);
 
         // Update webhook cache
         _webhookClient.TryAdd(webhook);
 
-        return result;
+        return true;
     }
 
     /// <summary>
@@ -115,10 +142,12 @@ public sealed class GuildLogService
     /// <param name="context">The command context.</param>
     /// <param name="logType">The type of guild event to generate logs for.</param>
     /// <param name="deleteEntry"><see langword="true"/> to remove the entry from the database, <see langword="false"/> to update it.</param>
+    /// <remarks>The method does not accept the types present in <see cref="ForbiddenTypes"/> and <see cref="GuildLogTypeGroups"/></remarks>
     /// <returns><see langword="true"/> if the guild log was successfully disabled, <see langword="false"/> otherwise or if it is already disabled.</returns>
     public async Task<bool> StopLogAsync(CommandContext context, GuildLogType logType, bool deleteEntry = false)
     {
-        if (!_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
+        if (logType.HasOneFlag(ForbiddenTypes) || GuildLogTypeGroups.Contains(logType)
+            || !_dbCache.GuildLogs.TryGetValue(context.Guild.Id, out var guildLogs))
             return false;
 
         var guildLog = guildLogs.FirstOrDefault(x => x.Type == logType);

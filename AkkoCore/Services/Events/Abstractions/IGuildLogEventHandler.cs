@@ -30,9 +30,19 @@ public interface IGuildLogEventHandler
     Task LogBulkDeletedMessagesAsync(DiscordClient client, MessageBulkDeleteEventArgs eventArgs);
 
     /// <summary>
-    /// Logs addition, edit or removal of a guild's emoji.
+    /// Logs guild emoji creation.
+    /// </summary>
+    Task LogEmojiCreateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs guild emoji update.
     /// </summary>
     Task LogEmojiUpdateAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs guild emoji deletion.
+    /// </summary>
+    Task LogEmojiDeleteAsync(DiscordClient client, GuildEmojisUpdateEventArgs eventArgs);
 
     /// <summary>
     /// Logs invite creation.
@@ -85,9 +95,19 @@ public interface IGuildLogEventHandler
     Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs);
 
     /// <summary>
-    /// Logs voice state updates.
+    /// Logs voice state connections.
     /// </summary>
-    Task LogVoiceStateAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
+    Task LogVoiceStateConnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs voice state movement.
+    /// </summary>
+    Task LogVoiceStateMoveAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs voice state disconnection.
+    /// </summary>
+    Task LogVoiceStateDisconnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);
 
     /// <summary>
     /// Logs user join.
@@ -110,9 +130,14 @@ public interface IGuildLogEventHandler
     Task LogLeavingAltAsync(DiscordClient client, GuildMemberRemoveEventArgs eventArgs);
 
     /// <summary>
-    /// Logs role assignments and removals.
+    /// Logs role assignments.
     /// </summary>
-    Task LogMemberRoleChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
+    Task LogMemberRoleAssignmentAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs role removals.
+    /// </summary>
+    Task LogMemberRoleRevokeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
 
     /// <summary>
     /// Logs nickname changes.

@@ -1,4 +1,4 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Services.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ public class AkkoDbContextFactory : IDesignTimeDbContextFactory<AkkoDbContext>
     public AkkoDbContext CreateDbContext(string[] args)
     {
         var creds = LoadCredentials(AkkoEnvironment.CredsPath);
-        var connectionString = (string.IsNullOrWhiteSpace(creds.Database["custom_connection_string"]))
+        var connectionString = (!string.IsNullOrWhiteSpace(creds.Database["custom_connection_string"]))
             ? creds.Database["custom_connection_string"]
             : @"Server=127.0.0.1;" +
               @"Port=5432;" +

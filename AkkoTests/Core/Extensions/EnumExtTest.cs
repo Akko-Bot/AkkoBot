@@ -13,7 +13,8 @@ internal enum TestEnum
     B = 1 << 1,
     C = 1 << 2,
     D = 1 << 3,
-    E = 1 << 4
+    E = 1 << 4,
+    All = A | B | C | D | E
 }
 
 public sealed class EnumExtTest
@@ -110,4 +111,21 @@ public sealed class EnumExtTest
     [InlineData(TestEnum.A | TestEnum.B, TestEnum.C | TestEnum.D, TestEnum.A | TestEnum.B | TestEnum.C | TestEnum.D)]
     internal void ToggleFlagTest<T>(T enumGroup, T toToggle, T expectedValue) where T : struct, Enum
         => Assert.Equal(expectedValue, enumGroup.ToggleFlag(toToggle));
+
+    [Theory]
+    [InlineData(TestEnum.None, TestEnum.None)]
+    [InlineData(TestEnum.A, TestEnum.A)]
+    [InlineData(TestEnum.A | TestEnum.B, TestEnum.A, TestEnum.B)]
+    [InlineData(TestEnum.A | TestEnum.C | TestEnum.B, TestEnum.A, TestEnum.B, TestEnum.C)]
+    [InlineData(TestEnum.All, TestEnum.A, TestEnum.B, TestEnum.C, TestEnum.D, TestEnum.E)]
+    internal void ToValuesTest(TestEnum enumGroup, params TestEnum[] expectedValue)
+    {
+        Assert.Equal(
+            expectedValue,
+            enumGroup.ToValues()
+                .Where(x => x is not TestEnum.All)
+                .If(x => x.Count() != 1 || x.FirstOrDefault() is not TestEnum.None, x => x.Where(x => x is not TestEnum.None))
+                .ToArray()
+        );
+    }
 }

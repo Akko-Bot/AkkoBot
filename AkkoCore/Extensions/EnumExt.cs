@@ -60,6 +60,23 @@ public static class EnumExt
     }
 
     /// <summary>
+    /// Gets all values of the marked bitflags in this enum.
+    /// </summary>
+    /// <typeparam name="T">The type of the enum.</typeparam>
+    /// <param name="value">This enum.</param>
+    /// <remarks>
+    /// If the enum contains a value equal to 0 or values that aggregate multiple bitflags,
+    /// they will be returned along with the marked bitflags.
+    /// </remarks>
+    /// <returns>All individual enum values contained in this enum or <see langword="default"/> if no bitflag is marked.</returns>
+    public static IEnumerable<T> ToValues<T>(this T value) where T : struct, Enum
+    {
+        return Enum.GetValues<T>()
+            .Where(x => value.HasFlag(x))
+            .DefaultIfEmpty();
+    }
+
+    /// <summary>
     /// Combines two enum flags.
     /// </summary>
     /// <typeparam name="T">The type of the enum.</typeparam>

@@ -86,7 +86,11 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.MessagesBulkDeleted += _guildLogger.LogBulkDeletedMessagesAsync;
 
+        _shardedClient.GuildEmojisUpdated += _guildLogger.LogEmojiCreateAsync;
+
         _shardedClient.GuildEmojisUpdated += _guildLogger.LogEmojiUpdateAsync;
+
+        _shardedClient.GuildEmojisUpdated += _guildLogger.LogEmojiDeleteAsync;
 
         _shardedClient.InviteCreated += _guildLogger.LogCreatedInviteAsync;
 
@@ -108,7 +112,11 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.ChannelUpdated += _guildLogger.LogEditedChannelAsync;
 
-        _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateAsync;
+        _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateConnectionAsync;
+
+        _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateMoveAsync;
+
+        _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateDisconnectionAsync;
 
         _shardedClient.GuildMemberAdded += _guildLogger.LogJoiningMemberAsync;
 
@@ -118,7 +126,9 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.GuildMemberRemoved += _guildLogger.LogLeavingAltAsync;
 
-        _shardedClient.GuildMemberUpdated += _guildLogger.LogMemberRoleChangeAsync;
+        _shardedClient.GuildMemberUpdated += _guildLogger.LogMemberRoleAssignmentAsync;
+
+        _shardedClient.GuildMemberUpdated += _guildLogger.LogMemberRoleRevokeAsync;
 
         _shardedClient.GuildMemberUpdated += _guildLogger.LogMemberNicknameChangeAsync;
 
@@ -273,7 +283,11 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.MessagesBulkDeleted -= _guildLogger.LogBulkDeletedMessagesAsync;
 
+        _shardedClient.GuildEmojisUpdated -= _guildLogger.LogEmojiCreateAsync;
+
         _shardedClient.GuildEmojisUpdated -= _guildLogger.LogEmojiUpdateAsync;
+
+        _shardedClient.GuildEmojisUpdated -= _guildLogger.LogEmojiDeleteAsync;
 
         _shardedClient.InviteCreated -= _guildLogger.LogCreatedInviteAsync;
 
@@ -295,7 +309,11 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.ChannelUpdated -= _guildLogger.LogEditedChannelAsync;
 
-        _shardedClient.VoiceStateUpdated -= _guildLogger.LogVoiceStateAsync;
+        _shardedClient.VoiceStateUpdated -= _guildLogger.LogVoiceStateConnectionAsync;
+
+        _shardedClient.VoiceStateUpdated -= _guildLogger.LogVoiceStateMoveAsync;
+
+        _shardedClient.VoiceStateUpdated -= _guildLogger.LogVoiceStateDisconnectionAsync;
 
         _shardedClient.GuildMemberAdded -= _guildLogger.LogJoiningMemberAsync;
 
@@ -305,7 +323,9 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.GuildMemberRemoved -= _guildLogger.LogLeavingAltAsync;
 
-        _shardedClient.GuildMemberUpdated -= _guildLogger.LogMemberRoleChangeAsync;
+        _shardedClient.GuildMemberUpdated -= _guildLogger.LogMemberRoleAssignmentAsync;
+
+        _shardedClient.GuildMemberUpdated -= _guildLogger.LogMemberRoleRevokeAsync;
 
         _shardedClient.GuildMemberUpdated -= _guildLogger.LogMemberNicknameChangeAsync;
 

@@ -1,3 +1,4 @@
+using AkkoCore.Extensions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using System;
@@ -43,18 +44,12 @@ public interface IGuildLogGenerator
     /// <summary>
     /// Generates a log message for a <see cref="GuildEmojisUpdateEventArgs"/> event.
     /// </summary>
-    /// <param name="server">The server the event took place.</param>
-    /// <param name="emoji">The emoji that got added/edited/deleted.</param>
-    /// <param name="action">
-    /// Amount of emojis before minus amount of emojis after. Less than 0 means the emoji was added, more than 0 means the emoji was deleted and 0 means the emoji was modified.
-    /// </param>
-    /// <param name="oldEmojiName">The previous name of the emoji - only relevant if the emoji was modified.</param>
-    /// <returns></returns>
+    /// <param name="eventArgs">The event arguments.</param>
     /// <returns>The guild log message.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// Occurs when <paramref name="server"/> or <paramref name="emoji"/> are <see langword="null"/>.
-    /// </exception>
-    DiscordWebhookBuilder GetEmojiUpdateLog(DiscordGuild server, DiscordEmoji emoji, int action, string? oldEmojiName = default);
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="server"/> or <paramref name="emoji"/> are <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">Occurs when the emoji is not found. This would indicate an issue with D#+</exception>
+    /// <exception cref="NotSupportedException">Occurs when <see cref="GuildEmojisUpdateEventArgsExt.GetStatus(GuildEmojisUpdateEventArgs)"/> returns an unknown activity type.</exception>
+    DiscordWebhookBuilder GetEmojiLog(GuildEmojisUpdateEventArgs eventArgs);
 
     /// <summary>
     /// Generates a log message for a <see cref="InviteCreateEventArgs"/> event.

@@ -206,7 +206,7 @@ public sealed class Tags : AkkoCommandModule
     public async Task ExportTagsAsync(CommandContext context, [RemainingText, Description("arg_tag_ids")] params int[] tagIds)
     {
         using var tags = _service.GetTags(context.Guild?.Id)
-            .If(tagIds.Length is not 0, x => x.Where(y => tagIds.Contains(y.Id)))
+            .If(_ => tagIds.Length is not 0, x => x.Where(y => tagIds.Contains(y.Id)))
             .Select(x => new SerializableTagEntity(x))
             .ToRentedArray();
 

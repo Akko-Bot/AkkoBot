@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AkkoCore.Services.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AkkoBot.Migrations
 {
     [DbContext(typeof(AkkoDbContext))]
-    partial class AkkoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220104075436_GuildLogExpansion")]
+    partial class GuildLogExpansion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
