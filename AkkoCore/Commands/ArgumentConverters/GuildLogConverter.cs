@@ -12,7 +12,7 @@ internal sealed class GuildLogConverter : IArgumentConverter<GuildLogType>
 {
     public Task<Optional<GuildLogType>> ConvertAsync(string input, CommandContext ctx)
     {
-        var result = Enum.GetValues<GuildLogType>().FirstOrDefault(x => input.Equals(x.ToString()));
+        var result = Enum.GetValues<GuildLogType>().FirstOrDefault(x => input.Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
         return (result is GuildLogType.None)
             ? Task.FromResult(Optional.FromNoValue<GuildLogType>())

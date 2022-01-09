@@ -143,4 +143,9 @@ public interface IGuildLogEventHandler
     /// Logs nickname changes.
     /// </summary>
     Task LogMemberNicknameChangeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs message pins and unpins.
+    /// </summary>
+    Task LogPinnedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs);
 }

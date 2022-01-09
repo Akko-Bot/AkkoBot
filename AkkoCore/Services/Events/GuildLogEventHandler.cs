@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -37,17 +38,19 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     private readonly IGuildLogGenerator _logGenerator;
     private readonly IAkkoCache _akkoCache;
     private readonly IDbCache _dbCache;
+    private readonly IEqualityComparer<DiscordEmbed> _embedComparer;
     private readonly BotConfig _botConfig;
     private readonly DiscordWebhookClient _webhookClient;
     private readonly UtilitiesService _utilities;
 
     public GuildLogEventHandler(IServiceScopeFactory scopeFactory, IGuildLogGenerator logGenerator, IAkkoCache akkoCache, IDbCache dbCache,
-        BotConfig botConfig, DiscordWebhookClient webhookClient, UtilitiesService utilities)
+        IEqualityComparer<DiscordEmbed> embedComparer, BotConfig botConfig, DiscordWebhookClient webhookClient, UtilitiesService utilities)
     {
         _scopeFactory = scopeFactory;
         _logGenerator = logGenerator;
         _akkoCache = akkoCache;
         _dbCache = dbCache;
+        _embedComparer = embedComparer;
         _botConfig = botConfig;
         _webhookClient = webhookClient;
         _utilities = utilities;
@@ -56,8 +59,8 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public Task CacheMessageOnCreationAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLog) || !guildLog.IsActive)
-            return Task.CompletedTask;
+            || !TryGetGuildLogs(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLogs) || !guildLogs.Any(x => x.IsActive))
+            return Task.CompletedTask;        
 
         if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
         {
@@ -68,6 +71,16 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
         messageCache.Add(eventArgs.Message);
 
         return Task.CompletedTask;
+    }
+
+    public Task LogPinnedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessagePinned, out var guildLog) || !guildLog.IsActive
+            || eventArgs.MessageBefore?.Pinned == eventArgs.Message.Pinned
+            || eventArgs.MessageBefore?.Content.Equals(eventArgs.Message.Content, StringComparison.Ordinal) is not true
+            || eventArgs.MessageBefore?.Embeds.Any(x => !eventArgs.Message.Embeds.Contains(x, _embedComparer)) is true)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetMessagePinLog(eventArgs));
     }
 
     public Task LogUpdatedMessageAsync(DiscordClient client, MessageUpdateEventArgs eventArgs)
@@ -83,18 +96,14 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
         // Cache uncached edited messages, but don't log them.
         if (eventArgs.MessageBefore is null)
         {
-            if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
-            {
-                messageCache = new(_botConfig.MessageSizeCache) { eventArgs.Message };
-                _akkoCache.GuildMessageCache.TryAdd(eventArgs.Guild.Id, messageCache);
-            }
-
-            messageCache.Add(eventArgs.Message);
+            CacheNewMessage(eventArgs.Guild.Id, eventArgs.Message);
             return Task.CompletedTask;
         }
 
         return DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetMessageUpdateLog(eventArgs));
     }
+
+    
 
     public async Task LogDeletedMessageAsync(DiscordClient client, MessageDeleteEventArgs eventArgs)
     {
@@ -220,7 +229,8 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public Task LogMemberRoleAssignmentAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
     {
         return (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleAssigned, out var guildLog) || !guildLog.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleAssigned, out var guildLog) || !guildLog.IsActive
+            || eventArgs.RolesAfter.Count <= eventArgs.RolesBefore.Count)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
     }
@@ -228,7 +238,8 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     public Task LogMemberRoleRevokeAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
     {
         return (eventArgs.Guild is null || eventArgs.RolesBefore.Count == eventArgs.RolesAfter.Count
-            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleRevoked, out var guildLog) || !guildLog.IsActive)
+            || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.RoleRevoked, out var guildLog) || !guildLog.IsActive
+            || eventArgs.RolesBefore.Count <= eventArgs.RolesAfter.Count)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetRoleChangeLog(eventArgs));
     }
@@ -399,13 +410,13 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     /// <param name="logType">The type of guild log to get.</param>
     /// <param name="guildLogs">The resulting guild logs.</param>
     /// <returns><see langword="true"/> if at least one guild log was found, <see langword="false"/> otherwise.</returns>
-    private bool TryGetGuildLogs(ulong sid, GuildLogType logType, out IReadOnlyList<GuildLogEntity> guildLogs)
+    private bool TryGetGuildLogs(ulong sid, GuildLogType logType, out IEnumerable<GuildLogEntity> guildLogs)
     {
         _dbCache.GuildLogs.TryGetValue(sid, out var dbGuildLogs);
-        guildLogs = dbGuildLogs?.Where(x => logType.HasFlag(x.Type)).ToArray()
-            ?? Array.Empty<GuildLogEntity>();
+        guildLogs = dbGuildLogs?.Where(x => logType.HasFlag(x.Type))
+            ?? Enumerable.Empty<GuildLogEntity>();
 
-        return guildLogs.Count is not 0;
+        return guildLogs.Any();
     }
 
     /// <summary>
@@ -426,6 +437,23 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
         await webhook.ExecuteAsync(responseFactory()).ConfigureAwait(false);
 
         return true;
+    }
+
+    /// <summary>
+    /// Caches a new message. If the message cache doesn't exist for the provided
+    /// <paramref name="sid"/>, it creates one.
+    /// </summary>
+    /// <param name="sid">The Id of the Discord guild.</param>
+    /// <param name="message">The message to be cached.</param>
+    private void CacheNewMessage(ulong sid, DiscordMessage message)
+    {
+        if (!_akkoCache.GuildMessageCache.TryGetValue(sid, out var messageCache))
+        {
+            messageCache = new(_botConfig.MessageSizeCache);
+            _akkoCache.GuildMessageCache.TryAdd(sid, messageCache);
+        }
+
+        messageCache.Add(message);
     }
 
     /// <summary>

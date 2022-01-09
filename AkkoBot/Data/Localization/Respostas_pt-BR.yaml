@@ -888,3 +888,9 @@ xid: ID do {0} {1} é {2}.
 
 nickname_changed: Apelido Alterado
 log_invalid: Log do tipo {0} não é válido.
+message_pinned: Menssagem fixada
+message_unpinned: mensagem desafixada
+pinned_on: Fixada em
+unpinned_on: Desafixada em
+jump_to: Pular para
+log_list_desc: Lista de logs de servidor disponíveis. Logs que estiverem ativos terão o canal para onde as mensagems são enviadas listado ao seu lado. Ativar/Desativar um grupo de logs terá efeito sobre todos os logs contidos nesse grupo.

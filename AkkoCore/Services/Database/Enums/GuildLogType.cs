@@ -228,7 +228,7 @@ public enum GuildLogType : long
     /// <summary>
     /// Message edit, delete, and bulk delete.
     /// </summary>
-    MessageEvents = MessageCreated | MessageUpdated | MessageDeleted | MessageBulkDeleted,
+    MessageEvents = MessageCreated | MessagePinned | MessageUpdated | MessageDeleted | MessageBulkDeleted,
 
     /// <summary>
     /// Voice connect, move, and disconnect.

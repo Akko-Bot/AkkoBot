@@ -186,13 +186,22 @@ public interface IGuildLogGenerator
     /// <summary>
     /// Generates a log message for a <see cref="GuildMemberUpdateEventArgs"/> event when a user changes their nickname.
     /// </summary>
-    /// <returns>The guild log message.</returns>
     /// <param name="user">The user who got updated.</param>
     /// <param name="serverId">The ID of the Discord guild.</param>
     /// <param name="oldName">The user's previous name.</param>
     /// <param name="newName">The user's current name.</param>
     /// <param name="logTitle">The title of the log. Localizable.</param>
+    /// <returns>The guild log message.</returns>
     /// <exception cref="ArgumentException">Occurs when there was no change in nickname.</exception>
     /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
     DiscordWebhookBuilder GetNameChangeLog(DiscordUser user, ulong serverId, string? oldName, string? newName, string logTitle);
+
+    /// <summary>
+    /// Generates a log message for a <see cref="MessageUpdateEventArgs"/> event when a message gets pinned or unpinned.
+    /// </summary>
+    /// <param name="eventArgs">The event argument.</param>
+    /// <returns>The guild log message.</returns>
+    /// <exception cref="ArgumentException">Occurs when the Guild in <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    DiscordWebhookBuilder GetMessagePinLog(MessageUpdateEventArgs eventArgs);
 }

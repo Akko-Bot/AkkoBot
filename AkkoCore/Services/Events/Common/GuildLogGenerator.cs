@@ -41,6 +41,30 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         _botconfig = botconfig;
     }
 
+    public DiscordWebhookBuilder GetMessagePinLog(MessageUpdateEventArgs eventArgs)
+    {
+        if (eventArgs is null)
+            throw new ArgumentNullException(nameof(eventArgs), "Event arguments cannot be null.");
+        else if (eventArgs.Guild is null)
+            throw new ArgumentException("Guild cannot be null.", nameof(eventArgs));
+
+        var settings = GetMessageSettings(eventArgs.Guild.Id);
+        var webhookMessage = new SerializableDiscordEmbed()
+            .WithColor((eventArgs.Message.Pinned) ? settings.OkColor : settings.ErrorColor)
+            .WithAuthor((eventArgs.Message.Pinned) ? "message_pinned" : "message_unpinned")
+            .WithTitle(eventArgs.Author.GetFullname())
+            .AddField("author_mention", eventArgs.Author.Mention, true)
+            .AddField((eventArgs.Message.Pinned) ? "pinned_on" : "unpinned_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .AddField("jump_to", Formatter.MaskedUrl('#' + eventArgs.Channel.Name, eventArgs.Message.JumpLink), true)
+            .WithFooter($"{_localizer.GetResponseString(settings.Locale, "id")}: {eventArgs.Message.Id}")
+            .WithLocalization(_localizer, settings.Locale);
+
+        if (!string.IsNullOrWhiteSpace(eventArgs.Message.Content))
+            webhookMessage.WithDescription(eventArgs.Message.Content);
+
+        return GetStandardMessage(webhookMessage, settings);
+    }
+
     public DiscordWebhookBuilder GetMessageDeleteLog(DiscordMessage message)
     {
         if (message is null)
@@ -79,6 +103,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             )
             .AddField("author_mention", eventArgs.Message.Author.Mention, true)
             .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .AddField("jump_to", Formatter.MaskedUrl('#' + eventArgs.Channel.Name, eventArgs.Message.JumpLink), true)
             .WithFooter($"{_localizer.GetResponseString(settings.Locale, "id")}: {eventArgs.Message.Id}")
             .WithLocalization(_localizer, settings.Locale);
 

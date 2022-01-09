@@ -888,3 +888,9 @@ xid: ID of {0} {1} is {2}.
 
 nickname_changed: Nickname Changed
 log_invalid: Log of type {0} is not valid.
+message_pinned: Message pinned
+message_unpinned: Message unpinned
+pinned_on: Pinned on
+unpinned_on: Unpinned on
+jump_to: Jump to
+log_list_desc: List of available guild logs. Logs that are currently active will have the channel they send messages to listed right next to them. Enabling/Disabling a log group affects all logs in it.

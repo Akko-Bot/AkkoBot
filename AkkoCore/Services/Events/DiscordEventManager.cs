@@ -80,6 +80,8 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.MessageCreated += _guildLogger.CacheMessageOnCreationAsync;
 
+        _shardedClient.MessageUpdated += _guildLogger.LogPinnedMessageAsync;
+
         _shardedClient.MessageUpdated += _guildLogger.LogUpdatedMessageAsync;
 
         _shardedClient.MessageDeleted += _guildLogger.LogDeletedMessageAsync;
@@ -276,6 +278,8 @@ internal sealed class DiscordEventManager : IDiscordEventManager
         #region Log Events
 
         _shardedClient.MessageCreated -= _guildLogger.CacheMessageOnCreationAsync;
+
+        _shardedClient.MessageUpdated -= _guildLogger.LogPinnedMessageAsync;
 
         _shardedClient.MessageUpdated -= _guildLogger.LogUpdatedMessageAsync;
 
