@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
@@ -420,7 +420,6 @@ public sealed class BotCoreBuilder
 
             // > Utilities
             ServiceDescriptor.Singleton(_ => new DiscordWebhookClient(loggerFactory: _loggerFactory, minimumLogLevel: LogLevel.None)),
-            ServiceDescriptor.Singleton(_ => new Random()),
 
             // > Cogs
             ServiceDescriptor.Singleton<ICogs>(_ => new Cogs(cogSetups))

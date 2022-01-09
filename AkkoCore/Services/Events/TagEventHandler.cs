@@ -41,15 +41,13 @@ internal sealed class TagEventHandler : ITagEventHandler
     private readonly IDbCache _dbCache;
     private readonly BotConfig _botConfig;
     private readonly UtilitiesService _utilitiesService;
-    private readonly Random _rng;
 
-    public TagEventHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, BotConfig botConfig, UtilitiesService utilitiesService, Random rng)
+    public TagEventHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, BotConfig botConfig, UtilitiesService utilitiesService)
     {
         _scopeFactory = scopeFactory;
         _dbCache = dbCache;
         _botConfig = botConfig;
         _utilitiesService = utilitiesService;
-        _rng = rng;
     }
 
     public Task ExecuteGlobalTagAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
@@ -65,7 +63,7 @@ internal sealed class TagEventHandler : ITagEventHandler
         var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.Prefix);
         var tag = globalTags
             .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-            .RandomElementOrDefault(_rng);
+            .RandomElementOrDefault();
 
         return (tag is null || IsIgnoredContext(eventArgs, tag) || HasLocalOverride(eventArgs, tag))
             ? Task.CompletedTask
@@ -84,7 +82,7 @@ internal sealed class TagEventHandler : ITagEventHandler
         var dummyContext = GetCommandContext(client, eventArgs, dbGuild.Prefix);
         var tag = dbTags
             .Where(x => FilterTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-            .RandomElementOrDefault(_rng);
+            .RandomElementOrDefault();
 
         return (tag is null || IsIgnoredContext(eventArgs, tag))
             ? Task.CompletedTask
@@ -105,7 +103,7 @@ internal sealed class TagEventHandler : ITagEventHandler
         var dummyContext = GetCommandContext(client, eventArgs, dbGuild?.Prefix ?? _botConfig.Prefix);
         var tag = globalTags
             .Where(x => FilterEmojiTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-            .RandomElementOrDefault(_rng);
+            .RandomElementOrDefault();
 
         return (tag is null || IsIgnoredContext(eventArgs, tag) || HasLocalOverride(eventArgs, tag))
             ? Task.CompletedTask
@@ -124,7 +122,7 @@ internal sealed class TagEventHandler : ITagEventHandler
         var dummyContext = GetCommandContext(client, eventArgs, dbGuild.Prefix);
         var tag = dbTags
             .Where(x => FilterEmojiTags(SmartString.Parse(dummyContext, x.Trigger), eventArgs, x))
-            .RandomElementOrDefault(_rng);
+            .RandomElementOrDefault();
 
         return (tag is null || IsIgnoredContext(eventArgs, tag))
             ? Task.CompletedTask

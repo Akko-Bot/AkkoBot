@@ -316,7 +316,7 @@ public static class LinqExt
     /// <returns>A random <typeparamref name="T"/> element from this collection or <see langword="default"/>(<typeparamref name="T"/>) if the collection is empty.</returns>
     public static T? RandomElementOrDefault<T>(this IEnumerable<T> collection, Random? random = default)
     {
-        random ??= new();
+        random ??= Random.Shared;
         return collection.ElementAtOrDefault(random.Next(collection.Count()));
     }
 
@@ -330,7 +330,7 @@ public static class LinqExt
     /// <returns>A random <typeparamref name="T"/> element from this collection or <see langword="default"/>(<typeparamref name="T"/>) if the collection is empty.</returns>
     public static T? RandomElementOrDefault<T>(this IEnumerable<T> collection, int maxIndex, Random? random = default)
     {
-        random ??= new();
+        random ??= Random.Shared;
         return collection.ElementAtOrDefault(random.Next(Math.Min(collection.Count(), Math.Abs(maxIndex))));
     }
 

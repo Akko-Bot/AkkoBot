@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
@@ -99,7 +99,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         /* Miscelaneous */
 
-        ["rng"] = (context) => context.Services.GetRequiredService<Random>().Next(),
+        ["rng"] = (context) => Random.Shared.Next(),
         ["cmd.argument"] = (context) => context.RawArgumentString,
 
         /* Ban Template Placeholders - Only works on ban templates */
@@ -212,14 +212,14 @@ public class CommandPlaceholders : IPlaceholderFormatter
             if (x > y)
                 (x, y) = (y, x);
 
-            return context.Services.GetRequiredService<Random>().Next(x, y);
+            return Random.Shared.Next(x, y);
         },
 
         ["choose"] = (context, parameter) =>
         {
             return (parameter is not IReadOnlyList<string> arguments || arguments.Count == 0)
                 ? null
-                : arguments[context.Services.GetRequiredService<Random>().Next(0, arguments.Count)].Trim();
+                : arguments[Random.Shared.Next(0, arguments.Count)].Trim();
         },
 
         ["cmd.argument"] = (context, parameter) =>
