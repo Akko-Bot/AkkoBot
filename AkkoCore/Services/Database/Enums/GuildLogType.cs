@@ -18,7 +18,7 @@ public enum GuildLogType : long
     /// </summary>
     Unknown = 1L << 0,
 
-    /* Messages */ 
+    /* Messages */
 
     /// <summary>
     /// When a Discord message is created.
@@ -258,7 +258,7 @@ public enum GuildLogType : long
     /// <summary>
     /// User activity, avatar and username changes.
     /// </summary>
-    PresenceEvents = UserActivityCreated | UserActivityUpdated | UserActivityRemoved | UserStatusUpdated  | UserAvatarUpdated | UserNameUpdated,
+    PresenceEvents = UserActivityCreated | UserActivityUpdated | UserActivityRemoved | UserStatusUpdated | UserAvatarUpdated | UserNameUpdated,
 
     /// <summary>
     /// All events.

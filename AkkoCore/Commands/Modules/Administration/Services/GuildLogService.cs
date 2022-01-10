@@ -38,12 +38,12 @@ public sealed class GuildLogService
     /// <summary>
     /// Contains the flags of the guild log types that are not supported for guild logging.
     /// </summary>
-    public const GuildLogType ForbiddenTypes = GuildLogType.MessageCreated | GuildLogType.UserStatusUpdated;
+    public const GuildLogType ForbiddenTypes = GuildLogType.MessageCreated | GuildLogType.PresenceEvents;
 
     /// <summary>
     /// Contains the flags of all groups of guild logs.
     /// </summary>
-    public static GuildLogType[] GuildLogTypeGroups { get; } = new[] 
+    public static GuildLogType[] GuildLogTypeGroups { get; } = new[]
     {
         GuildLogType.None,
         GuildLogType.All,

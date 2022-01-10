@@ -605,6 +605,7 @@ joinrole_limit: O limite de 3 cargos de entrada foi atingido.
 joinrole_list_empty: Não há cargos de entrada.
 joinrole_list_title: Lista de Cargos de Entrada
 joinrole_removed: O cargo {0} foi removido da lista de cargos de entrada.
+jump_to: Pular para
 kick: Expulsar
 kick_enum: expulso
 kick_notification: Você foi expulso do servidor {0}.
@@ -628,12 +629,14 @@ log_emoji_edited_simple: Emoji {0} foi modificado.
 log_emoji_title: Emoji atualizado
 log_ignore_add: '{0} foi adicionado à lista de canais ignorados.'
 log_ignore_remove: '{0} foi removido da lista de canais ignorados.'
+log_invalid: Log do tipo {0} não é válido.
 log_invite_created_title: Convite criado
 log_invite_deleted_title: Convite excluído
 log_joiningalt_title: ❗Possível alt entrou
 log_joiningmember_title: Usuário entrou
 log_leavingalt_title: ❗Possível alt saiu
 log_leavingmember_title: Usuário saiu
+log_list_desc: Lista de logs de servidor disponíveis. Logs que estiverem ativos terão o canal para onde as mensagems são enviadas listado ao seu lado. Ativar/Desativar um grupo de logs terá efeito sobre todos os logs contidos nesse grupo.
 log_list_title: Registros do Servidor
 log_message_deleted_title: Mensagem excluída
 log_message_edited_title: Mensagem alterada
@@ -655,6 +658,8 @@ medium: Médio
 members: Membros
 memory: Memória
 message: Mensagem
+message_pinned: Menssagem fixada
+message_unpinned: mensagem desafixada
 messages: Mensagens
 minutes: Minutos
 moderator: Moderador
@@ -676,6 +681,7 @@ name: Nome
 new_name: Nome novo
 news: Anúncios
 nickname: Apelido
+nickname_changed: Apelido Alterado
 none: Nenhum
 notice_success: Anotação adicionada com sucesso.
 nsfw: NSFW
@@ -739,6 +745,7 @@ perm_use_voice: Conectar
 perm_use_voice_detection: Detecção de Voz
 perm_view_audit_log: Visualizar o Registro de Auditoria
 permissions: Permissões
+pinned_on: Fixada em
 poll: Enquete
 poll_anonymous_error: Já existe uma enquete anônima ativa nesse canal.
 poll_anonymous_footer: Você também pode usar o comando {0} em mensagem direta para votar nessa enquete.
@@ -844,6 +851,7 @@ undeafen_success: Usuário {0} pode ouvir outros usuários nos canais de voz nov
 unknown: Desconhecido
 unlockchannel_reason: Lockdown Suspenso
 unmute_success: Usuário {0} pode falar novamente.
+unpinned_on: Desafixada em
 unspecified: Não especificado
 unwarn_all: Todas as advertências do usuário {0} foram removidas.
 unwarn_failure: A infração de ID {0} não foi encontrada.
@@ -885,12 +893,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-
-nickname_changed: Apelido Alterado
-log_invalid: Log do tipo {0} não é válido.
-message_pinned: Menssagem fixada
-message_unpinned: mensagem desafixada
-pinned_on: Fixada em
-unpinned_on: Desafixada em
-jump_to: Pular para
-log_list_desc: Lista de logs de servidor disponíveis. Logs que estiverem ativos terão o canal para onde as mensagems são enviadas listado ao seu lado. Ativar/Desativar um grupo de logs terá efeito sobre todos os logs contidos nesse grupo.

@@ -79,6 +79,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithDescription($"{_localizer.GetResponseString(settings.Locale, "channel")}: {message.Channel.Mention} | {message.Channel.Name}\n\n{message.Content}")
             .AddField("author_mention", message.Author.Mention, true)
             .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .AddField("jump_to", Formatter.MaskedUrl('#' + message.Channel.Name, message.JumpLink), true)
             .WithFooter($"{_localizer.GetResponseString(settings.Locale, "id")}: {message.Id}")
             .WithLocalization(_localizer, settings.Locale);
 

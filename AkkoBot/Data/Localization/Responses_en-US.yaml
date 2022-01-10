@@ -605,6 +605,7 @@ joinrole_limit: Limit of 3 join roles has been reached.
 joinrole_list_empty: There are no join roles.
 joinrole_list_title: List of Join Roles
 joinrole_removed: The {0} role has been removed from the list of join roles.
+jump_to: Jump to
 kick: Kick
 kick_enum: kicked
 kick_notification: You have been kicked from the {0} server.
@@ -628,12 +629,14 @@ log_emoji_edited_simple: Emoji {0} has been modified.
 log_emoji_title: Emoji updated
 log_ignore_add: Added {0} to the ignored list.
 log_ignore_remove: Removed {0} from the ignored list.
+log_invalid: Log of type {0} is not valid.
 log_invite_created_title: Invite created
 log_invite_deleted_title: Invite deleted
 log_joiningalt_title: ❗Possible alt has joined
 log_joiningmember_title: User has joined
 log_leavingalt_title: ❗Possible alt has left
 log_leavingmember_title: User has left
+log_list_desc: List of available guild logs. Logs that are currently active will have the channel they send messages to listed right next to them. Enabling/Disabling a log group affects all logs in it.
 log_list_title: Server Logs
 log_message_deleted_title: Message deleted
 log_message_edited_title: Message edited
@@ -655,6 +658,8 @@ medium: Medium
 members: Members
 memory: Memory
 message: Message
+message_pinned: Message pinned
+message_unpinned: Message unpinned
 messages: Messages
 minutes: Minutes
 moderator: Moderator
@@ -676,6 +681,7 @@ name: Name
 new_name: New name
 news: News
 nickname: Nickname
+nickname_changed: Nickname Changed
 none: None
 notice_success: Notice added successfully.
 nsfw: NSFW
@@ -739,6 +745,7 @@ perm_use_voice: Connect
 perm_use_voice_detection: Voice Detection
 perm_view_audit_log: View Audit Log
 permissions: Permissions
+pinned_on: Pinned on
 poll: Poll
 poll_anonymous_error: There is an anonymous poll already active in this channel.
 poll_anonymous_footer: You can also use the {0} command in direct message to vote on this poll.
@@ -844,6 +851,7 @@ undeafen_success: User {0} can now hear other users speaking in voice channels.
 unknown: Unknown
 unlockchannel_reason: Lockdown Lifted
 unmute_success: User {0} has been unmuted.
+unpinned_on: Unpinned on
 unspecified: Unspecified
 unwarn_all: Removed all warnings from {0}.
 unwarn_failure: Infraction of ID {0} was not found.
@@ -885,12 +893,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-
-nickname_changed: Nickname Changed
-log_invalid: Log of type {0} is not valid.
-message_pinned: Message pinned
-message_unpinned: Message unpinned
-pinned_on: Pinned on
-unpinned_on: Unpinned on
-jump_to: Jump to
-log_list_desc: List of available guild logs. Logs that are currently active will have the channel they send messages to listed right next to them. Enabling/Disabling a log group affects all logs in it.

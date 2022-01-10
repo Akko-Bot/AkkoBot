@@ -1,7 +1,6 @@
 using AkkoCore.Commands.Attributes;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -20,8 +19,8 @@ internal sealed class DiscordEmbedFieldComparer : IEqualityComparer<DiscordEmbed
     {
         return ReferenceEquals(x, y)
             || ((x is not null || y is null) && (x is null || y is not null)
-            && x!.Inline == y!.Inline
-            && Equals(x.Value, y.Value)
-            && Equals(x.Name, y.Name));
+                && x!.Inline == y!.Inline
+                && Equals(x.Value, y.Value)
+                && Equals(x.Name, y.Name));
     }
 }

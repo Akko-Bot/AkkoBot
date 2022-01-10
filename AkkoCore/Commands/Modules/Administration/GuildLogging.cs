@@ -154,16 +154,15 @@ public sealed class GuildLogging : AkkoCommandModule
         var message = new SerializableDiscordEmbed()
             .WithTitle("log_list_title")
             .WithDescription("log_list_desc")
+            .AddField(GuildLogType.RoleEvents.ToString(), GetLogSubtypes(GuildLogType.RoleEvents), true)
             .AddField(GuildLogType.MessageEvents.ToString(), GetLogSubtypes(GuildLogType.MessageEvents), true)
             .AddField(GuildLogType.ChannelEvents.ToString(), GetLogSubtypes(GuildLogType.ChannelEvents), true)
-            .AddField(GuildLogType.RoleEvents.ToString(), GetLogSubtypes(GuildLogType.RoleEvents), true)
             .AddField(GuildLogType.MemberEvents.ToString(), GetLogSubtypes(GuildLogType.MemberEvents), true)
-            .AddField(GuildLogType.AltEvents.ToString(), GetLogSubtypes(GuildLogType.AltEvents), true)
-            .AddField(GuildLogType.PunishmentEvents.ToString(), GetLogSubtypes(GuildLogType.PunishmentEvents), true)
             .AddField(GuildLogType.VoiceEvents.ToString(), GetLogSubtypes(GuildLogType.VoiceEvents), true)
-            .AddField(GuildLogType.InviteEvents.ToString(), GetLogSubtypes(GuildLogType.InviteEvents), true)
             .AddField(GuildLogType.EmojiEvents.ToString(), GetLogSubtypes(GuildLogType.EmojiEvents), true)
-            .AddField(GuildLogType.PresenceEvents.ToString(), GetLogSubtypes(GuildLogType.PresenceEvents), true);
+            .AddField(GuildLogType.InviteEvents.ToString(), GetLogSubtypes(GuildLogType.InviteEvents), true)
+            .AddField(GuildLogType.AltEvents.ToString(), GetLogSubtypes(GuildLogType.AltEvents), true)
+            .AddField(GuildLogType.PunishmentEvents.ToString(), GetLogSubtypes(GuildLogType.PunishmentEvents), true);
 
         await context.RespondLocalizedAsync(message, false);
 

@@ -41,7 +41,10 @@ public sealed class GuildEmojis : AkkoCommandModule
         foreach (var emojiGroup in emojis)
             embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', emojiGroup.Select(emoji => $"{emoji} {emoji.GetDiscordName()}")), true);
 
-        await context.RespondPaginatedByFieldsAsync(embed, 2);
+        if (embed.Fields?.Count > 0)
+            await context.RespondPaginatedByFieldsAsync(embed, 2);
+        else
+            await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
     }
 
     [Command("show"), Aliases("showemoji", "se")]

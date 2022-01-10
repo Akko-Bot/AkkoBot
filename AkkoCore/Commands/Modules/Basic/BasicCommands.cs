@@ -4,7 +4,6 @@ using AkkoCore.Config.Models;
 using AkkoCore.Core.Abstractions;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
-using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -27,17 +26,15 @@ public sealed class BasicCommands : AkkoCommandModule, IDisposable
 
     private readonly ICommandHandler _commandHandler;
     private readonly IGlobalEventsHandler _globalEvents;
-    private readonly IDbCache _dbCache;
     private readonly ICogs _cogs;
     private readonly DiscordShardedClient _shardedClient;
     private readonly Credentials _creds;
 
-    public BasicCommands(ICommandHandler commandHandler, IGlobalEventsHandler globalEvents, IDbCache dbCache,
+    public BasicCommands(ICommandHandler commandHandler, IGlobalEventsHandler globalEvents,
         ICogs cogs, DiscordShardedClient shardedClient, Credentials creds)
     {
         _commandHandler = commandHandler;
         _globalEvents = globalEvents;
-        _dbCache = dbCache;
         _cogs = cogs;
         _shardedClient = shardedClient;
         _creds = creds;

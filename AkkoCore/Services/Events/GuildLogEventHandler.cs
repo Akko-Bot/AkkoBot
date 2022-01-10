@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -60,7 +59,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
     {
         if (eventArgs.Guild is null || eventArgs.Message.Author?.IsBot is not false
             || !TryGetGuildLogs(eventArgs.Guild.Id, GuildLogType.MessageEvents, out var guildLogs) || !guildLogs.Any(x => x.IsActive))
-            return Task.CompletedTask;        
+            return Task.CompletedTask;
 
         if (!_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache))
         {
@@ -102,8 +101,6 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
         return DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetMessageUpdateLog(eventArgs));
     }
-
-    
 
     public async Task LogDeletedMessageAsync(DiscordClient client, MessageDeleteEventArgs eventArgs)
     {
