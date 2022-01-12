@@ -108,7 +108,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.MessageDeleted, out var guildLog)
             || !guildLog.IsActive
             || !_akkoCache.GuildMessageCache.TryGetValue(eventArgs.Guild.Id, out var messageCache)
-            || !messageCache.TryGetValue(x => x.Id == eventArgs.Message.Id, out var message)
+            || !messageCache.TryGetValue(x => x?.Id == eventArgs.Message.Id, out var message)
             || (eventArgs.Message.Author is DiscordMember member && IsIgnoredContext(eventArgs.Guild.Id, member.Roles.Select(x => x.Id).Append(eventArgs.Message.Author.Id).Append(eventArgs.Channel.Id))))
             return;
 
