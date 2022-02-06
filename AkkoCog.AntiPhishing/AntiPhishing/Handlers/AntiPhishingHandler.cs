@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -26,6 +27,7 @@ namespace AkkoCog.AntiPhishing.AntiPhishing.Handlers;
 internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 {
     private const string _apiUrl = "https://anti-fish.harmony.rocks?url=";
+    private const string _shamefulNick = "I'm a dirty scammer❗";
 
     private readonly EventId _eventLog = new(99, nameof(AntiPhishingHandler));
 
@@ -48,35 +50,114 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
         _punishService = punishService;
     }
 
-    public Task FilterPhishingLinksAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
+    public Task FilterPhishingMessagesAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || !_service.IsAntiPhishingActive(eventArgs.Guild.Id)
+        if (eventArgs.Guild is null || eventArgs.Author.IsBot || !_service.IsAntiPhishingActive(eventArgs.Guild.Id)
+            || string.IsNullOrWhiteSpace(eventArgs.Message.Content)
             || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
             return Task.CompletedTask;
 
-        _ = DeleteIfMatchAsync(client, eventArgs);
+        _ = CheckAndPunishAsync(client, eventArgs.Message.Content, (DiscordMember)eventArgs.Author, eventArgs.Channel, eventArgs.Guild, x =>
+        {
+            eventArgs.Handled = true;
+            return eventArgs.Message.DeleteAsync();
+        });
+
+        return Task.CompletedTask;
+    }
+
+    public Task FilterPhishingNicknamesAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
+    {
+        if (eventArgs.Guild is null || eventArgs.Member.IsBot || !_service.IsAntiPhishingActive(eventArgs.Guild.Id))
+            return Task.CompletedTask;
+
+        _ = CheckAndPunishAsync(client, eventArgs.NicknameAfter ?? eventArgs.Member.DisplayName, eventArgs.Member, default, eventArgs.Guild, x =>
+        {
+            eventArgs.Handled = true;
+
+            return (_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member) && eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.ManageNicknames))
+                ? eventArgs.Member.ModifyAsync(x => x.Nickname = (string.IsNullOrWhiteSpace(eventArgs.NicknameAfter)) ? _shamefulNick : string.Empty)
+                : Task.CompletedTask;
+        });
+
+        return Task.CompletedTask;
+    }
+
+    public Task FilterPhishingUserJoinAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
+    {
+        if (eventArgs.Guild is null || eventArgs.Member.IsBot || !_service.IsAntiPhishingActive(eventArgs.Guild.Id))
+            return Task.CompletedTask;
+
+        _ = CheckAndPunishAsync(client, eventArgs.Member.Username, eventArgs.Member, default, eventArgs.Guild, x =>
+        {
+            eventArgs.Handled = true;
+
+            if (!_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member))
+                return Task.CompletedTask;
+
+            var punishmentType = _service.GetPunishment(eventArgs.Guild.Id);
+            var fakeContext = GetFakeContext(client.GetCommandsNext(), eventArgs.Guild.CurrentMember, eventArgs.Guild.GetDefaultChannel());
+
+            return punishmentType switch
+            {
+                null when eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.KickMembers)
+                    => _punishService.KickUserAsync(fakeContext, eventArgs.Member, "antiphishing_punish_reason"),
+
+                PunishmentType.Mute when eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.ManageNicknames)
+                    => eventArgs.Member.ModifyAsync(x => x.Nickname = _shamefulNick),
+
+                _ => Task.CompletedTask
+            };
+        });
+
+        // If Discord ever exposes the "About Me" section of a user, add it here.
+
+        var customStatus = eventArgs.Member.Presence.Activities.FirstOrDefault(x => x.ActivityType is ActivityType.Custom)?.CustomStatus?.Name ?? string.Empty;
+
+        _ = CheckAndPunishAsync(client, customStatus, eventArgs.Member, default, eventArgs.Guild, x =>
+        {
+            eventArgs.Handled = true;
+            var fakeContext = GetFakeContext(client.GetCommandsNext(), eventArgs.Guild.CurrentMember, eventArgs.Guild.GetDefaultChannel());
+
+            return (_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member) && eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.KickMembers))
+                ? _punishService.KickUserAsync(fakeContext, eventArgs.Member, "antiphishing_punish_reason")
+                : Task.CompletedTask;
+        });
 
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Deletes the Discord message if it contains a phishing link.
+    /// Gets a fake command context with an empty prefix and content and no command.
     /// </summary>
-    /// <param name="client">The Discord client</param>
-    /// <param name="eventArgs">The event arguments.</param>
-    /// <returns><see langword="true"/> if the message was deleted, <see langword="false"/> otherwise.</returns>
-    private async Task<bool> DeleteIfMatchAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
-    {
-        // Delete message, cache the scam URL, and stop handling this event
-        Task DeleteMessageAsync(Match match, MessageCreateEventArgs eventArgs)
-        {
-            eventArgs.Handled = true;
-            _positiveUrls.Add(match.Value);
+    /// <param name="cmdHandler">The command handler.</param>
+    /// <param name="user">The user to assign the context to.</param>
+    /// <param name="channel">The text channel to assign the context to.</param>
+    /// <returns>A fake command context.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private CommandContext GetFakeContext(CommandsNextExtension cmdHandler, DiscordUser user, DiscordChannel channel)
+        => cmdHandler.CreateFakeContext(user, channel, string.Empty, string.Empty, null);
 
-            return eventArgs.Message.DeleteAsync();
+    /// <summary>
+    /// Checks if a phishing link was sent, executes an <paramref name="action"/> and applies the appropriate punishment.
+    /// </summary>
+    /// <param name="client">The Discord client.</param>
+    /// <param name="text">The text to be checked for phishing links.</param>
+    /// <param name="user">The user to be checked.</param>
+    /// <param name="channel">The text channel where the message was sent, <see langword="null"/> if no channel is involved.</param>
+    /// <param name="server">The Discord guild the event originated from.</param>
+    /// <param name="action">An action to be performed before the punishment is applied.</param>
+    /// <returns><see langword="true"/> if a punishment was applied, false otherwise.</returns>
+    private async Task<bool> CheckAndPunishAsync(DiscordClient client, string text, DiscordMember user, DiscordChannel? channel, DiscordGuild? server, Func<Match, Task> action)
+    {
+        async Task ExecuteAsync(Match match, Func<Match, Task> action)
+        {
+            _positiveUrls.Add(match.Value);
+            await action(match);
+            await ApplyPunishmentAsync(client, user, channel, server);
         }
 
-        var matches = _urlRegex.Matches(eventArgs.Message.Content);
+        var matches = _urlRegex.Matches(text);
 
         if (matches.Count is 0)
             return false;
@@ -87,7 +168,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
         {
             if (_positiveUrls.Contains(match.Value))
             {
-                _ = Task.WhenAll(DeleteMessageAsync(match, eventArgs), ApplyPunishmentAsync(client, eventArgs));
+                await ExecuteAsync(match, action);
                 return true;
             }
 
@@ -95,7 +176,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
             if (!result.Equals(@"{""match"":false}", StringComparison.Ordinal))
             {
-                _ = Task.WhenAll(DeleteMessageAsync(match, eventArgs), ApplyPunishmentAsync(client, eventArgs));
+                await ExecuteAsync(match, action);
                 return true;
             }
         }
@@ -107,48 +188,43 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
     /// Applies the punishment to the user who shared a phishing link.
     /// </summary>
     /// <param name="client">The Discord client.</param>
-    /// <param name="eventArgs">The event arguments.</param>
-    private async Task ApplyPunishmentAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
+    /// <param name="user">The user to be checked.</param>
+    /// <param name="channel">The channel where the message was sent, <see langword="null"/> if no channel is involved.</param>
+    /// <param name="server">The Discord guild the event originated from.</param>
+    /// <returns>The type of punishment that was applied or <see langword="null"/> if no punishment was applied.</returns>
+    private async Task<PunishmentType?> ApplyPunishmentAsync(DiscordClient client, DiscordMember user, DiscordChannel? channel, DiscordGuild? server)
     {
-        var punishmentType = _service.GetPunishment(eventArgs.Guild.Id);
+        var punishmentType = _service.GetPunishment(server?.Id ?? default);
 
-        if (punishmentType is null)
-            return;
+        if (punishmentType is null || server is null)
+            return default;
 
-        var user = (DiscordMember)eventArgs.Author;
+        var fakeContext = GetFakeContext(client.GetCommandsNext(), server.CurrentMember, channel ?? server.GetDefaultChannel());
 
-        var fakeContext = client.GetCommandsNext().CreateFakeContext(
-            eventArgs.Guild.CurrentMember,
-            eventArgs.Channel,
-            string.Empty,
-            string.Empty,
-            null
-        );
-
-        if (_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, user))
+        if (_roleService.CheckHierarchy(server.CurrentMember, user))
         {
             client.Logger.LogWarning(_eventLog, "Failed to apply an anti-phishing punishment because the bot doesn't have enough permission to act on user {User}.", user.GetFullname());
-            return;
+            return default;
         }
 
         var reason = fakeContext.FormatLocalized("antiphishing_punish_reason");
 
         switch (punishmentType)
         {
-            case PunishmentType.Mute when eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageRoles)):
-                var muteRole = await _roleService.FetchMuteRoleAsync(eventArgs.Guild);
+            case PunishmentType.Mute when server.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageRoles)):
+                var muteRole = await _roleService.FetchMuteRoleAsync(server);
                 await _roleService.MuteUserAsync(fakeContext, muteRole, user, TimeSpan.Zero, reason);
                 break;
 
-            case PunishmentType.Kick when eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.KickMembers)):
+            case PunishmentType.Kick when server.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.KickMembers)):
                 await _punishService.KickUserAsync(fakeContext, user, reason);
                 break;
 
-            case PunishmentType.Softban when eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.BanMembers)):
+            case PunishmentType.Softban when server.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.BanMembers)):
                 await _punishService.SoftbanUserAsync(fakeContext, user, 7, reason);
                 break;
 
-            case PunishmentType.Ban when eventArgs.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.BanMembers)):
+            case PunishmentType.Ban when server.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.BanMembers)):
                 await _punishService.BanUserAsync(fakeContext, user, 7, reason);
                 break;
 
@@ -156,5 +232,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
                 client.Logger.LogWarning(_eventLog, "Failed applying punishment of type \"{PunishmentType}\". It's either unsupported or the bot has no permission to apply it.", punishmentType.ToString());
                 break;
         }
+
+        return punishmentType;
     }
 }

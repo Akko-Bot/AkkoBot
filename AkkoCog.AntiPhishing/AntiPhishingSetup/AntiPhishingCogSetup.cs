@@ -17,7 +17,7 @@ public sealed class AntiPhishingCogSetup : ICogSetup
 {
     public string Name { get; } = "Harmony Anti-Phishing";
 
-    public string Version { get; } = "1.0.0";
+    public string Version { get; } = "1.0.1";
 
     public string Author { get; } = "Kotz#7299";
 
@@ -36,7 +36,9 @@ public sealed class AntiPhishingCogSetup : ICogSetup
         var cmdHandler = shardedClient.ShardClients[0].GetCommandsNext();
         var antiphishingHandler = cmdHandler.Services.GetRequiredService<IAntiPhishingHandler>();
 
-        shardedClient.MessageCreated += antiphishingHandler.FilterPhishingLinksAsync;
+        shardedClient.MessageCreated += antiphishingHandler.FilterPhishingMessagesAsync;
+        shardedClient.GuildMemberUpdated += antiphishingHandler.FilterPhishingNicknamesAsync;
+        shardedClient.GuildMemberAdded += antiphishingHandler.FilterPhishingUserJoinAsync;
     }
 
     public void RegisterComponentResponses(IInteractionResponseManager responseGenerator)
