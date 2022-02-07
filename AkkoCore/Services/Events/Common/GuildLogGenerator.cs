@@ -434,7 +434,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .AddField("joined_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
             .WithTitle("log_joiningalt_title")
             .WithFooter(
-                $"{_localizer.FormatLocalized(settings.Locale, "time_difference")}: {GetSmallestTimeString(timeDifference, settings.Locale)} | " +
+                $"{_localizer.FormatLocalized(settings.Locale, "time_difference")}: {timeDifference.GetLocalizedTimeString(_localizer, settings.Locale)} | " +
                 $"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}"
             )
             .WithLocalization(_localizer, settings.Locale);
@@ -470,7 +470,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithTitle("log_leavingalt_title")
             .AddField("left_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
             .WithFooter(
-                $"{_localizer.FormatLocalized(settings.Locale, "stayed_for")}: {GetSmallestTimeString(timeDifference, settings.Locale)} | " +
+                $"{_localizer.FormatLocalized(settings.Locale, "stayed_for")}: {timeDifference.GetLocalizedTimeString(_localizer, settings.Locale)} | " +
                 $"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}"
             )
             .WithLocalization(_localizer, settings.Locale);
@@ -549,23 +549,6 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private IMessageSettings GetMessageSettings(ulong? sid)
         => (_dbCache.Guilds.TryGetValue(sid ?? default, out var dbGuild)) ? dbGuild : _botconfig;
-
-    /// <summary>
-    /// Returns the smallest time string for the specified time span.
-    /// </summary>
-    /// <param name="time">The time span.</param>
-    /// <param name="locale">Locale to translate the time to.</param>
-    /// <returns>The time string.</returns>
-    private string GetSmallestTimeString(TimeSpan time, string locale)
-    {
-        return (time.TotalDays >= 1.0)
-            ? $"{time.TotalDays:0.00} {_localizer.FormatLocalized(locale, "days")}"
-            : (time.TotalHours >= 1.0)
-                ? $"{time.TotalHours:0.00} {_localizer.FormatLocalized(locale, "hours")}"
-                : (time.TotalMinutes >= 1.0)
-                    ? $"{time.TotalMinutes:0.00} {_localizer.FormatLocalized(locale, "minutes")}"
-                    : $"{time.TotalSeconds:0.00} {_localizer.FormatLocalized(locale, "seconds")}";
-    }
 
     /// <summary>
     /// Gets the base log for when a user joins or leaves the Discord guild.

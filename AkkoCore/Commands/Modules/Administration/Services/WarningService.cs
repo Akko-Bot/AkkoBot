@@ -411,43 +411,43 @@ public sealed class WarningService
     private async Task ApplyPunishmentAsync(CommandContext context, DiscordUser user, WarnPunishEntity punishment, string? reason)
     {
         using var scope = _scopeFactory.CreateScope();
-        var warnString = context.FormatLocalized("infraction");
+        var warnString = $"{context.FormatLocalized("infraction")} | {reason}";
 
         switch (punishment.Type)
         {
             case PunishmentType.Mute when user is DiscordMember member:
                 var muteRole = await _roleService.FetchMuteRoleAsync(context.Guild);
-                await _roleService.MuteUserAsync(context, muteRole, member, punishment.Interval ?? TimeSpan.Zero, warnString + " | " + reason);
+                await _roleService.MuteUserAsync(context, muteRole, member, punishment.Interval ?? TimeSpan.Zero, warnString);
                 break;
 
             case PunishmentType.Kick when user is DiscordMember member:
-                await _punishmentService.KickUserAsync(context, member, warnString + " | " + reason);
+                await _punishmentService.KickUserAsync(context, member, warnString);
                 break;
 
             case PunishmentType.Softban:
-                await _punishmentService.SoftbanUserAsync(context, user.Id, 1, warnString + " | " + reason);
+                await _punishmentService.SoftbanUserAsync(context, user.Id, 1, warnString);
                 break;
 
             case PunishmentType.Ban when punishment.Interval.HasValue:
-                await _punishmentService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString + " | " + reason);
+                await _punishmentService.TimedBanAsync(context, punishment.Interval.Value, user.Id, warnString);
                 break;
 
             case PunishmentType.Ban when !punishment.Interval.HasValue:
-                await _punishmentService.BanUserAsync(context, user.Id, 1, warnString + " | " + reason);
+                await _punishmentService.BanUserAsync(context, user.Id, 1, warnString);
                 break;
 
             case PunishmentType.AddRole or PunishmentType.RemoveRole when user is DiscordMember member && punishment.Interval.HasValue
                 && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
 
-                await _punishmentService.TimedRolePunishAsync(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString + " | " + reason);
+                await _punishmentService.TimedRolePunishAsync(context, punishment.Type, punishment.Interval.Value, member, punishRole, warnString);
                 break;
 
             case PunishmentType.AddRole when user is DiscordMember member && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
-                await member.GrantRoleAsync(punishRole, warnString + " | " + reason);
+                await member.GrantRoleAsync(punishRole, warnString);
                 break;
 
             case PunishmentType.RemoveRole when user is DiscordMember member && context.Guild.Roles.TryGetValue(punishment.PunishRoleId ?? default, out var punishRole):
-                await member.RevokeRoleAsync(punishRole, warnString + " | " + reason);
+                await member.RevokeRoleAsync(punishRole, warnString);
                 break;
 
             default:
@@ -464,7 +464,7 @@ public sealed class WarningService
     /// <param name="sid">The ID of the Discord guild.</param>
     /// <remarks>Kick at 3 warnings, ban at 5 warnings.</remarks>
     /// <returns>A collection of punishments.</returns>
-    private IReadOnlyCollection<WarnPunishEntity> CreateDefaultPunishments(ulong sid)
+    private IReadOnlyList<WarnPunishEntity> CreateDefaultPunishments(ulong sid)
     {
         return new WarnPunishEntity[]
         {

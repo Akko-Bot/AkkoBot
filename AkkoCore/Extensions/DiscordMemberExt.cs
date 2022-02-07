@@ -1,4 +1,4 @@
-﻿using DSharpPlus.Entities;
+using DSharpPlus.Entities;
 using System;
 using System.Threading.Tasks;
 
@@ -6,6 +6,15 @@ namespace AkkoCore.Extensions;
 
 public static class DiscordMemberExt
 {
+    /// <summary>
+    /// Times-out a member and restricts their ability to send messages, add reactions, speak in threads, and join voice channels.
+    /// </summary>
+    /// <param name="member">This Discord member.</param>
+    /// <param name="time">For how long the user should be timed out.</param>
+    /// <param name="reason">The reason for the punishment.</param>
+    public static Task TimeoutAsync(this DiscordMember member, TimeSpan time, string? reason = default)
+        => member.TimeoutAsync(DateTimeOffset.Now.Add(time), reason);
+
     /// <summary>
     /// Safely sends a direct message to the specified user.
     /// </summary>

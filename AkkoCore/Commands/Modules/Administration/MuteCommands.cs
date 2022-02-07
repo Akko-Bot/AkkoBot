@@ -3,6 +3,7 @@ using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
+using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -15,11 +16,13 @@ namespace AkkoCore.Commands.Modules.Administration;
 [RequireGuild]
 public sealed class MuteCommands : AkkoCommandModule
 {
+    private readonly ILocalizer _localizer;
     private readonly RoleService _roleService;
     private readonly ChannelService _channelServices;
 
-    public MuteCommands(RoleService roleService, ChannelService channelServices)
+    public MuteCommands(ILocalizer localizer, RoleService roleService, ChannelService channelServices)
     {
+        _localizer = localizer;
         _roleService = roleService;
         _channelServices = channelServices;
     }
@@ -194,6 +197,35 @@ public sealed class MuteCommands : AkkoCommandModule
 
         var embed = new SerializableDiscordEmbed()
             .WithDescription(context.FormatLocalized("chatunmute_success", Formatter.Bold(user.GetFullname())));
+
+        await context.RespondLocalizedAsync(embed);
+    }
+
+    [Command("timeout")]
+    [Description("cmd_timeout")]
+    [RequirePermissions(Permissions.ModerateMembers)]
+    [HiddenOverload]
+    public async Task TimeoutAsync(CommandContext context, DiscordMember user, string? reason = default)
+        => await TimeoutAsync(context, TimeSpan.FromHours(1), user, reason);
+
+    [Command("timeout")]
+    public async Task TimeoutAsync(
+        CommandContext context,
+        [Description("arg_timed_mute")] TimeSpan time,
+        [Description("arg_discord_user")] DiscordMember user,
+        [RemainingText, Description("arg_punishment_reason")] string? reason = default)
+    {
+        if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
+            return;
+
+        if (time > TimeSpan.FromDays(28)) // Discord doesn't allow timeouts longer than 4 weeks
+            time = TimeSpan.FromDays(28);
+
+        await user.TimeoutAsync(time, $"{context.Member.GetFullname()} | {reason}");
+
+        var locale = context.GetMessageSettings().Locale;
+        var embed = new SerializableDiscordEmbed()
+            .WithDescription(context.FormatLocalized("timeout_success", Formatter.Bold(user.GetFullname()), time.GetLocalizedTimeString(_localizer, locale)));
 
         await context.RespondLocalizedAsync(embed);
     }

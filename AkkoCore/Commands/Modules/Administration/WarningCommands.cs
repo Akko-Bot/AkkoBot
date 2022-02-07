@@ -68,9 +68,10 @@ public sealed class WarningCommands : AkkoCommandModule
     [Command("warn")]
     [Description("cmd_warn")]
     [RequireUserPermissions(Permissions.KickMembers)]
-    public async Task WarnAsync(CommandContext context,
-    [Description("arg_discord_user")] DiscordMember user,
-    [RemainingText, Description("arg_infraction")] string? reason = default)
+    public async Task WarnAsync(
+        CommandContext context,
+        [Description("arg_discord_user")] DiscordMember user,
+        [RemainingText, Description("arg_infraction")] string? reason = default)
     {
         if (!await _roleService.CheckHierarchyAsync(context, user, "error_hierarchy"))
             return;

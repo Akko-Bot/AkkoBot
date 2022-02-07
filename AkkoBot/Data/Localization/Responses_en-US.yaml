@@ -429,6 +429,7 @@ cmd_tag_remove: Removes the tag with the specified ID.
 cmd_tag_removeignore: Removes a user, channel and/or role IDs from the list of ignored IDs for the specified tag.
 cmd_tag_search: Searches for tags that contain the specified keyword in its response.
 cmd_timedban: Temporarily bans a user from the server.
+cmd_timeout: Times out a user, rendering them unable to send messages in text channels, react to messages, or speak in voice channels.
 cmd_timezone: Shows the time zone used in this server.
 cmd_timezones: Lists all time zones available to the bot.
 cmd_unban: Unbans a user from the server.
@@ -726,6 +727,7 @@ perm_manage_roles: Manage Roles
 perm_manage_threads: Manage Threads
 perm_manage_webhooks: Manage Webhooks
 perm_mention_everyone: Mention Everyone
+perm_moderate_members: Timeout Members
 perm_move_members: Move Members
 perm_mute_members: Mute Members
 perm_none: None
@@ -835,6 +837,7 @@ timedban_title: Temporary Ban
 timedmute: Expired Mute
 timedrole: Punishment Role
 timedunrole: Punishment Role Removal
+timeout_success: User {0} has been timed out for {1}.
 timers: Timers
 timezone_list: Time Zones
 total: Total

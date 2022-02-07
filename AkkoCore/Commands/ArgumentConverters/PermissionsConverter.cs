@@ -1,4 +1,4 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -80,6 +80,7 @@ internal sealed class PermissionsConverter : IArgumentConverter<Permissions>
             "perm_create_private_threads" => Optional.FromValue(Permissions.CreatePrivateThreads),
             "perm_create_public_threads" => Optional.FromValue(Permissions.CreatePublicThreads),
             "perm_use_application_commands" => Optional.FromValue(Permissions.UseApplicationCommands),
+            "perm_moderate_members" => Optional.FromValue(Permissions.ModerateMembers),
             _ => Optional.FromNoValue<Permissions>()
         };
     }

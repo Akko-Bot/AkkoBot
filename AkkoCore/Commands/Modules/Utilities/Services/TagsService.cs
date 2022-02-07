@@ -86,7 +86,7 @@ public sealed class TagsService
         if (!_dbCache.Tags.TryGetValue(context.Guild?.Id ?? default, out var cachedTags))
             cachedTags = new(1, 0);
 
-        var toAdd = tags
+        using var toAdd = tags
             .Where( // Remove tags that already exist
                 x => IsValidAddContext(context, x.Trigger, x.Response)
                     && !cachedTags.Any(y => x.Trigger == y.Trigger && x.Response == y.Response)

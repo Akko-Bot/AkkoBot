@@ -429,6 +429,7 @@ cmd_tag_remove: Remove a tag com o ID especificado.
 cmd_tag_removeignore: Remove IDs de usuários, canais e/ou cargos da lista de IDs ignorados da tag especificada.
 cmd_tag_search: Procura por tags que contenham a palavra-chave especificada em sua resposta.
 cmd_timedban: Bane um usuário temporariamente do servidor.
+cmd_timeout: Castiga um usuário, impedindo-o de enviar mensagens em canais de texto, reagir a mensagens ou falar em canais de voz.
 cmd_timezone: Exibe o fuso horário utilizado nesse servidor.
 cmd_timezones: Exibe todos os fusos horários disponíveis ao bot.
 cmd_unban: Desbane um usuário do servidor.
@@ -726,6 +727,7 @@ perm_manage_roles: Gerenciar Cargos
 perm_manage_threads: Gerenciar Threads
 perm_manage_webhooks: Gerenciar Webhooks
 perm_mention_everyone: Mencionar Everyone
+perm_moderate_members: Castigar Membros
 perm_move_members: Mover Membros
 perm_mute_members: Silenciar Membros
 perm_none: Nenhuma
@@ -835,6 +837,7 @@ timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
+timeout_success: Usuário {0} está de castigo por {1}.
 timers: Timers
 timezone_list: Fusos Horários
 total: Total
