@@ -1,4 +1,4 @@
-﻿using AkkoCore.Enums;
+using AkkoCore.Enums;
 using DSharpPlus.EventArgs;
 
 namespace AkkoCore.Extensions;
@@ -12,7 +12,7 @@ public static class VoiceStateUpdateEventArgsExt
     /// <returns>The voice state of the user.</returns>
     public static UserVoiceState GetVoiceState(this VoiceStateUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Before == eventArgs.After)
+        return (eventArgs.Before?.Channel?.Id == eventArgs.After?.Channel?.Id)
             ? UserVoiceState.Reconnected
             : (eventArgs.Channel is null)
                 ? UserVoiceState.Disconnected

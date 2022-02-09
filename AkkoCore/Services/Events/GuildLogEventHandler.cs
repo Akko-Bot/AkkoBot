@@ -264,7 +264,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogVoiceStateConnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Connected
+        return (eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Connected
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
@@ -272,7 +272,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogVoiceStateMoveAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Moved
+        return (eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Moved
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
@@ -280,7 +280,7 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
 
     public Task LogVoiceStateDisconnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
     {
-        return (eventArgs.Before == eventArgs.After || eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Disconnected
+        return (eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Disconnected
             || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.VoiceEvents, out var guildLog) || !guildLog.IsActive)
             ? Task.CompletedTask
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetVoiceStateLog(eventArgs));
