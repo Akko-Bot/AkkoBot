@@ -130,15 +130,15 @@ public sealed class BasicGuildCommands : AkkoCommandModule
 
     [Command("inrole")]
     [Description("cmd_inrole")]
-    public async Task InRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
+    public async Task InRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole? role = default)
     {
-        var users = context.Guild.Members.Values.Where(x => x.Roles.Contains(role))
+        var function = (DiscordMember x) => (role is null) ? !x.Roles.Any() : x.Roles.Contains(role);
+        var users = context.Guild.Members.Values
+            .Where(function)
             .OrderByDescending(x => x.Hierarchy)
-            .Select(x => $"● {x.GetFullname()}")
-            .Chunk(AkkoConstants.LinesPerPage);     // x users per page
+            .Select(x => $"● {x.GetFullname()}");
 
-        var title = context.FormatLocalized("inrole_title", role.Name);
-        var embed = new SerializableDiscordEmbed();
+        var embed = new SerializableDiscordEmbed();            
 
         if (!users.Any())
         {
@@ -148,12 +148,13 @@ public sealed class BasicGuildCommands : AkkoCommandModule
             return;
         }
 
-        embed.WithFooter(context.FormatLocalized("total_of", ((users.Count() - 1) * AkkoConstants.LinesPerPage) + users.LastOrDefault()?.Length ?? 0));
+        embed.WithAuthor(context.FormatLocalized((role is null) ? "inrole_title_no_role" : "inrole_title", role?.Name));
+        embed.WithFooter(context.FormatLocalized("total_of", users.Count()));
 
-        foreach (var userGroup in users)
-            embed.AddField(title, string.Join('\n', userGroup));
+        foreach (var username in users.Chunk(AkkoConstants.LinesPerPage))
+            embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', username));
 
-        await context.RespondPaginatedByFieldsAsync(embed, 1);
+        await context.RespondPaginatedByFieldsAsync(embed, 2);
     }
 
     [RequireGuild]
