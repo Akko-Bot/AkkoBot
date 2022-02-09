@@ -341,6 +341,7 @@ cmd_modrole_unset: Remove um cargo-alvo do usuário especificado.
 cmd_modules: Lista os módulos atualmente disponíveis. Especifique um módulo para visualizar a lista de comandos sob esse módulo.
 cmd_moveuser: Move um usuário para outro canal de voz. Forneça nenhum canal para forçá-lo a se desconectar.
 cmd_mute: Silencia um usuário nos canais de voz e texto.
+cmd_norole: Lista todos os usuários desse servidor que não possuem o cargo especificado.
 cmd_notice: Adiciona uma anotação sobre um usuário.
 cmd_nsfwtoggle: Alterna a propriedade NSFW do canal de texto atual.
 cmd_override: Agrupa comandos que gerenciam permissões personalizadas. Use-os para modificar as permissões necessárias para executar um comando. Usá-los em mensagem direta com o bot exige autoria do bot e torna a permissão global. Permissões personalizadas de servidor sempre terão prioridade sobre permissões personalizadas globais. Autoria do bot não é removível.
@@ -588,6 +589,7 @@ infractions_empty: Esse usuário não possui infrações.
 infractions_field: '{0} às {1} por {2}'
 infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
+inrole_title_no_role: Lista de usuários sem cargo
 interval: Intervalo
 invalid_color: O código de cor especificado é inválido.
 invite: Convite
@@ -684,6 +686,7 @@ news: Anúncios
 nickname: Apelido
 nickname_changed: Apelido Alterado
 none: Nenhum
+norole_title: Lista de usuários sem o cargo {0}
 notice_success: Anotação adicionada com sucesso.
 nsfw: NSFW
 nsfw_toggle: NSFW foi {0} nesse canal.
@@ -896,5 +899,3 @@ warnpl_title: Punições do Servidor
 with_votes: com {0} votos.
 x_times: '{0} vezes'
 xid: ID do {0} {1} é {2}.
-
-inrole_title_no_role: Lista de usuários sem cargo

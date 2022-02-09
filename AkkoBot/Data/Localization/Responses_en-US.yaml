@@ -341,6 +341,7 @@ cmd_modrole_unset: Removes a target role from the specified user.
 cmd_modules: Lists the currently available modules. Specify a module name to see the commands available under that module.
 cmd_moveuser: Moves a user to another voice channel. Provide no channel to force them to disconnect.
 cmd_mute: Mutes a user from text and voice channels.
+cmd_norole: Lists all users on this server without the specified role.
 cmd_notice: Adds a notice about a user.
 cmd_nsfwtoggle: Toggles the NSFW property of the current text channel.
 cmd_override: Groups commands for managing permission overrides. Use them to modify the permissions required to run a command. Using it in direct message with the bot requires bot ownership and makes the override global. Server overrides always take precedence over global overrides. Bot ownership cannot be overriden.
@@ -588,6 +589,7 @@ infractions_empty: There are no infractions to show.
 infractions_field: '{0} at {1} by {2}'
 infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
+inrole_title_no_role: List of users with no role
 interval: Interval
 invalid_color: The specified color code is invalid.
 invite: Invite
@@ -684,6 +686,7 @@ news: News
 nickname: Nickname
 nickname_changed: Nickname Changed
 none: None
+norole_title: List of users without the {0} role
 notice_success: Notice added successfully.
 nsfw: NSFW
 nsfw_toggle: NSFW has been {0} on this channel.
@@ -896,5 +899,3 @@ warnpl_title: Server Punishments
 with_votes: with {0} votes.
 x_times: '{0} times'
 xid: ID of {0} {1} is {2}.
-
-inrole_title_no_role: List of users with no role

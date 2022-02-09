@@ -131,14 +131,29 @@ public sealed class BasicGuildCommands : AkkoCommandModule
     [Command("inrole")]
     [Description("cmd_inrole")]
     public async Task InRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole? role = default)
+        => await MemberRoleSearchAsync(context, role, "inrole_title", "inrole_title_no_role", (role is null) ? x => !x.Roles.Any() : x => x.Roles.Contains(role));
+
+    [Command("norole")]
+    [Description("cmd_norole")]
+    public async Task NoRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole? role = default)
+        => await MemberRoleSearchAsync(context, role, "norole_title", "inrole_title_no_role", (role is null) ? x => !x.Roles.Any() : x => !x.Roles.Contains(role));
+
+    /// <summary>
+    /// Searches for users according to the specified <paramref name="role"/> and <paramref name="predicate"/>.
+    /// </summary>
+    /// <param name="context">The command context.</param>
+    /// <param name="role">The role to search for.</param>
+    /// <param name="titleWithRoleKey">Embed title when <paramref name="role"/> is not <see langword="null"/>.</param>
+    /// <param name="titleNoRoleKey">Embed title when <paramref name="role"/> is <see langword="null"/>.</param>
+    /// <param name="predicate">The search criteria.</param>
+    private async Task MemberRoleSearchAsync(CommandContext context, DiscordRole? role, string titleWithRoleKey, string titleNoRoleKey, Func<DiscordMember, bool> predicate)
     {
-        var function = (DiscordMember x) => (role is null) ? !x.Roles.Any() : x.Roles.Contains(role);
         var users = context.Guild.Members.Values
-            .Where(function)
+            .Where(predicate)
             .OrderByDescending(x => x.Hierarchy)
             .Select(x => $"● {x.GetFullname()}");
 
-        var embed = new SerializableDiscordEmbed();            
+        var embed = new SerializableDiscordEmbed();
 
         if (!users.Any())
         {
@@ -148,7 +163,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
             return;
         }
 
-        embed.WithAuthor(context.FormatLocalized((role is null) ? "inrole_title_no_role" : "inrole_title", role?.Name));
+        embed.WithAuthor(context.FormatLocalized((role is null) ? titleNoRoleKey : titleWithRoleKey, role?.Name));
         embed.WithFooter(context.FormatLocalized("total_of", users.Count()));
 
         foreach (var username in users.Chunk(AkkoConstants.LinesPerPage))
