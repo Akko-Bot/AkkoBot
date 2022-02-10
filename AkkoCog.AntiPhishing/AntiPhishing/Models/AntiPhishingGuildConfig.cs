@@ -1,12 +1,31 @@
 using AkkoCore.Services.Database.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace AkkoCog.AntiPhishing.AntiPhishing.Models;
 
 /// <summary>
 /// Defines the anti-phishing settings of a Discord guild.
 /// </summary>
-internal sealed class AntiPhishingGuildConfig
+public sealed class AntiPhishingGuildConfig
 {
+    private readonly Lazy<List<ulong>> _ignoredIds = new();
+
+    /// <summary>
+    /// Defines all IDs that should be ignored by the filter.
+    /// </summary>
+    public List<ulong> IgnoredIds
+    {
+        get => _ignoredIds.Value;
+        init
+        {
+            _ignoredIds.Value.Clear();
+
+            foreach (var id in value)
+                _ignoredIds.Value.Add(id);
+        }
+    }
+
     /// <summary>
     /// Defines the Id of the Discord guild.
     /// </summary>

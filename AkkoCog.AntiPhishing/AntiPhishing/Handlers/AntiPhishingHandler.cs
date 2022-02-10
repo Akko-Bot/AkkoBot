@@ -1,4 +1,5 @@
 using AkkoCog.AntiPhishing.AntiPhishing.Abstractions;
+using AkkoCog.AntiPhishing.AntiPhishing.Models;
 using AkkoCog.AntiPhishing.AntiPhishing.Services;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
@@ -52,12 +53,12 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
     public Task FilterPhishingMessagesAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || eventArgs.Author.IsBot || !_service.IsAntiPhishingActive(eventArgs.Guild.Id)
-            || string.IsNullOrWhiteSpace(eventArgs.Message.Content)
+        if (eventArgs.Guild is null || eventArgs.Author is not DiscordMember member || string.IsNullOrWhiteSpace(eventArgs.Message.Content)
+            || !_service.TryGetAntiPhishingConfig(eventArgs.Guild.Id, out var config) || !IsValidContext(config, member, eventArgs.Channel)
             || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
             return Task.CompletedTask;
 
-        _ = CheckAndPunishAsync(client, eventArgs.Message.Content, (DiscordMember)eventArgs.Author, eventArgs.Channel, eventArgs.Guild, x =>
+        _ = CheckAndPunishAsync(client, eventArgs.Message.Content, member, eventArgs.Channel, eventArgs.Guild, x =>
         {
             eventArgs.Handled = true;
             return eventArgs.Message.DeleteAsync();
@@ -68,7 +69,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
     public Task FilterPhishingNicknamesAsync(DiscordClient client, GuildMemberUpdateEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || eventArgs.Member.IsBot || !_service.IsAntiPhishingActive(eventArgs.Guild.Id))
+        if (eventArgs.Guild is null || !_service.TryGetAntiPhishingConfig(eventArgs.Guild.Id, out var config) || !IsValidContext(config, eventArgs.Member))
             return Task.CompletedTask;
 
         _ = CheckAndPunishAsync(client, eventArgs.NicknameAfter ?? eventArgs.Member.DisplayName, eventArgs.Member, default, eventArgs.Guild, x =>
@@ -85,7 +86,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
     public Task FilterPhishingUserJoinAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)
     {
-        if (eventArgs.Guild is null || eventArgs.Member.IsBot || !_service.IsAntiPhishingActive(eventArgs.Guild.Id))
+        if (eventArgs.Guild is null || !_service.TryGetAntiPhishingConfig(eventArgs.Guild.Id, out var config) || !IsValidContext(config, eventArgs.Member))
             return Task.CompletedTask;
 
         _ = CheckAndPunishAsync(client, eventArgs.Member.Username, eventArgs.Member, default, eventArgs.Guild, x =>
@@ -95,10 +96,10 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
             if (!_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member))
                 return Task.CompletedTask;
 
-            var punishmentType = _service.GetPunishment(eventArgs.Guild.Id);
+            _service.TryGetAntiPhishingConfig(eventArgs.Guild.Id, out var config);
             var fakeContext = GetFakeContext(client.GetCommandsNext(), eventArgs.Guild.CurrentMember, eventArgs.Guild.GetDefaultChannel());
 
-            return punishmentType switch
+            return config?.PunishmentType switch
             {
                 null when eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.KickMembers)
                     => _punishService.KickUserAsync(fakeContext, eventArgs.Member, "antiphishing_punish_reason"),
@@ -137,6 +138,27 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private CommandContext GetFakeContext(CommandsNextExtension cmdHandler, DiscordUser user, DiscordChannel channel)
         => cmdHandler.CreateFakeContext(user, channel, string.Empty, string.Empty, null);
+
+    /// <summary>
+    /// Checks if the current context is valid.
+    /// </summary>
+    /// <param name="config">The anti-phishing config.</param>
+    /// <param name="member">The user that triggered the event.</param>
+    /// <param name="channel">The channel where the event occurred, if any.</param>
+    /// <returns><see langword="true"/> if the context is valid, <see langword="false"/> otherwise.</returns>
+    private bool IsValidContext(AntiPhishingGuildConfig config, DiscordMember member, DiscordChannel? channel = default)
+    {
+        if (!config.IsActive || member.IsBot)
+            return false;
+
+        foreach (var id in config.IgnoredIds)
+        {
+            if (member.Id == id || member.Roles.Select(x => x.Id).Contains(id) || channel?.Id == id)
+                return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Checks if a phishing link was sent, executes an <paramref name="action"/> and applies the appropriate punishment.
@@ -194,9 +216,9 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
     /// <returns>The type of punishment that was applied or <see langword="null"/> if no punishment was applied.</returns>
     private async Task<PunishmentType?> ApplyPunishmentAsync(DiscordClient client, DiscordMember user, DiscordChannel? channel, DiscordGuild? server)
     {
-        var punishmentType = _service.GetPunishment(server?.Id ?? default);
+        _service.TryGetAntiPhishingConfig(server?.Id ?? default, out var config);
 
-        if (punishmentType is null || server is null)
+        if (config?.PunishmentType is null || server is null)
             return default;
 
         var fakeContext = GetFakeContext(client.GetCommandsNext(), server.CurrentMember, channel ?? server.GetDefaultChannel());
@@ -209,7 +231,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
         var reason = fakeContext.FormatLocalized("antiphishing_punish_reason");
 
-        switch (punishmentType)
+        switch (config.PunishmentType)
         {
             case PunishmentType.Mute when server.CurrentMember.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageRoles)):
                 var muteRole = await _roleService.FetchMuteRoleAsync(server);
@@ -229,10 +251,10 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
                 break;
 
             default:
-                client.Logger.LogWarning(_eventLog, "Failed applying punishment of type \"{PunishmentType}\". It's either unsupported or the bot has no permission to apply it.", punishmentType.ToString());
+                client.Logger.LogWarning(_eventLog, "Failed applying punishment of type \"{PunishmentType}\". It's either unsupported or the bot has no permission to apply it.", config.PunishmentType.ToString());
                 break;
         }
 
-        return punishmentType;
+        return config.PunishmentType;
     }
 }

@@ -93,6 +93,8 @@ arg_repeat_time: Tempo até a execução do repetidor. Mínimo de __1m__.
 arg_role_name: O nome do cargo.
 arg_role_newname: O novo nome do cargo.
 arg_say: A mensagem a ser enviada.
+arg_snowflake: ID ou menção a um usuário, canal ou cargo.
+arg_snowflakes:  ID ou menção a um ou múltiplos usuários, canais e/ou cargos, separados por espaço.
 arg_stream_url: A URL do stream.
 arg_tag_behavior: O comportamento da tag.
 arg_tag_clearold_time: Tempo em que a tag não foi utilizada.

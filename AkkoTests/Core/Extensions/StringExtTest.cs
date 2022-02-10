@@ -60,6 +60,7 @@ public sealed class StringExtTest
     [InlineData("hello", "Hello")]
     [InlineData(" hello", " hello")]
     [InlineData("hello there", "Hello there")]
+    [InlineData("a", "A")]
     [InlineData("", "")]
     internal void CapitalizeTest(string caller, string result)
         => Assert.Equal(result, caller.Capitalize());

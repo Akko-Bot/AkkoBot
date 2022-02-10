@@ -93,6 +93,8 @@ arg_repeat_time: How long until the repeater is triggered. Minimum of __1m__.
 arg_role_name: The name of the role.
 arg_role_newname: The new name of the role.
 arg_say: The message to be sent.
+arg_snowflake: ID or mention to a Discord user, channel, or role.
+arg_snowflakes:  ID or mention to one or multiple Discord users, channels, and/or roles, separated by space.
 arg_stream_url: The URL of the stream.
 arg_tag_behavior: The tag behavior.
 arg_tag_clearold_time: Time the tag hasn't been used.
@@ -293,7 +295,7 @@ cmd_greetmessage: Sets the message to be sent when users join the server. Provid
 cmd_guild: Groups settings that define how the bot should behave on this Discord server.
 cmd_guild_delmsgoncmd: Groups commands for managing automatic command deletion.
 cmd_guild_delmsgoncmd_clearignored: Clears the list of ignored IDs.
-cmd_guild_delmsgoncmd_ignore: Adds users, channels or roles to the list of ignored IDs.
+cmd_guild_delmsgoncmd_ignore: Adds users, channels, or roles to the list of ignored IDs.
 cmd_guild_delmsgoncmd_listignored: Lists the ignored IDs.
 cmd_guild_delmsgoncmd_toggle: Toggles automatic deletion of command messages.
 cmd_guild_embed: Toggles usage of embeds for bot responses on this server.

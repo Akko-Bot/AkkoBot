@@ -6,7 +6,9 @@ using AkkoCore.Services.Database.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace AkkoCog.AntiPhishing.AntiPhishing.Services;
@@ -18,9 +20,10 @@ namespace AkkoCog.AntiPhishing.AntiPhishing.Services;
 [CommandService(ServiceLifetime.Singleton)]
 public sealed class AntiPhishingService
 {
-    private readonly IConfigLoader _configLoader;
     private readonly ConcurrentDictionary<ulong, AntiPhishingGuildConfig> _cache;
     private readonly string _configPath;
+
+    private readonly IConfigLoader _configLoader;
 
     public AntiPhishingService(IConfigLoader configLoader)
     {
@@ -37,20 +40,13 @@ public sealed class AntiPhishingService
     }
 
     /// <summary>
-    /// Checks if anti-phishing is active for the guild of the specified ID.
+    /// Gets the anti-phishing config for the guild of the specified ID.
     /// </summary>
     /// <param name="sid">The ID of the Discord guild.</param>
-    /// <returns><see langword="true"/> if the filter is active, <see langword="false"/> otherwise.</returns>
-    public bool IsAntiPhishingActive(ulong sid)
-        => _cache.TryGetValue(sid, out var guildConfig) && guildConfig.IsActive;
-
-    /// <summary>
-    /// Gets the punishment for the guild of the specified ID.
-    /// </summary>
-    /// <param name="sid">The ID of the Discord guild.</param>
-    /// <returns>The active punishment or <see langword="null"/> if there is no punishment.</returns>
-    public PunishmentType? GetPunishment(ulong sid)
-        => (_cache.TryGetValue(sid, out var guildConfig)) ? guildConfig.PunishmentType : default;
+    /// <param name="guildConfig">The anti-phishing guild config or <see langword="null"/> if it's not found.</param>
+    /// <returns><see langword="true"/> if the guild config is found, <see langword="false"/> otherwise.</returns>
+    public bool TryGetAntiPhishingConfig(ulong sid, [MaybeNullWhen(false)] out AntiPhishingGuildConfig guildConfig)
+        => _cache.TryGetValue(sid, out guildConfig);
 
     /// <summary>
     /// Toggles the anti-phishing filter for the guild of the specified ID.
@@ -59,15 +55,15 @@ public sealed class AntiPhishingService
     /// <returns><see langword="true"/> if the filter was enabled, <see langword="false"/> otherwise.</returns>
     public bool ToggleAntiPhishing(ulong sid)
     {
-        if (!_cache.TryGetValue(sid, out var guildConfig))
-            guildConfig = new() { GuildId = sid };
+        if (!_cache.TryGetValue(sid, out var config))
+            config = new() { GuildId = sid };
 
-        guildConfig.IsActive = !guildConfig.IsActive;
-        _cache[sid] = guildConfig;
+        config.IsActive = !config.IsActive;
+        _cache[sid] = config;
 
         _configLoader.SaveConfig(_cache.Values, _configPath);
 
-        return guildConfig.IsActive;
+        return config.IsActive;
     }
 
     /// <summary>
@@ -83,12 +79,40 @@ public sealed class AntiPhishingService
         if (punishmentType is PunishmentType.AddRole or PunishmentType.RemoveRole)
             return false;
 
-        if (!_cache.TryGetValue(sid, out var guildConfig))
-            guildConfig = new() { GuildId = sid, IsActive = false };
+        if (!_cache.TryGetValue(sid, out var config))
+            config = new() { GuildId = sid, IsActive = false };
 
-        guildConfig.PunishmentType = punishmentType;
-        _cache[sid] = guildConfig;
+        config.PunishmentType = punishmentType;
+        _cache[sid] = config;
 
+        _configLoader.SaveConfig(_cache.Values, _configPath);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Adds or removes ignored IDs for the guild of the specified ID.
+    /// </summary>
+    /// <param name="sid">The ID of the Discord guild.</param>
+    /// <param name="ids">The IDs to be added or removed.</param>
+    /// <returns><see langword="true"/> if the ignored list was changed, <see langword="false"/> otherwise.</returns>
+    public bool ToggleIgnoredIds(ulong sid, IEnumerable<ulong> ids)
+    {
+        if (ids is null || !ids.Any())
+            return false;
+
+        if (!_cache.TryGetValue(sid, out var config))
+            config = new() { GuildId = sid, IsActive = false };
+
+        foreach (var id in ids)
+        {
+            if (config.IgnoredIds.Contains(id))
+                config.IgnoredIds.Remove(id);
+            else
+                config.IgnoredIds.Add(id);
+        }
+
+        _cache[sid] = config;
         _configLoader.SaveConfig(_cache.Values, _configPath);
 
         return true;
