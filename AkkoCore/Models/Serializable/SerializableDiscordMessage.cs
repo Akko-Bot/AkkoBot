@@ -26,6 +26,12 @@ public class SerializableDiscordMessage
     public List<SerializableDiscordEmbed>? Embeds { get; private set; }
 
     /// <summary>
+    /// Defines the rules for the mentionability of different mentions.
+    /// </summary>
+    [YamlIgnore, JsonIgnore]
+    public IEnumerable<IMention> MentionRules { get; set; } = Mentions.All;
+
+    /// <summary>
     /// Gets the first embed of this message, <see langword="null"/> if there isn't one.
     /// </summary>
     /// <remarks>This property is not mapped.</remarks>
@@ -47,6 +53,14 @@ public class SerializableDiscordMessage
     /// </summary>
     public SerializableDiscordMessage()
     { }
+
+    public SerializableDiscordMessage(DiscordMessageBuilder messageBuilder)
+    {
+        MentionRules = messageBuilder.Mentions;
+
+        Content = messageBuilder.Content;
+        AddEmbeds(messageBuilder.Embeds.Select(x => x.ToSerializableEmbed()));
+    }
 
     /// <summary>
     /// Initializes a serializable Discord message.
@@ -151,6 +165,17 @@ public class SerializableDiscordMessage
     }
 
     /// <summary>
+    /// Sets the allowed mentions for the current message.
+    /// </summary>
+    /// <param name="mentions">The mentions to be set.</param>
+    /// <returns>This message builder.</returns>
+    public SerializableDiscordMessage WithMentions(IEnumerable<IMention> mentions)
+    {
+        MentionRules = mentions;
+        return this;
+    }
+
+    /// <summary>
     /// Converts all text content from message builder into a string.
     /// </summary>
     /// <returns>A formatted string with the contents of message.</returns>
@@ -171,7 +196,8 @@ public class SerializableDiscordMessage
     /// <exception cref="ArgumentException">Occurs when one of the embeds' <see cref="SerializableDiscordEmbed.Color"/> is not a valid color.</exception>
     public DiscordMessageBuilder Build()
     {
-        var message = new DiscordMessageBuilder() { Content = this.Content };
+        var message = new DiscordMessageBuilder() { Content = this.Content }
+            .WithAllowedMentions(MentionRules);
 
         if (Embeds?.Count is not null and not 0)
             message.AddEmbeds(Embeds.Where(x => x.HasValidEmbed()).Select(x => x.Build()).Select(x => x!.Build()).Take(AkkoConstants.MaxEmbedAmount));
@@ -187,7 +213,8 @@ public class SerializableDiscordMessage
     public DiscordWebhookBuilder BuildWebhookMessage()
     {
         var webhookMsg = new DiscordWebhookBuilder()
-            .WithContent(Content);
+            .WithContent(Content)
+            .AddMentions(MentionRules);
 
         if (Embeds?.Count is not null and not 0)
             webhookMsg.AddEmbeds(Embeds.Where(x => x.HasValidEmbed()).Select(x => x.Build()).Select(x => x!.Build()).Take(AkkoConstants.MaxEmbedAmount));
@@ -203,7 +230,8 @@ public class SerializableDiscordMessage
     public DiscordInteractionResponseBuilder BuildInteractiveResponse()
     {
         var response = new DiscordInteractionResponseBuilder()
-            .WithContent(Content);
+            .WithContent(Content)
+            .AddMentions(MentionRules);
 
         if (Embeds?.Count is not null and not 0)
             response.AddEmbeds(Embeds.Where(x => x.HasValidEmbed()).Select(x => x.Build()!.Build()));

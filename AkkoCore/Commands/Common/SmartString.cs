@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Abstractions;
+using AkkoCore.Commands.Abstractions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
@@ -223,10 +223,6 @@ public sealed class SmartString
     private static StringBuilder SanitizeRoleMentions(CommandContext context, StringBuilder contentBuilder, Regex roleRegex)
     {
         var matches = roleRegex.Matches(contentBuilder.ToString());
-
-        if (context.Guild is null || matches.Count == 0)
-            return contentBuilder;
-
         var canMentionAll = context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.MentionEveryone);
 
         // If user is not server owner, admin or has no permission to mention everyone, remove everyone mentions from the message
@@ -235,6 +231,9 @@ public sealed class SmartString
             contentBuilder.Replace("@everyone", Formatter.InlineCode("@everyone"));
             contentBuilder.Replace("@here", Formatter.InlineCode("@here"));
         }
+
+        if (context.Guild is null || matches.Count == 0)
+            return contentBuilder;
 
         if (context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].Behavior.HasFlag(GuildConfigBehavior.PermissiveRoleMention))
         {

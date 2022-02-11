@@ -60,7 +60,7 @@ public sealed class GuildUtilities : AkkoCommandModule
         if (string.IsNullOrWhiteSpace(content))
             await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
         else
-            await SayAsync(context, channel, new SmartString(context, content));
+            await SayAsync(context, channel, new SmartString(context, content, true));
     }
 
     [Command("say")]

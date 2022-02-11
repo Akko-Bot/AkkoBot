@@ -37,25 +37,4 @@ public static class DiscordGuildExt
                 ? role.Mention
                 : $"<@{id}>";
     }
-
-    /// <summary>
-    /// Gets a Discord mention for the specified ID. Defaults to the raw ID if
-    /// no match was found.
-    /// </summary>
-    /// <param name="server">This Discord guild.</param>
-    /// <param name="dbCache">The database cache.</param>
-    /// <param name="id">The ID of a Discord snowflake object.</param>
-    /// <returns>The mention string.</returns>
-    public static string GetMentionWithoutPing(this DiscordGuild server, IDbCache dbCache, ulong id)
-    {
-        return (server.Channels.TryGetValue(id, out var channel))
-            ? channel.Mention
-            : server.Roles.TryGetValue(id, out var role)
-                ? Formatter.InlineCode('@' + role.Name)
-                : server.Members.TryGetValue(id, out var member)
-                    ? Formatter.InlineCode(member.GetFullname())
-                    : dbCache.Users.TryGetValue(id, out var dbUser)
-                        ? dbUser.FullName
-                        : Formatter.InlineCode(id.ToString());
-    }
 }

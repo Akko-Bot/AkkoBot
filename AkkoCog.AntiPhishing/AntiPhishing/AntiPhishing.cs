@@ -74,6 +74,9 @@ public sealed class AntiPhishing : AkkoCommandModule
             );
         }
 
-        await context.RespondLocalizedAsync(embed, false);
+        var message = embed.BuildMessage()
+            .WithAllowedMentions(Mentions.None);
+
+        await context.RespondLocalizedAsync(message, false);
     }
 }

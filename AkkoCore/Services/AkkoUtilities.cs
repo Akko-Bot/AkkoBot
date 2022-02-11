@@ -265,7 +265,7 @@ public static class AkkoUtilities
 
         return (settings.UseEmbed)
             ? message
-            : new SerializableDiscordMessage() { Content = message.Decompose() };
+            : new SerializableDiscordMessage() { Content = message.Decompose(), MentionRules = message.MentionRules };
     }
 
     /// <summary>

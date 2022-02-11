@@ -1,9 +1,8 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Models.Serializable;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
-using System.Linq;
 
 namespace AkkoCore.Extensions;
 
@@ -15,10 +14,7 @@ public static class DiscordMessageBuilderExt
     /// <param name="messageBuilder">This Discord message builder.</param>
     /// <returns>A serializable message builder.</returns>
     public static SerializableDiscordMessage ToSerializableMessage(this DiscordMessageBuilder messageBuilder)
-    {
-        return new SerializableDiscordMessage() { Content = messageBuilder.Content }
-            .AddEmbeds(messageBuilder.Embeds.Select(x => x.ToSerializableEmbed()));
-    }
+        => new(messageBuilder);
 
     /// <summary>
     /// Appends an embed to the current message builder with the specified <paramref name="note"/>.
