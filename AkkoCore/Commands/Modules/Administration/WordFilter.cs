@@ -7,6 +7,7 @@ using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -98,16 +99,16 @@ public sealed class WordFilter : AkkoCommandModule
     [Command("addignore")]
     [Description("cmd_fw_addignore")]
     [RequireUserPermissions(Permissions.ManageGuild)]
-    public async Task AddIgnoredIdAsync(CommandContext context, [Description("arg_fw_ids")] params ulong[] ids)
+    public async Task AddIgnoredIdAsync(CommandContext context, [Description("arg_snowflakes")] params SnowflakeObject[] ids)
     {
         var success = await _service.SetWordFilterAsync(context.Guild.Id, x =>
         {
             var amount = x.IgnoredIds.Count;
 
-            foreach (var id in ids)
+            foreach (long id in ids.Select(x => x.Id))
             {
-                if (!x.IgnoredIds.Contains((long)id))
-                    x.IgnoredIds.Add((long)id);
+                if (!x.IgnoredIds.Contains(id))
+                    x.IgnoredIds.Add(id);
             }
 
             return amount != x.IgnoredIds.Count;
@@ -119,9 +120,9 @@ public sealed class WordFilter : AkkoCommandModule
     [Command("removeignore"), Aliases("rmignore")]
     [Description("cmd_fw_removeignore")]
     [RequireUserPermissions(Permissions.ManageGuild)]
-    public async Task RemoveIgnoredIdAsync(CommandContext context, [Description("arg_fw_ids")] params ulong[] ids)
+    public async Task RemoveIgnoredIdAsync(CommandContext context, [Description("arg_snowflakes")] params SnowflakeObject[] ids)
     {
-        var result = await _service.SetWordFilterAsync(context.Guild.Id, x => x.IgnoredIds.RemoveAll(x => ids.Contains((ulong)x)) is not 0);
+        var result = await _service.SetWordFilterAsync(context.Guild.Id, x => x.IgnoredIds.RemoveAll(x => ids.Select(x => x.Id).Contains((ulong)x)) is not 0);
         await context.Message.CreateReactionAsync((result) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
     }
 

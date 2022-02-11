@@ -66,13 +66,13 @@ public sealed class Tags : AkkoCommandModule
     [Command("addignore")]
     [Description("cmd_tag_addignore")]
     [RequireUserPermissions(Permissions.ManageMessages | Permissions.ManageGuild)]
-    public async Task AddIgnoredIdsAsync(CommandContext context, [Description("arg_uint")] int tagId, [Description("arg_ulong_id_col")] params ulong[] ids)
+    public async Task AddIgnoredIdsAsync(CommandContext context, [Description("arg_uint")] int tagId, [Description("arg_snowflakes")] params SnowflakeObject[] ids)
     {
         var result = await _service.SetPropertyAsync(context.Guild, tagId, x =>
         {
             var amount = x.IgnoredIds.Count;
 
-            foreach (long id in ids)
+            foreach (long id in ids.Select(x => x.Id))
             {
                 if (!x.IgnoredIds.Contains(id))
                     x.IgnoredIds.Add(id);
@@ -90,13 +90,13 @@ public sealed class Tags : AkkoCommandModule
     [Command("removeignore"), Aliases("rmignore")]
     [Description("cmd_tag_removeignore")]
     [RequireUserPermissions(Permissions.ManageMessages | Permissions.ManageGuild)]
-    public async Task RemoveIgnoredIdsAsync(CommandContext context, [Description("arg_uint")] int tagId, [Description("arg_ulong_id_col")] params ulong[] ids)
+    public async Task RemoveIgnoredIdsAsync(CommandContext context, [Description("arg_uint")] int tagId, [Description("arg_snowflakes")] params SnowflakeObject[] ids)
     {
         var result = await _service.SetPropertyAsync(context.Guild, tagId, x =>
         {
             var amount = x.IgnoredIds.Count;
 
-            foreach (long id in ids)
+            foreach (long id in ids.Select(x => x.Id))
                 x.IgnoredIds.Remove(id);
 
             return amount - x.IgnoredIds.Count;

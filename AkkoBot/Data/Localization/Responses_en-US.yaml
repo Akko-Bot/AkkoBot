@@ -54,7 +54,6 @@ arg_emoji_url: A direct link to an image.
 arg_emojis: One or more Discord emojis.
 arg_exportcommand_format: The format of the file. Defaults to __yaml__.
 arg_fc_id: ID of the content filter.
-arg_fw_ids: User, channel and/or role IDs, separated by space.
 arg_fw_message: The message to be sent.
 arg_fw_word: A word.
 arg_fw_words: Multiple words, separated by space.

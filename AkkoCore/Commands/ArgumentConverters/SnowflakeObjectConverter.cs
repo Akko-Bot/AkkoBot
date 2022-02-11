@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.ArgumentConverters;
 
-internal sealed class SnowflakeTypeConverter : IArgumentConverter<SnowflakeObject>
+internal sealed class SnowflakeObjectConverter : IArgumentConverter<SnowflakeObject>
 {
     public async Task<Optional<SnowflakeObject>> ConvertAsync(string input, CommandContext ctx)
     {

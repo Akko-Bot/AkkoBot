@@ -9,6 +9,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Administration;
@@ -69,30 +70,30 @@ public sealed class AutoSlowmode : AkkoCommandModule
 
     [Command("ignore")]
     public async Task SetIgnoredIdAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user)
-        => await SetIgnoredIdAsync(context, user.Id);
+        => await SetIgnoredIdAsync(context, user);
 
     [Command("ignore")]
     public async Task SetIgnoredIdAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
-        => await SetIgnoredIdAsync(context, channel.Id);
+        => await SetIgnoredIdAsync(context, channel);
 
     [Command("ignore")]
     public async Task SetIgnoredIdAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
-        => await SetIgnoredIdAsync(context, role.Id);
+        => await SetIgnoredIdAsync(context, role);
 
     [Command("ignore")]
     [Description("cmd_autoslowmode_ignore")]
-    public async Task SetIgnoredIdAsync(CommandContext context, [Description("arg_ulong_id_col")] params ulong[] ids)
+    public async Task SetIgnoredIdAsync(CommandContext context, [Description("arg_snowflakes")] params SnowflakeObject[] ids)
     {
         var result = await _service.SetPropertyAsync(context.Guild, x =>
         {
             var amount = x.IgnoredIds.Count;
 
-            foreach (var id in ids)
+            foreach (long id in ids.Select(x => x.Id))
             {
-                if (x.IgnoredIds.Contains((long)id))
-                    x.IgnoredIds.Remove((long)id);
+                if (x.IgnoredIds.Contains(id))
+                    x.IgnoredIds.Remove(id);
                 else
-                    x.IgnoredIds.Add((long)id);
+                    x.IgnoredIds.Add(id);
             }
 
             return amount < x.IgnoredIds.Count; // true = increased

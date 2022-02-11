@@ -12,6 +12,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -319,21 +320,21 @@ public sealed class GuildConfig : AkkoCommandModule
 
         [Command("ignore")]
         public async Task AddUserAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user)
-            => await AddIdsAsync(context, user.Id);
+            => await AddIdsAsync(context, user);
 
         [Command("ignore")]
         public async Task AddChannelAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
-            => await AddIdsAsync(context, channel.Id);
+            => await AddIdsAsync(context, channel);
 
         [Command("ignore")]
         public async Task AddRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
-            => await AddIdsAsync(context, role.Id);
+            => await AddIdsAsync(context, role);
 
         [Command("ignore")]
         [Description("cmd_guild_delmsgoncmd_ignore")]
-        public async Task AddIdsAsync(CommandContext context, [Description("arg_fw_ids")] params ulong[] ids)
+        public async Task AddIdsAsync(CommandContext context, [Description("arg_snowflakes")] params SnowflakeObject[] ids)
         {
-            var result = await _service.SetPropertyAsync(context.Guild, x => UpdateDelCmdBlacklist(x, ids));
+            var result = await _service.SetPropertyAsync(context.Guild, x => UpdateDelCmdBlacklist(x, ids.Select(x => x.Id)));
 
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(context.FormatLocalized((result) ? "ignored_ids_add" : "ignored_ids_remove", ids.Length));
@@ -390,7 +391,7 @@ public sealed class GuildConfig : AkkoCommandModule
         /// <param name="dbGuild">The guild settings.</param>
         /// <param name="contextIds">The IDs to be included or removed from the list.</param>
         /// <returns><see langword="true"/> if the list of IDs has increased, <see langword="false"/> otherwise.</returns>
-        private bool UpdateDelCmdBlacklist(GuildConfigEntity dbGuild, params ulong[] contextIds)
+        private bool UpdateDelCmdBlacklist(GuildConfigEntity dbGuild, IEnumerable<ulong> contextIds)
         {
             var amount = dbGuild.DelCmdBlacklist.Count;
 

@@ -54,7 +54,6 @@ arg_emoji_url: Um link direto a uma imagem.
 arg_emojis: Um ou mais emojis.
 arg_exportcommand_format: O formato do arquivo. O padrão é __yaml__.
 arg_fc_id: ID do filtro de conteúdo.
-arg_fw_ids: IDs de usuários, canais e/ou cargos, separados por espaço.
 arg_fw_message: A mensagem a ser enviada.
 arg_fw_word: Uma palavra.
 arg_fw_words: Múltiplas palavras, separadas por espaço.
