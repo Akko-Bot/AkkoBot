@@ -1,6 +1,7 @@
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Utilities.Services;
+using AkkoCore.Common;
 using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
@@ -17,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events;
@@ -31,11 +31,6 @@ internal sealed class TagEventHandler : ITagEventHandler
     private const string _remainingTextPlaceholder = "{remaining.text}";
     private readonly TimeSpan _updateTime = TimeSpan.FromDays(1);
     private readonly EventId _tagLogEvent = new(98, nameof(TagEventHandler));
-
-    private readonly Regex _emojiRegex = new(
-        @"<a?:(\S+?):(\d+?)>",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
 
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IDbCache _dbCache;
@@ -210,7 +205,7 @@ internal sealed class TagEventHandler : ITagEventHandler
                 : Task.CompletedTask;
         }
 
-        var match = _emojiRegex.Match(dbTag.Response);
+        var match = AkkoRegexes.Emoji.Match(dbTag.Response);
 
         if (match.Success
             && ulong.TryParse(match.Groups[2].Value, out var emojiId)

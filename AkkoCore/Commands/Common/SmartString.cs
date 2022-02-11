@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Abstractions;
+using AkkoCore.Common;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Database.Enums;
 using DSharpPlus;
@@ -16,7 +17,6 @@ namespace AkkoCore.Commands.Common;
 /// </summary>
 public sealed class SmartString
 {
-    private static readonly Regex _roleRegex = new(@"<@&(\d+?)>", RegexOptions.Compiled);
     private static readonly Regex _defaultPlaceholderRegex = new(@"{([\w\.]+)\((.+?)\)}|{([\w\.]+)}", RegexOptions.Compiled);
 
     private string _parsedContent = string.Empty;
@@ -58,7 +58,7 @@ public sealed class SmartString
                 ParsePlaceholders(_context, _contentBuilder, ParseRegex, _formatter);
 
                 if (SanitizeRoles)
-                    SanitizeRoleMentions(_context, _contentBuilder, _roleRegex);
+                    SanitizeRoleMentions(_context, _contentBuilder, AkkoRegexes.Role);
 
                 IsParsed = true;
 
@@ -157,7 +157,7 @@ public sealed class SmartString
         result = ParsePlaceholders(context, result, placeholderRegex, formatter);
 
         if (sanitizeRoles ?? SanitizeRoles)
-            result = SanitizeRoleMentions(context, result, _roleRegex);
+            result = SanitizeRoleMentions(context, result, AkkoRegexes.Role);
 
         return result.ToString();
     }
@@ -184,7 +184,7 @@ public sealed class SmartString
         result = ParsePlaceholders(context, result, placeholderRegex, formatter);
 
         if (sanitizeRoles)
-            result = SanitizeRoleMentions(context, result, _roleRegex);
+            result = SanitizeRoleMentions(context, result, AkkoRegexes.Role);
 
         return result.ToString();
     }

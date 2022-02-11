@@ -166,8 +166,8 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         embed.WithAuthor(context.FormatLocalized((role is null) ? titleNoRoleKey : titleWithRoleKey, role?.Name));
         embed.WithFooter(context.FormatLocalized("total_of", users.Count()));
 
-        foreach (var username in users.Chunk(AkkoConstants.LinesPerPage))
-            embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', username));
+        foreach (var usernames in users.Chunk(AkkoConstants.LinesPerPage))
+            embed.AddField(AkkoConstants.ValidWhitespace, string.Join('\n', usernames));
 
         await context.RespondPaginatedByFieldsAsync(embed, 2);
     }

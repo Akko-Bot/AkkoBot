@@ -1,4 +1,5 @@
 using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Localization.Abstractions;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace AkkoCore.Services.Localization;
 
@@ -23,11 +23,6 @@ public sealed class AkkoLocalizer : ILocalizer
     /// string's key. The value is the response string itself.
     /// </summary>
     private readonly Dictionary<string, Dictionary<string, string>> _localizedStrings = new();
-
-    /// <summary>
-    /// Regex to get the locale of the response files. Locale must be between "_" and ".yaml"
-    /// </summary>
-    private static readonly Regex _localeRegex = new(@"_([\w-][^_]+(?=\.(?:yaml|yml)$))", RegexOptions.Compiled);
 
     public IReadOnlyCollection<string> Locales
         => _localizedStrings.Keys;
@@ -104,7 +99,7 @@ public sealed class AkkoLocalizer : ILocalizer
 
         var filePaths = Directory
             .GetFiles(localesDirectory)
-            .Where(x => _localeRegex.IsMatch(x));
+            .Where(x => AkkoRegexes.ResponseFileLocale.IsMatch(x));
 
         // If directory doesn't contain response strings, stop program execution
         if (!filePaths.Any())
@@ -113,7 +108,7 @@ public sealed class AkkoLocalizer : ILocalizer
         // Start deserialization
         foreach (var filePath in filePaths)
         {
-            var locale = _localeRegex.Match(filePath).Groups.Values.Last().Value;
+            var locale = AkkoRegexes.ResponseFileLocale.Match(filePath).Groups.Values.Last().Value;
             var reader = new StreamReader(File.OpenRead(filePath));
             var localizedStrings = reader.FromYaml<Dictionary<string, string>>();
 

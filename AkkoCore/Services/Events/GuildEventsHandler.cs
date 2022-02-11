@@ -1,4 +1,5 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
@@ -22,7 +23,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AkkoCore.Services.Events;
@@ -32,22 +32,7 @@ namespace AkkoCore.Services.Events;
 /// </summary>
 [CommandService<IGuildEventsHandler>(ServiceLifetime.Singleton)]
 internal sealed class GuildEventsHandler : IGuildEventsHandler
-{
-    private static readonly Regex _imageUrlRegex = new(
-        @"https?:\/\/[^.].+((png|jpg|jpeg|gif)$)",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
-
-    private static readonly Regex _inviteRegex = new(
-        @"discord(?:\.gg|\.io|\.me|\.li|(?:app)?\.com\/invite)\/(\w+)",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
-
-    private static readonly Regex _urlRegex = new(
-        @"https?:\/\/\S{2,}",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
-
+{ 
     private readonly ConcurrentDictionary<(ulong, ulong, ulong), (int, DateTimeOffset)> _slowmodeRegister = new();
     private readonly TimeSpan _30seconds = TimeSpan.FromSeconds(30);
 
@@ -277,7 +262,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
         // Check if message contains a valid content. If it does, leave it alone.
         if (filter is null || !filter.IsActive
             || (filter.ContentType.HasFlag(ContentFilter.Attachment) && eventArgs.Message.Attachments.Count is not 0)
-            || (filter.ContentType.HasFlag(ContentFilter.Url) && _urlRegex.IsMatch(eventArgs.Message.Content))
+            || (filter.ContentType.HasFlag(ContentFilter.Url) && AkkoRegexes.Url.IsMatch(eventArgs.Message.Content))
             || (filter.ContentType.HasFlag(ContentFilter.Invite) && HasInvite(eventArgs.Message))
             || (filter.ContentType.HasFlag(ContentFilter.Image) && HasImage(eventArgs.Message))
             || (filter.ContentType.HasFlag(ContentFilter.Sticker) && eventArgs.Message.Stickers.Count is not 0)
@@ -339,7 +324,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
     /// <param name="message">The Discord message.</param>
     /// <returns><see langword="true"/> if it contains an image, <see langword="false"/> otherwise.</returns>
     private bool HasImage(DiscordMessage message)
-        => _imageUrlRegex.Matches(message.Content + string.Join("\n", message.Attachments.Select(x => x.Url))).Count is not 0;
+        => AkkoRegexes.ImageUrl.Matches(message.Content + string.Join("\n", message.Attachments.Select(x => x.Url))).Count is not 0;
 
     /// <summary>
     /// Checks if a Discord message contains a server invite.
@@ -347,7 +332,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
     /// <param name="message">The Discord message.</param>
     /// <returns><see langword="true"/> if it contains an invite, <see langword="false"/> otherwise.</returns>
     private bool HasInvite(DiscordMessage message)
-        => _inviteRegex.Matches(message.Content).Count is not 0;
+        => AkkoRegexes.Invite.Matches(message.Content).Count is not 0;
 
     /// <summary>
     /// Performs an action after the specified amount of time.

@@ -3,6 +3,7 @@ using AkkoCog.AntiPhishing.AntiPhishing.Models;
 using AkkoCog.AntiPhishing.AntiPhishing.Services;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
+using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Enums;
 using ConcurrentCollections;
@@ -31,12 +32,6 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
     private const string _shamefulNick = "I'm a dirty scammer❗";
 
     private readonly EventId _eventLog = new(99, nameof(AntiPhishingHandler));
-
-    private static readonly Regex _urlRegex = new(
-        @"https?:\/\/\S{2,}",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
-
     private readonly ConcurrentHashSet<string> _positiveUrls = new();
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly AntiPhishingService _service;
@@ -179,7 +174,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
             await ApplyPunishmentAsync(client, user, channel, server);
         }
 
-        var matches = _urlRegex.Matches(text);
+        var matches = AkkoRegexes.Url.Matches(text);
 
         if (matches.Count is 0)
             return false;
