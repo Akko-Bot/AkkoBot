@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
 	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+      
+    <!-- Build Variables -->
+    <CogName>DangerousCommands</CogName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,5 +17,43 @@
   <ItemGroup>
     <Folder Include="Data\Localization\" />
   </ItemGroup>
+    
+  <!-- Post-build for Windows -->
+  <Target Name="PostBuildWin" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <!-- Copy everything in the cog's project Data to the cog's output Data -->
+    <Exec Command="xcopy &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)Data&quot; /i /e /R /Y" />
 
+    <!-- Copy the cog's binary file to the main project's output Cogs folder -->
+    <Exec Command="echo F | xcopy &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(ProjectDir)..\AkkoBot\$(OutDir)Data\Cogs\$(CogName)\$(ProjectName).dll&quot; /i /R /Y" />
+
+    <!-- Copy everything in the cog's project Data to the main project's output Cogs folder -->
+    <Exec Command="xcopy &quot;$(ProjectDir)Data&quot; &quot;$(ProjectDir)..\AkkoBot\$(OutDir)Data\Cogs\$(CogName)&quot; /i /e /R /Y" />
+  </Target>
+
+  <!-- Post-build for Linux -->
+  <Target Name="PostBuildLin" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <!-- Copy everything in the cog's project Data to the cog's output Data -->
+    <Exec Command="cp -r $(ProjectDir)Data $(TargetDir)" />
+    
+    <!-- Copy the cog's binary file to the main project's output Cogs folder -->
+    <Exec Command="mkdir -p $(ProjectDir)../AkkoBot/$(OutDir)Data/Cogs/$(CogName)" />
+    <Exec Command="cp $(TargetDir)$(ProjectName).dll $(ProjectDir)../AkkoBot/$(OutDir)Data/Cogs/$(CogName)/$(ProjectName).dll" />
+    
+    <!-- Copy everything in the cog's project Data to the main project's output Cogs folder -->
+    <Exec Command="cp -r $(TargetDir)Data/* $(ProjectDir)../AkkoBot/$(OutDir)Data/Cogs/$(CogName)" />
+  </Target>
+
+  <!-- Post-build for MacOS -->
+  <Target Name="PostBuildOsx" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <!-- Copy everything in the cog's project Data to the cog's output Data -->
+    <Exec Command="cp -r $(ProjectDir)Data $(TargetDir)" />
+    
+    <!-- Copy the cog's binary file to the main project's output Cogs folder -->
+    <Exec Command="mkdir -p $(ProjectDir)../AkkoBot/$(OutDir)Data/Cogs/$(CogName)" />
+    <Exec Command="cp $(TargetDir)$(ProjectName).dll $(ProjectDir)../AkkoBot/$(OutDir)Data/Cogs/$(CogName)/$(ProjectName).dll" />
+    
+    <!-- Copy everything in the cog's project Data to the main project's output Cogs folder -->
+    <Exec Command="cp -r $(TargetDir)Data/* $(ProjectDir)../AkkoBot/$(OutDir)Data/Cogs/$(CogName)" />
+  </Target>
+    
 </Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -24,15 +24,15 @@
   </ItemGroup>
 
   <Target Name="PostBuildWin" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <Exec Command="xcopy &quot;$(ProjectDir)Data\Localization&quot; &quot;$(TargetDir)Data\Localization&quot; /i /e /R /Y" />
+    <Exec Command="xcopy &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)Data&quot; /i /e /R /Y" />
   </Target>
 
   <Target Name="PostBuildLin" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
-    <Exec Command="cp &quot;$(ProjectDir)Data/Localization&quot; &quot;$(TargetDir)Data&quot; -r" />
+    <Exec Command="cp &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)&quot; -r" />
   </Target>
 
   <Target Name="PostBuildOsx" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <Exec Command="cp -r &quot;$(ProjectDir)Data/Localization&quot; &quot;$(TargetDir)Data&quot;" />
+    <Exec Command="cp -r &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)&quot;" />
   </Target>
 
 </Project>
