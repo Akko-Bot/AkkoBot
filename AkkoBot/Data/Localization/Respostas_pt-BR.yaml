@@ -841,6 +841,7 @@ timedban_title: Banido Temporariamente
 timedmute: Silenciamento Expirado
 timedrole: Cargo de Punição
 timedunrole: Remoção de Cargo de Punição
+timeout_lifted: Castigo removido
 timeout_success: Usuário {0} está de castigo por {1}.
 timers: Timers
 timezone_list: Fusos Horários

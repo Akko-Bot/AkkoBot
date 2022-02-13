@@ -48,7 +48,7 @@ public static class LogStrategy
     /// </summary>
     private static string DefaultHeader(EventId eventId, string? timeFormat)
     {
-        var eName = (eventId.Name?.Length > 12) ? eventId.Name?.Substring(0, 12) : eventId.Name;
+        var eName = (eventId.Name?.Length > 12) ? eventId.Name?[..12] : eventId.Name;
         return $"[{DateTimeOffset.Now.ToString(timeFormat ?? "yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture)}] [{eName,-6}] ";
     }
 
@@ -57,7 +57,7 @@ public static class LogStrategy
     /// </summary>
     private static string SimpleHeader(EventId eventId, string? timeFormat)
     {
-        var eName = (eventId.Name?.Length > 12) ? eventId.Name?.Substring(0, 12) : eventId.Name;
+        var eName = (eventId.Name?.Length > 12) ? eventId.Name?[..12] : eventId.Name;
         return $"[{DateTimeOffset.Now.ToString(timeFormat ?? "HH:mm", CultureInfo.InvariantCulture)}] [{eventId.Id,-4}/{eName,-12}] ";
     }
 
@@ -66,7 +66,7 @@ public static class LogStrategy
     /// </summary>
     private static string MinimalistHeader(EventId eventId, string? timeFormat)
     {
-        var eName = (eventId.Name?.Length > 7) ? eventId.Name?.Substring(0, 7) : eventId.Name;
+        var eName = (eventId.Name?.Length > 7) ? eventId.Name?[..7] : eventId.Name;
         return $"[{DateTimeOffset.Now.ToString(timeFormat ?? "HH:mm", CultureInfo.InvariantCulture)}] [{eName,-7}] ";
     }
 

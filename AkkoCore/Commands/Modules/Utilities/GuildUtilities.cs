@@ -120,6 +120,9 @@ public sealed class GuildUtilities : AkkoCommandModule
             .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime), true)
             .AddField("joined_on", user.JoinedAt.ToDiscordTimestamp(TimestampFormat.ShortDateTime), true);
 
+        if (user.CommunicationDisabledUntil.HasValue)
+            embed.AddField("timeout_lifted", user.CommunicationDisabledUntil.Value.ToDiscordTimestamp(TimestampFormat.RelativeTime), true);
+
         await context.RespondLocalizedAsync(embed, false);
     }
 
@@ -145,9 +148,10 @@ public sealed class GuildUtilities : AkkoCommandModule
             await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
             return;
         }
-        _ = (_service.DeserializeMessage(newMessage, out var dMsg))
-            ? await message.ModifyAsync(dMsg)
-            : await message.ModifyAsync(newMessage);
+
+        await ((_service.DeserializeMessage(newMessage, out var dMsg))
+            ? message.ModifyAsync(dMsg)
+            : message.ModifyAsync(newMessage));
 
         await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
     }

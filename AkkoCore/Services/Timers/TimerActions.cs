@@ -131,7 +131,7 @@ internal sealed class TimerActions : ITimerActions
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(_timerLogEvent, $"An error occurred when adding a punishment role. [{ex.Message}]");
+            _logger.LogWarning(_timerLogEvent, "An error occurred when adding a punishment role. [{Message}]", ex.Message);
         }
         finally
         {
@@ -161,7 +161,7 @@ internal sealed class TimerActions : ITimerActions
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(_timerLogEvent, $"An error occurred when removing a punishment role. [{ex.Message}]");
+            _logger.LogWarning(_timerLogEvent, "An error occurred when removing a punishment role. [{Message}]", ex.Message);
         }
         finally
         {
@@ -234,7 +234,11 @@ internal sealed class TimerActions : ITimerActions
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to send a reminder. [User: {dbReminder?.AuthorId}] [Server: {dbReminder?.GuildId}] [{ex.Message}]");
+            _logger.LogWarning(
+                _timerLogEvent,
+                "An error occurred when trying to send a reminder. [User: {AuthorId}] [Server: {GuildId}] [{Message}]",
+                dbReminder?.AuthorId, dbReminder?.GuildId, ex.Message
+            );
         }
         finally
         {
@@ -272,7 +276,11 @@ internal sealed class TimerActions : ITimerActions
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run an autocommand. [User: {dbCmd?.AuthorId}] [Command: {dbCmd?.CommandString}] [{ex.Message}]");
+            _logger.LogWarning(
+                _timerLogEvent,
+                "An error occurred when trying to run an autocommand. [User: {AuthorId}] [Command: {CommandString}] [{Message}]",
+                dbCmd?.AuthorId, dbCmd?.CommandString, ex.Message
+            );
         }
         finally
         {
@@ -341,7 +349,11 @@ internal sealed class TimerActions : ITimerActions
 
             scope.ServiceProvider.GetRequiredService<ITimerManager>().TryRemove(entryId);   // Circular dependency if this is passed in the constructor
 
-            _logger.LogWarning(_timerLogEvent, $"An error occurred when trying to run a repeater. [User: {dbRepeater?.AuthorId}] [Server: {dbRepeater?.GuildIdFK}] [{ex.Message}]");
+            _logger.LogWarning(
+                _timerLogEvent,
+                "An error occurred when trying to run a repeater. [User: {AuthorId}] [Server: {GuildIdFK}] [{Message}]",
+                dbRepeater?.AuthorId, dbRepeater?.GuildIdFK, ex.Message
+            );
         }
     }
 

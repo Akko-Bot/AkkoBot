@@ -48,13 +48,13 @@ jobs:
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
-        
+
     - name: Set up .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.x'
 
-    - name: Add DSharpPlus Nightly Repository 
+    - name: Add DSharpPlus Nightly Repository
       run: |
        dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusNightly
 
