@@ -49,6 +49,11 @@ public sealed class CommandScheduleService
 
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
+        // Limit autocommands to 5 per guild
+        if (await db.AutoCommands.CountAsync(x => x.GuildId == context.Guild.Id && x.Type == AutoCommandType.Repeated) >= 5
+            || await db.AutoCommands.CountAsync(x => x.GuildId == context.Guild.Id && x.Type == AutoCommandType.Scheduled) >= 5)
+            return false;
+
         var newTimer = new TimerEntity()
         {
             GuildIdFK = context.Guild?.Id,
@@ -149,24 +154,24 @@ public sealed class CommandScheduleService
     /// <summary>
     /// Gets all autocommands created by the specified user.
     /// </summary>
-    /// <param name="user">The Discord user who created the autocommands.</param>
+    /// <param name="server">The Discord guild where the autocommands are going to trigger.</param>
     /// <returns>A collection of autocommands.</returns>
-    public async Task<IReadOnlyCollection<AutoCommandEntity>> GetAutoCommandsAsync(DiscordUser user)
-        => await GetAutoCommandsAsync(user, x => x);
+    public async Task<IReadOnlyList<AutoCommandEntity>> GetAutoCommandsAsync(DiscordGuild server)
+        => await GetAutoCommandsAsync(server, x => x);
 
     /// <summary>
     /// Gets all autocommands created by the specified user.
     /// </summary>
-    /// <param name="user">The Discord user who created the autocommands.</param>
+    /// <param name="server">The Discord guild where the autocommands are going to trigger.</param>
     /// <param name="selector"></param>
     /// <returns>A collection of <typeparamref name="T"/>.</returns>
     /// <exception cref="ArgumentNullException">Occurs when <paramref name="selector"/> is <see langword="null"/>.</exception>
-    public async Task<IReadOnlyCollection<T>> GetAutoCommandsAsync<T>(DiscordUser user, Expression<Func<AutoCommandEntity, T>> selector)
+    public async Task<IReadOnlyList<T>> GetAutoCommandsAsync<T>(DiscordGuild server, Expression<Func<AutoCommandEntity, T>> selector)
     {
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);
 
         return await db.AutoCommands
-            .Where(x => x.AuthorId == user.Id)
+            .Where(x => x.GuildId == server.Id)
             .Select(selector)
             .ToArrayAsync();
     }

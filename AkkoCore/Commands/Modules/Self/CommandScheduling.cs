@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace AkkoCore.Commands.Modules.Self;
 
-[BotOwner, RequireGuild]
+[RequireGuild]  // Do not allow autocommands to be created in dms to prevent abuse
 [Group("autocommand"), Aliases("autocmd")]
 [Description("cmd_autocommand")]
 public sealed class CommandScheduling : AkkoCommandModule
@@ -26,6 +26,7 @@ public sealed class CommandScheduling : AkkoCommandModule
 
     [Command("addscheduled")]
     [Description("cmd_autocommand_addscheduled")]
+    [RequireUserPermissions(Permissions.ManageGuild)]
     public async Task AddScheduledCommandAsync(CommandContext context, [Description("arg_autocommand_time")] TimeSpan time, [RemainingText, Description("arg_command")] string command)
     {
         if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
@@ -40,6 +41,7 @@ public sealed class CommandScheduling : AkkoCommandModule
 
     [Command("addrepeated")]
     [Description("cmd_autocommand_addrepeated")]
+    [RequireUserPermissions(Permissions.ManageGuild)]
     public async Task AddRepeatedCommandAsync(CommandContext context, [Description("arg_autocommand_time")] TimeSpan time, [RemainingText, Description("arg_command")] string command)
     {
         if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
@@ -54,6 +56,7 @@ public sealed class CommandScheduling : AkkoCommandModule
 
     [Command("addstartup")]
     [Description("cmd_autocommand_startup")]
+    [BotOwner, RequireUserPermissions(Permissions.ManageGuild)]
     public async Task AddStartupCommandAsync(CommandContext context, [RemainingText, Description("arg_command")] string command)
     {
         if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
@@ -68,6 +71,7 @@ public sealed class CommandScheduling : AkkoCommandModule
 
     [Command("remove"), Aliases("rm")]
     [Description("cmd_autocommand_remove")]
+    [RequireUserPermissions(Permissions.ManageGuild)]
     public async Task RemoveAutoCommandAsync(CommandContext context, [Description("arg_autocommand_id")] int id)
     {
         var success = await _service.RemoveAutoCommandAsync(context.User, id);
@@ -76,9 +80,10 @@ public sealed class CommandScheduling : AkkoCommandModule
 
     [GroupCommand, Command("list"), Aliases("show")]
     [Description("cmd_autocommand_list")]
+    [RequireUserPermissions(Permissions.ManageGuild)]
     public async Task ListAutoCommandsAsync(CommandContext context)
     {
-        var reminders = (await _service.GetAutoCommandsAsync(context.User))
+        var reminders = (await _service.GetAutoCommandsAsync(context.Guild))
             .OrderBy(x => _service.GetElapseTime(x));
 
         var embed = new SerializableDiscordEmbed();
@@ -92,12 +97,12 @@ public sealed class CommandScheduling : AkkoCommandModule
         {
             embed.WithTitle("autocommand_title");
 
-            foreach (var group in reminders.Chunk(15))
+            foreach (var cmdGroup in reminders.Chunk(15))
             {
                 // Have to use .Bold for the IDs because .InlineCode misaligns the embed fields
-                embed.AddField("command", string.Join("\n", group.Select(x => Formatter.Bold($"{x.Id}.") + " " + context.Prefix + x.CommandString.Replace("\n", string.Empty).MaxLength(50, AkkoConstants.EllipsisTerminator))), true)
-                    .AddField("channel", string.Join("\n", group.Select(x => $"<#{x.ChannelId}>")), true)
-                    .AddField("triggers_in", string.Join("\n", group.Select(x => _service.GetElapseTime(x))), true);
+                embed.AddField("command", string.Join("\n", cmdGroup.Select(x => Formatter.Bold($"{x.Id}.") + " " + context.Prefix + x.CommandString.Replace("\n", string.Empty).MaxLength(50, AkkoConstants.EllipsisTerminator))), true)
+                    .AddField("channel", string.Join("\n", cmdGroup.Select(x => $"<#{x.ChannelId}>")), true)
+                    .AddField("triggers_in", string.Join("\n", cmdGroup.Select(x => _service.GetElapseTime(x))), true);
             }
 
             await context.RespondPaginatedByFieldsAsync(embed, 3);

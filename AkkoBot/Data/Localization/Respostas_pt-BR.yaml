@@ -170,8 +170,8 @@ cmd_alias_list: Exibe todos os atalhos de comando disponíveis nesse servidor. S
 cmd_alias_remove: Remove um atalho de comando.
 cmd_antialt: 'Ativa o filtro anti-alt. Contas de usuário são consideradas como alt se forem criadas e entrarem no servidor dentro do intervalo de tempo especificado. Ações disponíveis: __AddRole__, __Mute__, __Kick__, __Ban__. Forneça nenhum parâmetro para desativar.'
 cmd_autocommand: Agrupa comandos que gerenciam comandos automáticos.
-cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado.
-cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado.
+cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado. Limitado a 5 por servidor.
+cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado. Limitado a 5 por servidor.
 cmd_autocommand_list: Exibe todos os commandos automáticos criados por você.
 cmd_autocommand_remove: Remove um comando automático com o ID especificado.
 cmd_autocommand_startup: Adiciona um comando automático que executa assim que o bot se conecta ao Discord.
