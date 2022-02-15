@@ -364,7 +364,7 @@ cmd_poll_startsimple: Starts a poll for a yes or no question.
 cmd_poll_status: Checks the current state of the specified poll.
 cmd_poll_stop: Stops the specified poll and shows its result. Provide no parameter to stop the latest poll on the current channel.
 cmd_poll_vote: Casts a vote to the specified anonymous poll.
-cmd_prune: Deletes the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
+cmd_prune: Deletes the specified message or the last `x` messages from this channel. Specify a user to only delete their lastest messages from this channel. Defaults to 50.
 cmd_react: Reacts to a message with the specified emoji.
 cmd_reactclear: Removes all reactions from the specified message.
 cmd_reactremove: Removes a reaction from the specified message.
@@ -724,6 +724,7 @@ perm_embed_links: Embed Links
 perm_kick_members: Kick Members
 perm_manage_channels: Manage Channels
 perm_manage_emojis: Manage Emojis
+perm_manage_events: Manage Events
 perm_manage_guild: Manage Server
 perm_manage_messages: Manage Messages
 perm_manage_nicknames: Manage Nicknames

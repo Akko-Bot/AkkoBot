@@ -59,6 +59,7 @@ internal sealed class PermissionsConverter : IArgumentConverter<Permissions>
         ["perm_create_private_threads"] = Optional.FromValue(Permissions.CreatePrivateThreads),
         ["perm_create_public_threads"] = Optional.FromValue(Permissions.CreatePublicThreads),
         ["perm_use_application_commands"] = Optional.FromValue(Permissions.UseApplicationCommands),
+        ["perm_manage_events"] = Optional.FromValue(Permissions.ManageEvents),
         ["perm_moderate_members"] = Optional.FromValue(Permissions.ModerateMembers)
     };
 

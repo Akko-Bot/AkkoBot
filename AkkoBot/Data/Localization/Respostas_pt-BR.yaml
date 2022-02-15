@@ -364,7 +364,7 @@ cmd_poll_startsimple: Inicia uma enquete para uma pergunta de sim ou não.
 cmd_poll_status: Checa o estado atual da enquete especificada.
 cmd_poll_stop: Encerra a enquete especificada e exibe o resultado da votação. Forneça nenhum parâmetro para encerrar a enquete mais recente no canal atual.
 cmd_poll_vote: Submete um voto à enquete anônima especificada.
-cmd_prune: Exclui as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
+cmd_prune: Exclui a mensagem especificada ou as últimas `x` mensagens desse canal. Especifique um usuário para excluir apenas suas últimas mensagens desse canal. O padrão é 50.
 cmd_react: Reage a uma mensagem com o emoji especificado.
 cmd_reactclear: Remove todas as reações da mensagem especificada.
 cmd_reactremove: Remove uma reação da mensagem especificada.
@@ -724,6 +724,7 @@ perm_embed_links: Embed de Links
 perm_kick_members: Expulsar Membros
 perm_manage_channels: Gerenciar Canais
 perm_manage_emojis: Gerenciar Emojis
+perm_manage_events: Gerenciar Eventos
 perm_manage_guild: Gerenciar Servidor
 perm_manage_messages: Gerenciar Mensagens
 perm_manage_nicknames: Gerenciar Apelidos

@@ -90,6 +90,13 @@ public sealed class Administration : AkkoCommandModule
     public async Task PruneAsync(CommandContext context, int amount = 50, string options = "")
         => await PruneAsync(context, null, amount, options);
 
+    [Command("prune")]
+    public async Task PruneOneAsync(CommandContext context, [Description("arg_discord_message")] DiscordMessage message)
+    {
+        await message.DeleteAsync();
+        await context.Message.CreateReactionAsync(AkkoStatics.SuccessEmoji);
+    }
+
     [Command("prune"), Aliases("clear")]
     [Description("cmd_prune")]
     [RequireGuild, RequirePermissions(Permissions.ManageMessages)]
