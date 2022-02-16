@@ -448,10 +448,15 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
 
         var settings = GetMessageSettings(eventArgs.Guild.Id);
+        var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.JoinedAt);
+
         var message = GetBaseMemberActivityLog(settings, eventArgs.Member)
             .WithTitle("log_leavingmember_title")
             .AddField("left_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
-            .WithFooter($"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}")
+            .WithFooter(
+                $"{_localizer.FormatLocalized(settings.Locale, "stayed_for")}: {timeDifference.GetLocalizedTimeString(_localizer, settings.Locale)} | " +
+                $"{_localizer.FormatLocalized(settings.Locale, "id")}: {eventArgs.Member.Id}"
+            )
             .WithLocalization(_localizer, settings.Locale);
 
         return GetStandardMessage(message, settings);
@@ -463,7 +468,6 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
 
         var settings = GetMessageSettings(eventArgs.Guild.Id);
-
         var timeDifference = DateTimeOffset.Now.Subtract(eventArgs.Member.JoinedAt);
 
         var message = GetBaseMemberActivityLog(settings, eventArgs.Member)
