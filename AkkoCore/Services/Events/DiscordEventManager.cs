@@ -189,9 +189,6 @@ internal sealed class DiscordEventManager : IDiscordEventManager
         // Voting for anonymous polls in the context channel
         _shardedClient.MessageCreated += _guildEventsHandler.PollVoteAsync;
 
-        // Show prefix regardless of current config
-        _shardedClient.MessageCreated += _globalEventsHandler.DefaultPrefixAsync;
-
         // Enables and disables channel slow mode
         _shardedClient.MessageCreated += _guildEventsHandler.AutoSlowmodeAsync;
 
@@ -393,9 +390,6 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         // Voting for anonymous polls in the context channel
         _shardedClient.MessageCreated -= _guildEventsHandler.PollVoteAsync;
-
-        // Show prefix regardless of current config
-        _shardedClient.MessageCreated -= _globalEventsHandler.DefaultPrefixAsync;
 
         // Enables and disables channel slow mode
         _shardedClient.MessageCreated -= _guildEventsHandler.AutoSlowmodeAsync;

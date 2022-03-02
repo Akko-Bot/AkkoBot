@@ -23,9 +23,4 @@ public interface IGlobalEventsHandler
     /// Stops the callback chain if the message comes from a blacklisted context.
     /// </summary>
     Task BlockBlacklistedAsync(DiscordClient client, MessageCreateEventArgs eventArgs);
-
-    /// <summary>
-    /// Makes the bot always respond to "!prefix", regardless of the currently set prefix.
-    /// </summary>
-    Task DefaultPrefixAsync(DiscordClient client, MessageCreateEventArgs eventArgs);
 }
