@@ -38,7 +38,7 @@ public static class AkkoRegexes
     /// Regex to match any valid Discord server invite.
     /// </summary>
     /// <remarks>Example: "My super cool server https://discord.gg/l33tH4X0R" -> "discord.gg/l33tH4X0R" (l33tH4X0R)</remarks>
-    public static Regex Invite { get; } = new(
+    public static Regex DiscordInvite { get; } = new(
         @"discord(?:\.gg|\.io|\.me|\.li|(?:app)?\.com\/invite)\/(\w+)",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
@@ -47,17 +47,26 @@ public static class AkkoRegexes
     /// Regex to get Discord emojis.
     /// </summary>
     /// <remarks>Example: "This ＜:emojiName:12345＞ is an emoji" -> "＜:emojiName:12345＞" (emojiName) (12345)</remarks>
-    public static Regex Emoji { get; } = new(
+    public static Regex DiscordEmoji { get; } = new(
         @"<a?:(\S+?):(\d+?)>",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
     /// <summary>
-    /// Regex to match Discord roles.
+    /// Regex to match Discord role mentions.
     /// </summary>
     /// <remarks>Example: "People in the ＜@＆12345＞ role" -> "＜@＆12345＞" (12345)</remarks>
-    public static Regex Role { get; } = new(
+    public static Regex DiscordRole { get; } = new(
         @"<@&(\d+?)>",
+        RegexOptions.Compiled
+    );
+
+    /// <summary>
+    /// Regex to match Discord user mentions.
+    /// </summary>
+    /// <remarks>Example: "User ＜@!12345＞ got banned" -> "＜@!12345＞" (12345)</remarks>
+    public static Regex DiscordUser { get; } = new(
+        @"<@!?(\d+?)>",
         RegexOptions.Compiled
     );
 }

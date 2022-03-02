@@ -58,8 +58,8 @@ internal sealed class GlobalEventsHandler : IGlobalEventsHandler
             return;
 
         var prefix = _dbCache.Guilds.TryGetValue(eventArgs.Guild?.Id ?? default, out var dbGuild)
-                ? dbGuild.Prefix
-                : _botConfig.Prefix;
+            ? dbGuild.Prefix
+            : _botConfig.Prefix;
 
         if (eventArgs.Guild is not null && prefix.Equals("!", StringComparison.Ordinal))
             return;

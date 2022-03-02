@@ -99,7 +99,7 @@ public sealed class BotConfig : Settings, IMessageSettings
     /// Defines whether the bot responds to commands prefixed with a mention to the bot.
     /// </summary>
     [YamlMember(Description = @"Defines whether the bot responds to commands prefixed with a mention to the bot. Defaults to ""false"". Values: true, false")]
-    public bool MentionPrefix { get; set; } = false;
+    public bool MentionPrefix { get; set; } = true;
 
     /// <summary>
     /// Defines whether the bot should respond to help commands.

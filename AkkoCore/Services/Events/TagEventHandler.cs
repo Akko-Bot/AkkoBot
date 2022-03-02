@@ -205,7 +205,7 @@ internal sealed class TagEventHandler : ITagEventHandler
                 : Task.CompletedTask;
         }
 
-        var match = AkkoRegexes.Emoji.Match(dbTag.Response);
+        var match = AkkoRegexes.DiscordEmoji.Match(dbTag.Response);
 
         if (match.Success
             && ulong.TryParse(match.Groups[2].Value, out var emojiId)
@@ -221,7 +221,7 @@ internal sealed class TagEventHandler : ITagEventHandler
             return SendReactionAsync(eventArgs, emoji);
         }
 
-        client.Logger.LogWarning(_tagLogEvent, $"A tag emoji could not be found. Removing the tag from the database. Tag Trigger: {dbTag.Trigger} | Tag Response: {dbTag.Response}");
+        client.Logger.LogWarning(_tagLogEvent, "A tag emoji could not be found. Removing the tag from the database. Tag Trigger: {TagTrigger} | Tag Response: {TagResponse}", dbTag.Trigger, dbTag.Response);
         return DeleteTagAsync(dbTag);
     }
 

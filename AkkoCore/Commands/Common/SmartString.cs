@@ -58,7 +58,7 @@ public sealed class SmartString
                 ParsePlaceholders(_context, _contentBuilder, ParseRegex, _formatter);
 
                 if (SanitizeRoles)
-                    SanitizeRoleMentions(_context, _contentBuilder, AkkoRegexes.Role);
+                    SanitizeRoleMentions(_context, _contentBuilder, AkkoRegexes.DiscordRole);
 
                 IsParsed = true;
 
@@ -157,7 +157,7 @@ public sealed class SmartString
         result = ParsePlaceholders(context, result, placeholderRegex, formatter);
 
         if (sanitizeRoles ?? SanitizeRoles)
-            result = SanitizeRoleMentions(context, result, AkkoRegexes.Role);
+            result = SanitizeRoleMentions(context, result, AkkoRegexes.DiscordRole);
 
         return result.ToString();
     }
@@ -184,7 +184,7 @@ public sealed class SmartString
         result = ParsePlaceholders(context, result, placeholderRegex, formatter);
 
         if (sanitizeRoles)
-            result = SanitizeRoleMentions(context, result, AkkoRegexes.Role);
+            result = SanitizeRoleMentions(context, result, AkkoRegexes.DiscordRole);
 
         return result.ToString();
     }

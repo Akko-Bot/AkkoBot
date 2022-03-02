@@ -33,7 +33,7 @@ Features include, but are not limited to:
 
 ## Getting Started
 
-By default Akko responds to commands prefixed with `!`, but it also has a few slash commands to help you find and setup the features you're looking for. Just type `/` and scroll through the list.
+By default Akko responds to commands prefixed with `!` or a mention to it, but it also has a few slash commands to help you find and setup the features you're looking for. Just type `/` and scroll through the list.
 
 After you [invite Akko to your server][AkkoInvite], you should [setup the permissions][Role101] needed for her to do her job. For example, if you want her to be able to kick users, you should give her permission to `Kick Members` and so on.
 

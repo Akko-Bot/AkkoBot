@@ -1,5 +1,4 @@
 using AkkoCore.Commands.Attributes;
-using AkkoCore.Commands.Common;
 using AkkoCore.Commands.Modules.Administration.Services;
 using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
@@ -32,7 +31,7 @@ namespace AkkoCore.Services.Events;
 /// </summary>
 [CommandService<IGuildEventsHandler>(ServiceLifetime.Singleton)]
 internal sealed class GuildEventsHandler : IGuildEventsHandler
-{ 
+{
     private readonly ConcurrentDictionary<(ulong, ulong, ulong), (int, DateTimeOffset)> _slowmodeRegister = new();
     private readonly TimeSpan _30seconds = TimeSpan.FromSeconds(30);
 
@@ -332,7 +331,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
     /// <param name="message">The Discord message.</param>
     /// <returns><see langword="true"/> if it contains an invite, <see langword="false"/> otherwise.</returns>
     private bool HasInvite(DiscordMessage message)
-        => AkkoRegexes.Invite.Matches(message.Content).Count is not 0;
+        => AkkoRegexes.DiscordInvite.Matches(message.Content).Count is not 0;
 
     /// <summary>
     /// Performs an action after the specified amount of time.
