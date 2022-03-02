@@ -95,6 +95,21 @@ public interface IGuildLogEventHandler
     Task LogEditedChannelAsync(DiscordClient client, ChannelUpdateEventArgs eventArgs);
 
     /// <summary>
+    /// Logs thread creation.
+    /// </summary>
+    Task LogCreatedThreadAsync(DiscordClient client, ThreadCreateEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs thread creation.
+    /// </summary>
+    Task LogDeletedThreadAsync(DiscordClient client, ThreadDeleteEventArgs eventArgs);
+
+    /// <summary>
+    /// Logs thread creation.
+    /// </summary>
+    Task LogEditedThreadAsync(DiscordClient client, ThreadUpdateEventArgs eventArgs);
+
+    /// <summary>
     /// Logs voice state connections.
     /// </summary>
     Task LogVoiceStateConnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs);

@@ -317,70 +317,44 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
 
     public DiscordWebhookBuilder GetCreatedChannelLog(ChannelCreateEventArgs eventArgs)
     {
-        if (eventArgs is null)
-            throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
-
-        var settings = GetMessageSettings(eventArgs.Guild?.Id);
-
-        var message = new SerializableDiscordEmbed()
-            .WithColor(settings.OkColor)
-            .WithAuthor("log_channelcreated_title")
-            .WithTitle("#" + eventArgs.Channel.Name)
-            .AddField("type", eventArgs.Channel.Type.ToString(), true)
-            .AddField("id", eventArgs.Channel.Id.ToString(), true)
-            .AddField("created_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
-            .WithLocalization(_localizer, settings.Locale);
-
-        return GetStandardMessage(message, settings);
+        return (eventArgs is null)
+            ? throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.")
+            : GenerateCreatedChannelLog(eventArgs.Channel, "log_channelcreated_title");
     }
 
     public DiscordWebhookBuilder GetDeletedChannelLog(ChannelDeleteEventArgs eventArgs)
     {
-        if (eventArgs is null)
-            throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
-
-        var settings = GetMessageSettings(eventArgs.Guild?.Id);
-
-        var message = new SerializableDiscordEmbed()
-            .WithColor(settings.OkColor)
-            .WithAuthor("log_channeldeleted_title")
-            .WithTitle("#" + eventArgs.Channel.Name)
-            .WithDescription(eventArgs.Channel.Topic)
-            .AddField("type", eventArgs.Channel.Type.ToString(), true)
-            .AddField("id", eventArgs.Channel.Id.ToString(), true)
-            .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
-            .WithLocalization(_localizer, settings.Locale);
-
-        return GetStandardMessage(message, settings);
+        return (eventArgs is null)
+            ? throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.")
+            : GenerateDeletedChannelLog(eventArgs.Channel, "log_channeldeleted_title");
     }
 
     public DiscordWebhookBuilder GetEditedChannelLog(ChannelUpdateEventArgs eventArgs)
     {
-        if (eventArgs is null)
-            throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.");
+        return (eventArgs is null)
+            ? throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.")
+            : GenerateEditedChannelLog(eventArgs.ChannelBefore, eventArgs.ChannelAfter, "log_channeledited_title");
+    }
 
-        var settings = GetMessageSettings(eventArgs.Guild?.Id);
+    public DiscordWebhookBuilder GetCreatedThreadLog(ThreadCreateEventArgs eventArgs)
+    {
+        return (eventArgs is null)
+            ? throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.")
+            : GenerateCreatedChannelLog(eventArgs.Thread, "log_threadcreated_title");
+    }
 
-        var message = new SerializableDiscordEmbed()
-            .WithColor(settings.OkColor)
-            .WithAuthor("log_channeledited_title")
-            .WithTitle("#" + eventArgs.ChannelAfter.Name);
+    public DiscordWebhookBuilder GetDeletedThreadLog(ThreadDeleteEventArgs eventArgs)
+    {
+        return (eventArgs is null)
+            ? throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.")
+            : GenerateDeletedChannelLog(eventArgs.Thread, "log_threaddeleted_title");
+    }
 
-        if (eventArgs.ChannelBefore.Topic.Equals(eventArgs.ChannelAfter.Topic, StringComparison.Ordinal))
-            message.WithDescription(eventArgs.ChannelAfter.Topic);
-
-        if (eventArgs.ChannelBefore.Name.Equals(eventArgs.ChannelAfter.Name, StringComparison.Ordinal))
-        {
-            message.AddField("old_name", eventArgs.ChannelBefore.Name, true)
-            .AddField("new_name", eventArgs.ChannelAfter.Name, true);
-        }
-
-        message.AddField("id", eventArgs.ChannelAfter.Id.ToString(), true)
-            .AddField("type", eventArgs.ChannelAfter.Type.ToString(), true)
-            .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
-            .WithLocalization(_localizer, settings.Locale);
-
-        return GetStandardMessage(message, settings);
+    public DiscordWebhookBuilder GetEditedThreadLog(ThreadUpdateEventArgs eventArgs)
+    {
+        return (eventArgs is null)
+            ? throw new ArgumentNullException(nameof(eventArgs), "Event argument cannot be null.")
+            : GenerateEditedChannelLog(eventArgs.ThreadBefore, eventArgs.ThreadAfter, "log_threadedited_title");
     }
 
     public DiscordWebhookBuilder GetVoiceStateLog(VoiceStateUpdateEventArgs eventArgs)
@@ -568,5 +542,94 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
             .WithDescription($"{user.Mention} | {user.GetFullname()}")
             .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(), true);
+    }
+
+    /// <summary>
+    /// Gets the log message for the creation of a text channel.
+    /// </summary>
+    /// <param name="channel">The channel that got created.</param>
+    /// <param name="titleKey">The response key to be exibited in the title.</param>
+    /// <returns>The log message.</returns>
+    private DiscordWebhookBuilder GenerateCreatedChannelLog(DiscordChannel channel, string titleKey)
+    {
+        var settings = GetMessageSettings(channel.GuildId);
+
+        var message = new SerializableDiscordEmbed()
+            .WithColor(settings.OkColor)
+            .WithAuthor(titleKey)
+            .WithTitle("#" + channel.Name);
+
+        if (channel is DiscordThreadChannel thread)
+            message.AddField("parent_channel", thread.Parent.Mention, true);
+
+        message.AddField("type", channel.Type.ToString(), true)
+            .AddField("id", channel.Id.ToString(), true)
+            .AddField("created_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .WithLocalization(_localizer, settings.Locale);
+
+        return GetStandardMessage(message, settings);
+    }
+
+    /// <summary>
+    /// Gets the log message for the deletion of a text channel.
+    /// </summary>
+    /// <param name="channel">The channel that got deleted.</param>
+    /// <param name="titleKey">The response key to be exibited in the title.</param>
+    /// <returns>The log message.</returns>
+    private DiscordWebhookBuilder GenerateDeletedChannelLog(DiscordChannel channel, string titleKey)
+    {
+        var settings = GetMessageSettings(channel.GuildId);
+
+        var message = new SerializableDiscordEmbed()
+            .WithColor(settings.OkColor)
+            .WithAuthor(titleKey)
+            .WithTitle("#" + channel.Name)
+            .WithDescription(channel.Topic);
+
+        if (channel is DiscordThreadChannel thread)
+            message.AddField("parent_channel", thread.Parent.Mention, true);
+
+        message.AddField("type", channel.Type.ToString(), true)
+            .AddField("id", channel.Id.ToString(), true)
+            .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .WithLocalization(_localizer, settings.Locale);
+
+        return GetStandardMessage(message, settings);
+    }
+
+    /// <summary>
+    /// Gets the log message for the update of a text channel.
+    /// </summary>
+    /// <param name="channelBefore">The channel before the update.</param>
+    /// <param name="channelAfter">The channel after the update.</param>
+    /// <param name="titleKey">The response key to be exibited in the title.</param>
+    /// <returns>The log message.</returns>
+    private DiscordWebhookBuilder GenerateEditedChannelLog(DiscordChannel channelBefore, DiscordChannel channelAfter, string titleKey)
+    {
+        var settings = GetMessageSettings(channelAfter.GuildId);
+
+        var message = new SerializableDiscordEmbed()
+            .WithColor(settings.OkColor)
+            .WithAuthor(titleKey)
+            .WithTitle("#" + channelAfter.Name);
+
+        if (channelBefore.Topic?.Equals(channelAfter.Topic, StringComparison.Ordinal) is not true)
+            message.WithDescription(channelAfter.Topic);
+
+        if (channelAfter is DiscordThreadChannel thread)
+            message.AddField("parent_channel", thread.Parent.Mention, true);
+
+        if (!channelBefore.Name.Equals(channelAfter.Name, StringComparison.Ordinal))
+        {
+            message.AddField("old_name", channelBefore.Name, true)
+                .AddField("new_name", channelAfter.Name, true);
+        }
+
+        message.AddField("id", channelAfter.Id.ToString(), true)
+            .AddField("type", channelAfter.Type.ToString(), true)
+            .AddField("edited_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
+            .WithLocalization(_localizer, settings.Locale);
+
+        return GetStandardMessage(message, settings);
     }
 }

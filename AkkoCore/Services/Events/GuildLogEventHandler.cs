@@ -262,6 +262,27 @@ internal sealed class GuildLogEventHandler : IGuildLogEventHandler
             : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEditedChannelLog(eventArgs));
     }
 
+    public Task LogCreatedThreadAsync(DiscordClient client, ThreadCreateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelCreated, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetCreatedThreadLog(eventArgs));
+    }
+
+    public Task LogDeletedThreadAsync(DiscordClient client, ThreadDeleteEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelDeleted, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetDeletedThreadLog(eventArgs));
+    }
+
+    public Task LogEditedThreadAsync(DiscordClient client, ThreadUpdateEventArgs eventArgs)
+    {
+        return (eventArgs.Guild is null || !TryGetGuildLog(eventArgs.Guild.Id, GuildLogType.ChannelUpdated, out var guildLog) || !guildLog.IsActive)
+            ? Task.CompletedTask
+            : DispatchLogAsync(client, eventArgs.Guild, guildLog, () => _logGenerator.GetEditedThreadLog(eventArgs));
+    }
+
     public Task LogVoiceStateConnectionAsync(DiscordClient client, VoiceStateUpdateEventArgs eventArgs)
     {
         return (eventArgs.Guild is null || eventArgs.GetVoiceState() is not UserVoiceState.Connected

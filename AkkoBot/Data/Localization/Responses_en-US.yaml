@@ -653,6 +653,9 @@ log_start: Log Start
 log_started: Started logging {0} on channel {1}.
 log_stopped_failure: There is no active logging for {0}.
 log_stopped_success: Successfully stopped logging of {0}.
+log_threadcreated_title: Thread created
+log_threaddeleted_title: Thread deleted
+log_threadedited_title: Thread edited
 log_unban_title: Unbanned user
 log_voicestate_connected: '{0} has connected to the {1} voice channel.'
 log_voicestate_disconnected: '{0} has disconnected from the {1} voice channel.'
@@ -708,6 +711,7 @@ owner: Owner
 owner_ids: Owner IDs
 owners: Owners
 pages: Page {0}/{1}
+parent_channel: Parent channel
 perm_access_channels: View Channels
 perm_add_reactions: Add Reactions
 perm_administrator: Administrator

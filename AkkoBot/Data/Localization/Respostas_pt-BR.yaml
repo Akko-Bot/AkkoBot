@@ -653,6 +653,9 @@ log_start: Início do Log
 log_started: Registrando {0} no canal {1}.
 log_stopped_failure: Não há registro ativo para {0}.
 log_stopped_success: Registro de {0} encerrado.
+log_threadcreated_title: Thread criada
+log_threaddeleted_title: Thread excluída
+log_threadedited_title: Thread alterada
 log_unban_title: Usuário desbanido
 log_voicestate_connected: '{0} conectou ao canal de voz {1}.'
 log_voicestate_disconnected: '{0} desconectou do canal de voz {1}.'
@@ -708,6 +711,7 @@ owner: Dono
 owner_ids: IDs dos Donos
 owners: Donos
 pages: Página {0}/{1}
+parent_channel: Canal mãe
 perm_access_channels: Visualizar Canais
 perm_add_reactions: Adicionar Reações
 perm_administrator: Administrador

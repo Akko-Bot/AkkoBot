@@ -134,6 +134,30 @@ public interface IGuildLogGenerator
     DiscordWebhookBuilder GetEditedChannelLog(ChannelUpdateEventArgs eventArgs);
 
     /// <summary>
+    /// Generates a log message for a <see cref="ThreadCreateEventArgs"/> event.
+    /// </summary>
+    /// <param name="eventArgs">The event argument.</param>
+    /// <returns>The guild log message.</returns>
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    DiscordWebhookBuilder GetCreatedThreadLog(ThreadCreateEventArgs eventArgs);
+
+    /// <summary>
+    /// Generates a log message for a <see cref="ThreadDeleteEventArgs"/> event.
+    /// </summary>
+    /// <param name="eventArgs">The event argument.</param>
+    /// <returns>The guild log message.</returns>
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    DiscordWebhookBuilder GetDeletedThreadLog(ThreadDeleteEventArgs eventArgs);
+
+    /// <summary>
+    /// Generates a log message for a <see cref="ThreadUpdateEventArgs"/> event.
+    /// </summary>
+    /// <param name="eventArgs">The event argument.</param>
+    /// <returns>The guild log message.</returns>
+    /// <exception cref="ArgumentNullException">Occurs when <paramref name="eventArgs"/> is <see langword="null"/>.</exception>
+    DiscordWebhookBuilder GetEditedThreadLog(ThreadUpdateEventArgs eventArgs);
+
+    /// <summary>
     /// Generates a log message for a <see cref="VoiceStateUpdateEventArgs"/> event.
     /// </summary>
     /// <param name="eventArgs">The event argument.</param>

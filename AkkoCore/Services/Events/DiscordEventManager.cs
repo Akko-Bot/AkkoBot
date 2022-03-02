@@ -114,6 +114,12 @@ internal sealed class DiscordEventManager : IDiscordEventManager
 
         _shardedClient.ChannelUpdated += _guildLogger.LogEditedChannelAsync;
 
+        _shardedClient.ThreadCreated += _guildLogger.LogCreatedThreadAsync;
+
+        _shardedClient.ThreadDeleted += _guildLogger.LogDeletedThreadAsync;
+
+        _shardedClient.ThreadUpdated += _guildLogger.LogEditedThreadAsync;
+
         _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateConnectionAsync;
 
         _shardedClient.VoiceStateUpdated += _guildLogger.LogVoiceStateMoveAsync;
@@ -312,6 +318,12 @@ internal sealed class DiscordEventManager : IDiscordEventManager
         _shardedClient.ChannelDeleted -= _guildLogger.LogDeletedChannelAsync;
 
         _shardedClient.ChannelUpdated -= _guildLogger.LogEditedChannelAsync;
+
+        _shardedClient.ThreadCreated -= _guildLogger.LogCreatedThreadAsync;
+
+        _shardedClient.ThreadDeleted -= _guildLogger.LogDeletedThreadAsync;
+
+        _shardedClient.ThreadUpdated -= _guildLogger.LogEditedThreadAsync;
 
         _shardedClient.VoiceStateUpdated -= _guildLogger.LogVoiceStateConnectionAsync;
 

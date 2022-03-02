@@ -51,7 +51,7 @@ And that's it. You're set.
 - Ethereum: 0xDbF8045Cf606b6fF64A2f5Aa8904d91e854dc721
 
 ## License
-Copyright 2021 Kotz
+Copyright 2022 Kotz
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
