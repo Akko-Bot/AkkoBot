@@ -560,7 +560,10 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithTitle("#" + channel.Name);
 
         if (channel is DiscordThreadChannel thread)
-            message.AddField("parent_channel", thread.Parent.Mention, true);
+        {
+            message.AddField("parent_channel", thread.Parent.Mention, true)
+                .AddField("archives_in", string.Format(_localizer.GetResponseString(settings.Locale, "hours_of_inactivity"), thread.ThreadMetadata.AutoArchiveDuration.ToString("D")), true);
+        }
 
         message.AddField("type", channel.Type.ToString(), true)
             .AddField("id", channel.Id.ToString(), true)
@@ -617,7 +620,11 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             message.WithDescription(channelAfter.Topic);
 
         if (channelAfter is DiscordThreadChannel thread)
-            message.AddField("parent_channel", thread.Parent.Mention, true);
+        {
+            message.AddField("parent_channel", thread.Parent.Mention, true)
+                .AddField("archives_in", string.Format(_localizer.GetResponseString(settings.Locale, "hours_of_inactivity"), thread.ThreadMetadata.AutoArchiveDuration.ToString("D")), true)
+                .AddField("archived", (thread.ThreadMetadata.IsArchived) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji, true);
+        }
 
         if (!channelBefore.Name.Equals(channelAfter.Name, StringComparison.Ordinal))
         {

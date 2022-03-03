@@ -12,6 +12,8 @@ antialt_punish: Possible alt
 antialt_set: User accounts created within {0} hours prior to joining the server will automatically receive the {1} punishment.
 antialt_setrole: User accounts created within {0} hours prior to joining the server will automatically receive the {2} role.
 app_owners: Application Owners
+archived: Archived
+archives_in: Archives in
 arg_alias_add_alias: Text the bot should treat as a command.
 arg_alias_add_command: The command that should be mapped to this alias.
 arg_alias_remove: The alias to be removed.
@@ -576,6 +578,7 @@ help_optional: Optional
 high: High
 highest: Highest
 hours: Hours
+hours_of_inactivity: '{0} hours of inactivity'
 id: ID
 ignore_global_list_description: Execution of global tags has been {0}.
 ignored_ids: Ignored IDs

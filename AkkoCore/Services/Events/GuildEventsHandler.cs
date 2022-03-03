@@ -1,6 +1,5 @@
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
-using AkkoCore.Commands.Modules.Utilities.Services;
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
@@ -39,15 +38,13 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
     private readonly IDbCache _dbCache;
     private readonly RoleService _roleService;
     private readonly WarningService _warningService;
-    private readonly UtilitiesService _utilitiesService;
 
-    public GuildEventsHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, RoleService roleService, WarningService warningService, UtilitiesService utilitiesService)
+    public GuildEventsHandler(IServiceScopeFactory scopeFactory, IDbCache dbCache, RoleService roleService, WarningService warningService)
     {
         _scopeFactory = scopeFactory;
         _dbCache = dbCache;
         _roleService = roleService;
         _warningService = warningService;
-        _utilitiesService = utilitiesService;
     }
 
     public async Task RemuteAsync(DiscordClient client, GuildMemberAddEventArgs eventArgs)

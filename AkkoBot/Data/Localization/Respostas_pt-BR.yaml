@@ -12,6 +12,8 @@ antialt_punish: Possível alt
 antialt_set: Irei {1} contas de usuário criadas em até {0} horas antes de entrarem no servidor.
 antialt_setrole: Contas de usuário criadas em até {0} horas antes de entrarem no servidor automaticamente receberão o cargo {2}.
 app_owners: Donos da Aplicação
+archived: Arquivado
+archives_in: Arquiva em
 arg_alias_add_alias: O atalho de comando.
 arg_alias_add_command: O comando a ser executado quando o atalho for utilizado.
 arg_alias_remove: O atalho de comando a ser removido.
@@ -576,6 +578,7 @@ help_optional: Opcional
 high: Alto
 highest: Máximo
 hours: Horas
+hours_of_inactivity: '{0} horas de inatividade'
 id: ID
 ignore_global_list_description: A execução de tags globais foi {0}.
 ignored_ids: IDs Ignorados
