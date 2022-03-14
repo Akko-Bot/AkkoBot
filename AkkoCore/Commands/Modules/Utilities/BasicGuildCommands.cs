@@ -207,6 +207,37 @@ public sealed class BasicGuildCommands : AkkoCommandModule
             await context.Message.CreateReactionAsync((context.Guild.PremiumTier >= PremiumTier.Tier_2) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
         }
 
+        [Command("clearthreads"), Aliases("cth")]
+        [Description("cmd_clearthreads")]
+        public async Task ClearThreadsAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+        {
+            var isEmpty = channel.Threads.Count is 0;
+            var threads = (await channel.ListPublicArchivedThreadsAsync()).Threads.Concat((await channel.ListPrivateArchivedThreadsAsync()).Threads);
+
+            foreach (var thread in threads)
+                await thread.DeleteAsync();
+
+            await context.Message.CreateReactionAsync((isEmpty) ? AkkoStatics.FailureEmoji : AkkoStatics.SuccessEmoji);
+        }
+
+        [Command("archivethreads"), Aliases("ath")]
+        [Description("cmd_archivethreads")]
+        public async Task ArchiveThreadsAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel channel)
+        {
+            if (channel is DiscordThreadChannel)
+            {
+                await context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+                return;
+            }
+
+            var isEmpty = channel.Threads.All(x => x.ThreadMetadata.IsArchived);
+
+            foreach (var thread in channel.Threads.Where(x => !x.ThreadMetadata.IsArchived))
+                await thread.ModifyAsync(x => x.IsArchived = true);
+
+            await context.Message.CreateReactionAsync((isEmpty) ? AkkoStatics.FailureEmoji : AkkoStatics.SuccessEmoji);
+        }
+
         [Command("createtextchannel"), Aliases("ctch")]
         [Description("cmd_createtextchannel")]
         public async Task CreateTextChannelAsync(CommandContext context, [RemainingText, Description("arg_channel_name")] string name)

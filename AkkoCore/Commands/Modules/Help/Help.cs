@@ -65,6 +65,9 @@ public sealed class Help : AkkoCommandModule
     [RequireBotPermissions(Permissions.SendMessages | Permissions.SendMessagesInThreads | Permissions.AddReactions)]
     public async Task SearchAsync(CommandContext context, [RemainingText, Description("arg_keyword")] string keyword)
     {
+        if (string.IsNullOrWhiteSpace(keyword))
+            return;
+
         var embed = _service.SearchCommandByKeyword(context.GetMessageSettings(), context.CommandsNext, keyword);
         await context.RespondPaginatedByFieldsAsync(embed, 2);
     }

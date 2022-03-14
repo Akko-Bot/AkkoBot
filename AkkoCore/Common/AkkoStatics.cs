@@ -50,16 +50,16 @@ public static class AkkoStatics
     /// </summary>
     public static DiscordEmoji[] NumericEmojis { get; } = new DiscordEmoji[]
     {
-            DiscordEmoji.FromUnicode("1️⃣"),
-            DiscordEmoji.FromUnicode("2️⃣"),
-            DiscordEmoji.FromUnicode("3️⃣"),
-            DiscordEmoji.FromUnicode("4️⃣"),
-            DiscordEmoji.FromUnicode("5️⃣"),
-            DiscordEmoji.FromUnicode("6️⃣"),
-            DiscordEmoji.FromUnicode("7️⃣"),
-            DiscordEmoji.FromUnicode("8️⃣"),
-            DiscordEmoji.FromUnicode("9️⃣"),
-            DiscordEmoji.FromUnicode("🔟")
+        DiscordEmoji.FromUnicode("1️⃣"),
+        DiscordEmoji.FromUnicode("2️⃣"),
+        DiscordEmoji.FromUnicode("3️⃣"),
+        DiscordEmoji.FromUnicode("4️⃣"),
+        DiscordEmoji.FromUnicode("5️⃣"),
+        DiscordEmoji.FromUnicode("6️⃣"),
+        DiscordEmoji.FromUnicode("7️⃣"),
+        DiscordEmoji.FromUnicode("8️⃣"),
+        DiscordEmoji.FromUnicode("9️⃣"),
+        DiscordEmoji.FromUnicode("🔟")
     };
 
     /// <summary>

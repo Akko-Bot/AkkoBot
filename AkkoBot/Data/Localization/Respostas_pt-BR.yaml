@@ -171,6 +171,7 @@ cmd_alias_clear: Remove todos os atalhos de comando desse servidor. Se for execu
 cmd_alias_list: Exibe todos os atalhos de comando disponíveis nesse servidor. Se for executado em mensagem direta com o bot, exibe todos os atalhos de comand blobais.
 cmd_alias_remove: Remove um atalho de comando.
 cmd_antialt: 'Ativa o filtro anti-alt. Contas de usuário são consideradas como alt se forem criadas e entrarem no servidor dentro do intervalo de tempo especificado. Ações disponíveis: __AddRole__, __Mute__, __Kick__, __Ban__. Forneça nenhum parâmetro para desativar.'
+cmd_archivethreads: Arquiva todas as threads sob o canal especificado.
 cmd_autocommand: Agrupa comandos que gerenciam comandos automáticos.
 cmd_autocommand_addrepeated: Adiciona um comando automático que executa indefinidamente no intervalo especificado. Limitado a 5 por servidor.
 cmd_autocommand_addscheduled: Adiciona um comando automático que expira quando ativado. Limitado a 5 por servidor.
@@ -200,6 +201,7 @@ cmd_chatmute: Silencia um usuário, impedindo-o de escrever em canais de texto.
 cmd_chatunmute: Remove o silenciamento de um usuário, permitindo-o voltar a escrever em canais de texto.
 cmd_checkperms: Exibe as permissões de um cargo ou usuário no canal especificado. Forneça nenhum parâmetro para visualizar suas permissões no canal atual.
 cmd_clearstatus: Remove todos os status do bot.
+cmd_clearthreads: Exclui todas as threads sob o canal especificado.
 cmd_cogs: Agrupa comandos relacionados a cogs.
 cmd_cogs_info: Exibe informação sobre a cog especificada.
 cmd_cogs_list: Exibe todas as cogs atualmente carregadas.
