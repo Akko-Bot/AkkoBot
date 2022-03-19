@@ -54,9 +54,10 @@ jobs:
       with:
         dotnet-version: '6.x'
 
-    - name: Add DSharpPlus Nightly Repository
-      run: |
-       dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusNightly
+    # This NuGet feed has been discontinued - packages are now available at nuget.org
+    #- name: Add DSharpPlus Nightly Repository
+    #  run: |
+    #   dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusNightly
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
