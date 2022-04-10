@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
-	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	  <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
-	<!-- Enable Preview Features: remove this when .NET 7 releases -->
-	<EnablePreviewFeatures>True</EnablePreviewFeatures>
+	  <!-- Enable Preview Features: remove this when .NET 7 releases -->
+	  <EnablePreviewFeatures>True</EnablePreviewFeatures>
   </PropertyGroup>
 
   <ItemGroup>

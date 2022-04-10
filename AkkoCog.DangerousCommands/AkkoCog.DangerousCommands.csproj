@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
-	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	  <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
       
     <!-- Build Variables -->
     <CogName>DangerousCommands</CogName>

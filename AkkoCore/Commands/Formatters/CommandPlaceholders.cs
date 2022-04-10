@@ -79,7 +79,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
         ["user.joindate"] = (context) => context.Member?.JoinedAt.ToDiscordTimestamp(TimestampFormat.ShortDateTime),
         ["user.joindifference"] = (context) => context.Member.JoinedAt.Subtract(context.User.CreationTimestamp),
         ["user.badges"] = (context) => context.User.Flags,
-        //["user.locale"] = (context) => context.User.Locale,           // These only work if the bot has OAuth2, idk
+        //["user.locale"] = (context) => context.User.Locale,           // These only work if the bot has OAuth2
         //["user.2fa"] = (context) => context.User.MfaEnabled ?? false,
         ["user.hierarchy"] = (context) => context.Member?.Hierarchy,
         ["user.color"] = (context) => context.Member?.Color,
@@ -201,6 +201,8 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["remaining.text"] = (context, endMatchIndex) => context.RawArgumentString[(int)endMatchIndex..].Trim(),
 
+        ["hash"] = (context, parameter) => (parameter is not IReadOnlyList<string> arguments || arguments.Count is not 1) ? null : arguments[0].Trim().GetHashCode(),
+
         ["rng"] = (context, parameter) =>
         {
             // If array is the wrong length or contains invalid arguments, quit
@@ -217,14 +219,14 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["choose"] = (context, parameter) =>
         {
-            return (parameter is not IReadOnlyList<string> arguments || arguments.Count == 0)
+            return (parameter is not IReadOnlyList<string> arguments || arguments.Count is 0)
                 ? null
                 : arguments[Random.Shared.Next(0, arguments.Count)].Trim();
         },
 
         ["cmd.argument"] = (context, parameter) =>
         {
-            return (parameter is not IReadOnlyList<string> arguments || arguments.Count != 1
+            return (parameter is not IReadOnlyList<string> arguments || arguments.Count is not 1
             || !int.TryParse(arguments[0], out var index)
             || context.RawArguments.Count <= index)
                 ? null

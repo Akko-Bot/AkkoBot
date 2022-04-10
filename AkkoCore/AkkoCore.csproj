@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	<DebugType>embedded</DebugType>
-	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	  <DebugType>embedded</DebugType>
+	  <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
-	<!-- Enable NRT code analysis -->
+	  <!-- Enable NRT code analysis -->
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
 
