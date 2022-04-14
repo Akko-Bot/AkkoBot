@@ -1,5 +1,5 @@
 using AkkoCore.Config.Abstractions;
-using AkkoCore.Extensions;
+using Kotz.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;

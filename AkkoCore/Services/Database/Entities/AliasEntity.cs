@@ -1,7 +1,7 @@
 using AkkoCore.Common;
-using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Abstractions;
 using DSharpPlus.CommandsNext;
+using Kotz.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

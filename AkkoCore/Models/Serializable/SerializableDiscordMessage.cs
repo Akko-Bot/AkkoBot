@@ -2,6 +2,7 @@ using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
+using Kotz.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

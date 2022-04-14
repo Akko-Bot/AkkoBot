@@ -73,7 +73,7 @@ public sealed class UserPunishment : AkkoCommandModule
             .ToArray();
 
         var failed = 0;
-        if (toUnban.Length != 0)
+        if (toUnban.Length is not 0)
         {
             await context.TriggerTypingAsync();
 

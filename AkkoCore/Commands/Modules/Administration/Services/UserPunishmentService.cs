@@ -11,6 +11,7 @@ using AkkoCore.Services.Database.Queries;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;

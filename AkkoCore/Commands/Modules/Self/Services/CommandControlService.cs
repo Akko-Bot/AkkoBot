@@ -7,6 +7,7 @@ using AkkoCore.Services.Caching.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.DependencyInjection;
+using Kotz.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

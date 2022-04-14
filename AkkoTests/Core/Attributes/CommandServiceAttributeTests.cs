@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AkkoTests.Core.Attributes;
 
-public sealed class CommandServiceAttributeTest
+public sealed class CommandServiceAttributeTests
 {
     [Fact]
     internal void ServiceRegistrationTest()

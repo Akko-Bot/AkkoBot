@@ -1,7 +1,7 @@
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
-using AkkoCore.Extensions;
 using ConcurrentCollections;
+using Kotz.Extensions;
 using System;
 using System.Collections.Generic;
 using YamlDotNet.Serialization;

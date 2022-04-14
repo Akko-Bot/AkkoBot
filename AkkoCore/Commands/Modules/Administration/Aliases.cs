@@ -6,6 +6,7 @@ using AkkoCore.Models.Serializable;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Kotz.Extensions;
 using System.Linq;
 using System.Threading.Tasks;
 

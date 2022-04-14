@@ -20,6 +20,7 @@
     <PackageReference Include="DSharpPlus.Interactivity" Version="4.2.0-nightly-01099" />
     <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0-nightly-01099" />
     <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
+    <PackageReference Include="Kotz.Utilities" Version="1.1.2" />
     <PackageReference Include="linq2db.EntityFrameworkCore" Version="6.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />

@@ -1,8 +1,8 @@
 using AkkoCog.AntiPhishing.AntiPhishing.Models;
 using AkkoCore.Commands.Attributes;
 using AkkoCore.Config.Abstractions;
-using AkkoCore.Extensions;
 using AkkoCore.Services.Database.Enums;
+using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

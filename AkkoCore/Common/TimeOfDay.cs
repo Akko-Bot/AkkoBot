@@ -1,4 +1,4 @@
-﻿using AkkoCore.Extensions;
+﻿using Kotz.Extensions;
 using System;
 
 namespace AkkoCore.Common;

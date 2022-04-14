@@ -1,5 +1,5 @@
 ﻿using AkkoCore.Common;
-using AkkoCore.Extensions;
+using Kotz.Extensions;
 using DSharpPlus.Entities;
 
 namespace AkkoCore.Models.Serializable.EmbedParts;

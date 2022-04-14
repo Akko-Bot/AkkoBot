@@ -10,6 +10,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
+using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Kotz.Collections.Extensions;
 
 namespace AkkoCore.Commands.Modules.Utilities.Services;
 

@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
+using Kotz.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

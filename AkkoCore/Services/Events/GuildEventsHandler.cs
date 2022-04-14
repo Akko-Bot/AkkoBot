@@ -15,6 +15,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
+using Kotz.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;

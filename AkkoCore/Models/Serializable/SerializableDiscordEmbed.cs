@@ -4,6 +4,8 @@ using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using Kotz.Collections.Extensions;
+using Kotz.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

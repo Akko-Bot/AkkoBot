@@ -1,5 +1,5 @@
 ﻿using AkkoCore.Commands.Abstractions;
-using AkkoCore.Extensions;
+using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;

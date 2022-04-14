@@ -4,6 +4,7 @@ using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Kotz.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 

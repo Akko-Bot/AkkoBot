@@ -4,6 +4,7 @@ using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

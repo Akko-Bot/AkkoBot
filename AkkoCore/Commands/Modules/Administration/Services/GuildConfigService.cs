@@ -6,6 +6,7 @@ using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Queries;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus.Entities;
+using Kotz.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;

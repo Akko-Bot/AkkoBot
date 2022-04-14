@@ -1,7 +1,7 @@
-using AkkoCore.Common;
 using AkkoCore.Services.Timers.Abstractions;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Kotz.Collections;
 using System;
 using System.Collections.Concurrent;
 
@@ -16,7 +16,7 @@ public interface IAkkoCache : IDisposable
     /// Contains messages cached from a Discord guild.
     /// </summary>
     /// <remarks>The <see langword="ulong"/> is the ID of the guild. Messages are only cached if the guild is logging messages.</remarks>
-    ConcurrentDictionary<ulong, DynamicRingBuffer<DiscordMessage>> GuildMessageCache { get; }
+    ConcurrentDictionary<ulong, RingBuffer<DiscordMessage>> GuildMessageCache { get; }
 
     /// <summary>
     /// Contains commands that have been globally disabled.

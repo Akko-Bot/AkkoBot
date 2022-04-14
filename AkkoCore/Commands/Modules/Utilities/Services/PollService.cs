@@ -7,6 +7,7 @@ using AkkoCore.Services.Database.Entities;
 using AkkoCore.Services.Database.Enums;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
