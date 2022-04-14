@@ -53,7 +53,7 @@ public static class AkkoConstants
     /// <summary>
     /// Represents the terminator for any block of text that is too long to be sent.
     /// </summary>
-    public const string EllipsisTerminator = "[…]";
+    public const string EllipsisTerminator = "[ï¿½]";
 
     /// <summary>
     /// Represents the first part of a Discord guild invite link.
@@ -69,4 +69,14 @@ public static class AkkoConstants
     /// Represents the URL to the command list in the project's wiki.
     /// </summary>
     public const string CommandListUrl = "https://github.com/Akko-Bot/AkkoBot/wiki/Command-List";
+
+    /// <summary>
+    /// The name of the bot's author.
+    /// </summary>
+    public const string BotAuthor = "Kotz#7922";
+
+    /// <summary>
+    /// The current version of the bot.
+    /// </summary>
+    public const string BotVersion = "0.3.4-beta";
 }
