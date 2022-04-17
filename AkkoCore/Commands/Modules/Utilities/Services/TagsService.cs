@@ -135,7 +135,7 @@ public sealed class TagsService
         // Require bot ownership for global tags
         // Require user to be the tag's author or a higher admin for guild tags
         if (dbTag is null || (context.Guild is null && !AkkoUtilities.IsOwner(context, context.User.Id))
-            || !(dbTag.AuthorId == context.User.Id || context.Member.Hierarchy is int.MaxValue || context.Member?.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageGuild)) is true))
+            || !(dbTag.AuthorId == context.User.Id || context.Member?.Hierarchy is int.MaxValue || context.Member?.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageGuild)) is true))
             return false;
 
         using var scope = _scopeFactory.GetRequiredScopedService<AkkoDbContext>(out var db);

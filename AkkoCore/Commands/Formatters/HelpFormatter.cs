@@ -154,7 +154,7 @@ internal sealed class HelpFormatter : IHelpFormatter
         // Set title and description
         _helpMessage
             .WithTitle(GetHelpHeader(cmd))
-            .WithDescription(cmd.Description);
+            .WithDescription(cmd.Description!);
 
         // Add requirements
         _commandHandler.GetActiveOverride(context.Guild?.Id, cmd, out var permOverride);
@@ -212,7 +212,7 @@ internal sealed class HelpFormatter : IHelpFormatter
             .WithFooter(
                 context.FormatLocalized(
                     "help_footer",
-                    context.Prefix + context.Command.QualifiedName + " " + context.RawArgumentString +
+                    context.Prefix + context.Command!.QualifiedName + " " + context.RawArgumentString +
                     " <" + context.FormatLocalized("name").ToLowerInvariant() + ">"
                 )
                 .Replace("  ", " ")
@@ -346,7 +346,7 @@ internal sealed class HelpFormatter : IHelpFormatter
     /// <returns>A collection of parameters where each array represents a valid command overload.</returns>
     private IEnumerable<ParameterInfo[]> GetOverloads(Command cmd)
     {
-        return cmd.Module.ModuleType.GetMethods()
+        return cmd.Module!.ModuleType.GetMethods()
             .Where(
                 method => method.CustomAttributes.Any(
                     attribute => (attribute.ConstructorArguments.FirstOrDefault().Value as string)

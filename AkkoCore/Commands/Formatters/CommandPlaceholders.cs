@@ -78,7 +78,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
         ["user.avatar"] = (context) => context.User.AvatarUrl,
         ["user.creationdate"] = (context) => context.User.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime),
         ["user.joindate"] = (context) => context.Member?.JoinedAt.ToDiscordTimestamp(TimestampFormat.ShortDateTime),
-        ["user.joindifference"] = (context) => context.Member.JoinedAt.Subtract(context.User.CreationTimestamp),
+        ["user.joindifference"] = (context) => context.Member?.JoinedAt.Subtract(context.User.CreationTimestamp),
         ["user.badges"] = (context) => context.User.Flags,
         //["user.locale"] = (context) => context.User.Locale,           // These only work if the bot has OAuth2
         //["user.2fa"] = (context) => context.User.MfaEnabled ?? false,
@@ -105,11 +105,11 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         /* Ban Template Placeholders - Only works on ban templates */
 
-        ["ban.mod"] = (context) => !context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase) ? null : context.User.GetFullname(),
+        ["ban.mod"] = (context) => !context.Command!.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase) ? null : context.User.GetFullname(),
 
         ["ban.user"] = (context) =>
         {
-            if (!context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase))
+            if (!context.Command!.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase))
                 return null;
 
             // This will break if DiscordMember is not the first argument
@@ -123,7 +123,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["ban.reason"] = (context) =>
         {
-            if (!context.Command.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase))
+            if (!context.Command!.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase))
                 return null;
 
             var cmdArguments = new List<CommandArgument>(context.Overload.Arguments);

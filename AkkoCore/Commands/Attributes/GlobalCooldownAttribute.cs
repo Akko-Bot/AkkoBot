@@ -21,15 +21,15 @@ public sealed class GlobalCooldownAttribute : CheckBaseAttribute
     {
         var cmdCooldown = context.Services.GetRequiredService<ICommandCooldown>();
 
-        if (!cmdCooldown.ContainsCommand(context.Command, context.Guild))
+        if (!cmdCooldown.ContainsCommand(context.Command!, context.Guild))
         {
             // Command has no cooldown
             return Task.FromResult(true);
         }
-        else if (!cmdCooldown.IsOnCooldown(context.Command, context.User, context.Guild))
+        else if (!cmdCooldown.IsOnCooldown(context.Command!, context.User, context.Guild))
         {
             // Command has a cooldown but is not active for this user
-            cmdCooldown.AddUser(context.Command, context.User);
+            cmdCooldown.AddUser(context.Command!, context.User);
             return Task.FromResult(true);
         }
         else

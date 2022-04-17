@@ -146,7 +146,7 @@ public sealed class WarningCommands : AkkoCommandModule
     [Description("cmd_infractions")]
     public async Task InfractionsAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser? user = default)
     {
-        if (!context.Member.PermissionsIn(context.Channel).HasFlag(Permissions.KickMembers) && user is not null)
+        if (!context.Member!.PermissionsIn(context.Channel).HasFlag(Permissions.KickMembers) && user is not null)
             return;
 
         user ??= context.User;

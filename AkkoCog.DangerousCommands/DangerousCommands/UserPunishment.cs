@@ -45,7 +45,7 @@ public sealed class UserPunishment : AkkoCommandModule
         var fails = 0;
         foreach (var userId in nonBanned)
         {
-            try { await _service.BanUserAsync(context, userId, 1, context.Member.GetFullname() + " | " + massbanString); }
+            try { await _service.BanUserAsync(context, userId, 1, context.Member!.GetFullname() + " | " + massbanString); }
             catch { fails += 1; }
 
             // Safety delay
@@ -79,7 +79,7 @@ public sealed class UserPunishment : AkkoCommandModule
 
             foreach (var userId in toUnban)
             {
-                try { await context.Guild.UnbanMemberAsync(userId, $"{context.Member.GetFullname()} | {context.FormatLocalized("massunban")}"); }
+                try { await context.Guild.UnbanMemberAsync(userId, $"{context.Member!.GetFullname()} | {context.FormatLocalized("massunban")}"); }
                 catch { failed += 1; }
 
                 await Task.Delay(AkkoStatics.SafetyDelay);

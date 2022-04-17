@@ -233,7 +233,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
         var embed = new SerializableDiscordEmbed()
             .WithDescription("fw_stickers_notification");
 
-        var fakeContext = cmdHandler.CreateContext(eventArgs.Message, null, null);
+        var fakeContext = cmdHandler.CreateContext(eventArgs.Message, null!, null);
 
         var notification = await fakeContext.RespondLocalizedAsync(embed, false, true, eventArgs.Author.Mention);
 
@@ -399,7 +399,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
     private bool IsDelOnCmdIgnoredContext(GuildConfigEntity dbGuild, CommandContext context)
     {
         return dbGuild.DelCmdBlacklist.Contains((long)context.User.Id) || dbGuild.DelCmdBlacklist.Contains((long)context.Channel.Id)
-            || dbGuild.DelCmdBlacklist.Any(x => context.Member.Roles.Select(x => (long)x.Id).Contains(x));
+            || dbGuild.DelCmdBlacklist.Any(x => context.Member!.Roles.Select(x => (long)x.Id).Contains(x));
     }
 
     /// <summary>
@@ -423,7 +423,7 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
     /// <param name="eventArgs">The event arguments.</param>
     private async Task SendFilterWordNotificationAsync(FilteredWordsEntity filteredWords, CommandsNextExtension cmdHandler, MessageCreateEventArgs eventArgs)
     {
-        var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null, null);
+        var dummyCtx = cmdHandler.CreateContext(eventArgs.Message, null!, null);
         var toWarn = eventArgs.Message.Author is DiscordMember member
             && filteredWords.Behavior.HasFlag(WordFilterBehavior.WarnOnDelete)
             && _roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, member);

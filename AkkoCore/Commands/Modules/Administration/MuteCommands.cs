@@ -221,7 +221,7 @@ public sealed class MuteCommands : AkkoCommandModule
         if (time > TimeSpan.FromDays(28)) // Discord doesn't allow timeouts longer than 4 weeks
             time = TimeSpan.FromDays(28);
 
-        await user.TimeoutAsync(time, $"{context.Member.GetFullname()} | {reason}");
+        await user.TimeoutAsync(time, $"{context.Member!.GetFullname()} | {reason}");
 
         var locale = context.GetMessageSettings().Locale;
         var embed = new SerializableDiscordEmbed()

@@ -146,7 +146,7 @@ public sealed class GuildConfig : AkkoCommandModule
             .WithDescription(
                 (success)
                     ? context.FormatLocalized("guild_locale_changed", Formatter.InlineCode(responseKey))
-                    : context.FormatLocalized("guild_locale_unavailable", Formatter.InlineCode(context.Prefix + context.Command.QualifiedName))
+                    : context.FormatLocalized("guild_locale_unavailable", Formatter.InlineCode(context.Prefix + context.Command!.QualifiedName))
             );
 
         await context.RespondLocalizedAsync(embed, isError: !success);
@@ -178,7 +178,7 @@ public sealed class GuildConfig : AkkoCommandModule
     {
         if (string.IsNullOrWhiteSpace(banTemplate))
         {
-            var message = await _punishService.SendBanDmAsync(context, context.Member, "reason");
+            var message = await _punishService.SendBanDmAsync(context, context.Member!, "reason");
             await context.Message.CreateReactionAsync((message is not null) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
 
             return;

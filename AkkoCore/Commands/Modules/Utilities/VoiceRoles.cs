@@ -28,7 +28,7 @@ public sealed class VoiceRoles : AkkoCommandModule
     [Description("cmd_voicerole_add")]
     public async Task AddVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel? channel = default)
     {
-        channel ??= context.Member.VoiceState?.Channel;
+        channel ??= context.Member!.VoiceState?.Channel;
         var success = channel?.Type is ChannelType.Voice && await _service.AddVoiceRoleAsync(context.Guild, channel, role);
 
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
@@ -38,7 +38,7 @@ public sealed class VoiceRoles : AkkoCommandModule
     [Description("cmd_voicerole_remove")]
     public async Task RemoveVoiceRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role, [Description("arg_discord_channel")] DiscordChannel? channel = default)
     {
-        channel ??= context.Member.VoiceState?.Channel;
+        channel ??= context.Member!.VoiceState?.Channel;
         var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel?.Id && x.RoleId == role.Id);
 
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
@@ -48,7 +48,7 @@ public sealed class VoiceRoles : AkkoCommandModule
     [Description("cmd_voicerole_removeall")]
     public async Task RemoveAllVoiceRolesAsync(CommandContext context, [Description("arg_discord_channel")] DiscordChannel? channel = default)
     {
-        channel ??= context.Member.VoiceState?.Channel;
+        channel ??= context.Member!.VoiceState?.Channel;
         var success = await _service.RemoveVoiceRoleAsync(context.Guild, x => x.ChannelId == channel?.Id);
 
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);

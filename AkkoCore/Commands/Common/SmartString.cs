@@ -222,6 +222,9 @@ public sealed class SmartString
     /// <returns>The processed <paramref name="contentBuilder"/>.</returns>
     private static StringBuilder SanitizeRoleMentions(CommandContext context, StringBuilder contentBuilder, Regex roleRegex)
     {
+        if (context.Member is null)
+            return contentBuilder;
+
         var matches = roleRegex.Matches(contentBuilder.ToString());
         var canMentionAll = context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.MentionEveryone);
 
@@ -232,7 +235,7 @@ public sealed class SmartString
             contentBuilder.Replace("@here", Formatter.InlineCode("@here"));
         }
 
-        if (context.Guild is null || matches.Count == 0)
+        if (matches.Count is 0)
             return contentBuilder;
 
         if (context.Services.GetRequiredService<IDbCache>().Guilds[context.Guild.Id].Behavior.HasFlag(GuildConfigBehavior.PermissiveRoleMention))

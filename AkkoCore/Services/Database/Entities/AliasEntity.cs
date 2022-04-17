@@ -81,6 +81,6 @@ public class AliasEntity : DbEntity
     /// <param name="cmdHandler">The command handler.</param>
     /// <param name="arguments">Arguments of the command. <see cref="string.Empty"/> if there are none, <see langword="null"/> if the command is not found.</param>
     /// <returns>The command mapped to this alias.</returns>
-    public Command GetCommand(CommandsNextExtension cmdHandler, out string arguments)
+    public Command? GetCommand(CommandsNextExtension cmdHandler, out string? arguments)
         => cmdHandler.FindCommand(Command + " " + Arguments, out arguments);
 }

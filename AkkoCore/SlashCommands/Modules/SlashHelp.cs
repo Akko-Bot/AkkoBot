@@ -30,7 +30,7 @@ public sealed class SlashHelp : AkkoSlashCommandModule
     {
         var cmdHandler = context.Client.GetCommandsNext();
         var cmd = cmdHandler.FindCommand(command, out var args)
-            ?? cmdHandler.FindCommand("help", out args);
+            ?? cmdHandler.FindCommand("help", out args)!;
 
         using var scope = context.Services.GetRequiredScopedService<IHelpFormatter>(out var helpBuilder);
         var settings = context.GetMessageSettings();

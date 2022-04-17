@@ -163,7 +163,7 @@ public sealed class PollService
         await RemovePollAsync(message);
         await closedPoll.DeleteAllReactionsAsync();
 
-        return await context.RespondAsync(closedPoll.Content, (result.Embed is null) ? null : closedPoll.Embeds[0]);
+        return await context.RespondAsync(closedPoll.Content, (result.Embed is null) ? null! : closedPoll.Embeds[0]);
     }
 
     /// <summary>

@@ -119,7 +119,7 @@ public sealed class ModroleCommands : AkkoCommandModule
     [RequireBotPermissions(Permissions.ManageRoles)]
     public async Task SetTargetRoleAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_discord_role")] DiscordRole role)
     {
-        var success = await _service.AddTargetRoleAsync(context.Guild, context.Member, user, role);
+        var success = await _service.AddTargetRoleAsync(context.Guild, context.Member!, user, role);
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
     }
 
@@ -128,7 +128,7 @@ public sealed class ModroleCommands : AkkoCommandModule
     [RequireBotPermissions(Permissions.ManageRoles)]
     public async Task UnsetTargetRoleAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember user, [Description("arg_discord_role")] DiscordRole role)
     {
-        var success = await _service.RemoveTargetRoleAsync(context.Guild, context.Member, user, role);
+        var success = await _service.RemoveTargetRoleAsync(context.Guild, context.Member!, user, role);
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
     }
 

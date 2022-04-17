@@ -32,7 +32,7 @@ public sealed class Cooldown : AkkoCommandModule
         if (command.StartsWith(context.Prefix))
             command = command[context.Prefix.Length..];
 
-        var cmd = context.CommandsNext.FindCommand(command, out _);
+        var cmd = context.CommandsNext.FindCommand(command, out _)!;
         var success = (context.Guild is not null || AkkoUtilities.IsOwner(context, context.User.Id))
             && await _service.AddCommandCooldownAsync(cmd, time, context.Guild);
 

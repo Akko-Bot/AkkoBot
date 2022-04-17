@@ -56,7 +56,7 @@ public sealed class ReminderService
 
         // Limit of 20 reminders per user, 3 reminders per guild if user doesn't have permission to manage messages
         if (userReminders.Length >= 20
-            || (context.Guild is not null && userReminders.Count(sid => sid == context.Guild.Id) >= 3 && !context.Member.PermissionsIn(channel).HasPermission(Permissions.ManageMessages)))
+            || (context.Guild is not null && userReminders.Count(sid => sid == context.Guild.Id) >= 3 && !context.Member!.PermissionsIn(channel).HasPermission(Permissions.ManageMessages)))
             return false;
 
         var newTimer = new TimerEntity()

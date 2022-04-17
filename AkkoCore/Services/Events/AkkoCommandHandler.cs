@@ -111,8 +111,8 @@ internal sealed class AkkoCommandHandler : ICommandHandler
 
     public Task? CheckAndExecuteAsync(CommandContext context)
     {
-        return (GetActiveOverride(context.Guild?.Id, context.Command, out var permOverride) && IsAllowedOverridenContext(context, permOverride!))
-            ? Task.Run(async () => await context.Command.ExecuteAndLogAsync(context))           // Execute command with overriden permissions.
+        return (GetActiveOverride(context.Guild?.Id, context.Command!, out var permOverride) && IsAllowedOverridenContext(context, permOverride!))
+            ? Task.Run(async () => await context.Command!.ExecuteAndLogAsync(context))           // Execute command with overriden permissions.
             : (permOverride is null || !permOverride.IsActive)
                 ? Task.Run(async () => await context.CommandsNext.ExecuteCommandAsync(context)) // Execute command with default permissions. This method automatically performs the command checks.
                 : null;                                                                         // Command with overriden permission that failed to execute
@@ -147,6 +147,6 @@ internal sealed class AkkoCommandHandler : ICommandHandler
             && (context.Member is null || permOverride.Permissions is Permissions.None || context.Member.PermissionsIn(context.Channel).HasOneFlag(permOverride.Permissions))
             && (permOverride.AllowedUserIds.Count is 0 || permOverride.AllowedUserIds.Contains((long)context.User.Id))
             && (permOverride.AllowedChannelIds.Count is 0 || permOverride.AllowedChannelIds.Contains((long)context.Channel.Id))
-            && context.Command.ExecutionChecks.All(x => IsContextValid(x, context));
+            && context.Command!.ExecutionChecks.All(x => IsContextValid(x, context));
     }
 }

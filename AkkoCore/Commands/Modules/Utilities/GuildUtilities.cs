@@ -86,7 +86,7 @@ public sealed class GuildUtilities : AkkoCommandModule
     [Command("serverinfo"), HiddenOverload]
     public async Task ServerInfoAsync(CommandContext context, DiscordGuild server)
     {
-        if (!AkkoUtilities.IsOwner(context, context.Member.Id) || server.Channels.Count == 0)
+        if (!AkkoUtilities.IsOwner(context, context.Member!.Id) || server.Channels.Count == 0)
             return;
 
         await context.RespondLocalizedAsync(_service.GetServerInfo(context, server), false);
@@ -107,7 +107,7 @@ public sealed class GuildUtilities : AkkoCommandModule
     [Description("cmd_userinfo")]
     public async Task UserInfoAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember? user = default)
     {
-        user ??= context.Member;
+        user ??= context.Member!;
         var isMod = user.Hierarchy is int.MaxValue || user.Roles.Any(role => role.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers | Permissions.BanMembers));
 
         var embed = new SerializableDiscordEmbed()
@@ -229,7 +229,7 @@ public sealed class GuildUtilities : AkkoCommandModule
         [Description("arg_discord_user")] DiscordMember? user = default)
     {
         channel ??= context.Channel;
-        user ??= context.Member;
+        user ??= context.Member!;
 
         var (allowedPermsCol, deniedPermsCol) = GetLocalizedPermissions(context, user.PermissionsIn(channel), channel.Type);
         var allowedPerms = string.Join("\n", allowedPermsCol);

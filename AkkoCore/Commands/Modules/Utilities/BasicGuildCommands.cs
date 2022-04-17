@@ -22,7 +22,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
     [Description("cmd_userid")]
     public async Task UserIdAsync(CommandContext context, [Description("arg_discord_user")] DiscordMember? user = default)
     {
-        user ??= context.Member;
+        user ??= context.Member!;
 
         var embed = new SerializableDiscordEmbed()
             .WithDescription(context.FormatLocalized("xid", "user", Formatter.Bold(user.GetFullname()), Formatter.InlineCode(user.Id.ToString())));
@@ -76,7 +76,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         }
 
         var success = role.Position < context.Guild.CurrentMember.Hierarchy
-            && role.Position < context.Member.Hierarchy
+            && role.Position < context.Member!.Hierarchy
             && context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.ManageRoles)
             && context.Guild.CurrentMember.PermissionsIn(context.Channel).HasPermission(Permissions.ManageRoles);
 
@@ -100,7 +100,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         [RemainingText, Description("arg_nickname")] string nickname = "")
     {
         user ??= context.Guild.CurrentMember;
-        var success = context.Guild.CurrentMember.Hierarchy >= user.Hierarchy && context.Member.Hierarchy > user.Hierarchy;
+        var success = context.Guild.CurrentMember.Hierarchy >= user.Hierarchy && context.Member!.Hierarchy > user.Hierarchy;
 
         if (success)
             await user.ModifyAsync(x => x.Nickname = nickname.MaxLength(AkkoConstants.MaxUsernameLength));
@@ -357,7 +357,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         {
             var success = user.VoiceState is not null
                 && channel?.Type is null or ChannelType.Voice
-                && context.Member.Hierarchy > user.Hierarchy;
+                && context.Member!.Hierarchy > user.Hierarchy;
 
             if (success)
                 await user.ModifyAsync(x => x.VoiceChannel = channel);
@@ -384,7 +384,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         [Description("cmd_deleterole")]
         public async Task DeleteRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
-            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
                 await role.DeleteAsync();
@@ -396,7 +396,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         public async Task DeleteRoleAsync(CommandContext context, [RemainingText] string name)
         {
             var role = context.Guild.Roles.Values.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            var success = role is not null && CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = role is not null && CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
                 await role!.DeleteAsync();
@@ -408,7 +408,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         [Description("cmd_recreaterole")]
         public async Task RecreateRoleAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
-            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
             {
@@ -427,7 +427,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
             [Description("arg_discord_role")] DiscordRole role,
             [RemainingText, Description("arg_role_newname")] string newName)
         {
-            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
                 await role.ModifyAsync(x => x.Name = newName);
@@ -439,7 +439,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         [Description("cmd_rolehoist")]
         public async Task RoleHoistAsync(CommandContext context, [Description("arg_discord_role")] DiscordRole role)
         {
-            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
                 await role.ModifyAsync(x => x.Hoist = !role.IsHoisted);
@@ -452,7 +452,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         public async Task RemoveAllRolesAsync(CommandContext context)
         {
             var roles = context.Guild.Roles.Values
-                .Where(role => CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role) && !role.Name.Equals("@everyone"))
+                .Where(role => CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role) && !role.Name.Equals("@everyone"))
                 .ToArray();
 
             if (roles.Length is 0)
@@ -501,7 +501,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_discord_role")] DiscordRole role)
         {
-            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
                 await user.GrantRoleAsync(role);
@@ -515,7 +515,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
             [Description("arg_discord_user")] DiscordMember user,
             [Description("arg_discord_role")] DiscordRole role)
         {
-            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member, role);
+            var success = CheckRoleHierarchy(context.Guild.CurrentMember, context.Member!, role);
 
             if (success)
                 await user.RevokeRoleAsync(role);

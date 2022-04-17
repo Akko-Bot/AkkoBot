@@ -54,7 +54,7 @@ public sealed class CommandControlService
     public async Task<bool> DisableGlobalCommandAsync(Command cmd)
     {
         // Don't let user disable gcmd
-        if (cmd.Module.ModuleType.Name.Equals("GlobalCommandControl") || !_akkoCache.DisabledCommandCache.TryAdd(cmd.QualifiedName, cmd))
+        if (cmd.Module!.ModuleType.Name.Equals("GlobalCommandControl") || !_akkoCache.DisabledCommandCache.TryAdd(cmd.QualifiedName, cmd))
             return false;
 
         var result = _botConfig.DisabledCommands.Add(cmd.QualifiedName);

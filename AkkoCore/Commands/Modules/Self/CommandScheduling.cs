@@ -33,7 +33,7 @@ public sealed class CommandScheduling : AkkoCommandModule
         if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
             command = command[context.Prefix.Length..];
 
-        var cmd = context.CommandsNext.FindCommand(command, out var args);
+        var cmd = context.CommandsNext.FindCommand(command, out var args)!;
         var success = !(await cmd.RunChecksAsync(context, false)).Any()
             && await _service.AddAutoCommandAsync(context, time, AutoCommandType.Scheduled, cmd, args);
 
@@ -48,7 +48,7 @@ public sealed class CommandScheduling : AkkoCommandModule
         if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
             command = command[context.Prefix.Length..];
 
-        var cmd = context.CommandsNext.FindCommand(command, out var args);
+        var cmd = context.CommandsNext.FindCommand(command, out var args)!;
         var success = !(await cmd.RunChecksAsync(context, false)).Any()
             && await _service.AddAutoCommandAsync(context, time, AutoCommandType.Repeated, cmd, args);
 
@@ -63,9 +63,9 @@ public sealed class CommandScheduling : AkkoCommandModule
         if (command.StartsWith(context.Prefix, StringComparison.InvariantCultureIgnoreCase))
             command = command[context.Prefix.Length..];
 
-        var cmd = context.CommandsNext.FindCommand(command, out var args);
+        var cmd = context.CommandsNext.FindCommand(command, out var args)!;
         var success = !(await cmd.RunChecksAsync(context, false)).Any()
-            && await _service.AddStartupCommandAsync(context, cmd, args);
+            && await _service.AddStartupCommandAsync(context, cmd, args!);
 
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);
     }

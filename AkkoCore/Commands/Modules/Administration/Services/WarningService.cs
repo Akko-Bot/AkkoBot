@@ -65,7 +65,7 @@ public sealed class WarningService
         {
             GuildIdFK = context.Guild.Id,
             UserIdFK = user.Id,
-            AuthorId = context.Member.Id,
+            AuthorId = context.Member!.Id,
             Type = type,
             WarningText = note
         };

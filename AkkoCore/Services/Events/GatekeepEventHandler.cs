@@ -54,7 +54,7 @@ internal sealed class GatekeepEventHandler : IGatekeepEventHandler
             return;
 
         var cmdHandler = client.GetCommandsNext();
-        var context = cmdHandler.CreateFakeContext(eventArgs.Member, eventArgs.Guild.GetDefaultChannel(), string.Empty, _botConfig.Prefix, null);
+        var context = cmdHandler.CreateFakeContext(eventArgs.Member, eventArgs.Guild.GetDefaultChannel(), string.Empty, _botConfig.Prefix, null!);
         var action = gatekeeper.AntiAltPunishType switch
         {
             PunishmentType.Mute => _antiAltActions.MuteAltAsync(context, eventArgs.Member, (await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id, _botConfig)).MuteRoleId ?? default),
@@ -111,7 +111,7 @@ internal sealed class GatekeepEventHandler : IGatekeepEventHandler
 
         channel ??= eventArgs.Guild.GetDefaultChannel();
         var cmdHandler = client.GetCommandsNext();
-        var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
+        var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null!);
         var parsedString = new SmartString(fakeContext, gatekeeper.GreetMessage);
 
         var response = (_utilitiesService.DeserializeMessage(parsedString, out var message))
@@ -132,7 +132,7 @@ internal sealed class GatekeepEventHandler : IGatekeepEventHandler
 
         var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
         var cmdHandler = client.GetCommandsNext();
-        var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null);
+        var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.GreetMessage, dbGuild.Prefix, null!);
 
         _ = SendGatekeepMessageAsync(
             fakeContext, eventArgs.Member, channel, gatekeeper.GreetDeleteTime,
@@ -156,7 +156,7 @@ internal sealed class GatekeepEventHandler : IGatekeepEventHandler
         var dbGuild = await _dbCache.GetDbGuildAsync(eventArgs.Guild.Id);
 
         var cmdHandler = client.GetCommandsNext();
-        var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.FarewellMessage, dbGuild.Prefix, null);
+        var fakeContext = cmdHandler.CreateFakeContext(eventArgs.Member, channel, gatekeeper.FarewellMessage, dbGuild.Prefix, null!);
 
         _ = SendGatekeepMessageAsync(
             fakeContext, eventArgs.Member, channel, gatekeeper.FarewellDeleteTime,

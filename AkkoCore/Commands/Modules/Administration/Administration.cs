@@ -73,7 +73,7 @@ public sealed class Administration : AkkoCommandModule
     [Description("cmd_guild_prefix")]
     public async Task ChangePrefixAsync(CommandContext context, [RemainingText, Description("arg_prefix")] string? newPrefix = default)
     {
-        if (context.Guild is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.ManageGuild))
+        if (context.Member is null || string.IsNullOrWhiteSpace(newPrefix) || !context.Member.PermissionsIn(context.Channel).HasPermission(Permissions.ManageGuild))
         {
             await CheckPrefixAsync(context);
             return;

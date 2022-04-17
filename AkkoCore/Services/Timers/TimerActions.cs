@@ -214,7 +214,7 @@ internal sealed class TimerActions : ITimerActions
                 channel,
                 dbReminder.Content,
                 (dbReminder.IsPrivate) ? _botConfig.Prefix : dbGuild!.Prefix,
-                null
+                null!
             );
 
             var message = new SmartString(fakeContext, dbReminder.Content, true);
@@ -260,8 +260,8 @@ internal sealed class TimerActions : ITimerActions
 
         try
         {
-            var cmd = cmdHandler.FindCommand(dbCmd!.CommandString, out var args);
-            var user = FindMember(dbCmd.AuthorId, server);
+            var cmd = cmdHandler.FindCommand(dbCmd!.CommandString, out var args)!;
+            var user = FindMember(dbCmd.AuthorId, server)!;
 
             var fakeContext = cmdHandler.CreateFakeContext(
                 user,
@@ -315,14 +315,14 @@ internal sealed class TimerActions : ITimerActions
         try
         {
             var dbGuild = await _dbCache.GetDbGuildAsync(dbRepeater!.GuildIdFK);
-            var user = FindMember(dbRepeater.AuthorId, server);
+            var user = FindMember(dbRepeater.AuthorId, server)!;
             var channel = server.GetChannel(dbRepeater.ChannelId);
 
             if (!HasPermissionTo(server.CurrentMember, channel, Permissions.SendMessages))
                 return;
 
             var lastMessage = await channel.GetLatestMessageAsync(client);
-            var fakeContext = cmdHandler.CreateFakeContext(user, channel, dbRepeater.Content, dbGuild.Prefix, null);
+            var fakeContext = cmdHandler.CreateFakeContext(user, channel, dbRepeater.Content, dbGuild.Prefix, null!);
 
             var message = new SmartString(fakeContext, dbRepeater.Content);
             var wasDeserialized = _utilitiesService.DeserializeMessage(message, out var dmsg);

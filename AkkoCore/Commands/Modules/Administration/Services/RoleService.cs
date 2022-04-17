@@ -59,7 +59,7 @@ public sealed class RoleService
     /// <param name="errorMessage">The error message to be sent if the check fails.</param>
     /// <returns><see langword="true"/> if the context user is higher than the target user, <see langword="false"/> otherwise.</returns>
     public async Task<bool> SoftCheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
-        => context.Member.Hierarchy >= user.Hierarchy || await CheckHierarchyAsync(context, user, errorMessage);
+        => context.Member!.Hierarchy >= user.Hierarchy || await CheckHierarchyAsync(context, user, errorMessage);
 
     /// <summary>
     /// Checks if the <paramref name="context"/> user can perform actions on the specified <paramref name="user"/> and sends an error message if the check fails.
@@ -70,7 +70,7 @@ public sealed class RoleService
     /// <returns><see langword="true"/> if the context user is above in the hierarchy, <see langword="false"/> otherwise.</returns>
     public async Task<bool> CheckHierarchyAsync(CommandContext context, DiscordMember user, string errorMessage)
     {
-        if (!CheckHierarchy(context.Member, user))
+        if (!CheckHierarchy(context.Member!, user))
         {
             var embed = new SerializableDiscordEmbed()
                 .WithDescription(errorMessage);

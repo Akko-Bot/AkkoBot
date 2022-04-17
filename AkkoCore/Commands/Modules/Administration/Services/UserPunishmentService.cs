@@ -255,7 +255,7 @@ public sealed class UserPunishmentService
             time = TimeSpan.FromMinutes(1);
 
         // Ban the user
-        await context.Guild.BanMemberAsync(userId, time.Days, context.Member.GetFullname() + " | " + reason);
+        await context.Guild.BanMemberAsync(userId, time.Days, context.Member!.GetFullname() + " | " + reason);
 
         // Create the new database entry
         var dbTimer = new TimerEntity()

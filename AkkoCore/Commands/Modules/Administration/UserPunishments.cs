@@ -41,7 +41,7 @@ public sealed class UserPunishment : AkkoCommandModule
         var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "kick_notification", reason);
 
         // Kick the user
-        await _punishService.KickUserAsync(context, user, $"{context.Member.GetFullname()} | {reason}");
+        await _punishService.KickUserAsync(context, user, $"{context.Member!.GetFullname()} | {reason}");
 
         // Send kick message to the context channel
         var embed = _punishService.GetPunishEmbed(context, user, string.Empty, "kick_title");
@@ -76,7 +76,7 @@ public sealed class UserPunishment : AkkoCommandModule
         var dmMsg = await _punishService.SendPunishmentDmAsync(context, user, "sban_notification", reason);
 
         // Softban the user
-        await _punishService.SoftbanUserAsync(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+        await _punishService.SoftbanUserAsync(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member!.GetFullname() + " | " + reason);
 
         // Send soft-ban message to the context channel
         var embed = _punishService.GetPunishEmbed(context, user, ":biohazard:", "sban_title");
@@ -110,7 +110,7 @@ public sealed class UserPunishment : AkkoCommandModule
         var dmMsg = await _punishService.SendBanDmAsync(context, user, reason);
 
         // Ban the user
-        await _punishService.BanUserAsync(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member.GetFullname() + " | " + reason);
+        await _punishService.BanUserAsync(context, user, (int)Math.Round(time?.TotalDays ?? 1), context.Member!.GetFullname() + " | " + reason);
 
         // Send ban message to the context channel
         var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "ban_title");
@@ -126,7 +126,7 @@ public sealed class UserPunishment : AkkoCommandModule
     public async Task HackBanAsync(CommandContext context, DiscordUser user, [RemainingText] string? reason = default)
     {
         // Ban the user - Don't register any occurrency
-        await context.Guild.BanMemberAsync(user.Id, 1, context.Member.GetFullname() + " | " + reason);
+        await context.Guild.BanMemberAsync(user.Id, 1, context.Member!.GetFullname() + " | " + reason);
 
         // Send ban message to the context channel
         var embed = _punishService.GetPunishEmbed(context, user, ":no_entry:", "hackban_title");

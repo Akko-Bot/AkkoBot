@@ -132,7 +132,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
     /// <returns>A fake command context.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private CommandContext GetFakeContext(CommandsNextExtension cmdHandler, DiscordUser user, DiscordChannel channel)
-        => cmdHandler.CreateFakeContext(user, channel, string.Empty, string.Empty, null);
+        => cmdHandler.CreateFakeContext(user, channel, string.Empty, string.Empty, null!);
 
     /// <summary>
     /// Checks if the current context is valid.

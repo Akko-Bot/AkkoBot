@@ -73,7 +73,7 @@ public sealed class Reminders : AkkoCommandModule
         [RemainingText, Description("arg_remind_message")] string message)
     {
         var success = context.Guild is not null
-            && context.Member.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageMessages))
+            && context.Member!.Roles.Any(x => x.Permissions.HasPermission(Permissions.ManageMessages))
             && await _service.AddReminderAsync(context, channel, time, false, message);
 
         await context.Message.CreateReactionAsync((success) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji);

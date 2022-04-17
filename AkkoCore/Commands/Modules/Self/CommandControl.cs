@@ -50,7 +50,7 @@ public sealed class CommandControl : AkkoCommandModule
     public async Task GlobalModuleToggleAsync(CommandContext context, [Description("arg_module")] string module)
     {
         var cmds = context.CommandsNext.RegisteredCommands.Values
-            .Where(x => x.Module.ModuleType.FullName?.Contains(module, StringComparison.InvariantCultureIgnoreCase) is true)
+            .Where(x => x.Module!.ModuleType.FullName?.Contains(module, StringComparison.InvariantCultureIgnoreCase) is true)
             .ToArray();
 
         var success = (cmds.Length is not 0)

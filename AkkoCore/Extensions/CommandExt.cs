@@ -32,7 +32,7 @@ public static class CommandExt
     /// <returns>A list of attributes with the requirements.</returns>
     public static IEnumerable<CustomAttributeData> GetRequirements(this Command command)
     {
-        return command.Module.ModuleType.GetMethods()
+        return command.Module!.ModuleType.GetMethods()
             .Where(
                 method => method.CustomAttributes.Any(
                     attribute => (attribute.ConstructorArguments.FirstOrDefault().Value as string)
@@ -58,7 +58,7 @@ public static class CommandExt
     private static IEnumerable<CustomAttributeData> GetCommandAttributeTree(Command command)
     {
         return (command.Parent is null)
-            ? command.Module.ModuleType.CustomAttributes
-            : command.Parent.Module.ModuleType.CustomAttributes.Concat(GetCommandAttributeTree(command.Parent));
+            ? command.Module!.ModuleType.CustomAttributes
+            : command.Parent.Module!.ModuleType.CustomAttributes.Concat(GetCommandAttributeTree(command.Parent));
     }
 }

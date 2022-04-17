@@ -47,8 +47,8 @@ public sealed class HelpService
     public SerializableDiscordEmbed GetAllModules(IMessageSettings settings, CommandsNextExtension cmdHandler, string thisCmdQualifiedName)
     {
         var namespaces = cmdHandler.RegisteredCommands.Values
-            .Where(cmd => !cmd.IsHidden && !cmd.Module.ModuleType.FullName!.Contains("DSharpPlus"))                                             // Remove library modules
-            .Select(cmd => cmd.Module.ModuleType.Namespace?[(cmd.Module.ModuleType.Namespace.LastOccurrenceOf('.', 0) + 1)..] ?? "Undefined")   // Get the module name
+            .Where(cmd => !cmd.IsHidden && !cmd.Module!.ModuleType.FullName!.Contains("DSharpPlus"))                                             // Remove library modules
+            .Select(cmd => cmd.Module!.ModuleType.Namespace?[(cmd.Module.ModuleType.Namespace.LastOccurrenceOf('.', 0) + 1)..] ?? "Undefined")   // Get the module name
             .Distinct()                                                                                                                         // Remove the repeated modules
             .OrderBy(x => x);
 
@@ -78,7 +78,7 @@ public sealed class HelpService
     public async Task<SerializableDiscordEmbed> GetAllModuleCommandsAsync(IMessageSettings settings, CommandsNextExtension cmdHandler, DiscordUser user, DiscordChannel channel, string moduleName)
     {
         var cmdGroup = await cmdHandler.RegisteredCommands.Values
-            .Where(cmd => !cmd.IsHidden && cmd.Module.ModuleType.Namespace?.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase) is true)
+            .Where(cmd => !cmd.IsHidden && cmd.Module!.ModuleType.Namespace?.Contains(moduleName, StringComparison.InvariantCultureIgnoreCase) is true)
             .Distinct()
             .OrderBy(x => x.Name)
             .Select(async cmd =>
@@ -154,7 +154,7 @@ public sealed class HelpService
         foreach (var cmd in cmds.Chunk(AkkoConstants.LinesPerPage))
         {
             embed.AddField("command", string.Join("\n", cmd.Select(x => settings.Prefix + x.QualifiedName)), true);
-            embed.AddField("description", string.Join("\n", cmd.Select(x => _localizer.FormatLocalized(settings.Locale, x.Description).MaxLength(47, AkkoConstants.EllipsisTerminator))), true);
+            embed.AddField("description", string.Join("\n", cmd.Select(x => _localizer.FormatLocalized(settings.Locale, x.Description!).MaxLength(47, AkkoConstants.EllipsisTerminator))), true);
         }
 
         return embed;

@@ -49,7 +49,7 @@ public sealed class Help : AkkoCommandModule
     [RequireBotPermissions(Permissions.SendMessages | Permissions.SendMessagesInThreads)]
     public async Task ModulesAsync(CommandContext context)
     {
-        var embed = _service.GetAllModules(context.GetMessageSettings(), context.CommandsNext, context.Command.QualifiedName);
+        var embed = _service.GetAllModules(context.GetMessageSettings(), context.CommandsNext, context.Command!.QualifiedName);
         await context.RespondLocalizedAsync(embed, false);
     }
 
