@@ -28,6 +28,14 @@ public sealed class SlashHelp : AkkoSlashCommandModule
     [SlashCommand("help", "Gets help on how to use a command.")]
     public async Task SlashHelpCommandAsync(InteractionContext context, [RemainingText, Option("command", "The command to get help for.")] string command = "")
     {
+        if (context.Guild is null)
+        {
+            var error = new SerializableDiscordMessage(AkkoStatics.FailureEmoji.ToString());
+            await context.RespondLocalizedAsync(error, isError: true);
+
+            return;
+        }
+
         var cmdHandler = context.Client.GetCommandsNext();
         var cmd = cmdHandler.FindCommand(command, out var args)
             ?? cmdHandler.FindCommand("help", out args)!;
