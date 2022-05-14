@@ -66,7 +66,7 @@ public sealed class Reminders : AkkoCommandModule
 
     [GroupCommand, Command("channel")]
     [Description("cmd_remind_channel")]
-    [RequireUserPermissions(Permissions.ManageMessages)] // Shows up on !help, but doesn't perform the check
+    [RequireUserPermissions(Permissions.ManageMessages)]
     public async Task AddChannelReminderAsync(CommandContext context,
         [Description("arg_discord_channel")] DiscordChannel channel,
         [Description("arg_remind_time")] TimeSpan time,

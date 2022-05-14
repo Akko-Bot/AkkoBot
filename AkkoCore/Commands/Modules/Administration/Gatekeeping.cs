@@ -12,7 +12,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Kotz.Extensions;
 using System;
 using System.Threading.Tasks;
 

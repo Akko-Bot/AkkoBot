@@ -173,7 +173,6 @@ public sealed class GuildConfig : AkkoCommandModule
     [Command("bantemplate")]
     [Description("cmd_bantemplate")]
     [RequireUserPermissions(Permissions.BanMembers)]
-    [RequireBotPermissions(Permissions.AddReactions)]
     public async Task SetBanTemplateAsync(CommandContext context, [RemainingText, Description("arg_bantemplate")] string banTemplate = "")
     {
         if (string.IsNullOrWhiteSpace(banTemplate))

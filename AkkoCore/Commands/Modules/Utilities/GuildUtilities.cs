@@ -24,7 +24,7 @@ namespace AkkoCore.Commands.Modules.Utilities;
 [RequireGuild]
 public sealed class GuildUtilities : AkkoCommandModule
 {
-    private readonly Permissions _voicePerms = Permissions.UseVoice | Permissions.UseVoiceDetection | Permissions.Speak | Permissions.MuteMembers
+    private const Permissions _voicePerms = Permissions.UseVoice | Permissions.UseVoiceDetection | Permissions.Speak | Permissions.MuteMembers
         | Permissions.PrioritySpeaker | Permissions.Stream | Permissions.DeafenMembers | Permissions.MoveMembers;
 
     private readonly UtilitiesService _service;

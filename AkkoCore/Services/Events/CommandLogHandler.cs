@@ -2,6 +2,7 @@
 using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Services.Events.Abstractions;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.SlashCommands;
@@ -30,10 +31,19 @@ internal sealed class CommandLogHandler : ICommandLogHandler
     {
         if (eventArgs.Exception
             is ArgumentException            // Ignore commands with invalid arguments and subcommands that do not exist
-            or ChecksFailedException        // Ignore command check fails
             or CommandNotFoundException     // Ignore commands that do not exist
             or InvalidOperationException)   // Ignore groups that are not commands themselves
             return Task.CompletedTask;
+
+        eventArgs.Handled = true;
+
+        if (eventArgs.Exception is ChecksFailedException ex)
+        {
+            if (ex.Context.Member is null || ex.Context.Member.PermissionsIn(ex.Context.Channel).HasFlag(Permissions.AddReactions))
+                ex.Context.Message.CreateReactionAsync(AkkoStatics.FailureEmoji);
+
+            return Task.CompletedTask;
+        }
 
         //Log common errors
         cmdHandler.Client.Logger.LogCommand(
@@ -42,8 +52,6 @@ internal sealed class CommandLogHandler : ICommandLogHandler
             string.Empty,
             eventArgs.Exception
         );
-
-        eventArgs.Handled = true;
 
         return Task.CompletedTask;
     }

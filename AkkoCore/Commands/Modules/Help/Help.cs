@@ -46,7 +46,6 @@ public sealed class Help : AkkoCommandModule
 
     [Command("module"), Aliases("modules", "cmds")]
     [Description("cmd_modules")]
-    [RequireBotPermissions(Permissions.SendMessages | Permissions.SendMessagesInThreads)]
     public async Task ModulesAsync(CommandContext context)
     {
         var embed = _service.GetAllModules(context.GetMessageSettings(), context.CommandsNext, context.Command!.QualifiedName);
