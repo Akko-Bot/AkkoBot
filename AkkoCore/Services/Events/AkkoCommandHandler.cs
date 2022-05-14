@@ -40,6 +40,9 @@ internal sealed class AkkoCommandHandler : ICommandHandler
 
     public async Task HandleCommandAsync(DiscordClient client, MessageCreateEventArgs eventArgs)
     {
+        if (eventArgs.Author.IsBot)
+            return;
+
         var cmdHandler = client.GetCommandsNext();
         var prefixPos = await _prefixResolver.ResolvePrefixAsync(eventArgs.Message).ConfigureAwait(false);
 
@@ -65,7 +68,7 @@ internal sealed class AkkoCommandHandler : ICommandHandler
             & _dbCache.Aliases.TryGetValue(default, out var globalAliases);
 
         // If message is from a bot or there aren't any global or server aliases, quit.
-        if (eventArgs.Author.IsBot && !aliasExists)
+        if (eventArgs.Author.IsBot || !aliasExists)
             return Task.CompletedTask;
 
         // Get the context prefix

@@ -397,7 +397,7 @@ cmd_rolecolor: Sets the color of a role. Provide no color to see the current col
 cmd_rolehoist: Toggles the display of the specified role on the sidebar.
 cmd_roleid: Shows the ID of the specified role.
 cmd_rotatestatus: Toggles the rotation of the statuses in the rotation list.
-cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Providing no parameter to sanitize the original nickname.
+cmd_sanitizedname: Sets the nickname to be assigned to users who have special characters at the beginning of their name. Provide no parameter to sanitize to the default nickname.
 cmd_sanitizenames: Toggles whether nicknames should have special characters removed from the beginning.
 cmd_savechat: Saves the last messages sent in a text channel to a file. Bot messages are ignored. Users with no bot ownership are limited to 100 messages. Provide no parameters to save the last 100 messages from the current channel.
 cmd_say: Sends a message to the specified channel. If the channel is omitted, the message is sent to the current channel. It accepts `.txt` attachments for messages that are too long to type on Discord.

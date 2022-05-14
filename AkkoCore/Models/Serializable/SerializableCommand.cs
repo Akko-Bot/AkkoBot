@@ -5,6 +5,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Kotz.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -57,7 +58,7 @@ public record SerializableCommand
 
         Subcommands = (command is CommandGroup group)
             ? GetSubcommands(localizer, group, locale)
-            : new List<SerializableCommand>(0);
+            : Array.Empty<SerializableCommand>();
     }
 
     /// <summary>
@@ -68,7 +69,7 @@ public record SerializableCommand
     /// <param name="locale">The locale to get the strings for.</param>
     /// <returns>The list of serializable commands.</returns>
     private IReadOnlyList<SerializableCommand> GetSubcommands(ILocalizer localizer, CommandGroup command, string locale)
-        => command.Children.Select(x => new SerializableCommand(localizer, x, locale)).ToList();
+        => command.Children.Select(x => new SerializableCommand(localizer, x, locale)).ToArray();
 
     /// <summary>
     /// Gets the required permissions of the command.
