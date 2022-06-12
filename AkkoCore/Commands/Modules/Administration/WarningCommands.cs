@@ -13,6 +13,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -158,11 +159,10 @@ public sealed class WarningCommands : AkkoCommandModule
 
         foreach (var (modName, infraction) in infractions)
         {
-            var position = "#" + Formatter.InlineCode(infraction.Id.ToString());
+            var position = "#" + Formatter.InlineCode(infraction.Id.ToString(CultureInfo.InvariantCulture));
             var fieldName = context.FormatLocalized(
                 "infractions_field",
-                $"{position} {infraction.DateAdded.Date.ToShortDateString()}",
-                infraction.DateAdded.ToString(@"HH:mm"),
+                $"{position} {infraction.DateAdded.ToDiscordTimestamp(TimestampFormat.ShortDateTime)}",
                 modName
             );
 
@@ -198,11 +198,10 @@ public sealed class WarningCommands : AkkoCommandModule
         foreach (var (modName, infraction) in infractions.OrderBy(x => x.Item2.Type))
         {
             var emote = (infraction.Type is WarnType.Notice) ? _pencil : _warning;
-            var position = "#" + Formatter.InlineCode(infraction.Id.ToString());
+            var position = "#" + Formatter.InlineCode(infraction.Id.ToString(CultureInfo.InvariantCulture));
             var fieldName = context.FormatLocalized(
                 "infractions_field",
-                $"{emote} {position} {infraction.DateAdded.Date.ToShortDateString()}",
-                infraction.DateAdded.ToString(@"HH:mm"),
+                $"{emote} {position} {infraction.DateAdded.ToDiscordTimestamp(TimestampFormat.ShortDateTime)}",
                 modName.ToString()
             );
 
@@ -282,7 +281,7 @@ public sealed class WarningCommands : AkkoCommandModule
             )
         );
 
-        var interval = string.Join("\n", punishments.Select(x => x.Interval?.ToString(@"%d\d\ %h\h\ %m\m") ?? "-"));
+        var interval = string.Join("\n", punishments.Select(x => x.Interval?.ToString(@"%d\d\ %h\h\ %m\m", CultureInfo.InvariantCulture) ?? "-"));
 
         embed.AddField("warnpl_amount", amount, true)
             .AddField("warnpl_punish", punish, true)

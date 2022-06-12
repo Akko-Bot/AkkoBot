@@ -44,7 +44,7 @@ public sealed class GuildLogService
     /// <summary>
     /// Contains the flags of all groups of guild logs.
     /// </summary>
-    public static GuildLogType[] GuildLogTypeGroups { get; } = new[]
+    public static IReadOnlyList<GuildLogType> GuildLogTypeGroups { get; } = new GuildLogType[]
     {
         GuildLogType.None,
         GuildLogType.All,
@@ -82,7 +82,7 @@ public sealed class GuildLogService
     /// <exception cref="ArgumentException">Occurs when the channel type is invalid.</exception>
     public async Task<bool> StartLogAsync(CommandContext context, DiscordChannel channel, GuildLogType logType, string? name = default, Stream? avatar = default)
     {
-        if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.Store)
+        if (channel.Type is not ChannelType.Text and not ChannelType.News and not ChannelType.NewsThread and not ChannelType.PrivateThread and not ChannelType.PublicThread)
             throw new ArgumentException("Logs can only be output to text channels.", nameof(channel));
         else if (logType.HasOneFlag(ForbiddenTypes) || GuildLogTypeGroups.Contains(logType))
             return false;

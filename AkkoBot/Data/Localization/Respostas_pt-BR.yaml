@@ -592,7 +592,7 @@ image: Imagem
 info: Info
 infraction: Infração
 infractions_empty: Esse usuário não possui infrações.
-infractions_field: '{0} às {1} por {2}'
+infractions_field: '{0} por {1}'
 infractions_title: Infrações do {0}
 inrole_title: Lista de usuários com o cargo {0}
 inrole_title_no_role: Lista de usuários sem cargo

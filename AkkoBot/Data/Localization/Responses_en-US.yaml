@@ -592,7 +592,7 @@ image: Image
 info: Info
 infraction: Infraction
 infractions_empty: There are no infractions to show.
-infractions_field: '{0} at {1} by {2}'
+infractions_field: '{0} by {1}'
 infractions_title: Infractions for {0}
 inrole_title: List of users with {0} role
 inrole_title_no_role: List of users with no role

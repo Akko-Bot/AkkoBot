@@ -93,7 +93,7 @@ public sealed class UtilitiesService
     /// <returns>A <see langword="string"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
     public async Task<string?> GetOnlineStringAsync(string url, CancellationToken cToken = default)
     {
-        var httpClient = _httpClientFactory.CreateClient();
+        using var httpClient = _httpClientFactory.CreateClient();
 
         try { return await httpClient.GetStringAsync(url, cToken); }
         catch { return default; }
@@ -107,7 +107,7 @@ public sealed class UtilitiesService
     /// <returns>A <see cref="Stream"/> of the requested URL, <see langword="null"/> if the request fails.</returns>
     public async Task<Stream?> GetOnlineStreamAsync(string url, CancellationToken cToken = default)
     {
-        var httpClient = _httpClientFactory.CreateClient();
+        using var httpClient = _httpClientFactory.CreateClient();
 
         // Stream needs to be seekable.
         // HttpClient.GetStreamAsync() returns a non-seekable stream.
