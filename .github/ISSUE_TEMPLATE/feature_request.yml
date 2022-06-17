@@ -2,7 +2,7 @@
 name: "Bug Report"
 description: Suggest an idea for this project.
 labels: ["enhancement"]
-fields:
+body:
 - type: "textarea"
   attributes:
     label: "Is your feature request related to a problem?"
