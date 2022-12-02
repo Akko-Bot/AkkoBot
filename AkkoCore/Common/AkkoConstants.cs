@@ -78,5 +78,5 @@ public static class AkkoConstants
     /// <summary>
     /// The current version of the bot.
     /// </summary>
-    public const string BotVersion = "0.3.5-beta";
+    public const string BotVersion = "0.4.0-beta";
 }

@@ -98,7 +98,7 @@ public sealed class BotCoreBuilder
             builder.AddProvider(logProvider)
                 .AddFilter((category, level) =>
                     (category.EqualsAny(DbLoggerCategory.Database.Command.Name, "LinqToDB") && level is LogLevel.Information)   // Add database queries
-                    || category.Equals(typeof(BaseDiscordClient).FullName, StringComparison.Ordinal)                            // Add DiscordClient event logs
+                    || category?.Equals(typeof(BaseDiscordClient).FullName, StringComparison.Ordinal) is true                   // Add DiscordClient event logs
                 )
         );
 

@@ -1,10 +1,24 @@
 using AkkoCore.Extensions;
+using System;
 using Xunit;
 
 namespace AkkoTests.Core.Extensions;
 
 public sealed class StringExtTests
 {
+    [Theory]
+    [InlineData("hello", "hello", StringComparison.Ordinal, true)]
+    [InlineData("hello", "hel", StringComparison.Ordinal, true)]
+    [InlineData("", "", StringComparison.Ordinal, true)]
+    [InlineData("hello", "HEllo", StringComparison.OrdinalIgnoreCase, true)]
+    [InlineData("hello", "HEl", StringComparison.OrdinalIgnoreCase, true)]
+    [InlineData("hello", "hEl", StringComparison.Ordinal, true)]
+    [InlineData("hello", "h", StringComparison.Ordinal, true)]
+    [InlineData("hello", null, StringComparison.Ordinal, false)]
+    [InlineData("hello", "HEllo", StringComparison.Ordinal, false)]
+    internal void EqualsOrStartsWithTest(string caller, string calle, StringComparison comparisonType, bool result)
+        => Assert.Equal(result, caller.EqualsOrStartsWith(calle, comparisonType));
+
     [Theory]
     [InlineData("test.yaml", "test")]
     [InlineData("test", "test")]

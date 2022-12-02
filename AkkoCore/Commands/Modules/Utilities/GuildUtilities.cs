@@ -310,7 +310,7 @@ public sealed class GuildUtilities : AkkoCommandModule
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(log));
         var message = new DiscordMessageBuilder()
-            .WithFile($"savechat_{channel.Name}_{DateTimeOffset.Now}.txt", stream);
+            .AddFile($"savechat_{channel.Name}_{DateTimeOffset.Now}.txt", stream);
 
         await context.Channel.SendMessageAsync(message);
     }

@@ -39,7 +39,7 @@ public static class InteractionContextExt
     public static Task RespondLocalizedAsync(this InteractionContext context, SerializableDiscordMessage message, bool isEphemeral = true, bool isError = false)
     {
         var localizedMessage = AkkoUtilities.GetLocalizedMessage(context.Services, message, context.Guild?.Id, isError);
-        var response = new DiscordInteractionResponseBuilder(localizedMessage) { IsEphemeral = isEphemeral };
+        var response = new DiscordInteractionResponseBuilder(localizedMessage.Build()) { IsEphemeral = isEphemeral };
 
         return context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, response);
     }

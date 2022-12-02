@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using Kotz.Extensions;
 
@@ -5,6 +6,16 @@ namespace AkkoCore.Extensions;
 
 public static class StringExt
 {
+    /// <summary>
+    /// Checks if this string is equal or starts with the first character specified in <paramref name="target"/>.
+    /// </summary>
+    /// <param name="msg">This string.</param>
+    /// <param name="target">The string to compare with.</param>
+    /// <param name="comparisonType">The type of string comparison to be used.</param>
+    /// <returns><see langword="true"/> if it matches, <see langword="false"/> otherwise.</returns>
+    public static bool EqualsOrStartsWith(this string msg, string target, StringComparison comparisonType = StringComparison.Ordinal)
+        => target is not null && (msg.AsSpan().Equals(target, comparisonType) || msg.AsSpan().StartsWith(target.AsSpan()[..1], comparisonType));
+
     /// <summary>
     /// Removes the file extension of this string, if there is one.
     /// </summary>

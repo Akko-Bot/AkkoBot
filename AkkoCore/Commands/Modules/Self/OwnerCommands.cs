@@ -142,7 +142,7 @@ public sealed class OwnerCommands : AkkoCommandModule
 
         var message = new DiscordMessageBuilder()
             .WithContent(context.FormatLocalized("exportcommands_description", Formatter.Bold(result.Count.ToString())))
-            .WithFile($"commands.{((isJson) ? "json" : "yaml")}", stream);
+            .AddFile($"commands.{((isJson) ? "json" : "yaml")}", stream);
 
         await context.Channel.SendMessageAsync(message);
     }

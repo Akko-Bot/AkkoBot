@@ -31,7 +31,7 @@ public sealed class DefaultLogger : AkkoLogger
         if (!IsEnabled(logLevel))
             return;
 
-        lock (lockObject) // Static protected member, inherited from AkkoLogger
+        lock (LockObject) // Static protected member, inherited from AkkoLogger
         {
             base.ChangeConsoleTextColor(logLevel);
 

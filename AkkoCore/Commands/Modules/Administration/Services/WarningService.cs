@@ -374,7 +374,7 @@ public sealed class WarningService
         var timers = await db.Timers
             .Include(x => x.WarnRel)
             .Where(x => x.GuildIdFK == dbGuild.GuildId && x.Type == TimerType.TimedWarn)
-            .Select(x => new TimerEntity(x) { WarnRel = new() { DateAdded = x.WarnRel.DateAdded } })
+            .Select(x => new TimerEntity(x) { WarnRel = new() { DateAdded = x.WarnRel!.DateAdded } })
             .ToArrayAsyncEF();
 
         foreach (var timer in timers)

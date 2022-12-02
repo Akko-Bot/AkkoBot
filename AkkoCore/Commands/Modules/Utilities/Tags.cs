@@ -208,7 +208,7 @@ public sealed class Tags : AkkoCommandModule
     public async Task ExportTagsAsync(CommandContext context, [RemainingText, Description("arg_tag_ids")] params int[] tagIds)
     {
         using var tags = _service.GetTags(context.Guild?.Id)
-            .If(_ => tagIds.Length is not 0, x => x.Where(y => tagIds.Contains(y.Id)))
+            .When(_ => tagIds.Length is not 0, x => x.Where(y => tagIds.Contains(y.Id)))
             .Select(x => new SerializableTagEntity(x))
             .ToRentedArray();
 
@@ -222,7 +222,7 @@ public sealed class Tags : AkkoCommandModule
 
         var message = new DiscordMessageBuilder()
             .WithContent(context.FormatLocalized("tag_export_content", tags.Count))
-            .WithFile($"{context.Guild?.Name ?? "global"}_tags.yaml", fileStream);
+            .AddFile($"{context.Guild?.Name ?? "global"}_tags.yaml", fileStream);
 
         await context.Channel.SendMessageAsync(message);
     }

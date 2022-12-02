@@ -1,4 +1,4 @@
-﻿using AkkoCore.Config.Models;
+using AkkoCore.Config.Models;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -18,7 +18,7 @@ public abstract class AkkoLogger : ILogger
     /// <summary>
     /// Dummy object used for locking purposes.
     /// </summary>
-    protected static readonly object lockObject = new();
+    protected static object LockObject { get; } = new();
 
     /// <summary>
     /// Updates the internal configuration of this logger.
@@ -37,7 +37,7 @@ public abstract class AkkoLogger : ILogger
     /// <typeparam name="TState">The type of scope.</typeparam>
     /// <param name="state">The metadata to be passed to the logger.</param>
     /// <returns>A disposable object or <see langword="null"/> if the logger doesn't support this operation.</returns>
-    public virtual IDisposable BeginScope<TState>(TState state)
+    public virtual IDisposable BeginScope<TState>(TState state) where TState : notnull
         => default!;
 
     /// <summary>

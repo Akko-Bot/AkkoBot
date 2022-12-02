@@ -217,6 +217,6 @@ public sealed class GuildLogging : AkkoCommandModule
     {
         return logType.ToValues()
             .Where(x => x is not GuildLogType.None and not GuildLogType.All)
-            .If(x => x.Count() > 1, x => x.Where(x => x != logType));
+            .When(x => x.Count() > 1, x => x.Where(x => x != logType));
     }
 }

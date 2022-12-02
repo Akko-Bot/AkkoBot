@@ -1,4 +1,4 @@
-﻿using AkkoCore.Common;
+using AkkoCore.Common;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable.EmbedParts;
 using AkkoCore.Services.Localization.Abstractions;
@@ -444,21 +444,23 @@ public class SerializableDiscordEmbed
     /// </summary>
     /// <param name="fields">A collection of embed fields.</param>
     /// <returns>The formatted content of all fields.</returns>
-    private static string ExtractInLineFields(IEnumerable<SerializableEmbedField> fields)
+    private static string ExtractInLineFields(IReadOnlyList<SerializableEmbedField> fields)
     {
         // Extract the content of the fields
         var result = new StringBuilder();
 
         // Get the names and values of the grouped fields
-        using var names = fields.Select(x => x.Title).ToRentedArray();
         var namesLengthCounter = 0;
+        var names = fields
+            .Select(x => x.Title)
+            .ToRentedArray();
 
         using var values = fields
             .Select(x => x.Text.Split(_newlines, StringSplitOptions.None))
-            .Fill(string.Empty)
+            .NestedFill(string.Empty)
             .Select(x =>
             {
-                var maxLength = Math.Max(x.MaxElementLength(), names[namesLengthCounter++].Length);
+                var maxLength = Math.Max(x.MaxElementLength(), names[namesLengthCounter++]?.Length ?? 0);
                 return x.Select(x => x.HardPad(maxLength + 2)).ToRentedArray();
             }).ToRentedArray();
 
@@ -505,6 +507,6 @@ public class SerializableDiscordEmbed
         foreach (var value in values)
             value.Dispose();
 
-        return result.ToString();
+        return result.ToStringAndClear();
     }
 }

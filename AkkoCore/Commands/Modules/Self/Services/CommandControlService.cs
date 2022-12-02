@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
 using AkkoCore.Config.Models;
@@ -126,7 +126,7 @@ public sealed class CommandControlService
     public async Task<bool> EnableGlobalCommandsAsync(string module)
     {
         var cmdHandlers = (await _clients.GetCommandsNextAsync()).Values;
-        var cmds = _akkoCache.DisabledCommandCache.Values.Where(x => x.Module.ModuleType.FullName.Contains(module, StringComparison.InvariantCultureIgnoreCase));
+        var cmds = _akkoCache.DisabledCommandCache.Values.Where(x => x.Module?.ModuleType.FullName?.Contains(module, StringComparison.InvariantCultureIgnoreCase) is true);
         var result = false;
 
         foreach (var cmd in cmds)

@@ -87,7 +87,7 @@ public sealed class DatabaseQueries : AkkoCommandModule
 
         var message = new DiscordMessageBuilder()
             .WithContent(context.FormatLocalized("sqlselect_title", time.ToString("0.00"), fields.FirstOrDefault()?.Text.Occurrences('\n') ?? 0))
-            .WithFile("query_result.txt", stream);
+            .AddFile("query_result.txt", stream);
 
         await context.Channel.SendMessageAsync(message);
     }

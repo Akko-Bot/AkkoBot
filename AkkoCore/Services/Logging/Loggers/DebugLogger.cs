@@ -35,7 +35,7 @@ public sealed class DebugLogger : AkkoLogger
         if (eventId == default) // For some reason, LinqToDB doesn't emit EventIds
             eventId = _eventId;
 
-        lock (lockObject) // Static protected member, inherited from AkkoLogger
+        lock (LockObject) // Static protected member, inherited from AkkoLogger
         {
             base.ChangeConsoleTextColor((logLevel is LogLevel.Information) ? LogLevel.Debug : logLevel);
 
