@@ -188,8 +188,6 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
         if (isDeleted && filteredWords.Behavior.HasOneFlag(WordFilterBehavior.NotifyOnDelete | WordFilterBehavior.WarnOnDelete))
             await SendFilterWordNotificationAsync(filteredWords, cmdHandler, eventArgs);
 
-        eventArgs.Handled = isDeleted;
-
         return isDeleted;
     }
 
@@ -204,7 +202,6 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
             || (eventArgs.Author as DiscordMember)?.Roles.Any(role => filteredWords.IgnoredIds.Contains((long)role.Id)) is true)
             return Task.FromResult(false);
 
-        eventArgs.Handled = true;
         eventArgs.Message.DeleteAsync();
 
         return Task.FromResult(true);
@@ -240,8 +237,6 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
         // Delete the notification message after some time
         _ = notification.DeleteWithDelayAsync(TimeSpan.FromSeconds(30));
 
-        eventArgs.Handled = true;
-
         return true;
     }
 
@@ -266,7 +261,6 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
             || (filter.ContentType.HasFlag(ContentFilter.Command) && client.GetCommandsNext().FindCommand(eventArgs.Message.Content[dbGuild.Prefix.Length..], out _) is not null))
             return Task.CompletedTask;
 
-        eventArgs.Handled = true;
         return eventArgs.Message.DeleteAsync();
     }
 
@@ -294,8 +288,6 @@ internal sealed class GuildEventsHandler : IGuildEventsHandler
         // Delete the vote, if it was cast in the server
         if (eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
             await eventArgs.Message.DeleteAsync();
-
-        eventArgs.Handled = true;
     }
 
     public async Task DeleteCommandOnMessageAsync(CommandsNextExtension _, CommandExecutionEventArgs eventArgs)

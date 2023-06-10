@@ -56,7 +56,6 @@ internal sealed class InteractionEventHandler : IInteractionEventHandler
             || !eventArgs.Id.EndsWith(_updateInteractionSuffix, StringComparison.Ordinal))
             return;
 
-        eventArgs.Handled = true;
         var response = await _responseGenerator.RequestAsync(eventArgs.Message, eventArgs.Id, eventArgs.Values).ConfigureAwait(false);
 
         if (response is not null && response.Components.Count is not 0)
@@ -94,8 +93,6 @@ internal sealed class InteractionEventHandler : IInteractionEventHandler
     /// <remarks>Regular messages are deleted, whereas ephemeral messages are stripped off their components.</remarks>
     private async Task TerminateInteractionAsync(ComponentInteractionCreateEventArgs eventArgs)
     {
-        eventArgs.Handled = true;
-
         if (!eventArgs.Message.Flags.HasValue || !eventArgs.Message.Flags.Value.HasMessageFlag(MessageFlags.Ephemeral))
         {
             await eventArgs.Message.DeleteAsync();

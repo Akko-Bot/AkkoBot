@@ -35,8 +35,6 @@ internal sealed class CommandLogHandler : ICommandLogHandler
             or InvalidOperationException)   // Ignore groups that are not commands themselves
             return Task.CompletedTask;
 
-        eventArgs.Handled = true;
-
         if (eventArgs.Exception is ChecksFailedException ex)
         {
             if (ex.Context.Member is null || ex.Context.Member.PermissionsIn(ex.Context.Channel).HasFlag(Permissions.AddReactions))
@@ -67,8 +65,6 @@ internal sealed class CommandLogHandler : ICommandLogHandler
             eventArgs.Context,
             "Command execution has been cancelled due to an active cooldown."
         );
-
-        eventArgs.Handled = true;
 
         // React with a cooldown emoji
         return eventArgs.Context.Message.CreateReactionAsync(AkkoStatics.CooldownEmoji);

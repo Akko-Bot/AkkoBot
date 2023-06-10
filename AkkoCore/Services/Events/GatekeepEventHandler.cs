@@ -64,9 +64,6 @@ internal sealed class GatekeepEventHandler : IGatekeepEventHandler
             _ => throw new NotImplementedException($"Punishment of type {gatekeeper.AntiAltPunishType} has not been implemented for alts."),
         };
 
-        if (gatekeeper.AntiAltPunishType is PunishmentType.Kick or PunishmentType.Ban)
-            eventArgs.Handled = true;
-
         await action;
     }
 

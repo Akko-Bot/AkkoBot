@@ -56,9 +56,7 @@ internal sealed class AkkoCommandHandler : ICommandHandler
 
         var context = cmdHandler.CreateContext(eventArgs.Message, eventArgs.Message.Content[..prefixPos], command, args);
 
-        eventArgs.Handled = CheckAndExecuteAsync(context) is not null;
-
-        if (eventArgs.Handled)
+        if (CheckAndExecuteAsync(context) is not null)
             CommandsRan++;
     }
 

@@ -1,6 +1,6 @@
 ﻿using AkkoCore.Core.Abstractions;
 using AkkoCore.Models.EventArgs;
-using Emzi0767.Utilities;
+using DSharpPlus.AsyncEvents;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -28,7 +28,7 @@ internal sealed record BotLifetime : IBotLifetime
     public BotLifetime(CancellationTokenSource cTokenSource)
     {
         _cTokenSource = cTokenSource;
-        _onShutdownEvent = new("SHUTDOWN", TimeSpan.FromSeconds(2), ExceptionHandler);
+        _onShutdownEvent = new("SHUTDOWN", ExceptionHandler);
     }
 
     public void Shutdown()
@@ -89,20 +89,9 @@ internal sealed record BotLifetime : IBotLifetime
         IBotLifetime sender,
         TArgs eventArgs) where TArgs : AsyncEventArgs
     {
-        if (ex is AsyncEventTimeoutException)
-        {
-            Console.WriteLine(
-                $"An event handler for {asyncEvent.Name} took too long to execute. " +
-                $"Defined as \"{handler.Method.ToString()?.Replace(handler.Method.ReturnType.ToString(), string.Empty).TrimStart()}\" " +
-                $"located in \"{handler.Method.DeclaringType}\"."
-            );
-        }
-        else
-        {
-            Console.WriteLine(
-                $"Event handler exception for event {asyncEvent.Name} thrown from {handler.Method} " +
-                $"(defined in {handler.Method.DeclaringType})"
-            );
-        }
+        Console.WriteLine(
+            $"Event handler exception for event {asyncEvent.Name} thrown from {handler.Method} " +
+            $"(defined in {handler.Method.DeclaringType})"
+        );
     }
 }

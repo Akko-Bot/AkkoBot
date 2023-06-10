@@ -184,8 +184,6 @@ internal sealed class TagEventHandler : ITagEventHandler
             await eventArgs.Message.DeleteAsync().ConfigureAwait(false);
 
         _ = UpdateLastDayUsedAsync(dbTag, _updateTime);
-
-        eventArgs.Handled = true;
     }
 
     /// <summary>
@@ -199,8 +197,6 @@ internal sealed class TagEventHandler : ITagEventHandler
         // Local function to send the reaction
         static Task SendReactionAsync(MessageCreateEventArgs eventArgs, DiscordEmoji emoji)
         {
-            eventArgs.Handled = true;
-
             return (eventArgs.Guild is null || eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.AddReactions))
                 ? eventArgs.Message.CreateReactionAsync(emoji)
                 : Task.CompletedTask;

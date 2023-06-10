@@ -39,8 +39,6 @@ internal sealed class GlobalEventsHandler : IGlobalEventsHandler
             || _dbCache.Blacklist.Contains(eventArgs.Channel.Id)
             || _dbCache.Blacklist.Contains(eventArgs.Guild?.Id ?? default))
         {
-            eventArgs.Handled = true;
-
             if (!(await _guildEventsHandler.FilterWordAsync(client, eventArgs) || await _guildEventsHandler.FilterInviteAsync(client, eventArgs) || await _guildEventsHandler.FilterStickerAsync(client, eventArgs)))
                 await _guildEventsHandler.FilterContentAsync(client, eventArgs);
         }

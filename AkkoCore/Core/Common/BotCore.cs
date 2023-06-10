@@ -74,14 +74,25 @@ public class BotCore : IDisposable
                 cmdHandler.RegisterCommands(cog);
         }
 
+        Console.WriteLine("Registering Slash Commands! " + SlashExt.Values.Count());
+
         foreach (var slashHandler in SlashExt.Values)
         {
+            System.Console.WriteLine("Inside the loop!");
+
             // Register all default slash commands, globally
             slashHandler.RegisterCommands(assembly);
+
+            slashHandler.RegisterCommands<SlashCommands.Modules.SlashAdministration>();
+
+            System.Console.WriteLine($"Commands registered from assembly {assembly.FullName}!");
 
             // Register all slash commands from cogs
             foreach (var cogSetup in cogSetups)
                 cogSetup.RegisterSlashCommands(slashHandler);
+
+            System.Console.WriteLine(slashHandler.RegisteredCommands.Count);
+            Console.WriteLine(string.Join('\n', slashHandler.RegisteredCommands.SelectMany(x => x.Value.Select(x => x.Name))));
         }
     }
 

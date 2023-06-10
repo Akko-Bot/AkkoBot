@@ -500,7 +500,6 @@ public sealed class BotCoreBuilder
         // Setup client interactivity
         var interactivityOptions = new InteractivityConfiguration()
         {
-            AckPaginationButtons = true,
             ResponseBehavior = InteractionResponseBehavior.Ignore,      // Sets whether interactive messages should ignore or respond to invalid input
             ButtonBehavior = ButtonPaginationBehavior.DeleteButtons,    // Sets what should happen to buttons when an interaction is done running.
             PaginationBehaviour = PaginationBehaviour.WrapAround,       // Sets whether paginated responses should wrap from first page to last page and vice-versa
