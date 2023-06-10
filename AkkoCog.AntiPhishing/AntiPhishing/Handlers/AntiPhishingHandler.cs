@@ -53,11 +53,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
             || !eventArgs.Guild.CurrentMember.PermissionsIn(eventArgs.Channel).HasPermission(Permissions.ManageMessages))
             return Task.CompletedTask;
 
-        _ = CheckAndPunishAsync(client, eventArgs.Message.Content, member, eventArgs.Channel, eventArgs.Guild, x =>
-        {
-            eventArgs.Handled = true;
-            return eventArgs.Message.DeleteAsync();
-        });
+        _ = CheckAndPunishAsync(client, eventArgs.Message.Content, member, eventArgs.Channel, eventArgs.Guild, x => eventArgs.Message.DeleteAsync());
 
         return Task.CompletedTask;
     }
@@ -69,8 +65,6 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
         _ = CheckAndPunishAsync(client, eventArgs.NicknameAfter ?? eventArgs.Member.DisplayName, eventArgs.Member, default, eventArgs.Guild, x =>
         {
-            eventArgs.Handled = true;
-
             return (_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member) && eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.ManageNicknames))
                 ? eventArgs.Member.ModifyAsync(x => x.Nickname = (string.IsNullOrWhiteSpace(eventArgs.NicknameAfter)) ? _shamefulNick : string.Empty)
                 : Task.CompletedTask;
@@ -86,8 +80,6 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
         _ = CheckAndPunishAsync(client, eventArgs.Member.Username, eventArgs.Member, default, eventArgs.Guild, x =>
         {
-            eventArgs.Handled = true;
-
             if (!_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member))
                 return Task.CompletedTask;
 
@@ -112,7 +104,6 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
         _ = CheckAndPunishAsync(client, customStatus, eventArgs.Member, default, eventArgs.Guild, x =>
         {
-            eventArgs.Handled = true;
             var fakeContext = GetFakeContext(client.GetCommandsNext(), eventArgs.Guild.CurrentMember, eventArgs.Guild.GetDefaultChannel());
 
             return (_roleService.CheckHierarchy(eventArgs.Guild.CurrentMember, eventArgs.Member) && eventArgs.Guild.CurrentMember.Permissions.HasFlag(Permissions.KickMembers))
