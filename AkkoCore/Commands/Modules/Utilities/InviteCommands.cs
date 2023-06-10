@@ -122,7 +122,7 @@ public sealed class InviteCommands : AkkoCommandModule
         {
             embed.WithTitle("invite_check_title")
                 .WithDescription(guildInvite.GetInviteLink())
-                .AddField("author", guildInvite.Inviter.GetFullname(), true)
+                .AddField("author", guildInvite.Inviter.Username, true)
                 .AddField("code", guildInvite.Code, true)
                 .AddField("created_on", guildInvite.CreatedAt.ToDiscordTimestamp(), true)
                 .AddField("channel", $"<#{guildInvite.Channel.Id}>", true)

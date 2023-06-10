@@ -280,7 +280,7 @@ public sealed class WarningService
                 (infraction, dbUser) => infraction.AuthorId == dbUser.UserId,   // Predicate
                 (infraction, dbUser) => new                                     // Selector
                 {
-                    User = new DiscordUserEntity() { UserId = dbUser.UserId, Username = dbUser.Username, Discriminator = dbUser.Discriminator },
+                    User = new DiscordUserEntity() { UserId = dbUser.UserId, Username = dbUser.Username },
                     Infraction = infraction
                 }
             )
@@ -289,7 +289,7 @@ public sealed class WarningService
             .ToArrayAsyncLinqToDB();
 
         return infractions
-            .Select(x => (infractions.Select(y => y.User).FirstOrDefault(y => y.UserId == x.Infraction.AuthorId)?.FullName ?? "Unknown", x.Infraction))
+            .Select(x => (infractions.Select(y => y.User).FirstOrDefault(y => y.UserId == x.Infraction.AuthorId)?.Username ?? "Unknown", x.Infraction))
             .ToArray();
     }
 
@@ -311,7 +311,7 @@ public sealed class WarningService
                 (infraction, dbUser) => infraction.AuthorId == dbUser.UserId,   // Predicate
                 (infraction, dbUser) => new                                     // Selector
                 {
-                    User = new DiscordUserEntity() { UserId = dbUser.UserId, Username = dbUser.Username, Discriminator = dbUser.Discriminator },
+                    User = new DiscordUserEntity() { UserId = dbUser.UserId, Username = dbUser.Username },
                     Infraction = infraction
                 }
             )
@@ -320,7 +320,7 @@ public sealed class WarningService
             .ToArrayAsyncLinqToDB();
 
         return infractions
-            .Select(x => (infractions.Select(y => y.User).FirstOrDefault(y => y.UserId == x.Infraction.AuthorId)?.FullName ?? "Unknown", x.Infraction))
+            .Select(x => (infractions.Select(y => y.User).FirstOrDefault(y => y.UserId == x.Infraction.AuthorId)?.Username ?? "Unknown", x.Infraction))
             .ToArray();
     }
 

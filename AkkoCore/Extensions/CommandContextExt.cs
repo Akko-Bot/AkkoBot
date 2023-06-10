@@ -99,7 +99,7 @@ public static class CommandContextExt
         var localizedMsg = AkkoUtilities.GetLocalizedMessage(context.Services, message, context.Guild?.Id, isError);
 
         if (isMarked && !string.IsNullOrWhiteSpace(localizedMsg.Embed?.Body?.Description))   // Marks the message with the full name of the user who ran the command
-            localizedMsg.Embed.Body.Description = localizedMsg.Embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
+            localizedMsg.Embed.Body.Description = localizedMsg.Embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.Username} "));
 
         return context.Channel.SendMessageAsync(localizedMsg.Build());
     }

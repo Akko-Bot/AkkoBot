@@ -36,7 +36,7 @@ public abstract class AkkoCommandModule : BaseCommandModule
             .Concat(await GetUnmentionedUsersAsync(context, dbCache))
             .Append(context.User)
             .Distinct()
-            .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))
+            .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.Username.Equals(x.Username, StringComparison.Ordinal))
             .ToArray();
 
         await userService.SaveUsersAsync(mentionedUsers);

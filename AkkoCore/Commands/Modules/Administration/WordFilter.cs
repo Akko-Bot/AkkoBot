@@ -205,7 +205,7 @@ public sealed class WordFilter : AkkoCommandModule
             var members = context.Guild.Members.Values
                 .Where(x => dbEntry!.IgnoredIds.Contains((long)x.Id))
                 .OrderBy(x => x.Username)
-                .Select(x => x.GetFullname());
+                .Select(x => x.Username);
 
             if (channels.Any())
                 embed.AddField("fw_ignored_channels", string.Join(", ", channels).MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator));

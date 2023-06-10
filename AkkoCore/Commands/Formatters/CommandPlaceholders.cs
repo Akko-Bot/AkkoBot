@@ -28,8 +28,6 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["bot.id"] = (context) => context.Client.CurrentUser.Id,
         ["bot.name"] = (context) => context.Client.CurrentUser.Username,
-        ["bot.discrim"] = (context) => context.Client.CurrentUser.Discriminator,
-        ["bot.fullname"] = (context) => context.Client.CurrentUser.GetFullname(),
         ["bot.mention"] = (context) => context.Client.CurrentUser.Mention,
         ["bot.creationdate"] = (context) => context.Client.CurrentUser.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime),
         ["bot.avatar"] = (context) => context.Client.CurrentUser.AvatarUrl,
@@ -75,8 +73,6 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         ["user.id"] = (context) => context.User.Id,
         ["user.name"] = (context) => context.User.Username,
-        ["user.discrim"] = (context) => context.User.Discriminator,
-        ["user.fullname"] = (context) => context.User.GetFullname(),
         ["user.nickname"] = (context) => context.Member?.DisplayName,
         ["user.mention"] = (context) => context.User.Mention,
         ["user.avatar"] = (context) => context.User.AvatarUrl,
@@ -109,7 +105,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
         /* Ban Template Placeholders - Only works on ban templates */
 
-        ["ban.mod"] = (context) => !context.Command!.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase) ? null : context.User.GetFullname(),
+        ["ban.mod"] = (context) => !context.Command!.Name.Equals("ban", StringComparison.InvariantCultureIgnoreCase) ? null : context.User.Username,
 
         ["ban.user"] = (context) =>
         {
@@ -122,7 +118,7 @@ public class CommandPlaceholders : IPlaceholderFormatter
 
             context.Guild.Members.TryGetValue(userId, out var user);
 
-            return user?.GetFullname();
+            return user?.Username;
         },
 
         ["ban.reason"] = (context) =>

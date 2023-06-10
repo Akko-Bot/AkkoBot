@@ -7,7 +7,7 @@ namespace AkkoCore.Services.Logging;
 /// <summary>
 /// Groups methods for formatting log messages.
 /// </summary>
-public static class LogStrategy
+public static class LogFormat
 {
     /// <summary>
     /// Gets a method for formatting a log message.
@@ -15,7 +15,7 @@ public static class LogStrategy
     /// <param name="strategyName">The name of the log format.</param>
     /// <remarks>Defaults to "Default".</remarks>
     /// <returns>The method to format the log.</returns>
-    public static Func<LogData, Exception?, string> GetLogStrategy(string strategyName)
+    public static Func<LogData, Exception?, string> GetLogFormat(string strategyName)
     {
         return strategyName?.ToLowerInvariant() switch
         {
@@ -78,7 +78,7 @@ public static class LogStrategy
         var message = (!logData.HasContext)
             ? logData.OptionalMessage
             : $"[Shard {logData.Client.ShardId}] {logData.OptionalMessage}\n\t" +
-                $"User: {logData.User.Username}#{logData.User.Discriminator} [{logData.User.Id}]\n\t" +
+                $"User: {logData.User.Username} [{logData.User.Id}]\n\t" +
                 $"Server: {logData.Guild?.Name ?? "Private"} {((logData.Guild is null) ? string.Empty : "[" + logData.Guild.Id + "]")}\n\t" +
                 $"Channel: #{logData.Channel.Name ?? "Private"} [{logData.Channel.Id}]\n\t" +
                 $"Message: {logData.Message}";
@@ -116,7 +116,7 @@ public static class LogStrategy
         var message = (!logData.HasContext)
             ? logData.OptionalMessage
             : $"[{logData.Client.ShardId}] {logData.OptionalMessage} | " +
-                $"{logData.User.Username}#{logData.User.Discriminator}: {logData.Message} " +
+                $"{logData.User.Username}: {logData.Message} " +
                 $"| {logData.Guild?.Name ?? "Private"} | #{logData.Channel.Name ?? "Private"}";
 
         // Add exception

@@ -34,7 +34,7 @@ public static class DiscordMessageExt
         embed.WithLocalization(localizer, settings.Locale, (isError) ? settings.ErrorColor : settings.OkColor);
 
         if (isMarked && !string.IsNullOrWhiteSpace(embed.Body?.Description))   // Marks the message with the full name of the user who ran the command
-            embed.Body.Description = embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.GetFullname()} "));
+            embed.Body.Description = embed.Body.Description.Insert(0, Formatter.Bold($"{context.User.Username} "));
 
         return (settings.UseEmbed)
             ? await msg.ModifyAsync(embed.BuildMessage())

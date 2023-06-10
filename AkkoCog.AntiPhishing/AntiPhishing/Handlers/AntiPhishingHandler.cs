@@ -211,7 +211,7 @@ internal sealed class AntiPhishingHandler : IAntiPhishingHandler
 
         if (_roleService.CheckHierarchy(server.CurrentMember, user))
         {
-            client.Logger.LogWarning(_eventLog, "Failed to apply an anti-phishing punishment because the bot doesn't have enough permission to act on user {User}.", user.GetFullname());
+            client.Logger.LogWarning(_eventLog, "Failed to apply an anti-phishing punishment because the bot doesn't have enough permission to act on user {User}.", user.Username);
             return default;
         }
 

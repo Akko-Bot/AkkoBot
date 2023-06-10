@@ -205,7 +205,7 @@ public sealed class BlacklistService
                 context.Client.Guilds.Values
                     .FirstOrDefault(x => x.Members.Values.Any(u => u.Id == id))
                     ?.Members.Values.FirstOrDefault(u => u.Id == id)
-                    ?.GetFullname(),
+                    ?.Username,
 
             BlacklistType.Channel =>
                 context.Client.Guilds.Values

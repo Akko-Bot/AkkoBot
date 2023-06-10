@@ -290,7 +290,7 @@ internal sealed class HelpFormatter : IHelpFormatter
                 context.FormatLocalized(
                     "**{0}**: {1}",
                     "users",
-                    string.Join(", ", _dbCache.Users.Values.Where(x => permOverride.AllowedUserIds.Contains((long)x.UserId)).Select(x => x.FullName))
+                    string.Join(", ", _dbCache.Users.Values.Where(x => permOverride.AllowedUserIds.Contains((long)x.UserId)).Select(x => x.Username))
                 )
             );
         }

@@ -36,7 +36,7 @@ public sealed class DefaultLogger : AkkoLogger
             base.ChangeConsoleTextColor(logLevel);
 
             // Add the header
-            var logBuilder = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
+            var logBuilder = new StringBuilder(LogFormat.GetHeader(eventId, _logFormat, _timeFormat));
             logBuilder.Append(formatter(state, exception));
 
             var log = logBuilder.ToString();

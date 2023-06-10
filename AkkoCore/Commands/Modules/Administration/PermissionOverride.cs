@@ -89,7 +89,7 @@ public sealed class PermissionOverride : AkkoCommandModule
 
         var result = await _service.SetPermissionOverrideAsync(context.Guild.Id, cmd, x => ToggleCollection(x, x.AllowedUserIds, (long)user.Id));
 
-        await SendToggleResponseAsync(context, (result) ? "override_user_add" : "override_user_remove", cmd.QualifiedName, user.GetFullname());
+        await SendToggleResponseAsync(context, (result) ? "override_user_add" : "override_user_remove", cmd.QualifiedName, user.Username);
     }
 
     [Command("user")]
@@ -106,7 +106,7 @@ public sealed class PermissionOverride : AkkoCommandModule
 
         var result = await _service.SetPermissionOverrideAsync(context.Guild?.Id, cmd, x => ToggleCollection(x, x.AllowedUserIds, (long)user.Id));
 
-        await SendToggleResponseAsync(context, (result) ? "override_user_add" : "override_user_remove", cmd.QualifiedName, user.GetFullname());
+        await SendToggleResponseAsync(context, (result) ? "override_user_add" : "override_user_remove", cmd.QualifiedName, user.Username);
     }
 
     [Command("role")]

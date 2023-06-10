@@ -204,7 +204,7 @@ public sealed class GuildLogService
         foreach (var message in messages!)
         {
             msgLog.AppendLine(
-                $"{message.Author.GetFullname()} ({message.Author.Id}) [{message.CreationTimestamp.LocalDateTime}]" + Environment.NewLine +
+                $"{message.Author.Username} ({message.Author.Id}) [{message.CreationTimestamp.LocalDateTime}]" + Environment.NewLine +
                 message.Content + ((string.IsNullOrWhiteSpace(message.Content)) ? string.Empty : Environment.NewLine) +
                 ((message.Attachments.Count is 0) ? string.Empty : string.Join(Environment.NewLine, message.Attachments.Select(x => x.Url)) + Environment.NewLine)
             );

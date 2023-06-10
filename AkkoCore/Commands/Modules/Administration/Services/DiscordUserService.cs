@@ -44,13 +44,12 @@ public sealed class DiscordUserService
         // Update old users
         foreach (var user in mentionedUsers)
         {
-            if (!_dbCache.Users.TryGetValue(user.Id, out var dbUser) || dbUser.FullName.Equals(user.GetFullname(), StringComparison.Ordinal))
+            if (!_dbCache.Users.TryGetValue(user.Id, out var dbUser) || dbUser.Username.Equals(user.Username, StringComparison.Ordinal))
                 continue;
 
             db.Upsert(dbUser);
 
             dbUser.Username = user.Username;
-            dbUser.Discriminator = user.Discriminator;
         }
 
         var updated = await db.SaveChangesAsync();

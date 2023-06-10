@@ -195,7 +195,7 @@ public sealed class UtilitiesService
             .WithTitle(server.Name)
             .WithThumbnail(server.IconUrl)
             .AddField("id", server.Id.ToString(), true)
-            .AddField("owner", server.Owner.GetFullname(), true)
+            .AddField("owner", server.Owner.Username, true)
             .AddField("members", server.MemberCount.ToString(), true)
             .AddField(
                 context.FormatLocalized("{0} ({1})", "channels", server.Channels.Count),

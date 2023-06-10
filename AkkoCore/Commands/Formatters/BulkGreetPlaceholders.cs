@@ -29,7 +29,7 @@ public sealed class BulkGreetPlaceholders : CommandPlaceholders
         base.placeholderActions["user.id"] = _ => string.Join(", ", Users.Select(x => x.Id));
         base.placeholderActions["user.name"] = _ => string.Join(", ", Users.Select(x => x.Username));
         base.placeholderActions["user.discrim"] = _ => null;
-        base.placeholderActions["user.fullname"] = _ => string.Join(", ", Users.Select(x => x.GetFullname()));
+        base.placeholderActions["user.fullname"] = _ => string.Join(", ", Users.Select(x => x.Username));
         base.placeholderActions["user.nickname"] = _ => string.Join(", ", Users.Select(x => x.DisplayName));
         base.placeholderActions["user.mention"] = _ => string.Join(", ", Users.Select(x => x.Mention));
         //base.placeholderActions["user.avatar"] = _ => null; // Let it fetch the image of the context user, so deserialization doesn't fail

@@ -31,7 +31,7 @@ public static class ILoggerExt
             _commandEvent,
             new LogData(context, message),
             exception,
-            LogStrategy.GetLogStrategy(logConfig.LogFormat)
+            LogFormat.GetLogFormat(logConfig.LogFormat)
         );
     }
 
@@ -52,7 +52,7 @@ public static class ILoggerExt
             _slashCommandEvent,
             new LogData(context, message),
             exception,
-            LogStrategy.GetLogStrategy(logConfig.LogFormat)
+            LogFormat.GetLogFormat(logConfig.LogFormat)
         );
     }
 }

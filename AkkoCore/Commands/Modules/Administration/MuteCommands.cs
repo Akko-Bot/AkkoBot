@@ -58,7 +58,7 @@ public sealed class MuteCommands : AkkoCommandModule
 
         // Send confirmation message
         var embed = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("mute_success", Formatter.Bold(user.GetFullname())));
+            .WithDescription(context.FormatLocalized("mute_success", Formatter.Bold(user.Username)));
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -86,7 +86,7 @@ public sealed class MuteCommands : AkkoCommandModule
 
         // Send confirmation message
         var embed = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("unmute_success", Formatter.Bold(user.GetFullname())));
+            .WithDescription(context.FormatLocalized("unmute_success", Formatter.Bold(user.Username)));
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -103,7 +103,7 @@ public sealed class MuteCommands : AkkoCommandModule
             return;
 
         var embed = await _roleService.SetVoiceMuteAsync(user, true, "voicemute_success", reason);
-        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
+        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.Username));
 
         await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
     }
@@ -120,7 +120,7 @@ public sealed class MuteCommands : AkkoCommandModule
             return;
 
         var embed = await _roleService.SetVoiceMuteAsync(user, false, "voiceunmute_success", reason);
-        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
+        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.Username));
 
         await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
     }
@@ -137,7 +137,7 @@ public sealed class MuteCommands : AkkoCommandModule
             return;
 
         var embed = await _roleService.SetDeafAsync(user, true, "deafen_success", reason);
-        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
+        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.Username));
 
         await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
     }
@@ -154,7 +154,7 @@ public sealed class MuteCommands : AkkoCommandModule
             return;
 
         var embed = await _roleService.SetDeafAsync(user, false, "undeafen_success", reason);
-        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.GetFullname()));
+        embed.Body!.Description = context.FormatLocalized(embed.Body.Description!, Formatter.Bold(user.Username));
 
         await context.RespondLocalizedAsync(embed, isError: user.VoiceState is null);
     }
@@ -175,7 +175,7 @@ public sealed class MuteCommands : AkkoCommandModule
         await _channelServices.SetMuteOverwritesAsync(context.Guild, user, reason, true);
 
         var embed = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("chatmute_success", Formatter.Bold(user.GetFullname())));
+            .WithDescription(context.FormatLocalized("chatmute_success", Formatter.Bold(user.Username)));
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -196,7 +196,7 @@ public sealed class MuteCommands : AkkoCommandModule
         await _channelServices.RemoveOverwritesAsync(context.Guild, reason, x => x.Id == user.Id);
 
         var embed = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("chatunmute_success", Formatter.Bold(user.GetFullname())));
+            .WithDescription(context.FormatLocalized("chatunmute_success", Formatter.Bold(user.Username)));
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -221,11 +221,11 @@ public sealed class MuteCommands : AkkoCommandModule
         if (time > TimeSpan.FromDays(28)) // Discord doesn't allow timeouts longer than 4 weeks
             time = TimeSpan.FromDays(28);
 
-        await user.TimeoutAsync(time, $"{context.Member!.GetFullname()} | {reason}");
+        await user.TimeoutAsync(time, $"{context.Member!.Username} | {reason}");
 
         var locale = context.GetMessageSettings().Locale;
         var embed = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("timeout_success", Formatter.Bold(user.GetFullname()), time.GetLocalizedTimeString(_localizer, locale)));
+            .WithDescription(context.FormatLocalized("timeout_success", Formatter.Bold(user.Username), time.GetLocalizedTimeString(_localizer, locale)));
 
         await context.RespondLocalizedAsync(embed);
     }

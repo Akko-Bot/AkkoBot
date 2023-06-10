@@ -36,7 +36,7 @@ public sealed class Poll : AkkoCommandModule
     public async Task CreateSimplePollAsync(CommandContext context, [RemainingText, Description("arg_poll_question")] string question)
     {
         var embed = new SerializableDiscordEmbed()
-            .WithTitle(context.FormatLocalized("poll_title", context.User.GetFullname()))
+            .WithTitle(context.FormatLocalized("poll_title", context.User.Username))
             .WithDescription(Formatter.Bold(question));
 
         var pollMsg = await context.RespondLocalizedAsync(embed, false);
@@ -226,7 +226,7 @@ public sealed class Poll : AkkoCommandModule
             .Select(x => Formatter.InlineCode($"{++counter}.") + " " + Formatter.Bold(x))
             .ToArray();
 
-        embed.WithTitle(context.FormatLocalized("poll_title", context.User.GetFullname()))
+        embed.WithTitle(context.FormatLocalized("poll_title", context.User.Username))
             .WithDescription(Formatter.Bold(qAnswers[0]) + "\n\n" + string.Join("\n", answers));
 
         if (pollType is PollType.Anonymous)

@@ -95,7 +95,7 @@ public sealed class WarningCommands : AkkoCommandModule
             embed.WithDescription(
                 context.FormatLocalized(
                     "warn_and_punish",
-                    Formatter.Bold(user.GetFullname()),
+                    Formatter.Bold(user.Username),
                     punishment.ToString()!.ToLowerInvariant() + "_enum"
                 )
             );
@@ -105,7 +105,7 @@ public sealed class WarningCommands : AkkoCommandModule
             embed.WithDescription(
                 context.FormatLocalized(
                     "warn_success",
-                    Formatter.Bold(user.GetFullname())
+                    Formatter.Bold(user.Username)
                 )
             );
         }
@@ -134,9 +134,9 @@ public sealed class WarningCommands : AkkoCommandModule
         var embed = new SerializableDiscordEmbed();
 
         if (amount == 1 && id.HasValue)
-            embed.WithDescription(context.FormatLocalized("unwarn_success", Formatter.InlineCode("#" + id), Formatter.Bold(user.GetFullname())));
+            embed.WithDescription(context.FormatLocalized("unwarn_success", Formatter.InlineCode("#" + id), Formatter.Bold(user.Username)));
         else if (amount >= 1)
-            embed.WithDescription(context.FormatLocalized("unwarn_all", Formatter.Bold(user.GetFullname())));
+            embed.WithDescription(context.FormatLocalized("unwarn_all", Formatter.Bold(user.Username)));
         else
             embed.WithDescription(context.FormatLocalized("unwarn_failure", Formatter.InlineCode("#" + id)));
 
@@ -155,7 +155,7 @@ public sealed class WarningCommands : AkkoCommandModule
         var fields = new List<SerializableEmbedField>(infractions.Count);
 
         var embed = new SerializableDiscordEmbed()
-            .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()));
+            .WithTitle(context.FormatLocalized($"infractions_title", user.Username));
 
         foreach (var (modName, infraction) in infractions)
         {
@@ -186,7 +186,7 @@ public sealed class WarningCommands : AkkoCommandModule
         var fields = new List<SerializableEmbedField>(infractions.Count);
 
         var embed = new SerializableDiscordEmbed()
-            .WithTitle(context.FormatLocalized($"infractions_title", user.GetFullname()))
+            .WithTitle(context.FormatLocalized($"infractions_title", user.Username))
             .WithDescription(
                 context.FormatLocalized(
                     "modlog_description",

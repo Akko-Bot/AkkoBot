@@ -39,7 +39,7 @@ public sealed class DebugLogger : AkkoLogger
         {
             base.ChangeConsoleTextColor((logLevel is LogLevel.Information) ? LogLevel.Debug : logLevel);
 
-            var logBuilder = new StringBuilder(LogStrategy.GetHeader(eventId, _logFormat, _timeFormat));
+            var logBuilder = new StringBuilder(LogFormat.GetHeader(eventId, _logFormat, _timeFormat));
             logBuilder.AppendLine(formatter(state, exception));
 
             var log = logBuilder.ToString();

@@ -33,7 +33,7 @@ internal sealed class AntiAltActions : IAntiAltActions
         if (!context.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.ManageRoles | Permissions.MuteMembers)))
             return;
 
-        var reason = context.FormatLocalized("auto_punish", context.Guild.CurrentMember.GetFullname(), "antialt_punish");
+        var reason = context.FormatLocalized("auto_punish", context.Guild.CurrentMember.Username, "antialt_punish");
 
         if (!context.Guild.Roles.TryGetValue(muteRoleId, out var muteRole))
         {
@@ -50,14 +50,14 @@ internal sealed class AntiAltActions : IAntiAltActions
     {
         if (_roleService.CheckHierarchy(context.Guild.CurrentMember, user)
             && context.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.KickMembers)))
-            await user.RemoveAsync(context.FormatLocalized("auto_punish", context.Guild.CurrentMember.GetFullname(), "antialt_punish"));
+            await user.RemoveAsync(context.FormatLocalized("auto_punish", context.Guild.CurrentMember.Username, "antialt_punish"));
     }
 
     public async Task BanAltAsync(CommandContext context, DiscordMember user)
     {
         if (_roleService.CheckHierarchy(context.Guild.CurrentMember, user)
             && context.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.BanMembers)))
-            await user.BanAsync(1, context.FormatLocalized("auto_punish", context.Guild.CurrentMember.GetFullname(), "antialt_punish"));
+            await user.BanAsync(1, context.FormatLocalized("auto_punish", context.Guild.CurrentMember.Username, "antialt_punish"));
     }
 
     public async Task RoleAltAsync(CommandContext context, DiscordMember user, ulong roleId)
@@ -65,6 +65,6 @@ internal sealed class AntiAltActions : IAntiAltActions
         if (context.Guild.Roles.TryGetValue(roleId, out var role) && _roleService.CheckHierarchy(context.Guild.CurrentMember, user)
             && context.Guild.CurrentMember.Hierarchy > role.Position
             && context.Guild.CurrentMember.Roles.Any(x => x.Permissions.HasOneFlag(Permissions.Administrator | Permissions.ManageRoles)))
-            await user.GrantRoleAsync(role, context.FormatLocalized("auto_punish", context.Guild.CurrentMember.GetFullname(), "antialt_punish"));
+            await user.GrantRoleAsync(role, context.FormatLocalized("auto_punish", context.Guild.CurrentMember.Username, "antialt_punish"));
     }
 }

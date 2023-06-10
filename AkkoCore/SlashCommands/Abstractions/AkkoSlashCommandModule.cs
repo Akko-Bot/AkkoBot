@@ -37,7 +37,7 @@ public class AkkoSlashCommandModule : ApplicationCommandModule
         var mentionedUsers = (context.ResolvedUserMentions ?? Enumerable.Empty<DiscordUser>()) // Why is this null, wtf?
             .Append(context.User)
             .Distinct()
-            .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.FullName.Equals(x.GetFullname(), StringComparison.Ordinal))
+            .Where(x => !dbCache.Users.TryGetValue(x.Id, out var dbUser) || !dbUser.Username.Equals(x.Username, StringComparison.Ordinal))
             .ToArray();
 
         await userService.SaveUsersAsync(mentionedUsers);

@@ -106,7 +106,7 @@ public sealed class Repeaters : AkkoCommandModule
                 .AddField("interval", repeater.Interval.ToString(@"%d\d\ %h\h\ %m\m\ %s\s"), true)
                 .AddField("triggers_on", (timer?.ElapseAt ?? dbTimer!.ElapseAt).ToOffset(context.GetTimeZone().BaseUtcOffset).ToDiscordTimestamp(), true)
                 .AddField("triggers_in", DateTimeOffset.Now.Add(timer?.ElapseIn ?? dbTimer!.ElapseIn).ToDiscordTimestamp(TimestampFormat.RelativeTime), true)
-                .AddField("author", member?.GetFullname() ?? dbUser!.FullName, true)
+                .AddField("author", member?.Username ?? dbUser!.Username, true)
                 .AddField("channel", $"<#{repeater.ChannelId}>", true);
         }
 

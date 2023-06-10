@@ -112,7 +112,7 @@ public sealed class GuildUtilities : AkkoCommandModule
 
         var embed = new SerializableDiscordEmbed()
             .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
-            .AddField("name", user.GetFullname(), true)
+            .AddField("name", user.Username, true)
             .AddField("nickname", user.Nickname ?? "-", true)
             .AddField("id", user.Id.ToString(), true)
             .AddField("is_mod", (isMod) ? AkkoStatics.SuccessEmoji.Name : AkkoStatics.FailureEmoji.Name, true)
@@ -132,7 +132,7 @@ public sealed class GuildUtilities : AkkoCommandModule
     {
         var embed = new SerializableDiscordEmbed()
             .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
-            .AddField("name", user.GetFullname(), true)
+            .AddField("name", user.Username, true)
             .AddField("id", user.Id.ToString(), true)
             .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(TimestampFormat.ShortDateTime), false);
 
@@ -236,7 +236,7 @@ public sealed class GuildUtilities : AkkoCommandModule
         var deniedPerms = string.Join("\n", deniedPermsCol);
 
         var embed = new SerializableDiscordEmbed()
-            .WithTitle(context.FormatLocalized("checkperms_title", user.GetFullname(), channel.Name));
+            .WithTitle(context.FormatLocalized("checkperms_title", user.Username, channel.Name));
 
         if (!string.IsNullOrWhiteSpace(allowedPerms))
             embed.AddField("allowed", allowedPerms.MaxLength(AkkoConstants.MaxEmbedFieldLength, AkkoConstants.EllipsisTerminator), true);

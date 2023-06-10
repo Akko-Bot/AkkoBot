@@ -189,7 +189,7 @@ public sealed class Tags : AkkoCommandModule
             embed.WithTitle(context.FormatLocalized("{0} {1}", "tag", $"#{tag.Id}"))
                 .WithDescription((tag.IsEmoji) ? tag.Response : Formatter.BlockCode(tag.Response, "yaml"))
                 .AddField("trigger", tag.Trigger, true)
-                .AddField("author", dbUser?.FullName ?? author?.GetFullname() ?? "DeletedUser", true)
+                .AddField("author", dbUser?.Username ?? author?.Username ?? "DeletedUser", true)
                 .WithFooter(context.FormatLocalized("{0}: {1}", "reaction", (tag.IsEmoji) ? AkkoStatics.SuccessEmoji : AkkoStatics.FailureEmoji));
 
             if (tag.Behavior is not TagBehavior.None)
@@ -280,7 +280,7 @@ public sealed class Tags : AkkoCommandModule
     public async Task ClearTagsAsync(CommandContext context, [Description("arg_discord_user")] DiscordUser author)
     {
         var question = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("q_are_you_sure", context.FormatLocalized("tag_delete_all_user_tags", Formatter.Bold(author.GetFullname())), "q_yes", "q_no"));
+            .WithDescription(context.FormatLocalized("q_are_you_sure", context.FormatLocalized("tag_delete_all_user_tags", Formatter.Bold(author.Username)), "q_yes", "q_no"));
 
         await context.RespondInteractiveAsync(question, "q_yes", async () =>
         {
@@ -318,7 +318,7 @@ public sealed class Tags : AkkoCommandModule
             .WithDescription(
                 context.FormatLocalized(
                     "q_are_you_sure",
-                    context.FormatLocalized("tag_delete_trigger_user_tags", Formatter.Bold(author.GetFullname()), Formatter.InlineCode(smartString)),
+                    context.FormatLocalized("tag_delete_trigger_user_tags", Formatter.Bold(author.Username), Formatter.InlineCode(smartString)),
                     "q_yes",
                     "q_no")
             );

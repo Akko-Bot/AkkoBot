@@ -53,7 +53,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         var webhookMessage = new SerializableDiscordEmbed()
             .WithColor((eventArgs.Message.Pinned) ? settings.OkColor : settings.ErrorColor)
             .WithAuthor((eventArgs.Message.Pinned) ? "message_pinned" : "message_unpinned")
-            .WithTitle(eventArgs.Author.GetFullname())
+            .WithTitle(eventArgs.Author.Username)
             .AddField("author_mention", eventArgs.Author.Mention, true)
             .AddField((eventArgs.Message.Pinned) ? "pinned_on" : "unpinned_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
             .AddField("jump_to", Formatter.MaskedUrl('#' + eventArgs.Channel.Name, eventArgs.Message.JumpLink), true)
@@ -76,7 +76,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         var webhookMessage = new SerializableDiscordEmbed()
             .WithColor((message.Author as DiscordMember)?.Color.ToString())
             .WithAuthor("log_message_deleted_title", message.JumpLink.AbsoluteUri)
-            .WithTitle(DiscordUserExt.GetFullname(message.Author))
+            .WithTitle(message.Author.Username)
             .WithDescription($"{_localizer.GetResponseString(settings.Locale, "channel")}: {message.Channel.Mention} | {message.Channel.Name}\n\n{message.Content}")
             .AddField("author_mention", message.Author.Mention, true)
             .AddField("deleted_on", DateTimeOffset.Now.ToDiscordTimestamp(), true)
@@ -97,7 +97,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         var message = new SerializableDiscordEmbed()
             .WithColor((eventArgs.Message.Author as DiscordMember)?.Color.ToString())
             .WithAuthor("log_message_edited_title", eventArgs.Message.JumpLink.AbsoluteUri)
-            .WithTitle(eventArgs.Message.Author.GetFullname())
+            .WithTitle(eventArgs.Message.Author.Username)
             .WithDescription(
                 $"{_localizer.GetResponseString(settings.Locale, "channel")}: {eventArgs.Message.Channel.Mention} | {eventArgs.Message.Channel.Name}\n\n" +
                 $"{_localizer.GetResponseString(settings.Locale, "before")}:\n{eventArgs.MessageBefore.Content}\n\n" +
@@ -179,7 +179,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithColor(settings.OkColor)
             .WithTitle("log_invite_created_title")
             .WithDescription(eventArgs.Invite.GetInviteLink())
-            .AddField("author", eventArgs.Invite.Inviter.GetFullname(), true)
+            .AddField("author", eventArgs.Invite.Inviter.Username, true)
             .AddField("code", eventArgs.Invite.Code, true)
             .AddField("created_on", eventArgs.Invite.CreatedAt.ToDiscordTimestamp(), true)
             .AddField("channel", (settings.UseEmbed) ? eventArgs.Channel.Mention : $"#{eventArgs.Channel.Name}", true)
@@ -222,8 +222,8 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         var message = new SerializableDiscordEmbed()
             .WithColor(settings.ErrorColor)
             .WithTitle("ban_title")
-            .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
-            .AddField("moderator", auditLog.UserResponsible.GetFullname(), true)
+            .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.Username}")
+            .AddField("moderator", auditLog.UserResponsible.Username, true)
             .AddField("reason", auditLog.Reason, true)
             .AddField("banned_on", DateTimeOffset.Now.ToDiscordTimestamp())
             .WithLocalization(_localizer, settings.Locale);
@@ -243,8 +243,8 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         var message = new SerializableDiscordEmbed()
             .WithColor(settings.OkColor)
             .WithTitle("log_unban_title")
-            .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.GetFullname()}")
-            .AddField("moderator", auditLog.UserResponsible.GetFullname(), true)
+            .WithDescription($"{eventArgs.Member.Mention} | {eventArgs.Member.Username}")
+            .AddField("moderator", auditLog.UserResponsible.Username, true)
             .AddField("reason", auditLog.Reason, true)
             .AddField("unbanned_on", DateTimeOffset.Now.ToDiscordTimestamp())
             .WithLocalization(_localizer, settings.Locale);
@@ -376,7 +376,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
 
         var message = new SerializableDiscordEmbed()
             .WithColor((voiceState is not UserVoiceState.Disconnected) ? settings.OkColor : settings.ErrorColor)
-            .WithAuthor(eventArgs.User.GetFullname(), imageUrl: eventArgs.User.AvatarUrl ?? eventArgs.User.DefaultAvatarUrl)
+            .WithAuthor(eventArgs.User.Username, imageUrl: eventArgs.User.AvatarUrl ?? eventArgs.User.DefaultAvatarUrl)
             .WithDescription(description)
             .AddField(AkkoConstants.ValidWhitespace, DateTimeOffset.Now.ToDiscordTimestamp());
 
@@ -474,7 +474,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithColor(settings.OkColor)
             .WithThumbnail(eventArgs.Member.AvatarUrl ?? eventArgs.Member.DefaultAvatarUrl)
             .WithAuthor((wasAdded) ? "add_role" : "remove_role")
-            .WithTitle(eventArgs.Member.GetFullname())
+            .WithTitle(eventArgs.Member.Username)
             .AddField("role", role.Mention, true)
             .AddField("name", role.Name, true)
             .AddField("id", role.Id.ToString(), true)
@@ -496,7 +496,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
             .WithColor(settings.OkColor)
             .WithAuthor(logTitle)
             .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
-            .WithTitle(user.GetFullname())
+            .WithTitle(user.Username)
             .WithFooter($"{_localizer.FormatLocalized(settings.Locale, "id")}: {user.Id}");
 
         if (oldName is not null)
@@ -541,7 +541,7 @@ internal sealed class GuildLogGenerator : IGuildLogGenerator
         return new SerializableDiscordEmbed()
             .WithColor(settings.OkColor)
             .WithThumbnail(user.AvatarUrl ?? user.DefaultAvatarUrl)
-            .WithDescription($"{user.Mention} | {user.GetFullname()}")
+            .WithDescription($"{user.Mention} | {user.Username}")
             .AddField("created_on", user.CreationTimestamp.ToDiscordTimestamp(), true);
     }
 

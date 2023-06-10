@@ -94,7 +94,7 @@ public sealed class UserPunishmentService
     {
         return new SerializableDiscordEmbed()
             .WithTitle($"{emoji} " + context.FormatLocalized(titleKey))
-            .AddField("user", user.GetFullname(), true)
+            .AddField("user", user.Username, true)
             .AddField("id", user.Id.ToString(), true);
     }
 
@@ -255,7 +255,7 @@ public sealed class UserPunishmentService
             time = TimeSpan.FromMinutes(1);
 
         // Ban the user
-        await context.Guild.BanMemberAsync(userId, time.Days, context.Member!.GetFullname() + " | " + reason);
+        await context.Guild.BanMemberAsync(userId, time.Days, context.Member!.Username + " | " + reason);
 
         // Create the new database entry
         var dbTimer = new TimerEntity()

@@ -25,7 +25,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         user ??= context.Member!;
 
         var embed = new SerializableDiscordEmbed()
-            .WithDescription(context.FormatLocalized("xid", "user", Formatter.Bold(user.GetFullname()), Formatter.InlineCode(user.Id.ToString())));
+            .WithDescription(context.FormatLocalized("xid", "user", Formatter.Bold(user.Username), Formatter.InlineCode(user.Id.ToString())));
 
         await context.RespondLocalizedAsync(embed);
     }
@@ -152,7 +152,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
         var users = context.Guild.Members.Values
             .Where(predicate)
             .OrderByDescending(x => x.Hierarchy)
-            .Select(x => $"● {x.GetFullname()}");
+            .Select(x => $"● {x.Username}");
 
         var embed = new SerializableDiscordEmbed();
 
@@ -541,7 +541,7 @@ public sealed class BasicGuildCommands : AkkoCommandModule
 
             // add thing for length 0
             var embed = new SerializableDiscordEmbed()
-                .WithDescription(context.FormatLocalized("removeallroles", roles.Length, Formatter.Bold(user.GetFullname())));
+                .WithDescription(context.FormatLocalized("removeallroles", roles.Length, Formatter.Bold(user.Username)));
 
             await context.RespondLocalizedAsync(embed);
         }

@@ -225,7 +225,7 @@ internal sealed class TimerActions : ITimerActions
                 ? dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(_botConfig.Locale))
                 : dbReminder.DateAdded.ToString("D", CultureInfo.CreateSpecificCulture(dbGuild!.Locale));
 
-            var header = $"⏰ {Formatter.Bold(user.GetFullname())} - {localizedDate}\n";
+            var header = $"⏰ {Formatter.Bold(user.Username)} - {localizedDate}\n";
 
             dmsg.Content = (dmsg.Content is null)
                 ? (header + ((wasDeserialized) ? string.Empty : message)).MaxLength(AkkoConstants.MaxMessageLength, AkkoConstants.EllipsisTerminator)
