@@ -1,15 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-	  <DebugType>embedded</DebugType>
-	  <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-
-	  <!-- Enable NRT code analysis -->
+    <DebugType>embedded</DebugType>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Enable NRT code analysis -->
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="DSharpPlus" Version="4.4.1" />
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.4.1" />
@@ -24,5 +21,4 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
-
 </Project>

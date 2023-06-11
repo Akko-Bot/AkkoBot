@@ -1,4 +1,4 @@
-﻿using DSharpPlus;
+using DSharpPlus;
 using DSharpPlus.EventArgs;
 using System;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ namespace AkkoCore.Services.Events.Abstractions;
 /// <summary>
 /// Represents an object that manages message interactivity.
 /// </summary>
-public interface IInteractionEventHandler : IDisposable
+public interface IInteractionEventsHandler : IDisposable
 {
     /// <summary>
     /// Finalizes an interaction and stops its tracking.

@@ -1,10 +1,8 @@
 ﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Common;
 using AkkoCore.Config.Abstractions;
-using AkkoCore.Config.Models;
 using AkkoCore.Extensions;
 using AkkoCore.Models.Serializable;
-using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.Services.Events.Abstractions;
 using AkkoCore.Services.Localization.Abstractions;
 using DSharpPlus;
@@ -25,16 +23,12 @@ namespace AkkoCore.Commands.Modules.Help.Services;
 public sealed class HelpService
 {
     private readonly ILocalizer _localizer;
-    private readonly IDbCache _dbCache;
     private readonly ICommandHandler _commandHandler;
-    private readonly BotConfig _botConfig;
 
-    public HelpService(ILocalizer localizer, IDbCache dbCache, ICommandHandler commandHandler, BotConfig botConfig)
+    public HelpService(ILocalizer localizer, ICommandHandler commandHandler)
     {
         _localizer = localizer;
-        _dbCache = dbCache;
         _commandHandler = commandHandler;
-        _botConfig = botConfig;
     }
 
     /// <summary>
@@ -91,7 +85,7 @@ public sealed class HelpService
                         ? (await cmd.RunChecksAsync(fakeContext, false)).Any() ? AkkoStatics.FailureEmoji : AkkoStatics.SuccessEmoji
                         : AkkoStatics.FailureEmoji;
 
-                return @"\" + emote + " " + settings.Prefix + cmd.QualifiedName;
+                return $@"\{emote} {settings.Prefix}{cmd.QualifiedName}";
             })
             .WhenAllAsync();
 

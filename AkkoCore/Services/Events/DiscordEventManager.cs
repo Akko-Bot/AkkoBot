@@ -26,12 +26,12 @@ internal sealed class DiscordEventManager : IDiscordEventManager
     private readonly IGuildLogEventHandler _guildLogger;
     private readonly ITagEventHandler _tagEventHandler;
     private readonly ICommandHandler _commandHandler;
-    private readonly IInteractionEventHandler _interactionEventHandler;
+    private readonly IInteractionEventsHandler _interactionEventHandler;
     private readonly DiscordShardedClient _shardedClient;
 
     public DiscordEventManager(IVoiceRoleConnectionHandler vcRoleHandler, IStartupEventHandler startup, IGuildLoadHandler guildLoader, IGuildEventsHandler guildEventsHandler,
         IGlobalEventsHandler globalEventsHandler, ICommandLogHandler cmdLogHandler, IGatekeepEventHandler gatekeeper, IGuildLogEventHandler guildLogger, ITagEventHandler tagEventsHandler,
-        ICommandHandler commandHandler, IInteractionEventHandler interactionEventsHandler, DiscordShardedClient shardedClient)
+        ICommandHandler commandHandler, IInteractionEventsHandler interactionEventsHandler, DiscordShardedClient shardedClient)
     {
         _startup = startup;
         _voiceRoleHandler = vcRoleHandler;

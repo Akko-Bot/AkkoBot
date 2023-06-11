@@ -17,11 +17,12 @@ namespace AkkoCore.Services.Events;
 /// Handles interactive Discord messages.
 /// </summary>
 /// <remarks>This implementation only processes interactions whose ID are suffixed with either "_update" or "_end".</remarks>
-[CommandService<IInteractionEventHandler>(ServiceLifetime.Singleton)]
-internal sealed class InteractionEventHandler : IInteractionEventHandler
+[CommandService<IInteractionEventsHandler>(ServiceLifetime.Singleton)]
+public sealed class InteractionEventsHandler : IInteractionEventsHandler
 {
-    private const string _updateInteractionSuffix = "_update";
-    private const string _endInteractionSuffix = "_end";
+    public const string StartInteractionPrefix = "akko_";
+    public const string UpdateInteractionSuffix = "_update";
+    public const string EndInteractionSuffix = "_end";
 
     // Message ID, (User ID, Date Added)
     private readonly ConcurrentDictionary<ulong, (ulong, DateTimeOffset)> _userButtonPendingAction = new();
@@ -32,12 +33,12 @@ internal sealed class InteractionEventHandler : IInteractionEventHandler
 
     private readonly IInteractionResponseManager _responseGenerator;
 
-    public InteractionEventHandler(IInteractionResponseManager responseGenerator)
+    public InteractionEventsHandler(IInteractionResponseManager responseGenerator)
     {
         _responseGenerator = responseGenerator;
 
         // Setup cleanup timer
-        // The timer is needed because this handler registers ALL interactions
+        // The timer is needed because this handler registers ALL "akko_" interactions
         _cleanupTimer = new(_cleanupTime.TotalMilliseconds);
         _cleanupTimer.Elapsed += CleanupUserInteractions;
     }
@@ -46,14 +47,15 @@ internal sealed class InteractionEventHandler : IInteractionEventHandler
     {
         var message = await eventArgs.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);   // wtf, Discord?
 
-        if (message.Components.Count is not 0 && message.Author.Id == client.CurrentUser.Id) // Check if interaction is not from another bot
-            _userButtonPendingAction.TryAdd(message.Id, (eventArgs.Interaction.User.Id, DateTimeOffset.Now));
+        if (eventArgs.Interaction.Data.CustomId?.StartsWith(StartInteractionPrefix, StringComparison.Ordinal) is true    // Check if interaction starts with "akko_"
+            && message.Components.Count is not 0 && message.Author.Id == client.CurrentUser.Id)                 // Check if interaction is not from another bot
+            _userButtonPendingAction.TryAdd(message.Id, (eventArgs.Interaction.User.Id, DateTimeOffset.Now));   // Track the interaction
     }
 
     public async Task UpdateInteractionAsync(DiscordClient client, ComponentInteractionCreateEventArgs eventArgs)
     {
         if (!_userButtonPendingAction.TryGetValue(eventArgs.Message.Id, out var userId) || eventArgs.User.Id != userId.Item1
-            || !eventArgs.Id.EndsWith(_updateInteractionSuffix, StringComparison.Ordinal))
+            || !eventArgs.Id.EndsWith(UpdateInteractionSuffix, StringComparison.Ordinal))
             return;
 
         var response = await _responseGenerator.RequestAsync(eventArgs.Message, eventArgs.Id, eventArgs.Values).ConfigureAwait(false);
@@ -78,10 +80,11 @@ internal sealed class InteractionEventHandler : IInteractionEventHandler
     {
         // If interaction is not being tracked or if it is being tracked and was triggered
         // by the correct user, delete the message.
-        return (!_userButtonPendingAction.ContainsKey(eventArgs.Message.Id)
+        return ((eventArgs.Id.StartsWith(StartInteractionPrefix, StringComparison.Ordinal)
+            && !_userButtonPendingAction.ContainsKey(eventArgs.Message.Id))
             || (_userButtonPendingAction.TryRemove(eventArgs.Message.Id, out var userId)
             && eventArgs.User.Id == userId.Item1
-            && eventArgs.Id.EndsWith(_endInteractionSuffix, StringComparison.Ordinal)))
+            && eventArgs.Id.EndsWith(EndInteractionSuffix, StringComparison.Ordinal)))
                 ? TerminateInteractionAsync(eventArgs)
                 : Task.CompletedTask;
     }
@@ -93,7 +96,7 @@ internal sealed class InteractionEventHandler : IInteractionEventHandler
     /// <remarks>Regular messages are deleted, whereas ephemeral messages are stripped off their components.</remarks>
     private async Task TerminateInteractionAsync(ComponentInteractionCreateEventArgs eventArgs)
     {
-        if (!eventArgs.Message.Flags.HasValue || !eventArgs.Message.Flags.Value.HasMessageFlag(MessageFlags.Ephemeral))
+        if (eventArgs.Message.Components.Count is 0 && (!eventArgs.Message.Flags.HasValue || !eventArgs.Message.Flags.Value.HasMessageFlag(MessageFlags.Ephemeral)))
         {
             await eventArgs.Message.DeleteAsync();
             return;

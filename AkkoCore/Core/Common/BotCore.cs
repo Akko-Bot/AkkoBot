@@ -100,7 +100,7 @@ public class BotCore : IDisposable
         CommandExt[0].Services.GetService<ITimerManager>()?.Dispose();
         CommandExt[0].Services.GetService<ICommandCooldown>()?.Dispose();
         CommandExt[0].Services.GetService<IGatekeepEventHandler>()?.Dispose();
-        CommandExt[0].Services.GetService<IInteractionEventHandler>()?.Dispose();
+        CommandExt[0].Services.GetService<IInteractionEventsHandler>()?.Dispose();
 
         // Dispose clients - this also disposes the extensions
         _ = BotShardedClient.StopAsync();
