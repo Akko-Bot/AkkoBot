@@ -14,6 +14,7 @@ namespace AkkoCore.Services.Database.Entities;
 public class DiscordUserEntity : DbEntity
 {
     private string _username = "Unknown";
+    private string _discriminator = "0";
 
     /// <summary>
     /// The infractions associated with this user.
@@ -41,6 +42,26 @@ public class DiscordUserEntity : DbEntity
         set => _username = value ?? "Unknown";
     }
 
+    /// <summary>
+    /// The discriminator of the Discord user.
+    /// </summary>
+    [Required]
+    [StringLength(4)]
+    [Column(TypeName = "varchar(4)")]
+    public string Discriminator
+    {
+        get => _discriminator;
+        set => _discriminator = value ?? "0";
+    }
+
+    /// <summary>
+    /// The username and discriminator of the Discord user.
+    /// </summary>
+    /// <remarks>This property is not mapped.</remarks>
+    [NotMapped]
+    public string FullName
+        => $"{Username}#{Discriminator}";
+
     public DiscordUserEntity()
     {
     }
@@ -49,6 +70,7 @@ public class DiscordUserEntity : DbEntity
     {
         UserId = user.Id;
         Username = user.Username;
+        Discriminator = user.Discriminator;
     }
 
     /* Overrides */
