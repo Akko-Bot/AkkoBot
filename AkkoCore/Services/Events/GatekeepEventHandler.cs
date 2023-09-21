@@ -11,7 +11,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using Kotz.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;

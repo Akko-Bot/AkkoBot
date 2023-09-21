@@ -1,6 +1,6 @@
 ﻿using AkkoCore.Common;
-using Kotz.Extensions;
 using DSharpPlus.Entities;
+using Kotz.Extensions;
 
 namespace AkkoCore.Models.Serializable.EmbedParts;
 

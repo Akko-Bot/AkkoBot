@@ -1,5 +1,3 @@
-using AkkoCore.Services.Caching.Abstractions;
-using DSharpPlus;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
 

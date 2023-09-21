@@ -1,5 +1,4 @@
 ﻿using AkkoCore.Commands.Modules.Administration.Services;
-using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using AkkoCore.SlashCommands.Attributes;
 using DSharpPlus.Entities;

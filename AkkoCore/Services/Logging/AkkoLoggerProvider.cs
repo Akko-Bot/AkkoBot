@@ -1,5 +1,4 @@
 ﻿using AkkoCore.Config.Models;
-using AkkoCore.Extensions;
 using AkkoCore.Services.Logging.Abstractions;
 using AkkoCore.Services.Logging.Loggers;
 using Kotz.Extensions;

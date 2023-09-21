@@ -1,6 +1,5 @@
 ﻿using AkkoCore.Commands.Attributes;
 using AkkoCore.Commands.Modules.Administration.Services;
-using AkkoCore.Extensions;
 using AkkoCore.Services.Caching.Abstractions;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;

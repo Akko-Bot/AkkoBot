@@ -1,5 +1,4 @@
 ﻿using AkkoCore.Commands.Attributes;
-using AkkoCore.Extensions;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
