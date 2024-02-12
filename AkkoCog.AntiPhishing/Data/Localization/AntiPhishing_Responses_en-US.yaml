@@ -1,9 +1,0 @@
-antiphishing_list_title: Anti-phishing Settings
-antiphishing_punish_reason: Phishing Link
-antiphishing_toggle_desc: Anti-phishing has been {0} on this server.
-cmd_antiphishing: Groups commands for managing anti-phishing settings on servers.
-cmd_antiphishing_ignore: Adds users, channels, or roles to the list of ignored IDs, making them immute to the anti-phishing filter.
-cmd_antiphishing_list: Lists the anti-phishing settings for this server.
-cmd_antiphishing_punishment: Sets the punishment to be automatically applied to users who send phishing links. Possible punishments are `Mute`, `Kick`, `Softban`, and `Ban`. Provide no parameter to remove the punishment.
-cmd_antiphishing_toggle: Toggles the anti-phishing filter for the current server.
-cog_antiphishing_desc: Automatically filters phishing links using the `https://anti-fish.harmony.rocks/` API.

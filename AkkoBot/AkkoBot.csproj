@@ -1,38 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk.Worker">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <StartupObject>AkkoBot.Program</StartupObject>
-    <AssemblyName>AkkoBot</AssemblyName>
-    <RootNamespace>AkkoBot</RootNamespace>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <WarningsAsErrors>Nullable</WarningsAsErrors>
-    <DebugType>embedded</DebugType>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="ConcurrentHashSet" Version="1.3.0" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02037" />
+    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02037" />
+    <PackageReference Include="Kotz.Extensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="YamlDotNet" Version="15.1.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AkkoCore\AkkoCore.csproj" />
-  </ItemGroup>
-
-  <Target Name="PostBuildWin" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <Exec Command="xcopy &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)Data&quot; /i /e /R /Y" />
-  </Target>
-
-  <Target Name="PostBuildLin" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
-    <Exec Command="cp &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)&quot; -r" />
-  </Target>
-
-  <Target Name="PostBuildOsx" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <Exec Command="cp -r &quot;$(ProjectDir)Data&quot; &quot;$(TargetDir)&quot;" />
-  </Target>
-
 </Project>

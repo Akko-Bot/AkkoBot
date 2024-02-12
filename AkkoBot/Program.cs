@@ -1,36 +1,32 @@
-﻿using AkkoCore.Core;
-using LinqToDB.EntityFrameworkCore;
-using System;
-using System.Threading;
+using AkkoBot.Common;
+using AkkoBot.Config;
+using AkkoBot.Core;
+using AkkoBot.Core.Services;
+using AkkoBot.Core.Services.Abstractions;
 
 namespace AkkoBot;
 
-internal static class Program
+/// <summary>
+/// The entry point of the application.
+/// </summary>
+internal sealed class Program
 {
-    private static bool _restartBot = true;
-    private static CancellationTokenSource? _shutdownToken;
-
-    // Entry point.
-    private static void Main()
+    private static async Task Main(string[] args)
     {
-        // Print the process ID
-        Console.WriteLine($"Pid: {Environment.ProcessId}");
+        var builder = Host.CreateEmptyApplicationBuilder(new() { Args = args });
 
-        // LinqToDB initialization
-        LinqToDBForEFTools.Initialize();
+        builder.Logging
+            .AddSimpleConsole()
+            .AddDebug();
 
-        // Start the bot.
-        while (_restartBot)
-        {
-            _shutdownToken = new();
-            var bot = new Bot(_shutdownToken);
+        builder.Services
+            .AddHostedService<Bot>()
+            .AddSingleton<IBotLifetime, BotLifetime>()
+            .AddSingleton<IConfigLoader, ConfigLoader>()
+            .AddSingleton(x => x.GetRequiredService<ConfigLoader>().LoadCredentials(AkkoEnvironment.CredsPath))
+            .AddSingleton(x => x.GetRequiredService<ConfigLoader>().LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath));
 
-            // Run the bot
-            _restartBot = bot.RunAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
-            // Clean-up
-            bot.Dispose();
-            _shutdownToken.Dispose();
-        }
+        using var host = builder.Build();
+        await host.RunAsync();
     }
 }

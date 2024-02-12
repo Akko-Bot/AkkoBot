@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoBot", "AkkoBot\AkkoBot.csproj", "{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41F5902D-FF91-4E4D-897D-ED9DBA4B484E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -18,11 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoTests", "AkkoTests\AkkoTests.csproj", "{6EF07F6A-3756-4274-9DD3-D8729A077476}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoCore", "AkkoCore\AkkoCore.csproj", "{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoCog.DangerousCommands", "AkkoCog.DangerousCommands\AkkoCog.DangerousCommands.csproj", "{6097907C-6DD1-467A-8090-F89E80C2A71D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoCog.AntiPhishing", "AkkoCog.AntiPhishing\AkkoCog.AntiPhishing.csproj", "{AD6A6038-BB6F-4F3E-83AB-694217211A39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoBot", "AkkoBot\AkkoBot.csproj", "{375F53FE-6CC8-436D-A125-30C213D30325}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,26 +24,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F18035D-76D3-43C1-9154-C1BFBEE88ADC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EF07F6A-3756-4274-9DD3-D8729A077476}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A7EA748-1C32-49CE-A57A-E5029A2ADC6C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6097907C-6DD1-467A-8090-F89E80C2A71D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AD6A6038-BB6F-4F3E-83AB-694217211A39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD6A6038-BB6F-4F3E-83AB-694217211A39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD6A6038-BB6F-4F3E-83AB-694217211A39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD6A6038-BB6F-4F3E-83AB-694217211A39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{375F53FE-6CC8-436D-A125-30C213D30325}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{375F53FE-6CC8-436D-A125-30C213D30325}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{375F53FE-6CC8-436D-A125-30C213D30325}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{375F53FE-6CC8-436D-A125-30C213D30325}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
