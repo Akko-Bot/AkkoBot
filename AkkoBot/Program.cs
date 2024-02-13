@@ -1,8 +1,6 @@
 using AkkoBot.Common;
-using AkkoBot.Config;
 using AkkoBot.Core;
-using AkkoBot.Core.Services;
-using AkkoBot.Core.Services.Abstractions;
+using Kotz.DependencyInjection.Extensions;
 
 namespace AkkoBot;
 
@@ -21,10 +19,9 @@ internal sealed class Program
 
         builder.Services
             .AddHostedService<Bot>()
-            .AddSingleton<IBotLifetime, BotLifetime>()
-            .AddSingleton<IConfigLoader, ConfigLoader>()
-            .AddSingleton(x => x.GetRequiredService<ConfigLoader>().LoadCredentials(AkkoEnvironment.CredsPath))
-            .AddSingleton(x => x.GetRequiredService<ConfigLoader>().LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath));
+            .RegisterServices()
+            .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadCredentials(AkkoEnvironment.CredsPath))
+            .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath));
 
         using var host = builder.Build();
         await host.RunAsync();

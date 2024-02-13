@@ -1,10 +1,12 @@
 ﻿using AkkoBot.Core.Services.Abstractions;
+using Kotz.DependencyInjection;
 
 namespace AkkoBot.Core.Services;
 
 /// <summary>
 /// Manages the shutdown of a <see cref="Bot"/>.
 /// </summary>
+[Service<IBotLifetime>(ServiceLifetime.Singleton)]
 internal sealed class BotLifetime : IBotLifetime, IDisposable
 {
     private CancellationTokenSource _restartTokenSource = new();

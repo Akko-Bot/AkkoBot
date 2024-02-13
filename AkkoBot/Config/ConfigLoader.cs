@@ -1,6 +1,7 @@
 ﻿using AkkoBot.Common;
 using AkkoBot.Config.Models;
-using AkkoCore.Extensions;
+using AkkoBot.Extensions;
+using Kotz.DependencyInjection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -9,6 +10,7 @@ namespace AkkoBot.Config;
 /// <summary>
 /// Saves and loads Yaml configuration files.
 /// </summary>
+[Service<IConfigLoader>(ServiceLifetime.Singleton)]
 public sealed class ConfigLoader : IConfigLoader
 {
     private readonly ISerializer _serializer;

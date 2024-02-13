@@ -1,4 +1,4 @@
-﻿using AkkoCore.Commands.Attributes;
+﻿using AkkoBot.Commands.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AkkoTests.Models;
