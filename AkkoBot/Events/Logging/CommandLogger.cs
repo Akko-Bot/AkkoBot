@@ -13,11 +13,11 @@ internal sealed class CommandLogger : ICommandLogger
 {
     private const string _defaultLogTemplate =
         """
-        [Shard {ShardId}] | {Timestamp}
-        User: {Username} [{UserId}]
-        Server: {GuildName} {GuildId}
-        Channel: #{ChannelName} [{ChannelId}]
-        Command: {Command}
+        [Shard {ShardId}]
+              User: {Username} [{UserId}]
+              Server: {GuildName} {GuildId}
+              Channel: #{ChannelName} [{ChannelId}]
+              Command: {Command}
         """;
     private readonly ILogger<CommandLogger> _logger;
 
@@ -34,7 +34,6 @@ internal sealed class CommandLogger : ICommandLogger
         _logger.LogInformation(
             _defaultLogTemplate,
             cmdsExt.Client.ShardId,
-            DateTimeOffset.Now,
             eventArgs.Context.User.Username,
             eventArgs.Context.User.Id,
             eventArgs.Context.Guild?.Name ?? "Private",
@@ -52,14 +51,13 @@ internal sealed class CommandLogger : ICommandLogger
         _logger.LogError(
             _defaultLogTemplate,
             cmdsExt.Client.ShardId,
-            DateTimeOffset.Now,
             eventArgs.Context.User.Username,
             eventArgs.Context.User.Id,
             eventArgs.Context.Guild?.Name ?? "Private",
             (eventArgs.Context.Guild is null) ? string.Empty : "[" + eventArgs.Context.Guild.Id + "]",
             eventArgs.Context.Channel.Name ?? "Private",
             eventArgs.Context.Channel.Id,
-            $"{eventArgs.Context.Command.Name} {string.Join(' ', eventArgs.Context.Arguments.Select(x => x.Value)) + Environment.NewLine + eventArgs.Exception}"
+            $"{eventArgs.Context.Command.Name} {string.Join(' ', eventArgs.Context.Arguments.Select(x => x.Value)) + Environment.NewLine + AnsiColor.Red + eventArgs.Exception}"
         );
         return Task.CompletedTask;
     }

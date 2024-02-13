@@ -83,6 +83,8 @@ public sealed class Bot : BackgroundService
                 cmdsExtension.AddCommands(assembly);
             }
 
+            _logger.LogInformation("Starting AkkoBot v{Version}", AkkoConstants.BotVersion);
+
             await client.StartAsync();
             await Task.WhenAny(
                 Task.Delay(Timeout.Infinite, _lifetime.StopToken),

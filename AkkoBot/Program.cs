@@ -3,6 +3,7 @@ using AkkoBot.Core;
 using Kotz.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
+using Serilog;
 
 namespace AkkoBot;
 
@@ -13,12 +14,10 @@ internal sealed class Program
 {
     private static async Task Main(string[] args)
     {
+        Log.Logger = AkkoLogging.BaseLogBuilder.CreateLogger();
         var builder = Host.CreateEmptyApplicationBuilder(new() { Args = args });
 
-        builder.Logging
-            .AddSimpleConsole()
-            .AddDebug();
-
+        builder.Logging.AddSerilog();
         builder.Services
             .AddHostedService<Bot>()
             .RegisterServices()
@@ -27,5 +26,7 @@ internal sealed class Program
 
         using var host = builder.Build();
         await host.RunAsync();
+
+        await Log.CloseAndFlushAsync();
     }
 }
