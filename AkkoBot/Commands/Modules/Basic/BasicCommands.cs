@@ -22,6 +22,10 @@ public sealed class BasicCommands
     public static async Task SayAsync(CommandContext context, string message)
         => await context.RespondAsync(message);
 
+    [Command("error")]
+    public static Task SayAsync(CommandContext context)
+        => throw new InvalidOperationException("This is a command that failed.");
+
     [Command("die")]
     public async Task DieAsync(CommandContext context)
     {

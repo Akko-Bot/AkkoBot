@@ -1,5 +1,6 @@
 using AkkoBot.Config.Models;
 using AkkoBot.Core.Services.Abstractions;
+using AkkoBot.Events.Logging.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors;
@@ -18,6 +19,7 @@ public sealed class Bot : BackgroundService
 {
     private readonly DiscordConfiguration _clientConfig;
     private readonly CommandsConfiguration _cmdExtConfig;
+    private readonly ICommandLogger _cmdLogger;
     private readonly IBotLifetime _lifetime;
     private readonly ILogger<Bot> _logger;
 
@@ -26,11 +28,12 @@ public sealed class Bot : BackgroundService
     /// </summary>
     /// <param name="creds">The bot credentials.</param>
     /// <param name="botConfig">The bot settings.</param>
+    /// <param name="cmdLogger">The bot logger service.</param>
     /// <param name="lifetime">The bot lifetime.</param>
     /// <param name="logger">The host logger.</param>
     /// <param name="loggerFactory">The host logger factory.</param>
     /// <param name="serviceProvider">The host IoC container.</param>
-    public Bot(Credentials creds, BotConfig botConfig, IBotLifetime lifetime, ILogger<Bot> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public Bot(Credentials creds, BotConfig botConfig, ICommandLogger cmdLogger, IBotLifetime lifetime, ILogger<Bot> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _clientConfig = new DiscordConfiguration()
         {
@@ -49,7 +52,7 @@ public sealed class Bot : BackgroundService
             UseDefaultCommandErrorHandler = true,
             ServiceProvider = serviceProvider
         };
-
+        _cmdLogger = cmdLogger;
         _lifetime = lifetime;
         _logger = logger;
     }
@@ -73,6 +76,9 @@ public sealed class Bot : BackgroundService
 
             foreach (var (_, cmdsExtension) in await client.UseCommandsAsync(_cmdExtConfig))
             {
+                cmdsExtension.CommandExecuted += _cmdLogger.LogSuccessAsync;
+                cmdsExtension.CommandErrored += _cmdLogger.LogErrorAsync;
+
                 await cmdsExtension.AddProcessorsAsync(processors);
                 cmdsExtension.AddCommands(assembly);
             }

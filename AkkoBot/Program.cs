@@ -1,6 +1,8 @@
 using AkkoBot.Common;
 using AkkoBot.Core;
 using Kotz.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Console;
 
 namespace AkkoBot;
 

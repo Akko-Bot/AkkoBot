@@ -11,11 +11,14 @@ namespace AkkoBot.Config;
 /// Saves and loads Yaml configuration files.
 /// </summary>
 [Service<IConfigLoader>(ServiceLifetime.Singleton)]
-public sealed class ConfigLoader : IConfigLoader
+internal sealed class ConfigLoader : IConfigLoader
 {
     private readonly ISerializer _serializer;
     private readonly IDeserializer _deserializer;
 
+    /// <summary>
+    /// Saves and loads Yaml configuration files.
+    /// </summary>
     public ConfigLoader() : this(
         new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build(),
         new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build()
@@ -23,18 +26,25 @@ public sealed class ConfigLoader : IConfigLoader
     {
     }
 
+    /// <summary>
+    /// Saves and loads Yaml configuration files.
+    /// </summary>
+    /// <param name="serializer">The Yaml serializer.</param>
+    /// <param name="deserializer">The Yaml deserializer.</param>
     public ConfigLoader(ISerializer serializer, IDeserializer deserializer)
     {
         _serializer = serializer;
         _deserializer = deserializer;
     }
 
+    /// <inheritdoc />
     public Credentials LoadCredentials(string filePath)
     {
         while (!IsValidCredential(filePath)) { }
         return GetCredentials(filePath);
     }
 
+    /// <inheritdoc />
     public T LoadConfig<T>(string filePath) where T : new()
     {
         // Load the config file
@@ -45,6 +55,7 @@ public sealed class ConfigLoader : IConfigLoader
         return reader.FromYaml<T>(_deserializer);
     }
 
+    /// <inheritdoc />
     public void SaveConfig<T>(T config, string filePath)
     {
         using var writer = File.CreateText(filePath);
