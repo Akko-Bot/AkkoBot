@@ -1,11 +1,11 @@
-﻿using AkkoBot.Common;
-using AkkoBot.Config.Models;
+﻿using AkkoBot.Core.Config.Abstractions;
+using AkkoBot.Core.Config.Models;
 using AkkoBot.Extensions;
 using Kotz.DependencyInjection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace AkkoBot.Config;
+namespace AkkoBot.Core.Config;
 
 /// <summary>
 /// Saves and loads Yaml configuration files.

@@ -1,5 +1,8 @@
 ﻿namespace AkkoBot.Common;
 
+/// <summary>
+/// Groups data about the environment the bot is executing in.
+/// </summary>
 public static class AkkoEnvironment
 {
     /// <summary>

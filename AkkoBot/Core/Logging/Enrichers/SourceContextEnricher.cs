@@ -1,7 +1,7 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace AkkoBot.Events.Logging.Services;
+namespace AkkoBot.Core.Logging.Enrichers;
 
 /// <summary>
 /// Changes the SourceContext Serilog property from the full assembly name to the regular name of a type .

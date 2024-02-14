@@ -26,31 +26,31 @@ public static class AkkoLogging
     /// Default log message template.
     /// </summary>
     public const string DefaultLogMessageTemplate =
-        $"""
-        [Shard {nameof(CommandLogArguments.ShardId)}]
-              User: {nameof(CommandLogArguments.Username)} [{nameof(CommandLogArguments.UserId)}]
-              Server: {nameof(CommandLogArguments.GuildName)} [{nameof(CommandLogArguments.GuildId)}]
-              Channel: #{nameof(CommandLogArguments.ChannelName)} [{nameof(CommandLogArguments.ChannelId)}]
-              Command: {nameof(CommandLogArguments.Command)}{nameof(CommandLogArguments.CommandException)}
+        $$"""
+        [Shard {{{nameof(CommandLogArguments.ShardId)}}}]
+              User: {{{nameof(CommandLogArguments.Username)}}} [{{{nameof(CommandLogArguments.UserId)}}}]
+              Server: {{{nameof(CommandLogArguments.GuildName)}}} [{{{nameof(CommandLogArguments.GuildId)}}}]
+              Channel: #{{{nameof(CommandLogArguments.ChannelName)}}} [{{{nameof(CommandLogArguments.ChannelId)}}}]
+              Command: {{{nameof(CommandLogArguments.Command)}}}{{{nameof(CommandLogArguments.CommandException)}}}
         """;
 
     /// <summary>
     /// Simple log message template.
     /// </summary>
     public const string SimpleLogMessageTemplate =
-        $"[{nameof(CommandLogArguments.ShardId)}] | " +
-        $"g: {nameof(CommandLogArguments.GuildId)} | " +
-        $"c: {nameof(CommandLogArguments.ChannelId)} | " +
-        $"u: {nameof(CommandLogArguments.UserId)} | " +
-        $"msg: {nameof(CommandLogArguments.Command)}{nameof(CommandLogArguments.CommandException)}";
+        $"[{{{nameof(CommandLogArguments.ShardId)}}}] | " +
+        $"g: {{{nameof(CommandLogArguments.GuildId)}}} | " +
+        $"c: {{{nameof(CommandLogArguments.ChannelId)}}} | " +
+        $"u: {{{nameof(CommandLogArguments.UserId)}}} | " +
+        $"msg: {{{nameof(CommandLogArguments.Command)}}}{{{nameof(CommandLogArguments.CommandException)}}}";
 
     /// <summary>
     /// Minimalist log message template.
     /// </summary>
     public const string MinimalistLogMessageTemplate =
-        $"[{nameof(CommandLogArguments.ShardId)}] | " +
-        $"{nameof(CommandLogArguments.GuildName)} | " +
-        $"#{nameof(CommandLogArguments.ChannelName)} | " +
-        $"{nameof(CommandLogArguments.Username)}: " +
-        nameof(CommandLogArguments.Command) + nameof(CommandLogArguments.CommandException);
+        $"[{{{nameof(CommandLogArguments.ShardId)}}}] | " +
+        $"{{{nameof(CommandLogArguments.GuildName)}}} | " +
+        $"#{{{nameof(CommandLogArguments.ChannelName)}}} | " +
+        $"{{{nameof(CommandLogArguments.Username)}}}: " +
+        $"{{{nameof(CommandLogArguments.Command)}}}{{{nameof(CommandLogArguments.CommandException)}}}";
 }

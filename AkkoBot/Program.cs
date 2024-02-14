@@ -1,6 +1,6 @@
-using AkkoBot.Config.Abstractions;
-using AkkoBot.Config.Models;
 using AkkoBot.Core;
+using AkkoBot.Core.Config.Abstractions;
+using AkkoBot.Core.Config.Models;
 using Kotz.DependencyInjection.Extensions;
 using Serilog;
 

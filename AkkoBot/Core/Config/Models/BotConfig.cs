@@ -1,9 +1,7 @@
-﻿using AkkoBot.Common;
-using ConcurrentCollections;
-using Kotz.Extensions;
+﻿using ConcurrentCollections;
 using YamlDotNet.Serialization;
 
-namespace AkkoBot;
+namespace AkkoBot.Core.Config.Models;
 
 /// <summary>
 /// Stores settings related to the bot.

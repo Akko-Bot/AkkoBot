@@ -1,11 +1,11 @@
-using AkkoBot.Config.Abstractions;
+using AkkoBot.Core.Config.Abstractions;
 using AkkoBot.Core.Logging.Models;
-using AkkoBot.Events.Logging.Abstractions;
+using AkkoBot.Discord.Events.Logging.Abstractions;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
 using Kotz.DependencyInjection;
 
-namespace AkkoBot.Events.Logging;
+namespace AkkoBot.Discord.Events.Logging;
 
 /// <summary>
 /// Logs bot commands.
@@ -19,6 +19,7 @@ internal sealed class CommandLogger : ICommandLogger
     /// <summary>
     /// Logs bot commands.
     /// </summary>
+    /// <param name="loggerLoader">The log loader.</param>
     /// <param name="logger">The logger to use.</param>
     public CommandLogger(ILoggerLoader loggerLoader, ILogger<CommandLogger> logger)
     {
@@ -30,11 +31,13 @@ internal sealed class CommandLogger : ICommandLogger
     public Task LogSuccessAsync(CommandsExtension cmdsExt, CommandExecutedEventArgs eventArgs)
     {
         var logArguments = new CommandLogArguments(eventArgs.Context);
-        
+
+#pragma warning disable CA2254
         _logger.LogInformation(
             _loggerLoader.LogMessageTemplate,
             logArguments.GetLogArguments(_loggerLoader.LogMessageTemplate)
         );
+#pragma warning restore CA2254
 
         return Task.CompletedTask;
     }
@@ -44,10 +47,12 @@ internal sealed class CommandLogger : ICommandLogger
     {
         var logArguments = new CommandLogArguments(eventArgs.Context, eventArgs.Exception);
 
+#pragma warning disable CA2254
         _logger.LogError(
             _loggerLoader.LogMessageTemplate,
             logArguments.GetLogArguments(_loggerLoader.LogMessageTemplate)
         );
+#pragma warning restore CA2254
 
         return Task.CompletedTask;
     }

@@ -1,9 +1,4 @@
-﻿using AkkoBot.Events.Logging.Services;
-using DSharpPlus.Entities;
-using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
-using System.Globalization;
+﻿using DSharpPlus.Entities;
 
 namespace AkkoBot;
 

@@ -1,7 +1,7 @@
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace AkkoBot.Config.Abstractions;
+namespace AkkoBot.Core.Config.Abstractions;
 
 /// <summary>
 /// Contains data and methods relevants for configuring a Serilog logger.

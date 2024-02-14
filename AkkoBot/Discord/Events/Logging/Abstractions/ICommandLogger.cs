@@ -1,7 +1,7 @@
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
 
-namespace AkkoBot.Events.Logging.Abstractions;
+namespace AkkoBot.Discord.Events.Logging.Abstractions;
 
 /// <summary>
 /// Represents an object that logs bot commands. 

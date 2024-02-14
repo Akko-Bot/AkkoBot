@@ -2,15 +2,19 @@
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Commands.Trees.Attributes;
 
-namespace AkkoBot.Commands.Modules.Basic;
+namespace AkkoBot.Discord.Commands.Modules.Basic;
 
 /// <summary>
 /// Demo commands.
 /// </summary>
-public sealed class BasicCommands
+internal sealed class BasicCommands
 {
     private readonly IBotLifetime _restartState;
 
+    /// <summary>
+    /// Demo commands
+    /// </summary>
+    /// <param name="restartState">The bot lifetime.</param>
     public BasicCommands(IBotLifetime restartState)
         => _restartState = restartState;
 

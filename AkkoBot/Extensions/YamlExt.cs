@@ -4,6 +4,9 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace AkkoBot.Extensions;
 
+/// <summary>
+/// Contains extension methods for Yaml de/serialization.
+/// </summary>
 public static class YamlExt
 {
     private static readonly ISerializer _defaultSerializer = new SerializerBuilder()

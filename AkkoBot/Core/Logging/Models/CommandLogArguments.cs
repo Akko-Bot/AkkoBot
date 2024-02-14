@@ -12,14 +12,50 @@ public sealed partial record CommandLogArguments
     private static readonly Regex _argumentRegex = GenerateArgumentRegex();
     private static readonly PropertyInfo[] _classProperties = typeof(CommandLogArguments).GetProperties();
 
+    /// <summary>
+    /// The shard Id where the command was executed.
+    /// </summary>
     public int ShardId { get; }
+
+    /// <summary>
+    /// The name of the user who executed the command.
+    /// </summary>
     public string Username { get; }
+
+    /// <summary>
+    /// The Id of the user who executed the command.
+    /// </summary>
     public ulong UserId { get; }
+
+    /// <summary>
+    /// The name of the guild the command was executed in.
+    /// </summary>
     public string GuildName { get; }
+
+    /// <summary>
+    /// The Id of the guild the command was executed in.
+    /// </summary>
     public ulong? GuildId { get; }
+
+    /// <summary>
+    /// The name of the channel the command was executed in.
+    /// </summary>
     public string ChannelName { get; }
+
+    /// <summary>
+    /// The Id of the channel the command was executed in.
+    /// </summary>
     public ulong ChannelId { get; }
+
+    /// <summary>
+    /// The command that was executed.
+    /// </summary>
     public string Command { get; }
+
+    /// <summary>
+    /// The exception that the command generated or
+    /// <see cref="string.Empty"/> if there was no exception.
+    /// </summary>
     public string CommandException { get; } = string.Empty;
 
     /// <summary>

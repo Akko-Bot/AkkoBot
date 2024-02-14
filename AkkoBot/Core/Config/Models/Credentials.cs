@@ -1,6 +1,6 @@
 ﻿using ConcurrentCollections;
 
-namespace AkkoBot.Config.Models;
+namespace AkkoBot.Core.Config.Models;
 
 /// <summary>
 /// A class that represents a credentials file.

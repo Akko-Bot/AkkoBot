@@ -1,7 +1,6 @@
-using AkkoBot.Config.Models;
+using AkkoBot.Core.Config.Models;
 using AkkoBot.Core.Services.Abstractions;
-using AkkoBot.Events.Logging.Abstractions;
-using AkkoBot.Extensions;
+using AkkoBot.Discord.Events.Logging.Abstractions;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors;
@@ -9,7 +8,6 @@ using DSharpPlus.Commands.Processors.MessageCommands;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.TextCommands;
 using DSharpPlus.Commands.Processors.UserCommands;
-using Serilog;
 using System.Reflection;
 
 namespace AkkoBot.Core;

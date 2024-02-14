@@ -1,6 +1,6 @@
-﻿using AkkoBot.Config.Models;
+﻿using AkkoBot.Core.Config.Models;
 
-namespace AkkoBot;
+namespace AkkoBot.Core.Config.Abstractions;
 
 /// <summary>
 /// Represents an object that loads and saves config YAML files and the bot's credentials.

@@ -1,12 +1,12 @@
-using AkkoBot.Config.Abstractions;
-using AkkoBot.Config.Models;
-using AkkoBot.Events.Logging.Services;
+using AkkoBot.Core.Config.Abstractions;
+using AkkoBot.Core.Config.Models;
+using AkkoBot.Core.Logging.Enrichers;
 using Kotz.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Globalization;
 
-namespace AkkoBot.Config;
+namespace AkkoBot.Core.Config;
 
 /// <summary>
 /// Contains data and methods relevants for configuring a Serilog logger for Akko.
