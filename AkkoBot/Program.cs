@@ -1,8 +1,7 @@
-using AkkoBot.Common;
+using AkkoBot.Config.Abstractions;
+using AkkoBot.Config.Models;
 using AkkoBot.Core;
 using Kotz.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging.Console;
 using Serilog;
 
 namespace AkkoBot;
@@ -14,15 +13,14 @@ internal sealed class Program
 {
     private static async Task Main(string[] args)
     {
-        Log.Logger = AkkoLogging.BaseLogBuilder.CreateLogger();
         var builder = Host.CreateEmptyApplicationBuilder(new() { Args = args });
-
-        builder.Logging.AddSerilog();
         builder.Services
             .AddHostedService<Bot>()
             .RegisterServices()
             .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadCredentials(AkkoEnvironment.CredsPath))
-            .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath));
+            .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath))
+            .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadConfig<LogConfig>(AkkoEnvironment.LogConfigPath))
+            .AddSerilog((ioc, logBuilder) => ioc.GetRequiredService<ILoggerLoader>().ConfigureLogger(logBuilder));
 
         using var host = builder.Build();
         await host.RunAsync();

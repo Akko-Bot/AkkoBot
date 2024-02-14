@@ -1,3 +1,5 @@
+using AkkoBot.Config.Abstractions;
+using AkkoBot.Core.Logging.Models;
 using AkkoBot.Events.Logging.Abstractions;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
@@ -11,54 +13,42 @@ namespace AkkoBot.Events.Logging;
 [Service<ICommandLogger>(ServiceLifetime.Singleton)]
 internal sealed class CommandLogger : ICommandLogger
 {
-    private const string _defaultLogTemplate =
-        """
-        [Shard {ShardId}]
-              User: {Username} [{UserId}]
-              Server: {GuildName} {GuildId}
-              Channel: #{ChannelName} [{ChannelId}]
-              Command: {Command}
-        """;
+    private readonly ILoggerLoader _loggerLoader;
     private readonly ILogger<CommandLogger> _logger;
 
     /// <summary>
     /// Logs bot commands.
     /// </summary>
     /// <param name="logger">The logger to use.</param>
-    public CommandLogger(ILogger<CommandLogger> logger)
-        => _logger = logger;
+    public CommandLogger(ILoggerLoader loggerLoader, ILogger<CommandLogger> logger)
+    {
+        _loggerLoader = loggerLoader;
+        _logger = logger;
+    }
 
     /// <inheritdoc />
     public Task LogSuccessAsync(CommandsExtension cmdsExt, CommandExecutedEventArgs eventArgs)
     {
+        var logArguments = new CommandLogArguments(eventArgs.Context);
+        
         _logger.LogInformation(
-            _defaultLogTemplate,
-            cmdsExt.Client.ShardId,
-            eventArgs.Context.User.Username,
-            eventArgs.Context.User.Id,
-            eventArgs.Context.Guild?.Name ?? "Private",
-            (eventArgs.Context.Guild is null) ? string.Empty : "[" + eventArgs.Context.Guild.Id + "]",
-            eventArgs.Context.Channel.Name ?? "Private",
-            eventArgs.Context.Channel.Id,
-            $"{eventArgs.Context.Command.Name} {string.Join(' ', eventArgs.Context.Arguments.Select(x => x.Value))}"
+            _loggerLoader.LogMessageTemplate,
+            logArguments.GetLogArguments(_loggerLoader.LogMessageTemplate)
         );
+
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public Task LogErrorAsync(CommandsExtension cmdsExt, CommandErroredEventArgs eventArgs)
     {
+        var logArguments = new CommandLogArguments(eventArgs.Context, eventArgs.Exception);
+
         _logger.LogError(
-            _defaultLogTemplate,
-            cmdsExt.Client.ShardId,
-            eventArgs.Context.User.Username,
-            eventArgs.Context.User.Id,
-            eventArgs.Context.Guild?.Name ?? "Private",
-            (eventArgs.Context.Guild is null) ? string.Empty : "[" + eventArgs.Context.Guild.Id + "]",
-            eventArgs.Context.Channel.Name ?? "Private",
-            eventArgs.Context.Channel.Id,
-            $"{eventArgs.Context.Command.Name} {string.Join(' ', eventArgs.Context.Arguments.Select(x => x.Value)) + Environment.NewLine + AnsiColor.Red + eventArgs.Exception}"
+            _loggerLoader.LogMessageTemplate,
+            logArguments.GetLogArguments(_loggerLoader.LogMessageTemplate)
         );
+
         return Task.CompletedTask;
     }
 }

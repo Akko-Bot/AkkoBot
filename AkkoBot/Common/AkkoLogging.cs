@@ -1,43 +1,56 @@
-using AkkoBot.Events.Logging.Services;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-using System.Globalization;
+using AkkoBot.Core.Logging.Models;
 
 namespace AkkoBot.Common;
 
 /// <summary>
-/// Contains logging-related objects and methods.
+/// Groups constants that are used for logging.
 /// </summary>
 public static class AkkoLogging
 {
-    private const string _logTemplate = "{Level:w4}: [{Timestamp}] [{SourceContext}] {Message:l}{NewLine}";
-
-    private readonly static AnsiConsoleTheme _consoleTheme = new(
-        new Dictionary<ConsoleThemeStyle, string>()
-        {
-            [ConsoleThemeStyle.Text] = string.Empty,
-            [ConsoleThemeStyle.SecondaryText] = string.Empty,
-            [ConsoleThemeStyle.TertiaryText] = string.Empty,
-            [ConsoleThemeStyle.Invalid] = string.Empty,
-            [ConsoleThemeStyle.Null] = string.Empty,
-            [ConsoleThemeStyle.Name] = string.Empty,
-            [ConsoleThemeStyle.String] = string.Empty,
-            [ConsoleThemeStyle.Number] = string.Empty,
-            [ConsoleThemeStyle.Boolean] = string.Empty,
-            [ConsoleThemeStyle.Scalar] = string.Empty,
-            [ConsoleThemeStyle.LevelVerbose] = AnsiColor.Gray,
-            [ConsoleThemeStyle.LevelDebug] = AnsiColor.Green,
-            [ConsoleThemeStyle.LevelInformation] = AnsiColor.Blue,
-            [ConsoleThemeStyle.LevelWarning] = AnsiColor.Purple,
-            [ConsoleThemeStyle.LevelError] = AnsiColor.Red,
-            [ConsoleThemeStyle.LevelFatal] = AnsiColor.WhiteOnRed
-        }
-    );
+    /// <summary>
+    /// The default log template.
+    /// </summary>
+    public const string DefaultLogTemplate = "{Level:w4}: [{Timestamp}] [{SourceContext}] {Message:l}{NewLine}{Exception}";
 
     /// <summary>
-    /// The base Serilog log builder.
+    /// The simple log template.
     /// </summary>
-    public static LoggerConfiguration BaseLogBuilder { get; } = new LoggerConfiguration()
-        .Enrich.With<SourceContextEnricher>()
-        .WriteTo.Console(outputTemplate: _logTemplate, formatProvider: CultureInfo.InvariantCulture, theme: _consoleTheme);
+    public const string SimpleLogTemplate = "{Level:w4}: [{Timestamp:HH:mm}] [{SourceContext}] {Message:l}{NewLine}{Exception}";
+
+    /// <summary>
+    /// The minimalist log template.
+    /// </summary>
+    public const string MinimalistLogTemplate = "{Level:w4}: [{Timestamp:HH:mm}] {Message:l}{NewLine}{Exception}";
+
+    /// <summary>
+    /// Default log message template.
+    /// </summary>
+    public const string DefaultLogMessageTemplate =
+        $"""
+        [Shard {nameof(CommandLogArguments.ShardId)}]
+              User: {nameof(CommandLogArguments.Username)} [{nameof(CommandLogArguments.UserId)}]
+              Server: {nameof(CommandLogArguments.GuildName)} [{nameof(CommandLogArguments.GuildId)}]
+              Channel: #{nameof(CommandLogArguments.ChannelName)} [{nameof(CommandLogArguments.ChannelId)}]
+              Command: {nameof(CommandLogArguments.Command)}{nameof(CommandLogArguments.CommandException)}
+        """;
+
+    /// <summary>
+    /// Simple log message template.
+    /// </summary>
+    public const string SimpleLogMessageTemplate =
+        $"[{nameof(CommandLogArguments.ShardId)}] | " +
+        $"g: {nameof(CommandLogArguments.GuildId)} | " +
+        $"c: {nameof(CommandLogArguments.ChannelId)} | " +
+        $"u: {nameof(CommandLogArguments.UserId)} | " +
+        $"msg: {nameof(CommandLogArguments.Command)}{nameof(CommandLogArguments.CommandException)}";
+
+    /// <summary>
+    /// Minimalist log message template.
+    /// </summary>
+    public const string MinimalistLogMessageTemplate =
+        $"[{nameof(CommandLogArguments.ShardId)}] | " +
+        $"{nameof(CommandLogArguments.GuildName)} | " +
+        $"#{nameof(CommandLogArguments.ChannelName)} | " +
+        $"{nameof(CommandLogArguments.Username)}: " +
+        nameof(CommandLogArguments.Command) + nameof(CommandLogArguments.CommandException);
 }
