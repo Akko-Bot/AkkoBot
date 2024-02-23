@@ -19,8 +19,8 @@ internal sealed class ConfigLoader : IConfigLoader
     /// Saves and loads Yaml configuration files.
     /// </summary>
     public ConfigLoader() : this(
-        new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build(),
-        new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build()
+        new SerializerBuilder().EnablePrivateConstructors().WithNamingConvention(UnderscoredNamingConvention.Instance).Build(),
+        new DeserializerBuilder().EnablePrivateConstructors().WithNamingConvention(UnderscoredNamingConvention.Instance).Build()
     )
     {
     }

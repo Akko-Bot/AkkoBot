@@ -2,8 +2,10 @@ using AkkoBot.Core.Config.Abstractions;
 using AkkoBot.Core.Config.Models;
 using AkkoBot.Core.Logging.Enrichers;
 using Serilog;
+using Serilog.Core;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Globalization;
+using System.Text;
 
 namespace AkkoBot.Core.Config;
 
@@ -74,15 +76,33 @@ internal sealed class LoggerLoader : ILoggerLoader
     {
         logBuilder
             .Enrich.With<SourceContextEnricher>()
-            .WriteTo.Console(outputTemplate: LogTemplate, formatProvider: CultureInfo.InvariantCulture, theme: ConsoleTheme);
+            .WriteTo.Console(
+                outputTemplate: LogTemplate,
+                restrictedToMinimumLevel: _config.LogLevel,
+                formatProvider: CultureInfo.InvariantCulture,
+                theme: ConsoleTheme
+            );
 
         if (_config.IsLoggedToFile)
         {
+            var fileSizeLimit = (_config.LogSizeMb is 0.0)
+                ? null
+                : (long?)(_config.LogSizeMb * 1_000_000);
+
             var fileName = (_config.LogFileSaveInterval is RollingInterval.Infinite)
                 ? "AkkoBot.txt"
                 : "AkkoBot_.txt";
 
-            logBuilder.WriteTo.File(Path.Join(AkkoEnvironment.LogsDirectory, fileName), outputTemplate: LogTemplate, rollingInterval: _config.LogFileSaveInterval);
+            logBuilder.WriteTo.File(
+                Path.Join(AkkoEnvironment.LogsDirectory, fileName),
+                outputTemplate: LogTemplate,
+                restrictedToMinimumLevel: _config.LogLevel,
+                rollingInterval: _config.LogFileSaveInterval,
+                fileSizeLimitBytes: fileSizeLimit,
+                rollOnFileSizeLimit: true,
+                retainedFileCountLimit: null,
+                shared: true
+            );
         }
 
         return logBuilder;

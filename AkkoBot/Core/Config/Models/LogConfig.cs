@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Core.Config.Models;
@@ -12,26 +13,20 @@ public sealed class LogConfig
     /// <summary>
     /// The minimum severity level of logs that should be registered.
     /// </summary>
-    [YamlMember(Description = @"The minimum severity level of logs that should be registered. Defaults to ""Information"". Values: None, Error, Warning, Information, Debug")]
-    public LogLevel LogLevel { get; set; } = LogLevel.Information;
+    [YamlMember(Description = @"The minimum severity level of logs that should be registered. Defaults to ""Information"". Values: Verbose, Debug, Information, Warning, Error, Fatal")]
+    public LogEventLevel LogLevel { get; set; } = LogEventLevel.Information;
 
     /// <summary>
     /// Defines how logs should be formatted.
     /// </summary>
-    [YamlMember(Description = @"Defines how logs should be formatted. Defaults to ""Default"". Values: Minimalist, Simple, Default")]
+    [YamlMember(Description = @"Defines how logs should be formatted. Defaults to ""Default"". Values: Minimalist, Simple, Default, or a custom Serilog template: https://github.com/serilog/serilog/wiki/Formatting-Output#formatting-plain-text")]
     public string LogTemplate { get; set; } = "Default";
 
     /// <summary>
     /// Defines how the message of command logs should be formatted.
     /// </summary>
-    [YamlMember(Description = @"Defines how the message of command logs should be formatted. Defaults to ""Default"". Values: Minimalist, Simple, Default")]
+    [YamlMember(Description = @"Defines how the message of command logs should be formatted. Defaults to ""Default"". Values: Minimalist, Simple, Default")] // TODO: documentation for custom template
     public string LogMessageTemplate { get; set; } = "Default";
-
-    /// <summary>
-    /// Defines the time format to be used in the logs.
-    /// </summary>
-    [YamlMember(Description = @"Defines the time format to be used in the logs. Leave it empty to use the default. Refer to: https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings")]
-    public string? LogTimeFormat { get; set; }
 
     /// <summary>
     /// Determines whether logs should be written to a file.
@@ -48,6 +43,6 @@ public sealed class LogConfig
     /// <summary>
     /// Determines the maximum size of a log file, in megabytes.
     /// </summary>
-    [YamlMember(Description = @"Determines the maximum size of a log file, in megabytes. Defaults to ""1.0"".")]
-    public double LogSizeMb { get; set; } = 1.0;
+    [YamlMember(Description = @"Determines the maximum size of a log file, in megabytes. Defaults to ""0.0"" for no size limit.")]
+    public double LogSizeMb { get; set; } = 0.0;
 }
