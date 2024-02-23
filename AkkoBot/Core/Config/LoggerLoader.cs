@@ -1,7 +1,6 @@
 using AkkoBot.Core.Config.Abstractions;
 using AkkoBot.Core.Config.Models;
 using AkkoBot.Core.Logging.Enrichers;
-using Kotz.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Globalization;

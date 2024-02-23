@@ -1,7 +1,6 @@
-﻿using AkkoBot.Core.Config.Abstractions;
+using AkkoBot.Core.Config.Abstractions;
 using AkkoBot.Core.Config.Models;
 using AkkoBot.Extensions;
-using Kotz.DependencyInjection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -70,7 +69,8 @@ internal sealed class ConfigLoader : IConfigLoader
     /// <returns>The <typeparamref name="T"/> that has been serialized.</returns>
     private T CreateConfigFile<T>(string filePath) where T : new()
     {
-        var fileDirectory = AkkoEnvironment.GetFileDirectoryPath(filePath);
+        var fileDirectory = Directory.GetParent(filePath)?.FullName
+            ?? Directory.GetDirectoryRoot(filePath);
 
         // Ensure the folder exists
         if (!Directory.Exists(fileDirectory))
@@ -116,7 +116,7 @@ internal sealed class ConfigLoader : IConfigLoader
     private Credentials GetCredentials(string filePath)
     {
         // If directory or file don't exist, return false
-        if (!Directory.Exists(AkkoEnvironment.GetFileDirectoryPath(filePath)) || !File.Exists(filePath))
+        if (!Directory.Exists(Directory.GetParent(filePath)?.FullName) || !File.Exists(filePath))
         {
             CreateConfigFile<Credentials>(filePath);
 

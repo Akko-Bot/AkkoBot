@@ -1,4 +1,4 @@
-﻿using AkkoBot.Core.Services.Abstractions;
+using AkkoBot.Core.Services.Abstractions;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Commands.Trees.Attributes;
 

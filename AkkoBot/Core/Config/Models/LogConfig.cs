@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Core.Config.Models;

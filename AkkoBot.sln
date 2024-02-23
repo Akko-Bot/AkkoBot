@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkoTests", "AkkoTests\Akko
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoBot", "AkkoBot\AkkoBot.csproj", "{375F53FE-6CC8-436D-A125-30C213D30325}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkoApp", "AkkoApp\AkkoApp.csproj", "{D344942F-CB84-40FB-A9C4-3CF67337EC88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{375F53FE-6CC8-436D-A125-30C213D30325}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{375F53FE-6CC8-436D-A125-30C213D30325}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{375F53FE-6CC8-436D-A125-30C213D30325}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D344942F-CB84-40FB-A9C4-3CF67337EC88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D344942F-CB84-40FB-A9C4-3CF67337EC88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D344942F-CB84-40FB-A9C4-3CF67337EC88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D344942F-CB84-40FB-A9C4-3CF67337EC88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

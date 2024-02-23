@@ -1,4 +1,4 @@
-﻿namespace AkkoBot.Common;
+namespace AkkoBot.Common;
 
 /// <summary>
 /// Groups constants that are used across the entire project.

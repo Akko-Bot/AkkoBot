@@ -1,5 +1,5 @@
-﻿using AkkoBot.Core.Services.Abstractions;
-using Kotz.DependencyInjection;
+using AkkoBot.Core.Services.Abstractions;
+using Microsoft.Extensions.Hosting;
 
 namespace AkkoBot.Core.Services;
 

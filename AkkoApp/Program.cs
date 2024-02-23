@@ -1,3 +1,4 @@
+using AkkoBot.Common;
 using AkkoBot.Core;
 using AkkoBot.Core.Config.Abstractions;
 using AkkoBot.Core.Config.Models;
@@ -16,7 +17,7 @@ internal sealed class Program
         var builder = Host.CreateEmptyApplicationBuilder(new() { Args = args });
         builder.Services
             .AddHostedService<Bot>()
-            .RegisterServices()
+            .RegisterServices(typeof(Bot).Assembly)
             .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadCredentials(AkkoEnvironment.CredsPath))
             .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadConfig<BotConfig>(AkkoEnvironment.BotConfigPath))
             .AddSingleton(x => x.GetRequiredService<IConfigLoader>().LoadConfig<LogConfig>(AkkoEnvironment.LogConfigPath))

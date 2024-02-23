@@ -3,7 +3,8 @@ using AkkoBot.Core.Logging.Models;
 using AkkoBot.Discord.Events.Logging.Abstractions;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
-using Kotz.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AkkoBot.Discord.Events.Logging;
 
@@ -28,31 +29,31 @@ internal sealed class CommandLogger : ICommandLogger
     }
 
     /// <inheritdoc />
+    [SuppressMessage("Style", "CA2254:Template should be a static expression",
+        Justification = "The template does not change at runtime.")]
     public Task LogSuccessAsync(CommandsExtension cmdsExt, CommandExecutedEventArgs eventArgs)
     {
         var logArguments = new CommandLogArguments(eventArgs.Context);
 
-#pragma warning disable CA2254
         _logger.LogInformation(
             _loggerLoader.LogMessageTemplate,
             logArguments.GetLogArguments(_loggerLoader.LogMessageTemplate)
         );
-#pragma warning restore CA2254
 
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
+    [SuppressMessage("Style", "CA2254:Template should be a static expression",
+        Justification = "The template does not change at runtime.")]
     public Task LogErrorAsync(CommandsExtension cmdsExt, CommandErroredEventArgs eventArgs)
     {
         var logArguments = new CommandLogArguments(eventArgs.Context, eventArgs.Exception);
 
-#pragma warning disable CA2254
         _logger.LogError(
             _loggerLoader.LogMessageTemplate,
             logArguments.GetLogArguments(_loggerLoader.LogMessageTemplate)
         );
-#pragma warning restore CA2254
 
         return Task.CompletedTask;
     }

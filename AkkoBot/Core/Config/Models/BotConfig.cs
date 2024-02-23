@@ -1,4 +1,4 @@
-﻿using ConcurrentCollections;
+using ConcurrentCollections;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Core.Config.Models;

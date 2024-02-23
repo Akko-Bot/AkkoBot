@@ -1,4 +1,4 @@
-﻿using AkkoBot.Core.Config.Models;
+using AkkoBot.Core.Config.Models;
 
 namespace AkkoBot.Core.Config.Abstractions;
 

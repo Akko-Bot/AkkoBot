@@ -1,4 +1,4 @@
-﻿namespace AkkoBot.Common;
+namespace AkkoBot.Common;
 
 /// <summary>
 /// Groups data about the environment the bot is executing in.
@@ -44,16 +44,6 @@ public static class AkkoEnvironment
     /// Gets the fully qualified path for the log configuration file.
     /// </summary>
     public static string LogConfigPath { get; } = Path.Combine(ConfigDirectory, "log_config.yaml");
-
-    /// <summary>
-    /// Gets either the absolute or relative directory path for a file.
-    /// </summary>
-    /// <param name="filePath">Relative or absolute directory path to the file.</param>
-    /// <remarks><paramref name="filePath"/> must contain at least one <see cref="Path.DirectorySeparatorChar"/>.</remarks>
-    /// <returns>The directory path of the specified file.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Occurs when the string terminates in <see cref="Path.DirectorySeparatorChar"/>.</exception>
-    public static string GetFileDirectoryPath(string filePath)
-        => filePath[..(filePath.LastIndexOf(Path.DirectorySeparatorChar) + 1)];
 
     /// <summary>
     /// Gets the relative path from <see cref="CurrentDirectory"/> to <paramref name="path"/>.
