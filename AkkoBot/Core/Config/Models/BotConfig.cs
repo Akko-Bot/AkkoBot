@@ -18,7 +18,7 @@ public sealed class BotConfig
     /// Groups the qualified name of commands that have been disabled globally.
     /// </summary>
     [YamlMember(Description = @"Groups the qualified name of commands that have been disabled globally.")]
-    public ConcurrentHashSet<string> DisabledCommands { get; init; } = new();
+    public ConcurrentHashSet<string> DisabledCommands { get; init; } = [];
 
     /// <summary>
     /// The default bot locale.

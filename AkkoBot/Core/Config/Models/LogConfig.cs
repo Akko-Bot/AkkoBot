@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Serilog;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Core.Config.Models;
@@ -33,16 +34,16 @@ public sealed class LogConfig
     public string? LogTimeFormat { get; set; }
 
     /// <summary>
-    /// Defines time format to be used on log file names.
-    /// </summary>
-    [YamlMember(Description = @"Defines time format to be used on log file names. Leave it empty to use the default. Refer to: https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings")]
-    public string? LogTimeStamp { get; set; }
-
-    /// <summary>
     /// Determines whether logs should be written to a file.
     /// </summary>
     [YamlMember(Description = @"Determines whether logs should be written to a file. Defaults to ""false"". Values: true, false")]
     public bool IsLoggedToFile { get; set; } = false;
+
+    /// <summary>
+    /// Defines how frequently log files are saved.
+    /// </summary>
+    [YamlMember(Description = @"Defines how frequently log files are saved. Defaults to ""Day"". Values: Minute, Hour, Day, Month, Year, Infinite")]
+    public RollingInterval LogFileSaveInterval { get; set; } = RollingInterval.Day;
 
     /// <summary>
     /// Determines the maximum size of a log file, in megabytes.

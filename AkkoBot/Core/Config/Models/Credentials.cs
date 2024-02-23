@@ -10,7 +10,7 @@ public sealed class Credentials
     /// <summary>
     /// Contains the IDs of the bot owners.
     /// </summary>
-    public ConcurrentHashSet<ulong> OwnerIds { get; init; } = [default];
+    public ConcurrentHashSet<ulong> OwnerIds { get; init; } = [ default ];
 
     /// <summary>
     /// The token used to connect to Discord.

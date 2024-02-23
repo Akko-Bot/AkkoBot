@@ -77,7 +77,13 @@ internal sealed class LoggerLoader : ILoggerLoader
             .WriteTo.Console(outputTemplate: LogTemplate, formatProvider: CultureInfo.InvariantCulture, theme: ConsoleTheme);
 
         if (_config.IsLoggedToFile)
-            logBuilder.WriteTo.File(Path.Join(AkkoEnvironment.LogsDirectory, "AkkoBot_.txt"), outputTemplate: LogTemplate, rollingInterval: RollingInterval.Day);
+        {
+            var fileName = (_config.LogFileSaveInterval is RollingInterval.Infinite)
+                ? "AkkoBot.txt"
+                : "AkkoBot_.txt";
+
+            logBuilder.WriteTo.File(Path.Join(AkkoEnvironment.LogsDirectory, fileName), outputTemplate: LogTemplate, rollingInterval: _config.LogFileSaveInterval);
+        }
 
         return logBuilder;
     }
