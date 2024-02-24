@@ -39,18 +39,18 @@ public sealed class Bot : BackgroundService
     {
         _clientConfig = new DiscordConfiguration()
         {
-            Intents = DiscordIntents.All,                       // Sign up for all intents. Forgetting to enable them on the developer portal will throw an exception!
-            Token = creds.Token,                               // Sets the bot token
-            TokenType = TokenType.Bot,                          // Defines the type of token; User = 0, Bot = 1, Bearer = 2
-            AutoReconnect = true,                               // Sets whether the bot should automatically reconnect in case it disconnects
-            ReconnectIndefinitely = false,                      // Sets whether the bot should attempt to reconnect indefinitely
-            MessageCacheSize = botConfig.MessageSizeCache,     // Defines how many messages should be cached per DiscordClient
-            LoggerFactory = loggerFactory                      // Overrides D#+ default logger with my own
+            Intents = DiscordIntents.All,                   // Sign up for all intents. Forgetting to enable them on the developer portal will throw an exception!
+            Token = creds.Token,                            // Sets the bot token
+            TokenType = TokenType.Bot,                      // Defines the type of token; User = 0, Bot = 1, Bearer = 2
+            AutoReconnect = true,                           // Sets whether the bot should automatically reconnect in case it disconnects
+            ReconnectIndefinitely = false,                  // Sets whether the bot should attempt to reconnect indefinitely
+            MessageCacheSize = botConfig.MessageSizeCache,  // Defines how many messages should be cached per DiscordClient
+            LoggerFactory = loggerFactory                   // Overrides D#+ default logger with my own
         };
 
         _cmdExtConfig = new CommandsConfiguration()
         {
-            DebugGuildId = 805138211138437151,
+            DebugGuildId = (botConfig.DebugGuildId is 0) ? null : botConfig.DebugGuildId,
             UseDefaultCommandErrorHandler = true,
             ServiceProvider = serviceProvider
         };

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using YamlDotNet.Serialization;

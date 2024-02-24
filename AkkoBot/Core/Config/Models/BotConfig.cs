@@ -1,4 +1,3 @@
-using ConcurrentCollections;
 using YamlDotNet.Serialization;
 
 namespace AkkoBot.Core.Config.Models;
@@ -11,7 +10,6 @@ public sealed class BotConfig
     private string _locale = AkkoConstants.DefaultLanguage;
     private string _okColor = "007FFF";
     private string _errorColor = "FB3D28";
-    private TimeSpan _bulkGatekeepingTime = TimeSpan.FromSeconds(5);
     private string _defaultHelpMessage = string.Empty;
 
     /// <summary>
@@ -51,44 +49,16 @@ public sealed class BotConfig
     }
 
     /// <summary>
-    /// Defines how long the bot waits on bulk greetings and farewells.
-    /// </summary>
-    [YamlMember(Description = @"Defines how long the bot waits on bulk greetings and farewells. Defaults to ""00:00:05"".")]
-    public TimeSpan BulkGatekeepTime
-    {
-        get => _bulkGatekeepingTime;
-        set => _bulkGatekeepingTime = value <= TimeSpan.Zero ? TimeSpan.FromSeconds(5) : value;
-    }
-
-    /// <summary>
     /// The default bot prefix.
     /// </summary>
     [YamlMember(Description = @"The default bot prefix. Defaults to ""!"".")]
     public string Prefix { get; set; } = "!";
 
     /// <summary>
-    /// The default name to be used on webhooks for guild logging.
-    /// </summary>
-    [YamlMember(Description = @"The default name to be used on webhooks for guild logging. Defaults to ""AkkoLog"".")]
-    public string WebhookLogName { get; set; } = "AkkoLog";
-
-    /// <summary>
-    /// Defines whether embeds should be used in responses by default.
-    /// </summary>
-    [YamlMember(Description = @"Defines whether embeds should be used in responses by default. Defaults to ""true"". Values: true, false")]
-    public bool UseEmbed { get; set; } = true;
-
-    /// <summary>
     /// Defines whether the bot responds to commands in direct message.
     /// </summary>
     [YamlMember(Description = @"Defines whether the bot responds to commands in direct message. Defaults to ""true"". Values: true, false")]
     public bool RespondToDms { get; set; } = true;
-
-    /// <summary>
-    /// Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from.
-    /// </summary>
-    [YamlMember(Description = @"Defines whether greet messages and tags sent in direct message should have a note appended informing the user what server they originate from. Defaults to ""false"".")]
-    public bool MarkDmsWithSource { get; set; } = false;
 
     /// <summary>
     /// Defines whether the bot responds to commands prefixed with a mention to the bot.
@@ -109,12 +79,6 @@ public sealed class BotConfig
     public bool EnableDefaultHelpMessage { get; set; } = true;
 
     /// <summary>
-    /// Defines whether the bot has statuses in rotation.
-    /// </summary>
-    [YamlMember(Description = @"Defines whether the bot has statuses in rotation. Setting it to ""false"" disables status rotation. Values: true, false")]
-    public bool RotateStatus { get; set; } = false;
-
-    /// <summary>
     /// Defines whether commands are case sensitive or not.
     /// </summary>
     [YamlMember(Description = @"Defines whether commands are case sensitive or not. Defaults to ""true"". Values: true, false")]
@@ -125,12 +89,6 @@ public sealed class BotConfig
     /// </summary>
     [YamlMember(Description = @"Defines the message cache size for every Discord client. Defaults to ""200"".")]
     public int MessageSizeCache { get; set; } = 200;
-
-    /// <summary>
-    /// Defines the minimum amount of time that guilds are allowed to set automatic expirations of warnings.
-    /// </summary>
-    [YamlMember(Description = @"Defines the minimum amount of time that guilds are allowed to set automatic expirations of warnings. Defaults to ""30.00:00:00"".")]
-    public TimeSpan MinWarnExpire { get; set; } = TimeSpan.FromDays(30);
 
     /// <summary>
     /// Defines the maximum amount of time that an interactive command waits for user input.
@@ -148,4 +106,11 @@ public sealed class BotConfig
         get => _defaultHelpMessage;
         set => _defaultHelpMessage = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
     }
+
+    /// <summary>
+    /// Defines the Id of the guild to be used for debugging the bot.
+    /// </summary>
+    /// <remarks>The value is 0 if no guild should be defined for debugging.</remarks>
+    [YamlMember(Description = @"Defines the Id of the Discord server to be used for debugging the bot. Defaults to ""0"" for no debug server.")]
+    public ulong DebugGuildId { get; set; } = 0;
 }

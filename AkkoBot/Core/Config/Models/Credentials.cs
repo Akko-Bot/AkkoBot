@@ -1,5 +1,3 @@
-using ConcurrentCollections;
-
 namespace AkkoBot.Core.Config.Models;
 
 /// <summary>
